@@ -1,0 +1,108 @@
+package handler
+
+import (
+	"errors"
+	"net/http"
+	"os"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/Tencent/WeKnora/internal/config"
+	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Tencent/WeKnora/internal/types/interfaces"
+)
+
+// TestDataHandler handles HTTP requests related to test data operations
+// Used for development and testing purposes to provide sample data
+type TestDataHandler struct {
+	config        *config.Config
+	kbService     interfaces.KnowledgeBaseService
+	tenantService interfaces.TenantService
+}
+
+// NewTestDataHandler creates a new instance of the test data handler
+// Parameters:
+//   - config: Application configuration instance
+//   - kbService: Knowledge base service for accessing knowledge base data
+//   - tenantService: Tenant service for accessing tenant data
+//
+// Returns a pointer to the new TestDataHandler instance
+func NewTestDataHandler(
+	config *config.Config,
+	kbService interfaces.KnowledgeBaseService,
+	tenantService interfaces.TenantService,
+) *TestDataHandler {
+	return &TestDataHandler{
+		config:        config,
+		kbService:     kbService,
+		tenantService: tenantService,
+	}
+}
+
+// GetTestData handles the HTTP request to retrieve test data for development purposes
+// It returns predefined test tenant and knowledge base information
+// This endpoint is only available in non-production environments
+// Parameters:
+//   - c: Gin context for the HTTP request
+func (h *TestDataHandler) GetTestData(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	logger.Info(ctx, "Start retrieving test data")
+
+	// Check if we're running in release/production mode
+	if gin.Mode() == gin.ReleaseMode {
+		logger.Warn(ctx, "Attempting to retrieve test data in production mode")
+		c.Error(errors.New("This API is only available in development mode"))
+		return
+	}
+
+	// Check if test data environment variables are configured
+	if os.Getenv("INIT_TEST_TENANT_ID") == "" || os.Getenv("INIT_TEST_KNOWLEDGE_BASE_ID") == "" {
+		logger.Warn(ctx, "Test data environment variables not set")
+		c.Error(errors.New("Test data not enabled"))
+		return
+	}
+
+	tenantID := os.Getenv("INIT_TEST_TENANT_ID")
+	logger.Debugf(ctx, "Test tenant ID environment variable: %s", tenantID)
+
+	tenantIDUint, err := strconv.ParseUint(tenantID, 10, 64)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to parse tenant ID: %s", tenantID)
+		c.Error(err)
+		return
+	}
+
+	// Retrieve the test tenant data
+	logger.Infof(ctx, "Retrieving test tenant, ID: %d", tenantIDUint)
+	tenant, err := h.tenantService.GetTenantByID(ctx, uint(tenantIDUint))
+	if err != nil {
+		logger.ErrorWithFields(ctx, err, nil)
+		c.Error(err)
+		return
+	}
+
+	knowledgeBaseID := os.Getenv("INIT_TEST_KNOWLEDGE_BASE_ID")
+	logger.Debugf(ctx, "Test knowledge base ID environment variable: %s", knowledgeBaseID)
+
+	// Retrieve the test knowledge base data
+	logger.Infof(ctx, "Retrieving test knowledge base, ID: %s", knowledgeBaseID)
+	knowledgeBase, err := h.kbService.GetKnowledgeBaseByID(ctx, knowledgeBaseID)
+	if err != nil {
+		logger.ErrorWithFields(ctx, err, nil)
+		c.Error(err)
+		return
+	}
+
+	logger.Info(ctx, "Test data retrieved successfully")
+	// Return the test data in the response
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"tenant":          tenant,
+			"knowledge_bases": []types.KnowledgeBase{*knowledgeBase},
+		},
+		"success": true,
+	})
+}

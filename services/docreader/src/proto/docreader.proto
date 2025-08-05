@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package docreader;
+
+option go_package = "github.com/Tencent/WeKnora/internal/docreader/proto";
+
+// 文档读取服务
+service DocReader {
+  // 从文件读取文档
+  rpc ReadFromFile(ReadFromFileRequest) returns (ReadResponse) {}
+  // 从URL读取文档
+  rpc ReadFromURL(ReadFromURLRequest) returns (ReadResponse) {}
+}
+
+message ReadConfig {
+  int32 chunk_size = 1;    // 分块大小
+  int32 chunk_overlap = 2; // 分块重叠
+  repeated string separators = 3;    // 分隔符
+  bool enable_multimodal = 4; // 多模态处理
+}
+
+// 从文件读取文档请求
+message ReadFromFileRequest {
+  bytes file_content = 1;  // 文件内容
+  string file_name = 2;    // 文件名
+  string file_type = 3;    // 文件类型
+  ReadConfig read_config = 4; 
+  string request_id = 5;
+}
+
+// 从URL读取文档请求
+message ReadFromURLRequest {
+  string url = 1;          // 文档URL
+  string title = 2;        // 标题
+  ReadConfig read_config = 3; 
+  string request_id = 4;
+}
+
+// 图片信息
+message Image {
+  string url = 1;           // 图片URL
+  string caption = 2;       // 图片描述
+  string ocr_text = 3;      // OCR提取的文本内容
+  string original_url = 4;  // 原始图片URL
+  int32 start = 5;          // 图片在文本中的开始位置
+  int32 end = 6;            // 图片在文本中的结束位置
+}
+
+message Chunk {
+  string content = 1;     // 块内容
+  int32 seq = 2;          // 块在文档中的次序
+  int32 start = 3;        // 块在文档中的起始位置
+  int32 end = 4;          // 块在文档中的结束位置
+  repeated Image images = 5; // 块中包含的图片信息
+}
+
+// 从URL读取文档响应
+message ReadResponse {
+  repeated Chunk chunks = 1; // 文档分块
+  string error = 2;          // 错误信息
+} 
