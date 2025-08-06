@@ -115,12 +115,27 @@ class CaptionChatResp:
             A parsed CaptionChatResp object
         """
         logger.info("Parsing CaptionChatResp from JSON")
-        # Manually parse nested fields
-        choices = [
-            Choice(message=Message(**choice["message"]))
-            for choice in json_data.get("choices", [])
-        ]
-        usage = Usage(**json_data["usage"]) if "usage" in json_data else None
+        # Manually parse nested fields with safe field extraction
+        choices = []
+        for choice in json_data.get("choices", []):
+            message_data = choice.get("message", {})
+            message = Message(
+                role=message_data.get("role"),
+                content=message_data.get("content"),
+                tool_calls=message_data.get("tool_calls"),
+            )
+            choices.append(Choice(message=message))
+
+        # Handle usage with safe field extraction
+        usage_data = json_data.get("usage", {})
+        usage = None
+        if usage_data:
+            usage = Usage(
+                prompt_tokens=usage_data.get("prompt_tokens", 0),
+                total_tokens=usage_data.get("total_tokens", 0),
+                completion_tokens=usage_data.get("completion_tokens", 0),
+            )
+
         logger.info(
             f"Parsed {len(choices)} choices and usage data: {usage is not None}"
         )
