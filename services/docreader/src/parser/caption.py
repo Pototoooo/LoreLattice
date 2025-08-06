@@ -183,7 +183,9 @@ class Caption:
             role="user",
             content=[
                 Content(type="text", text=self.prompt),
-                Content(type="image_url", image_url=ImageUrl(url=image_url)),
+                Content(
+                    type="image_url", image_url=ImageUrl(url=image_url, detail="auto")
+                ),
             ],
         )
 
