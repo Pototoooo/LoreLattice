@@ -177,6 +177,7 @@ class Caption:
             return
         self.completion_url = os.getenv("VLM_MODEL_BASE_URL") + "/v1/chat/completions"
         self.model = os.getenv("VLM_MODEL_NAME")
+        self.api_key = os.getenv("VLM_MODEL_API_KEY")
         logger.info(
             f"Service configured with model: {self.model}, endpoint: {self.completion_url}"
         )
@@ -218,6 +219,8 @@ class Caption:
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
         }
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
 
         try:
             logger.info(f"Sending request to Caption API with model: {self.model}")
