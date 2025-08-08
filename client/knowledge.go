@@ -76,7 +76,7 @@ var ErrDuplicateFile = errors.New("file already exists")
 
 // CreateKnowledgeFromFile creates a knowledge entry from a local file path
 func (c *Client) CreateKnowledgeFromFile(ctx context.Context,
-	knowledgeBaseID string, filePath string, metadata map[string]string,
+	knowledgeBaseID string, filePath string, metadata map[string]string, enableMultimodel *bool,
 ) (*Knowledge, error) {
 	// Open the local file
 	file, err := os.Open(filePath)
@@ -110,6 +110,13 @@ func (c *Client) CreateKnowledgeFromFile(ctx context.Context,
 	_, err = io.Copy(part, file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to copy file content: %w", err)
+	}
+
+	// Add enable_multimodel field
+	if enableMultimodel != nil {
+		if err := writer.WriteField("enable_multimodel", strconv.FormatBool(*enableMultimodel)); err != nil {
+			return nil, fmt.Errorf("failed to write enable_multimodel field: %w", err)
+		}
 	}
 
 	// Add metadata to the request if provided
@@ -162,13 +169,15 @@ func (c *Client) CreateKnowledgeFromFile(ctx context.Context,
 }
 
 // CreateKnowledgeFromURL creates a knowledge entry from a web URL
-func (c *Client) CreateKnowledgeFromURL(ctx context.Context, knowledgeBaseID string, url string) (*Knowledge, error) {
+func (c *Client) CreateKnowledgeFromURL(ctx context.Context, knowledgeBaseID string, url string, enableMultimodel *bool) (*Knowledge, error) {
 	path := fmt.Sprintf("/api/v1/knowledge-bases/%s/knowledge/url", knowledgeBaseID)
 
 	reqBody := struct {
-		URL string `json:"url"`
+		URL              string `json:"url"`
+		EnableMultimodel *bool  `json:"enable_multimodel"`
 	}{
-		URL: url,
+		URL:              url,
+		EnableMultimodel: enableMultimodel,
 	}
 
 	resp, err := c.doRequest(ctx, http.MethodPost, path, reqBody, nil)

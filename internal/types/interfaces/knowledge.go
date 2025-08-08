@@ -16,9 +16,10 @@ type KnowledgeService interface {
 		kbID string,
 		file *multipart.FileHeader,
 		metadata map[string]string,
+		enableMultimodel *bool,
 	) (*types.Knowledge, error)
 	// CreateKnowledgeFromURL creates knowledge from a URL.
-	CreateKnowledgeFromURL(ctx context.Context, kbID string, url string) (*types.Knowledge, error)
+	CreateKnowledgeFromURL(ctx context.Context, kbID string, url string, enableMultimodel *bool) (*types.Knowledge, error)
 	// CreateKnowledgeFromPassage creates knowledge from text passages.
 	CreateKnowledgeFromPassage(ctx context.Context, kbID string, passage []string) (*types.Knowledge, error)
 	// GetKnowledgeByID retrieves knowledge by ID.
