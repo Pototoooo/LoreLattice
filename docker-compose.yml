@@ -100,6 +100,7 @@ services:
       - COS_ENABLE_OLD_DOMAIN=${COS_ENABLE_OLD_DOMAIN}
       - VLM_MODEL_BASE_URL=${VLM_MODEL_BASE_URL}
       - VLM_MODEL_NAME=${VLM_MODEL_NAME}
+      - VLM_MODEL_API_KEY=${VLM_MODEL_API_KEY}
     networks:
       - WeKnora-network
     restart: unless-stopped
