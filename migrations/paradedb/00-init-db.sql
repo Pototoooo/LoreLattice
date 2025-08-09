@@ -27,7 +27,7 @@ CREATE INDEX IF NOT EXISTS idx_tenants_status ON tenants(status);
 
 -- Create model table
 CREATE TABLE IF NOT EXISTS models (
-    id VARCHAR(36) PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id VARCHAR(64) PRIMARY KEY DEFAULT uuid_generate_v4(),
     tenant_id INTEGER NOT NULL,
     name VARCHAR(255) NOT NULL,
     type VARCHAR(50) NOT NULL,
@@ -53,8 +53,8 @@ CREATE TABLE IF NOT EXISTS knowledge_bases (
     tenant_id INTEGER NOT NULL,
     chunking_config JSONB NOT NULL DEFAULT '{"chunk_size": 512, "chunk_overlap": 50, "split_markers": ["\n\n", "\n", "。"], "keep_separator": true}',
     image_processing_config JSONB NOT NULL DEFAULT '{"enable_multimodal": false, "model_id": ""}',
-    embedding_model_id VARCHAR(36) NOT NULL,
-    summary_model_id VARCHAR(36) NOT NULL,
+    embedding_model_id VARCHAR(64) NOT NULL,
+    summary_model_id VARCHAR(64) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP WITH TIME ZONE
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS knowledges (
     source VARCHAR(128) NOT NULL,
     parse_status VARCHAR(50) NOT NULL DEFAULT 'unprocessed',
     enable_status VARCHAR(50) NOT NULL DEFAULT 'enabled',
-    embedding_model_id VARCHAR(36),
+    embedding_model_id VARCHAR(64),
     file_name VARCHAR(255),
     file_type VARCHAR(50),
     file_size BIGINT,
@@ -108,11 +108,11 @@ CREATE TABLE IF NOT EXISTS sessions (
     fallback_response TEXT NOT NULL DEFAULT '很抱歉，我暂时无法回答这个问题。',
     keyword_threshold FLOAT NOT NULL DEFAULT 0.5,
     vector_threshold FLOAT NOT NULL DEFAULT 0.5,
-    rerank_model_id VARCHAR(36),
+    rerank_model_id VARCHAR(64),
     embedding_top_k INTEGER NOT NULL DEFAULT 10,
     rerank_top_k INTEGER NOT NULL DEFAULT 10,
     rerank_threshold FLOAT NOT NULL DEFAULT 0.65,
-    summary_model_id VARCHAR(36),
+    summary_model_id VARCHAR(64),
     summary_parameters JSONB NOT NULL DEFAULT '{}',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

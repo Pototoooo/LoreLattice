@@ -22,7 +22,7 @@ CREATE TABLE tenants (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE models (
-    id VARCHAR(36) PRIMARY KEY,
+    id VARCHAR(64) PRIMARY KEY,
     tenant_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     type VARCHAR(50) NOT NULL,
@@ -45,8 +45,8 @@ CREATE TABLE knowledge_bases (
     tenant_id INT NOT NULL,
     chunking_config JSON NOT NULL,
     image_processing_config JSON NOT NULL,
-    embedding_model_id VARCHAR(36) NOT NULL,
-    summary_model_id VARCHAR(36) NOT NULL,
+    embedding_model_id VARCHAR(64) NOT NULL,
+    summary_model_id VARCHAR(64) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL DEFAULT NULL
@@ -64,7 +64,7 @@ CREATE TABLE knowledges (
     source VARCHAR(128) NOT NULL,
     parse_status VARCHAR(50) NOT NULL DEFAULT 'unprocessed',
     enable_status VARCHAR(50) NOT NULL DEFAULT 'enabled',
-    embedding_model_id VARCHAR(36),
+    embedding_model_id VARCHAR(64),
     file_name VARCHAR(255),
     file_type VARCHAR(50),
     file_size BIGINT,
@@ -93,11 +93,11 @@ CREATE TABLE sessions (
     fallback_response VARCHAR(255) NOT NULL DEFAULT '很抱歉，我暂时无法回答这个问题。',
     keyword_threshold FLOAT NOT NULL DEFAULT 0.5,
     vector_threshold FLOAT NOT NULL DEFAULT 0.5,
-    rerank_model_id VARCHAR(36),
+    rerank_model_id VARCHAR(64),
     embedding_top_k INTEGER NOT NULL DEFAULT 10,
     rerank_top_k INTEGER NOT NULL DEFAULT 10,
     rerank_threshold FLOAT NOT NULL DEFAULT 0.65,
-    summary_model_id VARCHAR(36),
+    summary_model_id VARCHAR(64),
     summary_parameters JSON NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
