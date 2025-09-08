@@ -14,6 +14,9 @@
     <a href="https://github.com/Tencent/WeKnora/blob/main/LICENSE">
         <img src="https://img.shields.io/badge/License-MIT-ffffff?labelColor=d4eaf7&color=2e6cc4" alt="License">
     </a>
+    <a href="./CHANGELOG.md">
+        <img alt="版本" src="https://img.shields.io/badge/version-0.1.0-2e6cc4?labelColor=d4eaf7">
+    </a>
 </p>
 
 <p align="center">
