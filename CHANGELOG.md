@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2025-01-27
+
+- Fixed health check implementation for docreader service
+- Improved query handling for empty queries
+- Enhanced knowledge base column value update methods
+- Optimized logging throughout the application
+- Added process parsing documentation for markdown files
+- Fixed OCR model pre-fetching in Docker containers
+- Resolved image parser concurrency errors
+- Added support for modifying listening port configuration
+
 ## [0.1.0] - 2025-09-08
 
 - Initial public release of WeKnora.
@@ -14,4 +25,5 @@ All notable changes to this project will be documented in this file.
 - Docker Compose for quick startup and service orchestration.
 - MCP server support for integrating with MCP-compatible clients.
 
+[0.1.2]: https://github.com/Tencent/WeKnora/tree/v0.1.2
 [0.1.0]: https://github.com/Tencent/WeKnora/tree/v0.1.0
