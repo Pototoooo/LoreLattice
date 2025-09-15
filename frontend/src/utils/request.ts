@@ -2,26 +2,8 @@
 import axios from "axios";
 import { generateRandomString } from "./index";
 
-// 从localStorage获取设置
-function getSettings() {
-  const settingsStr = localStorage.getItem("WeKnora_settings");
-  if (settingsStr) {
-    try {
-      return JSON.parse(settingsStr);
-    } catch (e) {
-      console.error("解析设置失败:", e);
-    }
-  }
-  return {
-    endpoint: import.meta.env.VITE_IS_DOCKER ? "" : "http://localhost:8080",
-    apiKey: "",
-    knowledgeBaseId: "",
-  };
-}
-
-// API基础URL，优先使用设置中的endpoint
-const settings = getSettings();
-const BASE_URL = settings.endpoint;
+// API基础URL
+const BASE_URL = import.meta.env.VITE_IS_DOCKER ? "" : "http://localhost:8080";
 
 // 测试数据
 let testData: {
@@ -50,13 +32,6 @@ const instance = axios.create({
 // 设置测试数据
 export function setTestData(data: typeof testData) {
   testData = data;
-  if (data) {
-    // 优先使用设置中的ApiKey，如果没有则使用测试数据中的
-    const apiKey = settings.apiKey || (data?.tenant?.api_key || "");
-    if (apiKey) {
-      instance.defaults.headers["X-API-Key"] = apiKey;
-    }
-  }
 }
 
 // 获取测试数据
@@ -66,24 +41,37 @@ export function getTestData() {
 
 instance.interceptors.request.use(
   (config) => {
-    // 每次请求前检查是否有更新的设置
-    const currentSettings = getSettings();
-    
-    // 更新BaseURL (如果有变化)
-    if (currentSettings.endpoint && config.baseURL !== currentSettings.endpoint) {
-      config.baseURL = currentSettings.endpoint;
-    }
-    
-    // 更新API Key (如果有)
-    if (currentSettings.apiKey) {
-      config.headers["X-API-Key"] = currentSettings.apiKey;
+    // 添加JWT token认证
+    const token = localStorage.getItem('weknora_token');
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
     
     config.headers["X-Request-ID"] = `${generateRandomString(12)}`;
     return config;
   },
-  (error) => {}
+  (error) => {
+    return Promise.reject(error);
+  }
 );
+
+// Token刷新标志，防止多个请求同时刷新token
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: Function; reject: Function }> = [];
+let hasRedirectedOn401 = false;
+
+// 处理队列中的请求
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(token);
+    }
+  });
+  
+  failedQueue = [];
+};
 
 instance.interceptors.response.use(
   (response) => {
@@ -95,12 +83,98 @@ instance.interceptors.response.use(
       return Promise.reject(data);
     }
   },
-  (error: any) => {
+  async (error: any) => {
+    const originalRequest = error.config;
+    
     if (!error.response) {
       return Promise.reject({ message: "网络错误，请检查您的网络连接" });
     }
-    const { data } = error.response;
-    return Promise.reject(data);
+    
+    // 如果是登录接口的401，直接返回错误以便页面展示toast，不做跳转
+    if (error.response.status === 401 && originalRequest?.url?.includes('/auth/login')) {
+      const { status, data } = error.response;
+      return Promise.reject({ status, message: (typeof data === 'object' ? data?.message : data) || '用户名或密码错误' });
+    }
+
+    // 如果是401错误且不是刷新token的请求，尝试刷新token
+    if (error.response.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
+      if (isRefreshing) {
+        // 如果正在刷新token，将请求加入队列
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers['Authorization'] = 'Bearer ' + token;
+          return instance(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+      
+      originalRequest._retry = true;
+      isRefreshing = true;
+      
+      const refreshToken = localStorage.getItem('weknora_refresh_token');
+      
+      if (refreshToken) {
+        try {
+          // 动态导入refresh token API
+          const { refreshToken: refreshTokenAPI } = await import('../api/auth/index');
+          const response = await refreshTokenAPI(refreshToken);
+          
+          if (response.success && response.data) {
+            const { token, refreshToken: newRefreshToken } = response.data;
+            
+            // 更新localStorage中的token
+            localStorage.setItem('weknora_token', token);
+            localStorage.setItem('weknora_refresh_token', newRefreshToken);
+            
+            // 更新请求头
+            originalRequest.headers['Authorization'] = 'Bearer ' + token;
+            
+            // 处理队列中的请求
+            processQueue(null, token);
+            
+            return instance(originalRequest);
+          } else {
+            throw new Error(response.message || 'Token刷新失败');
+          }
+        } catch (refreshError) {
+          // 刷新失败，清除所有token并跳转到登录页
+          localStorage.removeItem('weknora_token');
+          localStorage.removeItem('weknora_refresh_token');
+          localStorage.removeItem('weknora_user');
+          localStorage.removeItem('weknora_tenant');
+          
+          processQueue(refreshError, null);
+          
+          // 跳转到登录页
+          if (!hasRedirectedOn401 && typeof window !== 'undefined') {
+            hasRedirectedOn401 = true;
+            window.location.href = '/login';
+          }
+          
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
+      } else {
+        // 没有refresh token，直接跳转到登录页
+        localStorage.removeItem('weknora_token');
+        localStorage.removeItem('weknora_user');
+        localStorage.removeItem('weknora_tenant');
+        
+        if (!hasRedirectedOn401 && typeof window !== 'undefined') {
+          hasRedirectedOn401 = true;
+          window.location.href = '/login';
+        }
+        
+        return Promise.reject({ message: '请重新登录' });
+      }
+    }
+    
+    const { status, data } = error.response;
+    // 将HTTP状态码一并抛出，方便上层判断401等场景
+    return Promise.reject({ status, ...(typeof data === 'object' ? data : { message: data }) });
   }
 );
 

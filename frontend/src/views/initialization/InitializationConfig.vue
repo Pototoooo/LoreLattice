@@ -17,6 +17,10 @@
                             <span class="dot" />{{ s.label }}
                         </li>
                     </ul>
+                    <t-divider />
+                    <t-button size="small" variant="outline" theme="danger" block @click="handleLogout">
+                        退出登录
+                    </t-button>
                 </div>
             </aside>
             <div class="init-main">
@@ -780,8 +784,10 @@ import {
     listOllamaModels,
     testEmbeddingModel
  } from '@/api/initialization';
+import { useAuthStore } from '@/stores/auth';
 
 const router = useRouter();
+const authStore = useAuthStore();
 type TFormRef = {
     validate: (fields?: string[] | undefined) => Promise<true | any>;
     clearValidate?: (fields?: string | string[]) => void;
@@ -954,6 +960,12 @@ const goToSection = (id: string) => {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         activeSectionId.value = id;
     }
+};
+
+// 退出登录
+const handleLogout = () => {
+    authStore.logout();
+    router.replace('/login');
 };
 
 // 监听滚动，高亮当前区块
@@ -2335,6 +2347,27 @@ const detectEmbeddingDimension = async () => {
 
 <style lang="less" scoped>
 .initialization-container {
+    padding: 20px 16px;
+    background: linear-gradient(180deg, #f7faf9 0%, #f9fbfa 60%, #ffffff 100%);
+    scroll-behavior: smooth;
+
+    .initialization-header {
+        text-align: center;
+        margin: 10px auto 18px;
+
+        h1 {
+            margin: 0 0 6px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+    }
     .init-layout {
         display: grid;
         grid-template-columns: 220px 1fr;
@@ -2419,6 +2452,30 @@ const detectEmbeddingDimension = async () => {
     .init-main { 
         min-width: 0; 
         max-width: 960px;
+    }
+    /* 统一分区卡片视觉 */
+    .config-section {
+        background: #fff;
+        border: 1px solid #eef4f0;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(7, 192, 95, 0.04);
+        padding: 16px;
+        margin: 14px 0;
+
+        h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 12px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .section-icon {
+            color: #07c05f;
+            font-size: 18px;
+        }
     }
     .ollama-summary-card {
         max-width: 100%;

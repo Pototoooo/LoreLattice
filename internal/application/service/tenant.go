@@ -18,7 +18,9 @@ import (
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
 )
 
-var apiKeySecret = []byte(os.Getenv("TENANT_AES_KEY"))
+var apiKeySecret = func() []byte {
+	return []byte(os.Getenv("TENANT_AES_KEY"))
+}
 
 // ListTenantsParams defines parameters for listing tenants with filtering and pagination
 type ListTenantsParams struct {
@@ -221,7 +223,7 @@ func (r *tenantService) generateApiKey(tenantID uint) string {
 	binary.LittleEndian.PutUint64(idBytes, uint64(tenantID))
 
 	// 2. Encrypt tenant_id using AES-GCM
-	block, err := aes.NewCipher(apiKeySecret)
+	block, err := aes.NewCipher(apiKeySecret())
 	if err != nil {
 		panic("Failed to create AES cipher: " + err.Error())
 	}
@@ -267,7 +269,7 @@ func (r *tenantService) ExtractTenantIDFromAPIKey(apiKey string) (uint, error) {
 	nonce, ciphertext := encryptedData[:12], encryptedData[12:]
 
 	// 4. Decrypt
-	block, err := aes.NewCipher(apiKeySecret)
+	block, err := aes.NewCipher(apiKeySecret())
 	if err != nil {
 		return 0, errors.New("decryption error")
 	}

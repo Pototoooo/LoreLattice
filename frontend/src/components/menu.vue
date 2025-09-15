@@ -9,7 +9,7 @@
                 :class="['menu_item', item.childrenPath && item.childrenPath == currentpath ? 'menu_item_c_active' : item.path == currentpath ? 'menu_item_active' : '']">
                 <div class="menu_item-box">
                     <div class="menu_icon">
-                        <img class="icon" :src="getImgSrc(item.icon == 'zhishiku' ? knowledgeIcon : item.icon == 'setting' ? settingIcon : prefixIcon)" alt="">
+                        <img class="icon" :src="getImgSrc(item.icon == 'zhishiku' ? knowledgeIcon : item.icon == 'setting' ? settingIcon : item.icon == 'logout' ? logoutIcon : prefixIcon)" alt="">
                     </div>
                     <span class="menu_title">{{ item.title }}</span>
                 </div>
@@ -58,11 +58,13 @@ import { onMounted, watch, computed, ref, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getSessionsList, delSession } from "@/api/chat/index";
 import { useMenuStore } from '@/stores/menu';
+import { useAuthStore } from '@/stores/auth';
 import useKnowledgeBase from '@/hooks/useKnowledgeBase';
 import { MessagePlugin } from "tdesign-vue-next";
 let { requestMethod } = useKnowledgeBase()
 let uploadInput = ref();
 const usemenuStore = useMenuStore();
+const authStore = useAuthStore();
 const route = useRoute();
 const router = useRouter();
 const currentpath = ref('');
@@ -164,12 +166,14 @@ let fileAddIcon = ref('file-add-green.svg');
 let knowledgeIcon = ref('zhishiku-green.svg');
 let prefixIcon = ref('prefixIcon.svg');
 let settingIcon = ref('setting.svg');
+let logoutIcon = ref('logout.svg');
 let pathPrefix = ref(route.name)
 const getIcon = (path) => {
     fileAddIcon.value = path == 'knowledgeBase' ? 'file-add-green.svg' : 'file-add.svg';
     knowledgeIcon.value = path == 'knowledgeBase' ? 'zhishiku-green.svg' : 'zhishiku.svg';
     prefixIcon.value = path == 'creatChat' ? 'prefixIcon-green.svg' : path == 'knowledgeBase' ? 'prefixIcon-grey.svg' : 'prefixIcon.svg';
     settingIcon.value = path == 'settings' ? 'setting-green.svg' : 'setting.svg';
+    logoutIcon.value = 'logout.svg';
 }
 getIcon(route.name)
 const gotopage = (path) => {
@@ -177,6 +181,13 @@ const gotopage = (path) => {
     // 如果是系统设置，跳转到初始化配置页面
     if (path === 'settings') {
         router.push('/initialization');
+        return;
+    }
+    // 处理退出登录
+    if (path === 'logout') {
+        authStore.logout();
+        router.push('/login');
+        return;
     } else {
         router.push(`/platform/${path}`);
     }
