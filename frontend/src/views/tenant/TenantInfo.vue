@@ -311,11 +311,11 @@ onMounted(() => {
 .tenant-info-container {
   padding: 20px;
   background-color: #fff;
-  border-radius: 8px;
-  margin: 0 20px 20px 20px;
-  height: calc(100vh - 40px);
+  margin: 0 20px 0 20px;
+  height: calc(100vh);
   overflow-y: auto;
   box-sizing: border-box;
+  flex: 1;
 }
 
 .tenant-header {
@@ -363,7 +363,7 @@ onMounted(() => {
 .api-key-content,
 .storage-content,
 .doc-content {
-//   padding: 16px 0;
+  margin-top: 0;
 }
 
 .api-key-input {
