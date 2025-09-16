@@ -15,7 +15,7 @@
         <img src="https://img.shields.io/badge/License-MIT-ffffff?labelColor=d4eaf7&color=2e6cc4" alt="License">
     </a>
     <a href="./CHANGELOG.md">
-        <img alt="版本" src="https://img.shields.io/badge/version-0.1.0-2e6cc4?labelColor=d4eaf7">
+        <img alt="版本" src="https://img.shields.io/badge/version-0.1.3-2e6cc4?labelColor=d4eaf7">
     </a>
 </p>
 
@@ -40,6 +40,15 @@
 框架采用模块化架构，融合多模态预处理、语义向量索引、智能召回与大模型生成推理，构建起高效、可控的文档问答流程。核心检索流程基于 **RAG（Retrieval-Augmented Generation）** 机制，将上下文相关片段与语言模型结合，实现更高质量的语义回答。
 
 **官网：** https://weknora.weixin.qq.com
+
+## 🔒 安全声明
+
+**重要提示：** 从 v0.1.3 版本开始，WeKnora 提供了登录鉴权功能，以增强系统安全性。在生产环境部署时，我们强烈建议：
+
+- 将 WeKnora 服务部署在内网/私有网络环境中，而非公网环境
+- 避免将服务直接暴露在公网上，以防止重要信息泄露风险
+- 为部署环境配置适当的防火墙规则和访问控制
+- 定期更新到最新版本以获取安全补丁和改进
 
 ## 🏗️ 架构设计
 

@@ -15,7 +15,7 @@
         <img src="https://img.shields.io/badge/License-MIT-ffffff?labelColor=d4eaf7&color=2e6cc4" alt="License">
     </a>
     <a href="./CHANGELOG.md">
-        <img alt="バージョン" src="https://img.shields.io/badge/version-0.1.0-2e6cc4?labelColor=d4eaf7">
+        <img alt="バージョン" src="https://img.shields.io/badge/version-0.1.3-2e6cc4?labelColor=d4eaf7">
     </a>
 </p>
 
@@ -40,6 +40,15 @@
 フレームワークはモジュラーアーキテクチャを採用し、マルチモーダル前処理、意味ベクトルインデックス、インテリジェント検索、大規模モデル生成推論を統合して、効率的で制御可能な文書Q&Aワークフローを構築します。コア検索プロセスは **RAG（Retrieval-Augmented Generation）** メカニズムに基づいており、文脈関連フラグメントと言語モデルを組み合わせて、より高品質な意味的回答を実現します。
 
 **公式サイト：** https://weknora.weixin.qq.com
+
+## 🔒 セキュリティ通知
+
+**重要：** v0.1.3バージョンより、WeKnoraにはシステムセキュリティを強化するためのログイン認証機能が含まれています。本番環境でのデプロイメントにおいて、以下を強く推奨します：
+
+- WeKnoraサービスはパブリックインターネットではなく、内部/プライベートネットワーク環境にデプロイしてください
+- 重要な情報漏洩を防ぐため、サービスを直接パブリックネットワークに公開することは避けてください
+- デプロイメント環境に適切なファイアウォールルールとアクセス制御を設定してください
+- セキュリティパッチと改善のため、定期的に最新バージョンに更新してください
 
 ## 🏗️ アーキテクチャ設計
 
