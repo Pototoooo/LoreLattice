@@ -53,3 +53,12 @@ export async function loadTestData(): Promise<boolean> {
     return false;
   }
 } 
+
+/**
+ * 重置测试数据加载状态，在重新登录或需要强制刷新时调用
+ */
+export function resetTestDataLoaded() {
+  isTestDataLoaded = false;
+  // 清空已缓存的测试数据，确保下次调用会重新获取
+  setTestData(null);
+}

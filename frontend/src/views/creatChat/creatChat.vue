@@ -27,33 +27,7 @@ const sendMsg = (value: string) => {
 }
 
 async function createNewSession(value: string) {
-    // 从localStorage获取设置中的知识库ID
-    const settingsStr = localStorage.getItem("WeKnora_settings");
-    let knowledgeBaseId = "";
-    
-    if (settingsStr) {
-        try {
-            const settings = JSON.parse(settingsStr);
-            if (settings.knowledgeBaseId) {
-                knowledgeBaseId = settings.knowledgeBaseId;
-                createSessions({ knowledge_base_id: knowledgeBaseId }).then(res => {
-                    if (res.data && res.data.id) {
-                        getTitle(res.data.id, value);
-                    } else {
-                        // 错误处理
-                        console.error("创建会话失败");
-                    }
-                }).catch(error => {
-                    console.error("创建会话出错:", error);
-                });
-                return;
-            }
-        } catch (e) {
-            console.error("解析设置失败:", e);
-        }
-    }
-    
-    // 如果设置中没有知识库ID，则使用测试数据
+    // 使用测试数据获取知识库ID
     const testData = getTestData();
     if (!testData || testData.knowledge_bases.length === 0) {
         console.error("测试数据未初始化或不包含知识库");
@@ -61,7 +35,7 @@ async function createNewSession(value: string) {
     }
 
     // 使用第一个知识库ID
-    knowledgeBaseId = testData.knowledge_bases[0].id;
+    const knowledgeBaseId = testData.knowledge_bases[0].id;
 
     createSessions({ knowledge_base_id: knowledgeBaseId }).then(res => {
         if (res.data && res.data.id) {

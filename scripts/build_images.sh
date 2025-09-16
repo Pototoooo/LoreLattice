@@ -88,6 +88,7 @@ check_platform() {
         export TARGETARCH="amd64"
     fi
     log_info "当前平台：$PLATFORM"
+    log_info "当前架构：$TARGETARCH"
 }
 
 # 构建应用镜像

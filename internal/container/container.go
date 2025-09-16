@@ -78,6 +78,8 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(repository.NewSessionRepository))
 	must(container.Provide(repository.NewMessageRepository))
 	must(container.Provide(repository.NewModelRepository))
+	must(container.Provide(repository.NewUserRepository))
+	must(container.Provide(repository.NewAuthTokenRepository))
 
 	// Business service layer
 	must(container.Provide(service.NewTenantService))
@@ -91,6 +93,7 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(service.NewModelService))
 	must(container.Provide(service.NewDatasetService))
 	must(container.Provide(service.NewEvaluationService))
+	must(container.Provide(service.NewUserService))
 
 	// Chat pipeline components for processing chat requests
 	must(container.Provide(chatpipline.NewEventManager))
@@ -117,6 +120,7 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(handler.NewModelHandler))
 	must(container.Provide(handler.NewEvaluationHandler))
 	must(container.Provide(handler.NewInitializationHandler))
+	must(container.Provide(handler.NewAuthHandler))
 
 	// Router configuration
 	must(container.Provide(router.NewRouter))
@@ -175,6 +179,15 @@ func initDatabase(cfg *config.Config) (*gorm.DB, error) {
 	db, err := gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
 		return nil, err
+	}
+
+	// Auto-migrate database tables
+	err = db.AutoMigrate(
+		&types.User{},
+		&types.AuthToken{},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to auto-migrate database tables: %v", err)
 	}
 
 	// Get underlying SQL DB object

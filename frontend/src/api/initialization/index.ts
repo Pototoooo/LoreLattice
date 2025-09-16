@@ -70,6 +70,11 @@ export function checkInitializationStatus(): Promise<{ initialized: boolean }> {
                 resolve(response.data || { initialized: false });
             })
             .catch((error: any) => {
+                // 如果是401，交给全局拦截器去处理（重定向登录），这里不要把它当成未初始化
+                if (error && error.status === 401) {
+                    reject(error);
+                    return;
+                }
                 console.warn('检查初始化状态失败，假设需要初始化:', error);
                 resolve({ initialized: false });
             });

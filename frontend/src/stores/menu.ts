@@ -13,7 +13,8 @@ export const useMenuStore = defineStore('menuStore', {
                 childrenPath: 'chat',
                 children: reactive<object[]>([]),
             },
-            { title: '系统设置', icon: 'setting', path: 'settings' }
+            { title: '系统设置', icon: 'setting', path: 'settings' },
+            { title: '退出登录', icon: 'logout', path: 'logout' }
         ]),
         isFirstSession: false,
         firstQuery: ''

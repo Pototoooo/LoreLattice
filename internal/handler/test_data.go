@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/Tencent/WeKnora/internal/config"
+	"github.com/Tencent/WeKnora/internal/errors"
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
@@ -48,7 +49,7 @@ func (h *TestDataHandler) GetTestData(c *gin.Context) {
 
 	logger.Info(ctx, "Start retrieving test data")
 
-	tenantID := uint(types.InitDefaultTenantID)
+	tenantID := c.GetUint(types.TenantIDContextKey.String())
 	logger.Debugf(ctx, "Test tenant ID environment variable: %d", tenantID)
 
 	// Retrieve the test tenant data
@@ -60,15 +61,17 @@ func (h *TestDataHandler) GetTestData(c *gin.Context) {
 		return
 	}
 
-	knowledgeBaseID := types.InitDefaultKnowledgeBaseID
-	logger.Debugf(ctx, "Test knowledge base ID environment variable: %s", knowledgeBaseID)
-
 	// Retrieve the test knowledge base data
-	logger.Infof(ctx, "Retrieving test knowledge base, ID: %s", knowledgeBaseID)
-	knowledgeBase, err := h.kbService.GetKnowledgeBaseByID(ctx, knowledgeBaseID)
+	kbs, err := h.kbService.ListKnowledgeBases(ctx)
 	if err != nil {
 		logger.ErrorWithFields(ctx, err, nil)
 		c.Error(err)
+		return
+	}
+
+	if len(kbs) == 0 {
+		logger.Error(ctx, "No knowledge bases found")
+		c.Error(errors.NewInternalServerError("获取知识库信息失败"))
 		return
 	}
 
@@ -77,7 +80,7 @@ func (h *TestDataHandler) GetTestData(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
 			"tenant":          tenant,
-			"knowledge_bases": []types.KnowledgeBase{*knowledgeBase},
+			"knowledge_bases": kbs,
 		},
 		"success": true,
 	})
