@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.3] - 2025-01-27
+
+### 🔒 Security Features
+- **NEW**: Added login authentication functionality to enhance system security
+- Implemented user authentication and authorization mechanisms
+- Added session management and access control
+
+### 📚 Documentation Updates
+- Added security notices in all README files (English, Chinese, Japanese)
+- Updated deployment recommendations emphasizing internal/private network deployment
+- Enhanced security guidelines to prevent information leakage risks
+
+### 🛡️ Security Recommendations
+- Deploy WeKnora services in internal/private network environments
+- Avoid direct exposure to public internet
+- Configure proper firewall rules and access controls
+- Regular updates for security patches and improvements
+
 ## [0.1.2] - 2025-01-27
 
 - Fixed health check implementation for docreader service
@@ -25,5 +43,6 @@ All notable changes to this project will be documented in this file.
 - Docker Compose for quick startup and service orchestration.
 - MCP server support for integrating with MCP-compatible clients.
 
+[0.1.3]: https://github.com/Tencent/WeKnora/tree/v0.1.3
 [0.1.2]: https://github.com/Tencent/WeKnora/tree/v0.1.2
 [0.1.0]: https://github.com/Tencent/WeKnora/tree/v0.1.0

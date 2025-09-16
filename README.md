@@ -15,7 +15,7 @@
         <img src="https://img.shields.io/badge/License-MIT-ffffff?labelColor=d4eaf7&color=2e6cc4" alt="License">
     </a>
     <a href="./CHANGELOG.md">
-        <img alt="Version" src="https://img.shields.io/badge/version-0.1.0-2e6cc4?labelColor=d4eaf7">
+        <img alt="Version" src="https://img.shields.io/badge/version-0.1.3-2e6cc4?labelColor=d4eaf7">
     </a>
 </p>
 
@@ -40,6 +40,15 @@
 It adopts a modular architecture that combines multimodal preprocessing, semantic vector indexing, intelligent retrieval, and large language model inference. At its core, WeKnora follows the **RAG (Retrieval-Augmented Generation)** paradigm, enabling high-quality, context-aware answers by combining relevant document chunks with model reasoning.
 
 **Website:** https://weknora.weixin.qq.com
+
+## 🔒 Security Notice
+
+**Important:** Starting from v0.1.3, WeKnora includes login authentication functionality to enhance system security. For production deployments, we strongly recommend:
+
+- Deploy WeKnora services in internal/private network environments rather than public internet
+- Avoid exposing the service directly to public networks to prevent potential information leakage
+- Configure proper firewall rules and access controls for your deployment environment
+- Regularly update to the latest version for security patches and improvements
 
 ## 🏗️ Architecture
 
