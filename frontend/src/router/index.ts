@@ -62,9 +62,9 @@ const router = createRouter({
         {
             path: "settings",
             name: "settings",
-            component: () => import("../views/settings/Settings.vue"),
-          meta: { requiresInit: true }
-          },
+            component: () => import("../views/settings/SystemSettings.vue"),
+            meta: { requiresInit: true }
+        },
       ],
     },
   ],

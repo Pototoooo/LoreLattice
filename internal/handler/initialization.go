@@ -83,9 +83,7 @@ func NewInitializationHandler(
 
 // InitializationRequest 初始化请求结构
 type InitializationRequest struct {
-	// 前端传入的存储类型：cos 或 minio
-	StorageType string `json:"storageType"`
-	LLM         struct {
+	LLM struct {
 		Source    string `json:"source" binding:"required"`
 		ModelName string `json:"modelName" binding:"required"`
 		BaseURL   string `json:"baseUrl"`
@@ -115,7 +113,8 @@ type InitializationRequest struct {
 			APIKey        string `json:"apiKey"`
 			InterfaceType string `json:"interfaceType"` // "ollama" or "openai"
 		} `json:"vlm,omitempty"`
-		COS *struct {
+		StorageType string `json:"storageType"`
+		COS         *struct {
 			SecretID   string `json:"secretId"`
 			SecretKey  string `json:"secretKey"`
 			Region     string `json:"region"`
@@ -210,7 +209,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 
 	// 验证多模态配置
 	if req.Multimodal.Enabled {
-		storageType := strings.ToLower(req.StorageType)
+		storageType := strings.ToLower(req.Multimodal.StorageType)
 		if req.Multimodal.VLM == nil {
 			logger.Error(ctx, "Multimodal enabled but missing VLM configuration")
 			c.Error(errors.NewBadRequestError("启用多模态时需要配置VLM信息"))
@@ -502,11 +501,11 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 				InterfaceType: req.Multimodal.VLM.InterfaceType,
 			},
 		}
-		switch req.StorageType {
+		switch req.Multimodal.StorageType {
 		case "cos":
 			if req.Multimodal.COS != nil {
 				kb.StorageConfig = types.StorageConfig{
-					Provider:   req.StorageType,
+					Provider:   req.Multimodal.StorageType,
 					BucketName: req.Multimodal.COS.BucketName,
 					AppID:      req.Multimodal.COS.AppID,
 					PathPrefix: req.Multimodal.COS.PathPrefix,
@@ -518,7 +517,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 		case "minio":
 			if req.Multimodal.Minio != nil {
 				kb.StorageConfig = types.StorageConfig{
-					Provider:   req.StorageType,
+					Provider:   req.Multimodal.StorageType,
 					BucketName: req.Multimodal.Minio.BucketName,
 					PathPrefix: req.Multimodal.Minio.PathPrefix,
 					SecretID:   os.Getenv("MINIO_ACCESS_KEY_ID"),
@@ -560,11 +559,11 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 				APIKey:        req.Multimodal.VLM.APIKey,
 				InterfaceType: req.Multimodal.VLM.InterfaceType,
 			}
-			switch req.StorageType {
+			switch req.Multimodal.StorageType {
 			case "cos":
 				if req.Multimodal.COS != nil {
 					kb.StorageConfig = types.StorageConfig{
-						Provider:   req.StorageType,
+						Provider:   req.Multimodal.StorageType,
 						SecretID:   req.Multimodal.COS.SecretID,
 						SecretKey:  req.Multimodal.COS.SecretKey,
 						Region:     req.Multimodal.COS.Region,
@@ -576,7 +575,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 			case "minio":
 				if req.Multimodal.Minio != nil {
 					kb.StorageConfig = types.StorageConfig{
-						Provider:   req.StorageType,
+						Provider:   req.Multimodal.StorageType,
 						BucketName: req.Multimodal.Minio.BucketName,
 						PathPrefix: req.Multimodal.Minio.PathPrefix,
 						SecretID:   os.Getenv("MINIO_ACCESS_KEY_ID"),
