@@ -8,11 +8,30 @@ All notable changes to this project will be documented in this file.
 - **NEW**: Added login authentication functionality to enhance system security
 - Implemented user authentication and authorization mechanisms
 - Added session management and access control
+- Fixed XSS attack vulnerabilities in frontend components
 
 ### 📚 Documentation Updates
 - Added security notices in all README files (English, Chinese, Japanese)
 - Updated deployment recommendations emphasizing internal/private network deployment
 - Enhanced security guidelines to prevent information leakage risks
+- Fixed documentation spelling issues
+
+### 🛡️ Security Improvements
+- Hide API keys in UI for security purposes
+- Enhanced input sanitization and XSS protection
+- Added comprehensive security utilities
+
+### 🐛 Bug Fixes
+- Fixed OCR AVX support issues
+- Improved frontend health check dependencies
+- Enhanced Docker binary downloads for target architecture
+- Fixed COS file service initialization parameters and URL processing logic
+
+### 🚀 Features & Enhancements
+- Improved application and docreader log output
+- Enhanced frontend routing and authentication flow
+- Added comprehensive user management system
+- Improved initialization configuration handling
 
 ### 🛡️ Security Recommendations
 - Deploy WeKnora services in internal/private network environments
