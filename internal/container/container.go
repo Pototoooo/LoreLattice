@@ -229,7 +229,7 @@ func initFileService(cfg *config.Config) (interfaces.FileService, error) {
 			false,
 		)
 	case "cos":
-		if os.Getenv("COS_APP_ID") == "" ||
+		if os.Getenv("COS_BUCKET_NAME") == "" ||
 			os.Getenv("COS_REGION") == "" ||
 			os.Getenv("COS_SECRET_ID") == "" ||
 			os.Getenv("COS_SECRET_KEY") == "" ||
@@ -237,7 +237,7 @@ func initFileService(cfg *config.Config) (interfaces.FileService, error) {
 			return nil, fmt.Errorf("missing COS configuration")
 		}
 		return file.NewCosFileService(
-			os.Getenv("COS_APP_ID"),
+			os.Getenv("COS_BUCKET_NAME"),
 			os.Getenv("COS_REGION"),
 			os.Getenv("COS_SECRET_ID"),
 			os.Getenv("COS_SECRET_KEY"),

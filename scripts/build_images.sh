@@ -123,6 +123,7 @@ build_docreader_image() {
     
     docker build \
         --platform $PLATFORM \
+        --build-arg PLATFORM=$PLATFORM \
         --build-arg TARGETARCH=$TARGETARCH \
         -f docker/Dockerfile.docreader \
         -t wechatopenai/weknora-docreader:latest \
