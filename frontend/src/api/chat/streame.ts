@@ -2,21 +2,9 @@ import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { ref, type Ref, onUnmounted, nextTick } from 'vue'
 import { generateRandomString } from '@/utils/index';
 import { getTestData } from '@/utils/request';
-import { loadTestData } from '@/api/test-data';
+import { loadTestData } from "../test-data";
 
-// 从localStorage获取设置
-function getSettings() {
-  const settingsStr = localStorage.getItem("WeKnora_settings");
-  if (settingsStr) {
-    try {
-      const settings = JSON.parse(settingsStr);
-      return settings;
-    } catch (e) {
-      console.error("解析设置失败:", e);
-    }
-  }
-  return null;
-}
+
 
 interface StreamOptions {
   // 请求方法 (默认POST)
@@ -49,27 +37,16 @@ export function useStream() {
     isStreaming.value = true;
     isLoading.value = true;
 
-    // 获取设置信息
-    const settings = getSettings();
-    let apiUrl = '';
-    let apiKey = '';
-
-    // 如果有设置信息，优先使用设置信息
-    if (settings && settings.endpoint && settings.apiKey) {
-      apiUrl = settings.endpoint;
-      apiKey = settings.apiKey;
-    } else {
-      // 否则加载测试数据
-      await loadTestData();
-      const testData = getTestData();
-      if (!testData) {
-        error.value = "测试数据未初始化，无法进行聊天";
-        stopStream();
-        return;
-      }
-      apiUrl = import.meta.env.VITE_IS_DOCKER ? "" : "http://localhost:8080";
-      apiKey = testData.tenant.api_key;
+    // 使用默认配置
+    await loadTestData();
+    const testData = getTestData();
+    if (!testData) {
+      error.value = "测试数据未初始化，无法进行聊天";
+      stopStream();
+      return;
     }
+    const apiUrl = import.meta.env.VITE_IS_DOCKER ? "" : "http://localhost:8080";
+    const apiKey = testData.tenant.api_key;
 
     try {
       let url =

@@ -141,8 +141,10 @@ func (h *InitializationHandler) CheckStatus(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger.Info(ctx, "Checking system initialization status")
 
+	tenantID := ctx.Value(types.TenantIDContextKey).(uint)
+
 	// 检查是否存在租户
-	tenant, err := h.tenantService.GetTenantByID(ctx, types.InitDefaultTenantID)
+	tenant, err := h.tenantService.GetTenantByID(ctx, tenantID)
 	if err != nil {
 		logger.ErrorWithFields(ctx, err, nil)
 		c.JSON(http.StatusOK, gin.H{
@@ -165,7 +167,6 @@ func (h *InitializationHandler) CheckStatus(c *gin.Context) {
 		})
 		return
 	}
-	ctx = context.WithValue(ctx, types.TenantIDContextKey, types.InitDefaultTenantID)
 
 	// 检查是否存在模型
 	models, err := h.modelService.ListModels(ctx)
@@ -198,6 +199,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	logger.Info(ctx, "Starting system initialization")
+	tenantID := ctx.Value(types.TenantIDContextKey).(uint)
 
 	var req InitializationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -263,63 +265,16 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 	}
 	var err error
 	// 1. 处理租户 - 检查是否存在，不存在则创建
-	tenant, _ := h.tenantService.GetTenantByID(ctx, types.InitDefaultTenantID)
+	tenant, _ := h.tenantService.GetTenantByID(ctx, tenantID)
 	if tenant == nil {
 		logger.Info(ctx, "Tenant not found, creating tenant")
-		// 创建默认租户
-		tenant = &types.Tenant{
-			ID:          types.InitDefaultTenantID,
-			Name:        "Default Tenant",
-			Description: "System Default Tenant",
-			RetrieverEngines: types.RetrieverEngines{
-				Engines: []types.RetrieverEngineParams{
-					{
-						RetrieverType:       types.KeywordsRetrieverType,
-						RetrieverEngineType: types.PostgresRetrieverEngineType,
-					},
-					{
-						RetrieverType:       types.VectorRetrieverType,
-						RetrieverEngineType: types.PostgresRetrieverEngineType,
-					},
-				},
-			},
-		}
-		logger.Info(ctx, "Creating default tenant")
-		tenant, err = h.tenantService.CreateTenant(ctx, tenant)
-		if err != nil {
-			logger.ErrorWithFields(ctx, err, nil)
-			c.Error(errors.NewInternalServerError("创建租户失败: " + err.Error()))
-			return
-		}
-	} else {
-		logger.Info(ctx, "Tenant exists, updating if needed")
-		// 更新租户信息（如果需要）
-		updated := false
-		if tenant.Name != "Default Tenant" {
-			tenant.Name = "Default Tenant"
-			updated = true
-		}
-		if tenant.Description != "System Default Tenant" {
-			tenant.Description = "System Default Tenant"
-			updated = true
-		}
-
-		if updated {
-			_, err = h.tenantService.UpdateTenant(ctx, tenant)
-			if err != nil {
-				logger.ErrorWithFields(ctx, err, nil)
-				c.Error(errors.NewInternalServerError("更新租户失败: " + err.Error()))
-				return
-			}
-			logger.Info(ctx, "Tenant updated successfully")
-		}
+		err = errors.NewInternalServerError("Failed to get tenant")
+		c.Error(err)
+		return
 	}
 
-	// 创建带有租户ID的新上下文
-	newCtx := context.WithValue(ctx, types.TenantIDContextKey, types.InitDefaultTenantID)
-
 	// 2. 处理模型 - 检查现有模型并更新或创建
-	existingModels, err := h.modelService.ListModels(newCtx)
+	existingModels, err := h.modelService.ListModels(ctx)
 	if err != nil {
 		logger.ErrorWithFields(ctx, err, nil)
 		// 如果获取失败，继续执行创建流程
@@ -424,7 +379,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 			existingModel.IsDefault = true
 			existingModel.Status = types.ModelStatusActive
 
-			err := h.modelService.UpdateModel(newCtx, existingModel)
+			err := h.modelService.UpdateModel(ctx, existingModel)
 			if err != nil {
 				logger.ErrorWithFields(ctx, err, map[string]interface{}{
 					"model_name": modelConfig.name,
@@ -441,7 +396,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 				modelConfig.name, modelConfig.modelType,
 			)
 			newModel := &types.Model{
-				TenantID:    types.InitDefaultTenantID,
+				TenantID:    tenantID,
 				Name:        modelConfig.name,
 				Type:        modelConfig.modelType,
 				Source:      modelConfig.source,
@@ -457,7 +412,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 				Status:    types.ModelStatusActive,
 			}
 
-			err := h.modelService.CreateModel(newCtx, newModel)
+			err := h.modelService.CreateModel(ctx, newModel)
 			if err != nil {
 				logger.ErrorWithFields(ctx, err, map[string]interface{}{
 					"model_name": modelConfig.name,
@@ -474,7 +429,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 	if !req.Multimodal.Enabled {
 		if existingVLM, exists := modelMap[types.ModelTypeVLLM]; exists {
 			logger.Info(ctx, "Deleting VLM model as multimodal is disabled")
-			err := h.modelService.DeleteModel(newCtx, existingVLM.ID)
+			err := h.modelService.DeleteModel(ctx, existingVLM.ID)
 			if err != nil {
 				logger.ErrorWithFields(ctx, err, map[string]interface{}{
 					"model_id": existingVLM.ID,
@@ -489,7 +444,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 	if !req.Rerank.Enabled {
 		if existingRerank, exists := modelMap[types.ModelTypeRerank]; exists {
 			logger.Info(ctx, "Deleting Rerank model as rerank is disabled")
-			err := h.modelService.DeleteModel(newCtx, existingRerank.ID)
+			err := h.modelService.DeleteModel(ctx, existingRerank.ID)
 			if err != nil {
 				logger.ErrorWithFields(ctx, err, map[string]interface{}{
 					"model_id": existingRerank.ID,
@@ -501,7 +456,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 	}
 
 	// 3. 处理知识库 - 检查是否存在，不存在则创建，存在则更新
-	kb, err := h.kbService.GetKnowledgeBaseByID(newCtx, types.InitDefaultKnowledgeBaseID)
+	kbs, err := h.kbService.ListKnowledgeBases(ctx)
 
 	// 找到embedding模型ID和LLM模型ID
 	var embeddingModelID, llmModelID, rerankModelID, vlmModelID string
@@ -520,14 +475,16 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 		}
 	}
 
-	if kb == nil {
+	var kb *types.KnowledgeBase
+
+	if len(kbs) == 0 {
 		// 创建新知识库
 		logger.Info(ctx, "Creating default knowledge base")
 		kb = &types.KnowledgeBase{
-			ID:          types.InitDefaultKnowledgeBaseID,
+			ID:          uuid.New().String(),
 			Name:        "Default Knowledge Base",
 			Description: "System Default Knowledge Base",
-			TenantID:    types.InitDefaultTenantID,
+			TenantID:    tenantID,
 			ChunkingConfig: types.ChunkingConfig{
 				ChunkSize:        req.DocumentSplitting.ChunkSize,
 				ChunkOverlap:     req.DocumentSplitting.ChunkOverlap,
@@ -570,7 +527,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 			}
 		}
 
-		_, err = h.kbService.CreateKnowledgeBase(newCtx, kb)
+		_, err = h.kbService.CreateKnowledgeBase(ctx, kb)
 		if err != nil {
 			logger.ErrorWithFields(ctx, err, nil)
 			c.Error(errors.NewInternalServerError("创建知识库失败: " + err.Error()))
@@ -579,10 +536,11 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 	} else {
 		// 更新现有知识库
 		logger.Info(ctx, "Updating existing knowledge base")
+		kb = kbs[0]
 
 		// 检查是否有文件，如果有文件则不允许修改Embedding模型
 		knowledgeList, err := h.knowledgeService.ListKnowledgeByKnowledgeBaseID(
-			newCtx, types.InitDefaultKnowledgeBaseID,
+			ctx, kb.ID,
 		)
 		hasFiles := err == nil && len(knowledgeList) > 0
 
@@ -643,7 +601,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 		}
 
 		// 更新基本信息和配置
-		err = h.kbRepository.UpdateKnowledgeBase(newCtx, kb)
+		err = h.kbRepository.UpdateKnowledgeBase(ctx, kb)
 		if err != nil {
 			logger.ErrorWithFields(ctx, err, nil)
 			c.Error(errors.NewInternalServerError("更新知识库配置失败: " + err.Error()))
@@ -653,7 +611,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 		// 如果需要更新模型ID，使用repository直接更新
 		if !hasFiles || kb.SummaryModelID != llmModelID {
 			// 刷新知识库对象以获取最新信息
-			kb, err = h.kbService.GetKnowledgeBaseByID(newCtx, types.InitDefaultKnowledgeBaseID)
+			kb, err = h.kbService.GetKnowledgeBaseByID(ctx, kb.ID)
 			if err != nil {
 				logger.ErrorWithFields(ctx, err, nil)
 				c.Error(errors.NewInternalServerError("获取更新后的知识库失败: " + err.Error()))
@@ -669,7 +627,7 @@ func (h *InitializationHandler) Initialize(c *gin.Context) {
 			}
 
 			// 使用repository直接更新模型ID
-			err = h.kbRepository.UpdateKnowledgeBase(newCtx, kb)
+			err = h.kbRepository.UpdateKnowledgeBase(ctx, kb)
 			if err != nil {
 				logger.ErrorWithFields(ctx, err, nil)
 				c.Error(errors.NewInternalServerError("更新知识库模型ID失败: " + err.Error()))
@@ -1078,11 +1036,8 @@ func (h *InitializationHandler) GetCurrentConfig(c *gin.Context) {
 
 	logger.Info(ctx, "Getting current system configuration")
 
-	// 设置租户上下文
-	newCtx := context.WithValue(ctx, types.TenantIDContextKey, types.InitDefaultTenantID)
-
 	// 获取模型信息
-	models, err := h.modelService.ListModels(newCtx)
+	models, err := h.modelService.ListModels(ctx)
 	if err != nil {
 		logger.ErrorWithFields(ctx, err, nil)
 		c.Error(errors.NewInternalServerError("获取模型列表失败: " + err.Error()))
@@ -1090,16 +1045,24 @@ func (h *InitializationHandler) GetCurrentConfig(c *gin.Context) {
 	}
 
 	// 获取知识库信息
-	kb, err := h.kbService.GetKnowledgeBaseByID(newCtx, types.InitDefaultKnowledgeBaseID)
+	kbs, err := h.kbService.ListKnowledgeBases(ctx)
 	if err != nil {
 		logger.ErrorWithFields(ctx, err, nil)
 		c.Error(errors.NewInternalServerError("获取知识库信息失败: " + err.Error()))
 		return
 	}
 
+	if len(kbs) == 0 {
+		logger.Error(ctx, "No knowledge bases found")
+		c.Error(errors.NewInternalServerError("获取知识库信息失败"))
+		return
+	}
+
+	kb := kbs[0]
+
 	// 检查知识库是否有文件
-	knowledgeList, err := h.knowledgeService.ListPagedKnowledgeByKnowledgeBaseID(newCtx,
-		types.InitDefaultKnowledgeBaseID, &types.Pagination{
+	knowledgeList, err := h.knowledgeService.ListPagedKnowledgeByKnowledgeBaseID(ctx,
+		kb.ID, &types.Pagination{
 			Page:     1,
 			PageSize: 1,
 		})

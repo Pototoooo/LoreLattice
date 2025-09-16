@@ -18,6 +18,14 @@ type RouterParams struct {
 	dig.In
 
 	Config                *config.Config
+	UserService           interfaces.UserService
+	KBService             interfaces.KnowledgeBaseService
+	KnowledgeService      interfaces.KnowledgeService
+	ChunkService          interfaces.ChunkService
+	SessionService        interfaces.SessionService
+	MessageService        interfaces.MessageService
+	ModelService          interfaces.ModelService
+	EvaluationService     interfaces.EvaluationService
 	KBHandler             *handler.KnowledgeBaseHandler
 	KnowledgeHandler      *handler.KnowledgeHandler
 	TenantHandler         *handler.TenantHandler
@@ -28,6 +36,7 @@ type RouterParams struct {
 	TestDataHandler       *handler.TestDataHandler
 	ModelHandler          *handler.ModelHandler
 	EvaluationHandler     *handler.EvaluationHandler
+	AuthHandler           *handler.AuthHandler
 	InitializationHandler *handler.InitializationHandler
 }
 
@@ -50,7 +59,7 @@ func NewRouter(params RouterParams) *gin.Engine {
 	r.Use(middleware.Logger())
 	r.Use(middleware.Recovery())
 	r.Use(middleware.ErrorHandler())
-	r.Use(middleware.Auth(params.TenantService, params.Config))
+	r.Use(middleware.Auth(params.TenantService, params.UserService, params.Config))
 
 	// 添加OpenTelemetry追踪中间件
 	r.Use(middleware.TracingMiddleware())
@@ -60,31 +69,10 @@ func NewRouter(params RouterParams) *gin.Engine {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	// 测试数据接口（不需要认证）
-	r.GET("/api/v1/test-data", params.TestDataHandler.GetTestData)
-
-	// 初始化接口（不需要认证）
-	r.GET("/api/v1/initialization/status", params.InitializationHandler.CheckStatus)
-	r.GET("/api/v1/initialization/config", params.InitializationHandler.GetCurrentConfig)
-	r.POST("/api/v1/initialization/initialize", params.InitializationHandler.Initialize)
-
-	// Ollama相关接口（不需要认证）
-	r.GET("/api/v1/initialization/ollama/status", params.InitializationHandler.CheckOllamaStatus)
-	r.GET("/api/v1/initialization/ollama/models", params.InitializationHandler.ListOllamaModels)
-	r.POST("/api/v1/initialization/ollama/models/check", params.InitializationHandler.CheckOllamaModels)
-	r.POST("/api/v1/initialization/ollama/models/download", params.InitializationHandler.DownloadOllamaModel)
-	r.GET("/api/v1/initialization/ollama/download/progress/:taskId", params.InitializationHandler.GetDownloadProgress)
-	r.GET("/api/v1/initialization/ollama/download/tasks", params.InitializationHandler.ListDownloadTasks)
-
-	// 远程API相关接口（不需要认证）
-	r.POST("/api/v1/initialization/remote/check", params.InitializationHandler.CheckRemoteModel)
-	r.POST("/api/v1/initialization/embedding/test", params.InitializationHandler.TestEmbeddingModel)
-	r.POST("/api/v1/initialization/rerank/check", params.InitializationHandler.CheckRerankModel)
-	r.POST("/api/v1/initialization/multimodal/test", params.InitializationHandler.TestMultimodalFunction)
-
 	// 需要认证的API路由
 	v1 := r.Group("/api/v1")
 	{
+		RegisterAuthRoutes(v1, params.AuthHandler)
 		RegisterTenantRoutes(v1, params.TenantHandler)
 		RegisterKnowledgeBaseRoutes(v1, params.KBHandler)
 		RegisterKnowledgeRoutes(v1, params.KnowledgeHandler)
@@ -94,6 +82,8 @@ func NewRouter(params RouterParams) *gin.Engine {
 		RegisterMessageRoutes(v1, params.MessageHandler)
 		RegisterModelRoutes(v1, params.ModelHandler)
 		RegisterEvaluationRoutes(v1, params.EvaluationHandler)
+		RegisterInitializationRoutes(v1, params.InitializationHandler)
+		RegisterTestDataRoutes(v1, params.TestDataHandler)
 	}
 
 	return r
@@ -246,4 +236,40 @@ func RegisterEvaluationRoutes(r *gin.RouterGroup, handler *handler.EvaluationHan
 		evaluationRoutes.POST("/", handler.Evaluation)
 		evaluationRoutes.GET("/", handler.GetEvaluationResult)
 	}
+}
+
+func RegisterTestDataRoutes(r *gin.RouterGroup, handler *handler.TestDataHandler) {
+	r.GET("/test-data", handler.GetTestData)
+}
+
+// RegisterAuthRoutes registers authentication routes
+func RegisterAuthRoutes(r *gin.RouterGroup, handler *handler.AuthHandler) {
+	r.POST("/auth/register", handler.Register)
+	r.POST("/auth/login", handler.Login)
+	r.POST("/auth/refresh", handler.RefreshToken)
+	r.GET("/auth/validate", handler.ValidateToken)
+	r.POST("/auth/logout", handler.Logout)
+	r.GET("/auth/me", handler.GetCurrentUser)
+	r.POST("/auth/change-password", handler.ChangePassword)
+}
+
+func RegisterInitializationRoutes(r *gin.RouterGroup, handler *handler.InitializationHandler) {
+	// 初始化接口
+	r.GET("/initialization/status", handler.CheckStatus)
+	r.GET("/initialization/config", handler.GetCurrentConfig)
+	r.POST("/initialization/initialize", handler.Initialize)
+
+	// Ollama相关接口
+	r.GET("/initialization/ollama/status", handler.CheckOllamaStatus)
+	r.GET("/initialization/ollama/models", handler.ListOllamaModels)
+	r.POST("/initialization/ollama/models/check", handler.CheckOllamaModels)
+	r.POST("/initialization/ollama/models/download", handler.DownloadOllamaModel)
+	r.GET("/initialization/ollama/download/progress/:taskId", handler.GetDownloadProgress)
+	r.GET("/initialization/ollama/download/tasks", handler.ListDownloadTasks)
+
+	// 远程API相关接口
+	r.POST("/initialization/remote/check", handler.CheckRemoteModel)
+	r.POST("/initialization/embedding/test", handler.TestEmbeddingModel)
+	r.POST("/initialization/rerank/check", handler.CheckRerankModel)
+	r.POST("/initialization/multimodal/test", handler.TestMultimodalFunction)
 }

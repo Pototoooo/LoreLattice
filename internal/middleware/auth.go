@@ -16,10 +16,10 @@ import (
 
 // 无需认证的API列表
 var noAuthAPI = map[string][]string{
-	"/api/v1/test-data":        {"GET"},
-	"/api/v1/tenants":          {"POST"},
-	"/api/v1/initialization/*": {"GET", "POST"},
-	"/health":                  {"GET"},
+	"/health":               {"GET"},
+	"/api/v1/auth/register": {"POST"},
+	"/api/v1/auth/login":    {"POST"},
+	"/api/v1/auth/refresh":  {"POST"},
 }
 
 // 检查请求是否在无需认证的API列表中
@@ -38,7 +38,7 @@ func isNoAuthAPI(path string, method string) bool {
 }
 
 // Auth 认证中间件
-func Auth(tenantService interfaces.TenantService, cfg *config.Config) gin.HandlerFunc {
+func Auth(tenantService interfaces.TenantService, userService interfaces.UserService, cfg *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// ignore OPTIONS request
 		if c.Request.Method == "OPTIONS" {
@@ -52,53 +52,90 @@ func Auth(tenantService interfaces.TenantService, cfg *config.Config) gin.Handle
 			return
 		}
 
-		// Get API Key from request header
+		// 尝试JWT Token认证
+		authHeader := c.GetHeader("Authorization")
+		if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
+			token := strings.TrimPrefix(authHeader, "Bearer ")
+			user, err := userService.ValidateToken(c.Request.Context(), token)
+			if err == nil && user != nil {
+				// JWT Token认证成功
+				// 获取租户信息
+				tenant, err := tenantService.GetTenantByID(c.Request.Context(), user.TenantID)
+				if err != nil {
+					log.Printf("Error getting tenant by ID: %v, tenantID: %d, userID: %s", err, user.TenantID, user.ID)
+					c.JSON(http.StatusUnauthorized, gin.H{
+						"error": "Unauthorized: invalid tenant",
+					})
+					c.Abort()
+					return
+				}
+
+				// 存储用户和租户信息到上下文
+				c.Set(types.TenantIDContextKey.String(), user.TenantID)
+				c.Set(types.TenantInfoContextKey.String(), tenant)
+				c.Set("user", user)
+				c.Request = c.Request.WithContext(
+					context.WithValue(
+						context.WithValue(
+							context.WithValue(c.Request.Context(), types.TenantIDContextKey, user.TenantID),
+							types.TenantInfoContextKey, tenant,
+						),
+						"user", user,
+					),
+				)
+				c.Next()
+				return
+			}
+		}
+
+		// 尝试X-API-Key认证（兼容模式）
 		apiKey := c.GetHeader("X-API-Key")
-		if apiKey == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-			c.Abort()
+		if apiKey != "" {
+			// Get tenant information
+			tenantID, err := tenantService.ExtractTenantIDFromAPIKey(apiKey)
+			if err != nil {
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"error": "Unauthorized: invalid API key format",
+				})
+				c.Abort()
+				return
+			}
+
+			// Verify API key validity (matches the one in database)
+			t, err := tenantService.GetTenantByID(c.Request.Context(), tenantID)
+			if err != nil {
+				log.Printf("Error getting tenant by ID: %v, tenantID: %d, apiKey: %s", err, tenantID, apiKey)
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"error": "Unauthorized: invalid API key",
+				})
+				c.Abort()
+				return
+			}
+
+			if t == nil || t.APIKey != apiKey {
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"error": "Unauthorized: invalid API key",
+				})
+				c.Abort()
+				return
+			}
+
+			// Store tenant ID in context
+			c.Set(types.TenantIDContextKey.String(), tenantID)
+			c.Set(types.TenantInfoContextKey.String(), t)
+			c.Request = c.Request.WithContext(
+				context.WithValue(
+					context.WithValue(c.Request.Context(), types.TenantIDContextKey, tenantID),
+					types.TenantInfoContextKey, t,
+				),
+			)
+			c.Next()
 			return
 		}
 
-		// Get tenant information
-		tenantID, err := tenantService.ExtractTenantIDFromAPIKey(apiKey)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized: invalid API key format",
-			})
-			c.Abort()
-			return
-		}
-
-		// Verify API key validity (matches the one in database)
-		t, err := tenantService.GetTenantByID(c.Request.Context(), tenantID)
-		if err != nil {
-			log.Printf("Error getting tenant by ID: %v, tenantID: %d, apiKey: %s", err, tenantID, apiKey)
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized: invalid API key",
-			})
-			c.Abort()
-			return
-		}
-
-		if t == nil || t.APIKey != apiKey {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized: invalid API key",
-			})
-			c.Abort()
-			return
-		}
-
-		// Store tenant ID in context
-		c.Set(types.TenantIDContextKey.String(), tenantID)
-		c.Set(types.TenantInfoContextKey.String(), t)
-		c.Request = c.Request.WithContext(
-			context.WithValue(
-				context.WithValue(c.Request.Context(), types.TenantIDContextKey, tenantID),
-				types.TenantInfoContextKey, t,
-			),
-		)
-		c.Next()
+		// 没有提供任何认证信息
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: missing authentication"})
+		c.Abort()
 	}
 }
 
