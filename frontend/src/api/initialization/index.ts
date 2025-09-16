@@ -19,6 +19,7 @@ export interface InitializationConfig {
         modelName: string;
         baseUrl: string;
         apiKey?: string;
+        enabled: boolean;
     };
     multimodal: {
         enabled: boolean;

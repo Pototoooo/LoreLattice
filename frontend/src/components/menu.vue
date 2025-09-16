@@ -201,24 +201,19 @@ let knowledgeIcon = ref('zhishiku-green.svg');
 let prefixIcon = ref('prefixIcon.svg');
 let settingIcon = ref('setting.svg');
 let logoutIcon = ref('logout.svg');
-let tenantIcon = ref('setting.svg'); // 暂时使用setting图标
+let tenantIcon = ref('user.svg'); // 使用专门的用户图标
 let pathPrefix = ref(route.name)
 const getIcon = (path) => {
     fileAddIcon.value = path == 'knowledgeBase' ? 'file-add-green.svg' : 'file-add.svg';
     knowledgeIcon.value = path == 'knowledgeBase' ? 'zhishiku-green.svg' : 'zhishiku.svg';
     prefixIcon.value = path == 'creatChat' ? 'prefixIcon-green.svg' : path == 'knowledgeBase' ? 'prefixIcon-grey.svg' : 'prefixIcon.svg';
     settingIcon.value = path == 'settings' ? 'setting-green.svg' : 'setting.svg';
-    tenantIcon.value = path == 'tenant' ? 'setting-green.svg' : 'setting.svg'; // 暂时使用setting图标
+    tenantIcon.value = path == 'tenant' ? 'user-green.svg' : 'user.svg'; // 使用专门的用户图标
     logoutIcon.value = 'logout.svg';
 }
 getIcon(route.name)
 const gotopage = (path) => {
     pathPrefix.value = path;
-    // 如果是系统设置，跳转到初始化配置页面
-    if (path === 'settings') {
-        router.push('/initialization');
-        return;
-    }
     // 处理退出登录
     if (path === 'logout') {
         authStore.logout();
