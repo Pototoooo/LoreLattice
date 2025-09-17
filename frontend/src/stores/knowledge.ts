@@ -4,8 +4,8 @@ import { defineStore } from "pinia";
 
 export const knowledgeStore = defineStore("knowledge", {
   state: () => ({
-    cardList: ref([]),
-    total: ref(0),
+    cardList: ref<any[]>([]),
+    total: ref<number>(0),
   }),
   actions: {},
 });

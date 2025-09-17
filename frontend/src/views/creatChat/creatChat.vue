@@ -1,5 +1,5 @@
 <template>
-    <div v-show="cardList.length" class="dialogue-wrap">
+    <div class="dialogue-wrap">
         <div class="dialogue-answers">
             <div class="dialogue-title">
                 <span>基于知识库内容问答</span>
@@ -7,7 +7,17 @@
             <InputField @send-msg="sendMsg"></InputField>
         </div>
     </div>
-    <EmptyKnowledge v-show="!cardList.length"></EmptyKnowledge>
+    
+
+    <t-dialog v-model:visible="selectVisible" header="选择知识库" :confirmBtn="{ content: '开始对话', theme: 'primary' }" :onConfirm="confirmSelect" :onCancel="() => selectVisible = false">
+        <t-form :data="{ kb: selectedKbId }">
+            <t-form-item label="知识库">
+                <t-select v-model="selectedKbId" :loading="kbLoading" placeholder="请选择知识库">
+                    <t-option v-for="kb in kbList" :key="kb.id" :value="kb.id" :label="kb.name" />
+                </t-select>
+            </t-form-item>
+        </t-form>
+    </t-dialog>
 </template>
 <script setup lang="ts">
 import { ref, onUnmounted, watch } from 'vue';
@@ -17,29 +27,52 @@ import { getSessionsList, createSessions, generateSessionsTitle } from "@/api/ch
 import { useMenuStore } from '@/stores/menu';
 import { useRoute, useRouter } from 'vue-router';
 import useKnowledgeBase from '@/hooks/useKnowledgeBase';
-import { getTestData } from '@/utils/request';
+import { listKnowledgeBases } from '@/api/knowledge-base';
 
 let { cardList } = useKnowledgeBase()
 const router = useRouter();
+const route = useRoute();
 const usemenuStore = useMenuStore();
 const sendMsg = (value: string) => {
     createNewSession(value);
 }
 
+const selectVisible = ref(false)
+const selectedKbId = ref<string>('')
+const kbList = ref<Array<{ id: string; name: string }>>([])
+const kbLoading = ref(false)
+
+const ensureKbId = async (): Promise<string | null> => {
+    // 1) 优先使用当前路由上下文（如果来自某个知识库详情页）
+    const routeKb = (route.params as any)?.kbId as string
+    if (routeKb) return routeKb
+
+
+    // 3) 弹窗选择知识库（从接口拉取）
+    kbLoading.value = true
+    try {
+        const res: any = await listKnowledgeBases()
+        kbList.value = res?.data || []
+        if (kbList.value.length === 0) return null
+        selectedKbId.value = kbList.value[0].id
+        selectVisible.value = true
+        return null
+    } finally {
+        kbLoading.value = false
+    }
+}
+
 async function createNewSession(value: string) {
-    // 使用测试数据获取知识库ID
-    const testData = getTestData();
-    if (!testData || testData.knowledge_bases.length === 0) {
-        console.error("测试数据未初始化或不包含知识库");
-        return;
+    let knowledgeBaseId = await ensureKbId()
+    if (!knowledgeBaseId) {
+        // 等待用户在弹窗中选择
+        pendingValue.value = value
+        return
     }
 
-    // 使用第一个知识库ID
-    const knowledgeBaseId = testData.knowledge_bases[0].id;
-
-    createSessions({ knowledge_base_id: knowledgeBaseId }).then(res => {
+    createSessions({ knowledge_base_id: knowledgeBaseId }).then(async res => {
         if (res.data && res.data.id) {
-            getTitle(res.data.id, value)
+            await getTitle(res.data.id, value)
         } else {
             // 错误处理
             console.error("创建会话失败");
@@ -49,12 +82,33 @@ async function createNewSession(value: string) {
     })
 }
 
-const getTitle = (session_id: string, value: string) => {
-    let obj = { title: '新会话', path: `chat/${session_id}`, id: session_id, isMore: false, isNoTitle: true }
+const pendingValue = ref<string>('')
+const confirmSelect = async () => {
+    if (!selectedKbId.value) return
+    const value = pendingValue.value
+    pendingValue.value = ''
+    selectVisible.value = false
+    createSessions({ knowledge_base_id: selectedKbId.value }).then(async res => {
+        if (res.data && res.data.id) {
+            await getTitle(res.data.id, value, selectedKbId.value)
+        } else {
+            console.error('创建会话失败')
+        }
+    }).catch((e:any) => console.error('创建会话出错:', e))
+}
+
+const getTitle = async (session_id: string, value: string, kbId?: string) => {
+    const finalKbId = kbId || await ensureKbId();
+    if (!finalKbId) {
+        console.error('无法获取知识库ID');
+        return;
+    }
+    
+    let obj = { title: '新会话', path: `chat/${finalKbId}/${session_id}`, id: session_id, isMore: false, isNoTitle: true }
     usemenuStore.updataMenuChildren(obj);
     usemenuStore.changeIsFirstSession(true);
     usemenuStore.changeFirstQuery(value);
-    router.push(`/platform/chat/${session_id}`);
+    router.push(`/platform/chat/${finalKbId}/${session_id}`);
 }
 
 </script>

@@ -1,8 +1,6 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { ref, type Ref, onUnmounted, nextTick } from 'vue'
 import { generateRandomString } from '@/utils/index';
-import { getTestData } from '@/utils/request';
-import { loadTestData } from "../test-data";
 
 
 
@@ -37,16 +35,16 @@ export function useStream() {
     isStreaming.value = true;
     isLoading.value = true;
 
-    // 使用默认配置
-    await loadTestData();
-    const testData = getTestData();
-    if (!testData) {
-      error.value = "测试数据未初始化，无法进行聊天";
+    // 获取API配置
+    const apiUrl = import.meta.env.VITE_IS_DOCKER ? "" : "http://localhost:8080";
+    
+    // 获取JWT Token
+    const token = localStorage.getItem('weknora_token');
+    if (!token) {
+      error.value = "未找到登录令牌，请重新登录";
       stopStream();
       return;
     }
-    const apiUrl = import.meta.env.VITE_IS_DOCKER ? "" : "http://localhost:8080";
-    const apiKey = testData.tenant.api_key;
 
     try {
       let url =
@@ -57,7 +55,7 @@ export function useStream() {
         method: params.method,
         headers: {
           "Content-Type": "application/json",
-          "X-API-Key": apiKey,
+          "Authorization": `Bearer ${token}`,
           "X-Request-ID": `${generateRandomString(12)}`,
         },
         body:
