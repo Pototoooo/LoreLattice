@@ -64,10 +64,16 @@
                             <t-input v-model="formData.llm.modelName" placeholder="例如: qwen3:0.6b" 
                                      @blur="onModelNameChange('llm')" 
                                      @input="onModelNameInput('llm')"
-                                     @keyup.enter="onModelNameChange('llm')" />
+                                     @keyup.enter="onModelNameChange('llm')"
+                                     :clearable="!modelStatus.llm.downloading" />
                             <div class="model-status-icon">
+                                <!-- 下载状态：优先显示 -->
+                                <div v-if="formData.llm.source === 'local' && formData.llm.modelName && modelStatus.llm.downloading" class="model-download-status">
+                                    <span class="download-percentage">{{ modelStatus.llm.progress.toFixed(1) }}%</span>
+                                </div>
+                                <!-- 其他状态：非下载时显示 -->
                                 <t-icon 
-                                    v-if="formData.llm.source === 'local' && formData.llm.modelName && modelStatus.llm.checked" 
+                                    v-else-if="formData.llm.source === 'local' && formData.llm.modelName && modelStatus.llm.checked" 
                                     :name="modelStatus.llm.available ? 'check-circle-filled' : 'close-circle-filled'" 
                                     :class="['status-icon', modelStatus.llm.available ? 'installed' : 'not-installed']" 
                                     :title="modelStatus.llm.available ? '已安装' : '未安装'"
@@ -77,12 +83,6 @@
                                     name="help-circle" 
                                     class="status-icon unknown" 
                                     title="未检查"
-                                />
-                                <t-icon 
-                                    v-else-if="formData.llm.source === 'local' && formData.llm.modelName && modelStatus.llm.downloading" 
-                                    name="loading" 
-                                    class="status-icon downloading spinning" 
-                                    title="下载中"
                                 />
                             </div>
                             <!-- 下载按钮：未安装时显示 -->
@@ -102,15 +102,6 @@
                         </div>
                     </t-form-item>
                     
-                    <!-- 下载进度：下载中时显示 -->
-                    <div v-if="formData.llm.source === 'local' && formData.llm.modelName && modelStatus.llm.downloading" class="download-progress">
-                        <div class="progress-info">
-                            <t-icon name="loading" class="loading-icon spinning" />
-                            <span class="progress-text">下载中</span>
-                        </div>
-                        <t-progress :percentage="Number(modelStatus.llm.progress.toFixed(1))" :show-info="false" size="small" class="progress-bar" />
-                        <div class="progress-message">{{ modelStatus.llm.message }}</div>
-                    </div>
                 </div>
                 
                 <!-- 远程 API 配置区域 -->
@@ -187,10 +178,16 @@
                                      @blur="onModelNameChange('embedding')" 
                                      @input="onModelNameInput('embedding')"
                                      @keyup.enter="onModelNameChange('embedding')"
-                                     :disabled="hasFiles" />
+                                     :disabled="hasFiles"
+                                     :clearable="!modelStatus.embedding.downloading" />
                             <div class="model-status-icon">
+                                <!-- 下载状态：优先显示 -->
+                                <div v-if="formData.embedding.source === 'local' && formData.embedding.modelName && modelStatus.embedding.downloading" class="model-download-status">
+                                    <span class="download-percentage">{{ modelStatus.embedding.progress.toFixed(1) }}%</span>
+                                </div>
+                                <!-- 其他状态：非下载时显示 -->
                                 <t-icon 
-                                    v-if="formData.embedding.source === 'local' && formData.embedding.modelName && modelStatus.embedding.checked" 
+                                    v-else-if="formData.embedding.source === 'local' && formData.embedding.modelName && modelStatus.embedding.checked" 
                                     :name="modelStatus.embedding.available ? 'check-circle-filled' : 'close-circle-filled'" 
                                     :class="['status-icon', modelStatus.embedding.available ? 'installed' : 'not-installed']" 
                                     :title="modelStatus.embedding.available ? '已安装' : '未安装'"
@@ -200,12 +197,6 @@
                                     name="help-circle" 
                                     class="status-icon unknown" 
                                     title="未检查"
-                                />
-                                <t-icon 
-                                    v-else-if="formData.embedding.source === 'local' && formData.embedding.modelName && modelStatus.embedding.downloading" 
-                                    name="loading" 
-                                    class="status-icon downloading spinning" 
-                                    title="下载中"
                                 />
                             </div>
                             <!-- 下载按钮：未安装时显示 -->
@@ -248,15 +239,6 @@
                         </div>
                     </t-form-item>
 
-                    <!-- 下载进度：下载中时显示 -->
-                    <div v-if="formData.embedding.source === 'local' && formData.embedding.modelName && modelStatus.embedding.downloading" class="download-progress">
-                        <div class="progress-info">
-                            <t-icon name="loading" class="loading-icon spinning" />
-                            <span class="progress-text">下载中 {{ modelStatus.embedding.progress.toFixed(1) }}%</span>
-                        </div>
-                        <t-progress :percentage="Number(modelStatus.embedding.progress.toFixed(1))" :show-info="false" size="small" class="progress-bar" />
-                        <div class="progress-message">{{ modelStatus.embedding.message }}</div>
-                    </div>
                 </div>
                 
                 <!-- 远程 Embedding API 配置 -->
@@ -417,10 +399,16 @@
                                 <t-input v-model="formData.multimodal.vlm.modelName" placeholder="例如: qwen2.5vl:3b" 
                                          @blur="onModelNameChange('vlm')" 
                                          @input="onModelNameInput('vlm')"
-                                         @keyup.enter="onModelNameChange('vlm')" />
+                                         @keyup.enter="onModelNameChange('vlm')"
+                                         :clearable="!modelStatus.vlm.downloading" />
                                 <div class="model-status-icon">
+                                    <!-- 下载状态：优先显示环形进度条 -->
+                                    <div v-if="formData.multimodal.vlm.interfaceType === 'ollama' && formData.multimodal.vlm.modelName && modelStatus.vlm.downloading" class="model-download-status">
+                                        <span class="download-percentage">{{ modelStatus.vlm.progress.toFixed(1) }}%</span>
+                                    </div>
+                                    <!-- 其他状态：非下载时显示 -->
                                     <t-icon 
-                                        v-if="formData.multimodal.vlm.interfaceType === 'ollama' && formData.multimodal.vlm.modelName && modelStatus.vlm.checked" 
+                                        v-else-if="formData.multimodal.vlm.interfaceType === 'ollama' && formData.multimodal.vlm.modelName && modelStatus.vlm.checked" 
                                         :name="modelStatus.vlm.available ? 'check-circle-filled' : 'close-circle-filled'" 
                                         :class="['status-icon', modelStatus.vlm.available ? 'installed' : 'not-installed']" 
                                         :title="modelStatus.vlm.available ? '已安装' : '未安装'"
@@ -430,12 +418,6 @@
                                         name="help-circle" 
                                         class="status-icon unknown" 
                                         title="未检查"
-                                    />
-                                    <t-icon 
-                                        v-else-if="formData.multimodal.vlm.interfaceType === 'ollama' && formData.multimodal.vlm.modelName && modelStatus.vlm.downloading" 
-                                        name="loading" 
-                                        class="status-icon downloading spinning" 
-                                        title="下载中"
                                     />
                                 </div>
                                 <!-- 下载按钮：未安装时显示 -->
@@ -454,16 +436,6 @@
                                 </div>
                             </div>
                         </t-form-item>
-                        
-                        <!-- 下载进度：下载中时显示 -->
-                        <div v-if="formData.multimodal.vlm.interfaceType === 'ollama' && formData.multimodal.vlm.modelName && modelStatus.vlm.downloading" class="download-progress">
-                            <div class="progress-info">
-                                <t-icon name="loading" class="loading-icon spinning" />
-                                <span class="progress-text">下载中 {{ modelStatus.vlm.progress.toFixed(1) }}%</span>
-                            </div>
-                            <t-progress :percentage="Number(modelStatus.vlm.progress.toFixed(1))" :show-info="false" size="small" class="progress-bar" />
-                            <div class="progress-message">{{ modelStatus.vlm.message }}</div>
-                        </div>
                     </div>
                     <div class="form-row">
                         <t-form-item label="接口类型" name="multimodal.vlm.interfaceType">
@@ -1115,6 +1087,11 @@ const checkAllOllamaModels = async () => {
         modelsToCheck.push(formData.embedding.modelName);
     }
     
+    // 添加VLM模型检查
+    if (formData.multimodal.enabled && isVlmOllama.value && formData.multimodal.vlm.modelName) {
+        modelsToCheck.push(formData.multimodal.vlm.modelName);
+    }
+    
     if (modelsToCheck.length === 0) return;
     
     try {
@@ -1130,6 +1107,12 @@ const checkAllOllamaModels = async () => {
             modelStatus.embedding.checked = true;
             modelStatus.embedding.available = result.models[formData.embedding.modelName] || false;
         }
+        
+        // 更新VLM模型状态
+        if (formData.multimodal.enabled && isVlmOllama.value && formData.multimodal.vlm.modelName) {
+            modelStatus.vlm.checked = true;
+            modelStatus.vlm.available = result.models[formData.multimodal.vlm.modelName] || false;
+        }
     } catch (error) {
         console.error('检查模型状态失败:', error);
     }
@@ -1139,8 +1122,11 @@ const checkAllOllamaModels = async () => {
 const downloadModel = async (type: 'llm' | 'embedding' | 'vlm', modelName: string) => {
     // 防止重复点击
     if (modelStatus[type].downloading) {
+        console.log(`模型 ${modelName} 正在下载中，忽略重复点击`);
         return;
     }
+    
+    console.log(`开始下载模型: ${type} - ${modelName}`);
     
     try {
         // 立即更新状态，防止重复点击
@@ -1337,10 +1323,10 @@ const onModelSourceChange = async (type: 'llm' | 'embedding') => {
 
 const onModelNameChange = async (type: 'llm' | 'embedding' | 'vlm') => {
     if (type === 'vlm') {
-        // 总是重置VLM模型状态
+        // 总是重置VLM模型状态（但不清除下载状态）
         modelStatus.vlm.checked = false;
         modelStatus.vlm.available = false;
-        modelStatus.vlm.downloading = false;
+        // 不清除 downloading 状态，避免中断正在进行的下载
         
         if (formData.multimodal.enabled && isVlmOllama.value && formData.multimodal.vlm.modelName) {
             if (ollamaStatus.available) {
@@ -1353,10 +1339,10 @@ const onModelNameChange = async (type: 'llm' | 'embedding' | 'vlm') => {
             }
         }
     } else {
-        // 总是重置模型状态
+        // 总是重置模型状态（但不清除下载状态）
         modelStatus[type].checked = false;
         modelStatus[type].available = false;
-        modelStatus[type].downloading = false;
+        // 不清除 downloading 状态，避免中断正在进行的下载
         
         if (formData[type].source === 'local' && formData[type].modelName) {
             if (ollamaStatus.available) {
@@ -1377,15 +1363,17 @@ const onModelNameInput = (type: 'llm' | 'embedding' | 'vlm') => {
         clearTimeout(inputDebounceTimers[type]);
     }
     
-    // 重置模型状态
+    // 重置模型状态（但不清除下载状态）
     if (type === 'vlm') {
         modelStatus.vlm.checked = false;
         modelStatus.vlm.available = false;
         modelStatus.vlm.message = '';
+        // 不清除 downloading 状态，避免中断正在进行的下载
     } else {
         modelStatus[type].checked = false;
         modelStatus[type].available = false;
         modelStatus[type].message = '';
+        // 不清除 downloading 状态，避免中断正在进行的下载
     }
     
     // 设置防抖延迟
@@ -1519,6 +1507,14 @@ const checkAllConfiguredModels = async () => {
         } else if (formData.embedding.source === 'remote' && formData.embedding.modelName && formData.embedding.baseUrl) {
             await checkEmbeddingModelStatus();
         }
+    }
+    
+    // 检查VLM模型
+    if (formData.multimodal.enabled && formData.multimodal.vlm.modelName) {
+        if (isVlmOllama.value && ollamaStatus.available) {
+            await checkAllOllamaModels();
+        }
+        // VLM远程API校验可以在这里添加
     }
 };
 
@@ -1673,6 +1669,17 @@ const onMultimodalChange = async () => {
         if (formData.multimodal.vlm.interfaceType === 'ollama' && !formData.multimodal.vlm.baseUrl) {
             formData.multimodal.vlm.baseUrl = 'http://localhost:11434/v1';
         }
+        
+        // 如果选择了Ollama接口，检查Ollama状态
+        if (formData.multimodal.vlm.interfaceType === 'ollama' && !ollamaStatus.checked) {
+            await checkOllama();
+        }
+    } else {
+        // 如果禁用多模态，重置VLM模型状态
+        modelStatus.vlm.checked = false;
+        modelStatus.vlm.available = false;
+        modelStatus.vlm.downloading = false;
+        modelStatus.vlm.message = '';
     }
 };
 
@@ -1769,8 +1776,26 @@ const checkRerankModelStatus = async () => {
 };
 
 // 添加一些基本的多模态函数（简化版）
-const onVlmInterfaceTypeChange = () => {
+const onVlmInterfaceTypeChange = async () => {
     console.log('VLM interface type changed:', formData.multimodal.vlm.interfaceType);
+    
+    // 重置VLM模型状态
+    modelStatus.vlm.checked = false;
+    modelStatus.vlm.available = false;
+    modelStatus.vlm.downloading = false;
+    modelStatus.vlm.message = '';
+    
+    // 如果切换到Ollama接口，检查Ollama状态
+    if (formData.multimodal.vlm.interfaceType === 'ollama') {
+        if (!ollamaStatus.checked) {
+            await checkOllama();
+        }
+        
+        // 如果已经有模型名称，立即检查模型状态
+        if (formData.multimodal.vlm.modelName && ollamaStatus.available) {
+            await checkAllOllamaModels();
+        }
+    }
 };
 
 const onVlmBaseUrlChange = async () => {
@@ -2160,31 +2185,43 @@ onMounted(async () => {
     
     .model-status-icon {
         flex-shrink: 0;
-        width: 24px;
+        min-width: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
     
     .model-status-icon .status-icon {
-        font-size: 18px;
+        font-size: 16px;
         cursor: help;
+        padding: 4px;
+        border-radius: 50%;
+        transition: all 0.2s ease;
     }
     
     .model-status-icon .status-icon.installed {
-        color: #00a870;
+        color: #16a34a;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
     }
     
     .model-status-icon .status-icon.not-installed {
-        color: #e34d59;
+        color: #dc2626;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
     }
     
     .model-status-icon .status-icon.unknown {
-        color: #d54941;
+        color: #d97706;
+        background: #fffbeb;
+        border: 1px solid #fed7aa;
     }
     
     .model-status-icon .status-icon.downloading {
-        color: #0052d9;
+        color: #16a34a;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        animation: pulse 2s infinite;
     }
 
     .download-action {
@@ -2192,23 +2229,25 @@ onMounted(async () => {
     }
     
     .download-action .download-btn {
-        height: 28px;
-        width: 28px;
-        min-width: 28px;
+        height: 24px;
+        width: 24px;
+        min-width: 24px;
         padding: 0;
-        border-radius: 50%;
+        border-radius: 4px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #07c05f, #00a651);
-        border: none;
+        background: #16a34a;
+        border: 1px solid #15803d;
         color: white;
         transition: all 0.2s ease;
-        box-shadow: 0 2px 8px rgba(7, 192, 95, 0.2);
+        box-shadow: 0 1px 3px rgba(22, 163, 74, 0.2);
         
         &:hover:not(:disabled) {
-            background: linear-gradient(135deg, #00a651, #008f47);
-            box-shadow: 0 4px 12px rgba(7, 192, 95, 0.3);
+            background: #15803d;
+            border-color: #166534;
+            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
+            transform: translateY(-1px);
         }
         
         &:disabled {
@@ -2223,56 +2262,21 @@ onMounted(async () => {
         }
     }
 
-    .download-progress {
-        margin-top: 12px;
-        padding: 12px 16px;
-        background: linear-gradient(135deg, #f0fdf4, #f8fafc);
-        border-radius: 8px;
-        border: 1px solid #dcfce7;
-        box-shadow: 0 1px 4px rgba(7, 192, 95, 0.08);
+    .model-download-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         
-        .progress-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            
-            .loading-icon {
-                color: #07c05f;
-                font-size: 14px;
-                animation: spin 1s linear infinite;
-            }
-            
-            .progress-text {
-                font-size: 14px;
-                color: #166534;
-                font-weight: 600;
-            }
+        .download-progress-circle {
+            flex-shrink: 0;
         }
         
-        .progress-bar {
-            margin-bottom: 8px;
-            
-            :deep(.t-progress__bar) {
-                background: linear-gradient(90deg, #07c05f, #00a651);
-                border-radius: 4px;
-                height: 6px;
-                box-shadow: 0 1px 2px rgba(7, 192, 95, 0.2);
-            }
-            
-            :deep(.t-progress__track) {
-                background-color: #e5e7eb;
-                border-radius: 4px;
-                height: 6px;
-            }
-        }
-        
-        .progress-message {
-            font-size: 12px;
-            color: #6b7280;
-            text-align: center;
-            line-height: 1.2;
-            font-style: italic;
+        .download-percentage {
+            font-size: 11px;
+            font-weight: 600;
+            color: #15803d;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            white-space: nowrap;
         }
     }
 
@@ -2771,6 +2775,17 @@ onMounted(async () => {
         }
         to {
             transform: rotate(360deg);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% { 
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% { 
+            opacity: 0.8;
+            transform: scale(1.05);
         }
     }
 
