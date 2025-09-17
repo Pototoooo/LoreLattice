@@ -42,8 +42,25 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Read VERSION file
-        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
+      - name: Set up Go
+        if: matrix.service_name == 'app'
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+
+      - name: Prepare version info
+        id: version
+        run: |
+          # 使用统一的版本管理脚本
+          eval $(./scripts/get_version.sh env)
+          
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "commit_id=$COMMIT_ID" >> $GITHUB_OUTPUT
+          echo "build_time=$BUILD_TIME" >> $GITHUB_OUTPUT
+          echo "go_version=$GO_VERSION" >> $GITHUB_OUTPUT
+          
+          # 显示版本信息
+          ./scripts/get_version.sh info
       
       - name: Build ${{ matrix.service_name }} Image
         uses: docker/build-push-action@v3
@@ -52,8 +69,13 @@ jobs:
           platforms: ${{ matrix.platform }}
           file: ${{ matrix.file }}
           context: ${{ matrix.context }}
+          build-args: |
+            ${{ matrix.service_name == 'app' && format('VERSION_ARG={0}', steps.version.outputs.version) || '' }}
+            ${{ matrix.service_name == 'app' && format('COMMIT_ID_ARG={0}', steps.version.outputs.commit_id) || '' }}
+            ${{ matrix.service_name == 'app' && format('BUILD_TIME_ARG={0}', steps.version.outputs.build_time) || '' }}
+            ${{ matrix.service_name == 'app' && format('GO_VERSION_ARG={0}', steps.version.outputs.go_version) || '' }}
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/weknora-${{ matrix.service_name }}:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/weknora-${{ matrix.service_name }}:${{ env.VERSION }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/weknora-${{ matrix.service_name }}:${{ steps.version.outputs.version }}
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/weknora-${{ matrix.service_name }}:cache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/weknora-${{ matrix.service_name }}:cache,mode=max

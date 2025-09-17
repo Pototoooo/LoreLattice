@@ -63,38 +63,19 @@ export interface DownloadTask {
     endTime?: string;
 }
 
-// 系统初始化状态检查
-export function checkInitializationStatus(): Promise<{ initialized: boolean }> {
-    return new Promise((resolve, reject) => {
-        get('/api/v1/initialization/status')
-            .then((response: any) => {
-                resolve(response.data || { initialized: false });
-            })
-            .catch((error: any) => {
-                // 如果是401，交给全局拦截器去处理（重定向登录），这里不要把它当成未初始化
-                if (error && error.status === 401) {
-                    reject(error);
-                    return;
-                }
-                console.warn('检查初始化状态失败，假设需要初始化:', error);
-                resolve({ initialized: false });
-            });
-    });
-}
 
-// 执行系统初始化
-export function initializeSystem(config: InitializationConfig): Promise<any> {
+
+// 根据知识库ID执行配置更新
+export function initializeSystemByKB(kbId: string, config: InitializationConfig): Promise<any> {
     return new Promise((resolve, reject) => {
-        console.log('开始系统初始化...', config);
-        post('/api/v1/initialization/initialize', config)
+        console.log('开始知识库配置更新...', kbId, config);
+        post(`/api/v1/initialization/initialize/${kbId}`, config)
             .then((response: any) => {
-                console.log('系统初始化完成', response);
-                // 设置本地初始化状态标记
-                localStorage.setItem('system_initialized', 'true');
+                console.log('知识库配置更新完成', response);
                 resolve(response);
             })
             .catch((error: any) => {
-                console.error('系统初始化失败:', error);
+                console.error('知识库配置更新失败:', error);
                 reject(error);
             });
     });
@@ -184,15 +165,15 @@ export function listDownloadTasks(): Promise<DownloadTask[]> {
     });
 }
 
-// 获取当前系统配置
-export function getCurrentConfig(): Promise<InitializationConfig & { hasFiles: boolean }> {
+
+export function getCurrentConfigByKB(kbId: string): Promise<InitializationConfig & { hasFiles: boolean }> {
     return new Promise((resolve, reject) => {
-        get('/api/v1/initialization/config')
+        get(`/api/v1/initialization/config/${kbId}`)
             .then((response: any) => {
                 resolve(response.data || {});
             })
             .catch((error: any) => {
-                console.error('获取当前配置失败:', error);
+                console.error('获取知识库配置失败:', error);
                 reject(error);
             });
     });

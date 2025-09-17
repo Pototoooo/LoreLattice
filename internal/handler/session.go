@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/application/service"
 	"github.com/Tencent/WeKnora/internal/config"
 	"github.com/Tencent/WeKnora/internal/errors"
 	"github.com/Tencent/WeKnora/internal/logger"
@@ -22,7 +21,6 @@ type SessionHandler struct {
 	sessionService       interfaces.SessionService // Service for managing sessions
 	streamManager        interfaces.StreamManager  // Manager for handling streaming responses
 	config               *config.Config            // Application configuration
-	testDataService      *service.TestDataService  // Service for test data (models, etc.)
 	knowledgebaseService interfaces.KnowledgeBaseService
 }
 
@@ -32,7 +30,6 @@ func NewSessionHandler(
 	messageService interfaces.MessageService,
 	streamManager interfaces.StreamManager,
 	config *config.Config,
-	testDataService *service.TestDataService,
 	knowledgebaseService interfaces.KnowledgeBaseService,
 ) *SessionHandler {
 	return &SessionHandler{
@@ -40,7 +37,6 @@ func NewSessionHandler(
 		messageService:       messageService,
 		streamManager:        streamManager,
 		config:               config,
-		testDataService:      testDataService,
 		knowledgebaseService: knowledgebaseService,
 	}
 }

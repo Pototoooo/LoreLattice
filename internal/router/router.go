@@ -33,11 +33,11 @@ type RouterParams struct {
 	ChunkHandler          *handler.ChunkHandler
 	SessionHandler        *handler.SessionHandler
 	MessageHandler        *handler.MessageHandler
-	TestDataHandler       *handler.TestDataHandler
 	ModelHandler          *handler.ModelHandler
 	EvaluationHandler     *handler.EvaluationHandler
 	AuthHandler           *handler.AuthHandler
 	InitializationHandler *handler.InitializationHandler
+	SystemHandler         *handler.SystemHandler
 }
 
 // NewRouter 创建新的路由
@@ -83,7 +83,7 @@ func NewRouter(params RouterParams) *gin.Engine {
 		RegisterModelRoutes(v1, params.ModelHandler)
 		RegisterEvaluationRoutes(v1, params.EvaluationHandler)
 		RegisterInitializationRoutes(v1, params.InitializationHandler)
-		RegisterTestDataRoutes(v1, params.TestDataHandler)
+		RegisterSystemRoutes(v1, params.SystemHandler)
 	}
 
 	return r
@@ -238,10 +238,6 @@ func RegisterEvaluationRoutes(r *gin.RouterGroup, handler *handler.EvaluationHan
 	}
 }
 
-func RegisterTestDataRoutes(r *gin.RouterGroup, handler *handler.TestDataHandler) {
-	r.GET("/test-data", handler.GetTestData)
-}
-
 // RegisterAuthRoutes registers authentication routes
 func RegisterAuthRoutes(r *gin.RouterGroup, handler *handler.AuthHandler) {
 	r.POST("/auth/register", handler.Register)
@@ -255,9 +251,8 @@ func RegisterAuthRoutes(r *gin.RouterGroup, handler *handler.AuthHandler) {
 
 func RegisterInitializationRoutes(r *gin.RouterGroup, handler *handler.InitializationHandler) {
 	// 初始化接口
-	r.GET("/initialization/status", handler.CheckStatus)
-	r.GET("/initialization/config", handler.GetCurrentConfig)
-	r.POST("/initialization/initialize", handler.Initialize)
+	r.GET("/initialization/config/:kbId", handler.GetCurrentConfigByKB)
+	r.POST("/initialization/initialize/:kbId", handler.InitializeByKB)
 
 	// Ollama相关接口
 	r.GET("/initialization/ollama/status", handler.CheckOllamaStatus)
@@ -272,4 +267,12 @@ func RegisterInitializationRoutes(r *gin.RouterGroup, handler *handler.Initializ
 	r.POST("/initialization/embedding/test", handler.TestEmbeddingModel)
 	r.POST("/initialization/rerank/check", handler.CheckRerankModel)
 	r.POST("/initialization/multimodal/test", handler.TestMultimodalFunction)
+}
+
+// RegisterSystemRoutes registers system information routes
+func RegisterSystemRoutes(r *gin.RouterGroup, handler *handler.SystemHandler) {
+	systemRoutes := r.Group("/system")
+	{
+		systemRoutes.GET("/info", handler.GetSystemInfo)
+	}
 }

@@ -10,19 +10,19 @@ export function generateRandomString(length: number) {
   return result;
 }
 
-export function formatStringDate(date) {
+export function formatStringDate(date: any) {
   let data = new Date(date);
   let year = data.getFullYear();
-  let month = data.getMonth() + 1;
-  let day = data.getDate();
-  let hour = data.getHours();
-  let minute = data.getMinutes();
-  let second = data.getSeconds();
+  let month = String(data.getMonth() + 1).padStart(2, '0');
+  let day = String(data.getDate()).padStart(2, '0');
+  let hour = String(data.getHours()).padStart(2, '0');
+  let minute = String(data.getMinutes()).padStart(2, '0');
+  let second = String(data.getSeconds()).padStart(2, '0');
   return (
     year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second
   );
 }
-export function kbFileTypeVerification(file) {
+export function kbFileTypeVerification(file: any) {
   let validTypes = ["pdf", "txt", "md", "docx", "doc", "jpg", "jpeg", "png"];
   let type = file.name.substring(file.name.lastIndexOf(".") + 1);
   if (!validTypes.includes(type)) {

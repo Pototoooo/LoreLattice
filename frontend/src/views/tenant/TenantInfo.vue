@@ -1,11 +1,34 @@
 <template>
   <div class="tenant-info-container">
     <div class="tenant-header">
-      <h2>账户信息</h2>
-      <p class="tenant-subtitle">查看和管理您的用户账户和租户配置信息</p>
+      <h2>系统信息</h2>
+      <p class="tenant-subtitle">查看系统版本信息和用户账户配置</p>
     </div>
 
     <div class="tenant-content" v-if="!loading && !error">
+      <!-- 系统信息卡片 -->
+      <t-card class="info-card" :bordered="false">
+        <template #header>
+          <div class="card-title">系统信息</div>
+        </template>
+        <div class="info-content">
+          <t-descriptions :column="1" layout="vertical">
+            <t-descriptions-item label="版本号">
+              {{ systemInfo?.version || '未知' }}
+              <span v-if="systemInfo?.commit_id" class="commit-info">
+                ({{ systemInfo.commit_id }})
+              </span>
+            </t-descriptions-item>
+            <t-descriptions-item label="构建时间" v-if="systemInfo?.build_time">
+              {{ systemInfo.build_time }}
+            </t-descriptions-item>
+            <t-descriptions-item label="Go版本" v-if="systemInfo?.go_version">
+              {{ systemInfo.go_version }}
+            </t-descriptions-item>
+          </t-descriptions>
+        </div>
+      </t-card>
+
       <!-- 用户信息卡片 -->
       <t-card class="info-card" :bordered="false">
         <template #header>
@@ -161,10 +184,12 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { getCurrentUser, type TenantInfo, type UserInfo } from '@/api/auth'
+import { getSystemInfo, type SystemInfo } from '@/api/system'
 
 // 响应式数据
 const tenantInfo = ref<TenantInfo | null>(null)
 const userInfo = ref<UserInfo | null>(null)
+const systemInfo = ref<SystemInfo | null>(null)
 const loading = ref(true)
 const error = ref('')
 const showApiKey = ref(false)
@@ -192,12 +217,21 @@ const loadTenantInfo = async () => {
     loading.value = true
     error.value = ''
     
-    const response = await getCurrentUser()
-    if (response.success && response.data) {
-      userInfo.value = response.data.user
-      tenantInfo.value = response.data.tenant
+    // 并行获取用户信息和系统信息
+    const [userResponse, systemResponse] = await Promise.all([
+      getCurrentUser(),
+      getSystemInfo().catch(() => ({ data: null })) // 系统信息获取失败不影响页面显示
+    ])
+    
+    if (userResponse.success && userResponse.data) {
+      userInfo.value = userResponse.data.user
+      tenantInfo.value = userResponse.data.tenant
     } else {
-      error.value = response.message || '获取用户信息失败'
+      error.value = userResponse.message || '获取用户信息失败'
+    }
+    
+    if (systemResponse.data) {
+      systemInfo.value = systemResponse.data
     }
   } catch (err: any) {
     error.value = err.message || '网络错误，请稍后重试'
@@ -349,7 +383,7 @@ onMounted(() => {
   .card-title {
     font-size: 16px;
     font-weight: 600;
-    color: #000000;
+    color: #07C05F;
   }
 
   .card-header-with-actions {
@@ -457,6 +491,12 @@ onMounted(() => {
     gap: 12px;
   }
   
+  .commit-info {
+    color: #666;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+
   .doc-actions {
     :deep(.t-space) {
       flex-direction: column;
@@ -471,7 +511,6 @@ onMounted(() => {
 
 /* 覆盖TDesign组件样式 */
 :deep(.t-card) {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
 }
 

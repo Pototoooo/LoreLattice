@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"runtime"
 	"sync"
 	"time"
@@ -30,7 +31,7 @@ type EvaluationService struct {
 	knowledgeBaseService interfaces.KnowledgeBaseService // Service for knowledge base operations
 	knowledgeService     interfaces.KnowledgeService     // Service for knowledge operations
 	sessionService       interfaces.SessionService       // Service for chat sessions
-	testData             *TestDataService                // Service for test data
+	modelService         interfaces.ModelService         // Service for model operations
 
 	evaluationMemoryStorage *evaluationMemoryStorage // In-memory storage for evaluation tasks
 }
@@ -41,7 +42,7 @@ func NewEvaluationService(
 	knowledgeBaseService interfaces.KnowledgeBaseService,
 	knowledgeService interfaces.KnowledgeService,
 	sessionService interfaces.SessionService,
-	testData *TestDataService,
+	modelService interfaces.ModelService,
 ) interfaces.EvaluationService {
 	evaluationMemoryStorage := newEvaluationMemoryStorage()
 	return &EvaluationService{
@@ -50,7 +51,7 @@ func NewEvaluationService(
 		knowledgeBaseService:    knowledgeBaseService,
 		knowledgeService:        knowledgeService,
 		sessionService:          sessionService,
-		testData:                testData,
+		modelService:            modelService,
 		evaluationMemoryStorage: evaluationMemoryStorage,
 	}
 }
@@ -144,11 +145,32 @@ func (e *EvaluationService) Evaluation(ctx context.Context,
 	if knowledgeBaseID == "" {
 		logger.Info(ctx, "No knowledge base ID provided, creating new knowledge base")
 		// Create new knowledge base with default evaluation settings
+		// 获取默认的嵌入模型和LLM模型
+		models, err := e.modelService.ListModels(ctx)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to list models: %v", err)
+			return nil, err
+		}
+
+		var embeddingModelID, llmModelID string
+		for _, model := range models {
+			if model.Type == types.ModelTypeEmbedding {
+				embeddingModelID = model.ID
+			}
+			if model.Type == types.ModelTypeKnowledgeQA {
+				llmModelID = model.ID
+			}
+		}
+
+		if embeddingModelID == "" || llmModelID == "" {
+			return nil, fmt.Errorf("no default models found for evaluation")
+		}
+
 		kb, err := e.knowledgeBaseService.CreateKnowledgeBase(ctx, &types.KnowledgeBase{
 			Name:             "evaluation",
 			Description:      "evaluation",
-			EmbeddingModelID: e.testData.EmbedModel.GetModelID(),
-			SummaryModelID:   e.testData.LLMModel.GetModelID(),
+			EmbeddingModelID: embeddingModelID,
+			SummaryModelID:   llmModelID,
 		})
 		if err != nil {
 			logger.Errorf(ctx, "Failed to create knowledge base: %v", err)
@@ -186,12 +208,37 @@ func (e *EvaluationService) Evaluation(ctx context.Context,
 	}
 
 	if rerankModelID == "" {
-		rerankModelID = e.testData.RerankModel.GetModelID()
-		logger.Infof(ctx, "Using default rerank model: %s", rerankModelID)
+		// 获取默认的重排模型
+		models, err := e.modelService.ListModels(ctx)
+		if err == nil {
+			for _, model := range models {
+				if model.Type == types.ModelTypeRerank {
+					rerankModelID = model.ID
+					break
+				}
+			}
+		}
+		if rerankModelID == "" {
+			logger.Warnf(ctx, "No rerank model found, skipping rerank")
+		} else {
+			logger.Infof(ctx, "Using default rerank model: %s", rerankModelID)
+		}
 	}
 
 	if chatModelID == "" {
-		chatModelID = e.testData.LLMModel.GetModelID()
+		// 获取默认的LLM模型
+		models, err := e.modelService.ListModels(ctx)
+		if err == nil {
+			for _, model := range models {
+				if model.Type == types.ModelTypeKnowledgeQA {
+					chatModelID = model.ID
+					break
+				}
+			}
+		}
+		if chatModelID == "" {
+			return nil, fmt.Errorf("no default chat model found")
+		}
 		logger.Infof(ctx, "Using default chat model: %s", chatModelID)
 	}
 

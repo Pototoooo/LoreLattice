@@ -5,19 +5,6 @@ import { generateRandomString } from "./index";
 // API基础URL
 const BASE_URL = import.meta.env.VITE_IS_DOCKER ? "" : "http://localhost:8080";
 
-// 测试数据
-let testData: {
-  tenant: {
-    id: number;
-    name: string;
-    api_key: string;
-  };
-  knowledge_bases: Array<{
-    id: string;
-    name: string;
-    description: string;
-  }>;
-} | null = null;
 
 // 创建Axios实例
 const instance = axios.create({
@@ -29,15 +16,6 @@ const instance = axios.create({
   },
 });
 
-// 设置测试数据
-export function setTestData(data: typeof testData) {
-  testData = data;
-}
-
-// 获取测试数据
-export function getTestData() {
-  return testData;
-}
 
 instance.interceptors.request.use(
   (config) => {
