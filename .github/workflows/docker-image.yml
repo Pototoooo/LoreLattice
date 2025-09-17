@@ -52,7 +52,7 @@ jobs:
         id: version
         run: |
           # 使用统一的版本管理脚本
-          eval $(./scripts/get_version.sh env)
+          eval "$(./scripts/get_version.sh env)"
           
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "commit_id=$COMMIT_ID" >> $GITHUB_OUTPUT

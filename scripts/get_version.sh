@@ -39,11 +39,11 @@ fi
 # 根据参数输出不同格式
 case "${1:-env}" in
     "env")
-        # 输出环境变量格式
+        # 输出环境变量格式，对包含空格的值进行转义
         echo "VERSION=$VERSION"
         echo "COMMIT_ID=$COMMIT_ID"
-        echo "BUILD_TIME=$BUILD_TIME"
-        echo "GO_VERSION=$GO_VERSION"
+        echo "BUILD_TIME=\"$BUILD_TIME\""
+        echo "GO_VERSION=\"$GO_VERSION\""
         ;;
     "json")
         # 输出JSON格式
