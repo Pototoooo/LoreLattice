@@ -36,14 +36,8 @@ All notable changes to this project will be documented in this file.
 - **SIMPLIFIED**: Initialization configuration components
 - **CLEANED**: Redundant UI components and unused code
 
-### 📊 Technical Details
-- **39 files** modified
-- **1,717 lines** added
-- **4,838 lines** removed
-- Enhanced multi-knowledgebase API endpoints
-- Improved error handling and user feedback
 
-## [0.1.3] - 2025-01-27
+## [0.1.3] - 2025-09-16
 
 ### 🔒 Security Features
 - **NEW**: Added login authentication functionality to enhance system security
@@ -80,7 +74,7 @@ All notable changes to this project will be documented in this file.
 - Configure proper firewall rules and access controls
 - Regular updates for security patches and improvements
 
-## [0.1.2] - 2025-01-27
+## [0.1.2] - 2025-09-10
 
 - Fixed health check implementation for docreader service
 - Improved query handling for empty queries
@@ -103,6 +97,7 @@ All notable changes to this project will be documented in this file.
 - Docker Compose for quick startup and service orchestration.
 - MCP server support for integrating with MCP-compatible clients.
 
+[0.1.4]: https://github.com/Tencent/WeKnora/tree/v0.1.4
 [0.1.3]: https://github.com/Tencent/WeKnora/tree/v0.1.3
 [0.1.2]: https://github.com/Tencent/WeKnora/tree/v0.1.2
 [0.1.0]: https://github.com/Tencent/WeKnora/tree/v0.1.0
