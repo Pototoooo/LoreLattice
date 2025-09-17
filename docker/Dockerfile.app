@@ -28,7 +28,19 @@ RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate
 # Copy source code
 COPY . .
 
-# Build the application
+# Get version and commit info for build injection
+ARG VERSION_ARG
+ARG COMMIT_ID_ARG
+ARG BUILD_TIME_ARG
+ARG GO_VERSION_ARG
+
+# Set build-time variables
+ENV VERSION=${VERSION_ARG}
+ENV COMMIT_ID=${COMMIT_ID_ARG}
+ENV BUILD_TIME=${BUILD_TIME_ARG}
+ENV GO_VERSION=${GO_VERSION_ARG}
+
+# Build the application with version info
 RUN make build-prod
 
 # Final stage

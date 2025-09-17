@@ -1,5 +1,6 @@
 <template>
-    <div class="initialization-content">
+    <div class="settings-page-container">
+        <div class="initialization-content">
         <!-- 顶部Ollama服务状态 -->
         <div class="ollama-summary-card">
             <div class="summary-header">
@@ -30,6 +31,21 @@
 
         <!-- 主配置表单 -->
         <t-form ref="form" :data="formData" :rules="rules" @submit.prevent layout="vertical">
+            <!-- 知识库基本信息配置区域 (仅在知识库设置模式下显示) -->
+            <div v-if="props.isKbSettings" class="config-section">
+                <h3><t-icon name="folder" class="section-icon" />知识库基本信息</h3>
+                <div class="form-row">
+                    <t-form-item label="知识库名称" name="kbName" :required="true">
+                        <t-input v-model="formData.kbName" placeholder="请输入知识库名称" maxlength="50" show-word-limit />
+                    </t-form-item>
+                </div>
+                <div class="form-row">
+                    <t-form-item label="知识库描述" name="kbDescription">
+                        <t-textarea v-model="formData.kbDescription" placeholder="请输入知识库描述" maxlength="200" show-word-limit :autosize="{ minRows: 3, maxRows: 6 }" />
+                    </t-form-item>
+                </div>
+            </div>
+
             <!-- LLM 大语言模型配置区域 -->
             <div class="config-section">
                 <h3><t-icon name="chat" class="section-icon" />LLM 大语言模型配置</h3>
@@ -709,7 +725,7 @@
                 <t-button theme="primary" type="button" size="large" 
                           :loading="submitting" :disabled="!canSubmit || isSubmitDebounced"
                           @click="handleSubmit">
-                    {{ isUpdateMode ? '更新配置信息' : '完成配置' }}
+                    {{ props.isKbSettings ? '更新知识库设置' : (isUpdateMode ? '更新配置信息' : '完成配置') }}
                 </t-button>
                 
                 <!-- 提交状态提示 -->
@@ -725,6 +741,7 @@
                 </div>
             </div>
         </t-form>
+        </div>
     </div>
 </template>
 
@@ -733,15 +750,15 @@
  * 导入必要的 Vue 组合式 API 和外部依赖
  */
 import { ref, reactive, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { 
-    initializeSystem, 
+    initializeSystemByKB,
     checkOllamaStatus, 
     checkOllamaModels, 
     downloadOllamaModel,
     getDownloadProgress,
-    getCurrentConfig,
+    getCurrentConfigByKB,
     checkRemoteModel,
     type DownloadTask,
     checkRerankModel,
@@ -749,10 +766,22 @@ import {
     listOllamaModels,
     testEmbeddingModel
 } from '@/api/initialization';
+import { getKnowledgeBaseById } from '@/api/knowledge-base';
 import { useAuthStore } from '@/stores/auth';
 
 const router = useRouter();
+const route = useRoute();
 const authStore = useAuthStore();
+
+// 接收props，判断是否为知识库设置模式
+const props = defineProps<{
+    isKbSettings?: boolean;
+}>();
+
+// 获取当前知识库ID（如果是知识库设置模式）
+const currentKbId = computed(() => {
+    return props.isKbSettings ? (route.params.kbId as string) : null;
+});
 type TFormRef = {
     validate: (fields?: string[] | undefined) => Promise<true | any>;
     clearValidate?: (fields?: string | string[]) => void;
@@ -824,6 +853,9 @@ const modelStatus = reactive({
 
 // 表单数据
 const formData = reactive({
+    // 知识库基本信息 (仅在知识库设置模式下使用)
+    kbName: '',
+    kbDescription: '',
     llm: {
         source: 'local',
         modelName: '',
@@ -867,8 +899,8 @@ const formData = reactive({
         }
     },
     documentSplitting: {
-        chunkSize: 1000, 
-        chunkOverlap: 200,
+        chunkSize: 512, 
+        chunkOverlap: 100,
         separators: ['\n\n', '\n', '。', '！', '？', ';', '；']
     }
 });
@@ -880,7 +912,7 @@ const inputDebounceTimers = reactive<Record<string, any>>({});
 const embeddingDimDetecting = ref(false);
 
 // 预设配置选择
-const selectedPreset = ref('balanced');
+const selectedPreset = ref('precision');
 
 // 分隔符选项
 const separatorOptions = [
@@ -1011,6 +1043,14 @@ const validateEmbeddingDimension = (val: any) => {
 
 // 表单验证规则
 const rules = {
+    // 知识库基本信息验证 (仅在知识库设置模式下使用)
+    'kbName': [
+        { required: (t: any) => props.isKbSettings, message: '请输入知识库名称', type: 'error' },
+        { min: 1, max: 50, message: '知识库名称长度应在1-50个字符之间', type: 'error' }
+    ],
+    'kbDescription': [
+        { max: 200, message: '知识库描述长度不能超过200个字符', type: 'error' }
+    ],
     'llm.modelName': [{ required: true, message: '请输入LLM模型名称', type: 'error' }],
     'llm.baseUrl': [
         { required: (t: any) => formData.llm.source === 'remote', message: '请输入BaseURL', type: 'error' }
@@ -1191,7 +1231,22 @@ const startProgressPolling = (type: 'llm' | 'embedding' | 'vlm', taskId: string,
 // 配置回填
 const loadCurrentConfig = async () => {
     try {
-        const config = await getCurrentConfig();
+        // 如果是知识库设置模式，先加载知识库基本信息
+        if (props.isKbSettings && currentKbId.value) {
+            try {
+                const kbInfo = await getKnowledgeBaseById(currentKbId.value);
+                if (kbInfo && kbInfo.data) {
+                    formData.kbName = kbInfo.data.name || '';
+                    formData.kbDescription = kbInfo.data.description || '';
+                }
+            } catch (error) {
+                console.error('获取知识库信息失败:', error);
+                MessagePlugin.error('获取知识库信息失败');
+            }
+        }
+        
+        // 根据是否为知识库设置模式选择不同的API
+        const config = await getCurrentConfigByKB(currentKbId.value);
         
         // 设置hasFiles状态
         hasFiles.value = config.hasFiles || false;
@@ -1234,6 +1289,9 @@ const loadCurrentConfig = async () => {
             } else {
                 selectedPreset.value = 'custom';
             }
+        } else {
+            // 如果没有文档分割配置，确保使用默认的precision模式
+            selectedPreset.value = 'precision';
         }
         
         // 在配置加载完成后，检查模型状态
@@ -1883,21 +1941,43 @@ const handleSubmit = async () => {
 
         submitting.value = true;
         
+        // 如果是知识库设置模式，先更新知识库基本信息
+        if (props.isKbSettings && currentKbId.value) {
+            try {
+                const { updateKnowledgeBase } = await import('@/api/knowledge-base');
+                await updateKnowledgeBase(currentKbId.value, {
+                    name: formData.kbName,
+                    description: formData.kbDescription,
+                    config: {} // 空的config对象，因为这里只更新基本信息
+                });
+            } catch (error) {
+                console.error('更新知识库基本信息失败:', error);
+                MessagePlugin.error('更新知识库基本信息失败');
+                return;
+            }
+        }
+        
         // 确保embedding.dimension是数字类型
         if (formData.embedding.dimension) {
             formData.embedding.dimension = Number(formData.embedding.dimension);
         }
         
-        // 直接使用formData，API期望原始结构
-        const result = await initializeSystem(formData);
+        // 根据是否为知识库设置模式选择不同的API
+        const result = await initializeSystemByKB(currentKbId.value, formData);
         
         if (result.success) {
-            MessagePlugin.success(isUpdateMode.value ? '配置更新成功' : '系统初始化完成');
+            MessagePlugin.success(props.isKbSettings ? '知识库设置更新成功' : (isUpdateMode.value ? '配置更新成功' : '系统初始化完成'));
             
-            // 如果是初始化模式，跳转到主页面
-            if (!isUpdateMode.value) {
+            // 根据不同模式进行跳转
+            if (props.isKbSettings && currentKbId.value) {
+                // 知识库设置模式，跳转回知识库详情页面
                 setTimeout(() => {
-                    router.push('/platform/knowledgeBase');
+                    router.push(`/platform/knowledge-bases/${currentKbId.value}`);
+                }, 1500);
+            } else if (!isUpdateMode.value) {
+                // 初始化模式，跳转到知识库列表页面
+                setTimeout(() => {
+                    router.push('/platform/knowledge-bases');
                 }, 1500);
             }
         } else {
@@ -1940,7 +2020,18 @@ onMounted(async () => {
 </script>
 
 <style lang="less" scoped>
+.settings-page-container {
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: #f5f7fa;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
 .initialization-content {
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 0;
     
     .ollama-summary-card {
@@ -2168,10 +2259,10 @@ onMounted(async () => {
 
     .remote-config {
         margin-top: 20px;
-        padding: 20px;
-        background: #f9fcff;
-        border-radius: 12px;
-        border: 1px solid #edf2f7;
+        // padding: 20px;
+        // background: #f9fcff;
+        // border-radius: 12px;
+        // border: 1px solid #edf2f7;
     }
 
     .url-input-with-check {
@@ -2272,11 +2363,11 @@ onMounted(async () => {
     }
 
     .rerank-config, .multimodal-config {
-        margin-top: 20px;
-        padding: 20px;
-        background: #f9fcff;
-        border-radius: 12px;
-        border: 1px solid #edf2f7;
+        // margin-top: 20px;
+        // padding: 20px;
+        // background: #f9fcff;
+        // border-radius: 12px;
+        // border: 1px solid #edf2f7;
         
         h4 {
             color: #333;
@@ -2436,11 +2527,11 @@ onMounted(async () => {
     }
 
     .multimodal-test {
-        margin-top: 20px;
-        padding: 20px;
-        background: #f8fff9;
-        border-radius: 10px;
-        border: 1px solid #e8f5e8;
+        // margin-top: 20px;
+        // padding: 20px;
+        // background: #f8fff9;
+        // border-radius: 10px;
+        // border: 1px solid #e8f5e8;
         
         h5 {
             font-size: 16px;
@@ -2476,12 +2567,12 @@ onMounted(async () => {
         }
         
         .image-preview {
-            text-align: center;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            border: 1px solid #e8f5e8;
-            box-shadow: 0 2px 8px rgba(7, 192, 95, 0.08);
+            // text-align: center;
+            // padding: 20px;
+            // background: white;
+            // border-radius: 10px;
+            // border: 1px solid #e8f5e8;
+            // box-shadow: 0 2px 8px rgba(7, 192, 95, 0.08);
             
             img {
                 max-width: 100%;
@@ -2521,11 +2612,11 @@ onMounted(async () => {
         
         .test-button-wrapper {
             text-align: center;
-            margin-top: 16px;
-            padding: 12px 20px;
-            background: #f8fff9;
-            border-radius: 8px;
-            border: 1px solid #e8f5e8;
+            // margin-top: 16px;
+            // padding: 12px 20px;
+            // background: #f8fff9;
+            // border-radius: 8px;
+            // border: 1px solid #e8f5e8;
             
             .t-button {
                 min-width: 100px;

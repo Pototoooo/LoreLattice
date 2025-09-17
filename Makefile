@@ -85,7 +85,15 @@ clean:
 
 # Build Docker image
 docker-build-app:
-	docker build --platform $(PLATFORM) -f docker/Dockerfile.app -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
+	@echo "获取版本信息..."
+	@eval $$(./scripts/get_version.sh env); \
+	./scripts/get_version.sh info; \
+	docker build --platform $(PLATFORM) \
+		--build-arg VERSION_ARG="$$VERSION" \
+		--build-arg COMMIT_ID_ARG="$$COMMIT_ID" \
+		--build-arg BUILD_TIME_ARG="$$BUILD_TIME" \
+		--build-arg GO_VERSION_ARG="$$GO_VERSION" \
+		-f docker/Dockerfile.app -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
 
 # Build docreader Docker image
 docker-build-docreader:
@@ -168,7 +176,12 @@ deps:
 
 # Build for production
 build-prod:
-	GOOS=linux go build -installsuffix cgo -ldflags="-w -s" -o $(BINARY_NAME) $(MAIN_PATH)
+	@VERSION=$${VERSION:-unknown}; \
+	COMMIT_ID=$${COMMIT_ID:-unknown}; \
+	BUILD_TIME=$${BUILD_TIME:-unknown}; \
+	GO_VERSION=$${GO_VERSION:-unknown}; \
+	LDFLAGS="-X 'github.com/Tencent/WeKnora/internal/handler.Version=$$VERSION' -X 'github.com/Tencent/WeKnora/internal/handler.CommitID=$$COMMIT_ID' -X 'github.com/Tencent/WeKnora/internal/handler.BuildTime=$$BUILD_TIME' -X 'github.com/Tencent/WeKnora/internal/handler.GoVersion=$$GO_VERSION'"; \
+	GOOS=linux go build -installsuffix cgo -ldflags="-w -s $$LDFLAGS" -o $(BINARY_NAME) $(MAIN_PATH)
 
 clean-db:
 	@echo "Cleaning database..."

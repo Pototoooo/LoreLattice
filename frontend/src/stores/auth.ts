@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { resetTestDataLoaded } from '@/api/test-data'
 import { ref, computed } from 'vue'
 import type { UserInfo, TenantInfo, KnowledgeBaseInfo } from '@/api/auth'
 
@@ -85,10 +84,6 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('weknora_knowledge_bases')
     localStorage.removeItem('weknora_current_kb')
 
-    // 重置测试数据加载标志，确保重新登录后会重新获取KB列表
-    try {
-      resetTestDataLoaded()
-    } catch {}
   }
 
   const initFromStorage = () => {

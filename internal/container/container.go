@@ -89,7 +89,6 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(service.NewMessageService))
 	must(container.Provide(service.NewChunkService))
 	must(container.Provide(embedding.NewBatchEmbedder))
-	must(container.Provide(service.NewTestDataService))
 	must(container.Provide(service.NewModelService))
 	must(container.Provide(service.NewDatasetService))
 	must(container.Provide(service.NewEvaluationService))
@@ -116,11 +115,11 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(handler.NewChunkHandler))
 	must(container.Provide(handler.NewSessionHandler))
 	must(container.Provide(handler.NewMessageHandler))
-	must(container.Provide(handler.NewTestDataHandler))
 	must(container.Provide(handler.NewModelHandler))
 	must(container.Provide(handler.NewEvaluationHandler))
 	must(container.Provide(handler.NewInitializationHandler))
 	must(container.Provide(handler.NewAuthHandler))
+	must(container.Provide(handler.NewSystemHandler))
 
 	// Router configuration
 	must(container.Provide(router.NewRouter))

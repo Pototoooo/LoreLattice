@@ -145,7 +145,6 @@ import { ref, reactive, computed, nextTick, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { MessagePlugin } from 'tdesign-vue-next'
 import { login, register } from '@/api/auth'
-import { loadTestData, resetTestDataLoaded } from '@/api/test-data'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
@@ -272,11 +271,6 @@ const handleLogin = async () => {
       
       MessagePlugin.success('登录成功！')
 
-      // 登录成功后先重置并加载一次测试数据，确保有KB可用
-      try {
-        resetTestDataLoaded()
-        await loadTestData()
-      } catch (_) {}
 
       // 等待状态更新完成后再跳转
       await nextTick()

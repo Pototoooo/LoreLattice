@@ -2,23 +2,109 @@
     <div class="system-settings-container">
         <!-- 页面标题区域 -->
         <div class="settings-header">
-            <h2>系统设置</h2>
-            <p class="settings-subtitle">管理和更新系统模型与服务配置</p>
+            <h2>{{ isKbSettings ? '知识库设置' : '系统设置' }}</h2>
+            <p class="settings-subtitle">{{ isKbSettings ? '配置该知识库的模型与文档切分参数' : '管理和更新系统模型与服务配置' }}</p>
         </div>
         
         <!-- 配置内容 -->
         <div class="settings-content">
-            <!-- 直接引用初始化配置组件的内容，不使用外层卡片包装 -->
-            <InitializationContent />
+            <!-- 系统设置：使用初始化配置 -->
+            <InitializationContent v-if="!isKbSettings" />
+            <!-- 知识库设置：基础信息与文档切分配置 -->
+            <div v-else>
+                <t-form :data="kbForm" @submit="saveKb">
+                    <div class="config-section">
+                        <h3><span class="section-icon">⚙️</span>基础信息</h3>
+                        <t-form-item label="名称" name="name" :rules="[{ required: true, message: '请输入名称' }]">
+                            <t-input v-model="kbForm.name" />
+                        </t-form-item>
+                        <t-form-item label="描述" name="description">
+                            <t-textarea v-model="kbForm.description" />
+                        </t-form-item>
+                    </div>
+                    <div class="config-section">
+                        <h3><span class="section-icon">📄</span>文档切分</h3>
+                        <t-row :gutter="16">
+                            <t-col :span="6">
+                                <t-form-item label="Chunk Size" name="chunkSize">
+                                    <t-input-number v-model="kbForm.config.chunking_config.chunk_size" :min="1" />
+                                </t-form-item>
+                            </t-col>
+                            <t-col :span="6">
+                                <t-form-item label="Chunk Overlap" name="chunkOverlap">
+                                    <t-input-number v-model="kbForm.config.chunking_config.chunk_overlap" :min="0" />
+                                </t-form-item>
+                            </t-col>
+                        </t-row>
+                    </div>
+                    <div class="submit-section">
+                        <t-button theme="primary" type="submit" :loading="saving">保存</t-button>
+                    </div>
+                </t-form>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue'
+import { defineAsyncComponent, onMounted, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { MessagePlugin } from 'tdesign-vue-next'
+import { getKnowledgeBaseById, updateKnowledgeBase } from '@/api/knowledge-base'
 
 // 异步加载初始化配置组件
 const InitializationContent = defineAsyncComponent(() => import('../initialization/InitializationContent.vue'))
+
+const route = useRoute()
+const router = useRouter()
+const isKbSettings = ref<boolean>(false)
+
+interface KbForm {
+    name: string
+    description?: string
+    config: { chunking_config: { chunk_size: number; chunk_overlap: number } }
+}
+const kbForm = reactive<KbForm>({
+    name: '',
+    description: '',
+    config: { chunking_config: { chunk_size: 512, chunk_overlap: 64 } }
+})
+const saving = ref(false)
+
+const loadKb = () => {
+    const kbId = (route.params as any).kbId as string
+    if (!kbId) return
+    getKnowledgeBaseById(kbId).then((res: any) => {
+        if (res?.data) {
+            kbForm.name = res.data.name
+            kbForm.description = res.data.description
+            const cc = res.data.chunking_config || {}
+            kbForm.config.chunking_config.chunk_size = cc.chunk_size ?? 512
+            kbForm.config.chunking_config.chunk_overlap = cc.chunk_overlap ?? 64
+        }
+    })
+}
+
+onMounted(() => {
+    isKbSettings.value = route.name === 'knowledgeBaseSettings'
+    if (isKbSettings.value) loadKb()
+})
+
+const saveKb = () => {
+    const kbId = (route.params as any).kbId as string
+    if (!kbId) return
+    saving.value = true
+    updateKnowledgeBase(kbId, { name: kbForm.name, description: kbForm.description, config: { chunking_config: { chunk_size: kbForm.config.chunking_config.chunk_size, chunk_overlap: kbForm.config.chunking_config.chunk_overlap, separators: [], enable_multimodal: false }, image_processing_config: { model_id: '' } } })
+    .then((res: any) => {
+        if (res.success) {
+            MessagePlugin.success('保存成功')
+        } else {
+            MessagePlugin.error(res.message || '保存失败')
+        }
+    })
+    .catch((e: any) => MessagePlugin.error(e?.message || '保存失败'))
+    .finally(() => saving.value = false)
+}
 </script>
 
 <style lang="less" scoped>

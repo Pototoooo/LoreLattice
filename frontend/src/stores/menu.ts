@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 export const useMenuStore = defineStore('menuStore', {
     state: () => ({
         menuArr: reactive([
-            { title: '知识库', icon: 'zhishiku', path: 'knowledgeBase' },
+            { title: '知识库', icon: 'zhishiku', path: 'knowledge-bases' },
             {
                 title: '对话',
                 icon: 'prefixIcon',
@@ -13,8 +13,7 @@ export const useMenuStore = defineStore('menuStore', {
                 childrenPath: 'chat',
                 children: reactive<object[]>([]),
             },
-            { title: '账户信息', icon: 'tenant', path: 'tenant' },
-            { title: '系统设置', icon: 'setting', path: 'settings' },
+            { title: '系统信息', icon: 'tenant', path: 'tenant' },
             { title: '退出登录', icon: 'logout', path: 'logout' }
         ]),
         isFirstSession: false,
