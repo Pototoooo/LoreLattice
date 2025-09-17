@@ -143,10 +143,10 @@ export async function register(data: RegisterRequest): Promise<RegisterResponse>
 /**
  * 获取当前用户信息
  */
-export async function getCurrentUser(): Promise<{ success: boolean; data?: UserInfo; message?: string }> {
+export async function getCurrentUser(): Promise<{ success: boolean; data?: { user: UserInfo; tenant: TenantInfo }; message?: string }> {
   try {
     const response = await get('/api/v1/auth/me')
-    return response as unknown as { success: boolean; data?: UserInfo; message?: string }
+    return response as unknown as { success: boolean; data?: { user: UserInfo; tenant: TenantInfo }; message?: string }
   } catch (error: any) {
     return {
       success: false,

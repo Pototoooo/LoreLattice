@@ -1,25 +1,48 @@
 <template>
     <div class="aside_box">
-        <div class="logo_box">
+        <div class="logo_box" @click="router.push('/platform/knowledge-bases')" style="cursor: pointer;">
             <img class="logo" src="@/assets/img/weknora.png" alt="">
         </div>
         
         <!-- 上半部分：知识库和对话 -->
         <div class="menu_top">
             <div class="menu_box" :class="{ 'has-submenu': item.children }" v-for="(item, index) in topMenuItems" :key="index">
-                <div @click="gotopage(item.path)"
+                <div @click="handleMenuClick(item.path)"
                     @mouseenter="mouseenteMenu(item.path)" @mouseleave="mouseleaveMenu(item.path)"
-                    :class="['menu_item', item.childrenPath && item.childrenPath == currentpath ? 'menu_item_c_active' : item.path == currentpath ? 'menu_item_active' : '']">
+                     :class="['menu_item', item.childrenPath && item.childrenPath == currentpath ? 'menu_item_c_active' : isMenuItemActive(item.path) ? 'menu_item_active' : '']">
                     <div class="menu_item-box">
                         <div class="menu_icon">
-                            <img class="icon" :src="getImgSrc(item.icon == 'zhishiku' ? knowledgeIcon : item.icon == 'setting' ? settingIcon : item.icon == 'logout' ? logoutIcon : item.icon == 'tenant' ? tenantIcon : prefixIcon)" alt="">
+                            <img class="icon" :src="getImgSrc(item.icon == 'zhishiku' ? knowledgeIcon :  item.icon == 'logout' ? logoutIcon : item.icon == 'tenant' ? tenantIcon : prefixIcon)" alt="">
                         </div>
-                        <span class="menu_title">{{ item.title }}</span>
+                        <span class="menu_title" :title="item.path === 'knowledge-bases' && kbMenuItem ? kbMenuItem.title : item.title">{{ item.path === 'knowledge-bases' && kbMenuItem ? kbMenuItem.title : item.title }}</span>
+                        <!-- 知识库切换下拉箭头 -->
+                        <div v-if="item.path === 'knowledge-bases' && isInKnowledgeBase" 
+                             class="kb-dropdown-icon" 
+                             :class="{ 
+                                 'rotate-180': showKbDropdown,
+                                 'active': isMenuItemActive(item.path)
+                             }"
+                             @click.stop="toggleKbDropdown">
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                <path d="M2.5 4.5L6 8L9.5 4.5H2.5Z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <!-- 知识库切换下拉菜单 -->
+                    <div v-if="item.path === 'knowledge-bases' && showKbDropdown && isInKnowledgeBase" 
+                         class="kb-dropdown-menu">
+                        <div v-for="kb in initializedKnowledgeBases" 
+                             :key="kb.id" 
+                             class="kb-dropdown-item"
+                             :class="{ 'active': kb.name === currentKbName }"
+                             @click.stop="switchKnowledgeBase(kb.id)">
+                            {{ kb.name }}
+                        </div>
                     </div>
                     <t-popup overlayInnerClassName="upload-popup" class="placement top center" content="上传知识"
                         placement="top" show-arrow destroy-on-close>
-                        <div class="upload-file-wrap" @click="uploadFile" variant="outline"
-                            v-if="item.path == 'knowledgeBase'">
+                        <div class="upload-file-wrap" @click.stop="uploadFile" variant="outline"
+                             v-if="item.path === 'knowledge-bases' && $route.name === 'knowledgeBaseDetail'">
                             <img class="upload-file-icon" :class="[item.path == currentpath ? 'active-upload' : '']"
                                 :src="getImgSrc(fileAddIcon)" alt="">
                         </div>
@@ -55,14 +78,14 @@
         <!-- 下半部分：账户信息、系统设置、退出登录 -->
         <div class="menu_bottom">
             <div class="menu_box" v-for="(item, index) in bottomMenuItems" :key="'bottom-' + index">
-                <div @click="gotopage(item.path)"
+                <div @click="handleMenuClick(item.path)"
                     @mouseenter="mouseenteMenu(item.path)" @mouseleave="mouseleaveMenu(item.path)"
-                    :class="['menu_item', item.childrenPath && item.childrenPath == currentpath ? 'menu_item_c_active' : item.path == currentpath ? 'menu_item_active' : '']">
+                    :class="['menu_item', item.childrenPath && item.childrenPath == currentpath ? 'menu_item_c_active' : (item.path == currentpath) ? 'menu_item_active' : '']">
                     <div class="menu_item-box">
                         <div class="menu_icon">
-                            <img class="icon" :src="getImgSrc(item.icon == 'zhishiku' ? knowledgeIcon : item.icon == 'setting' ? settingIcon : item.icon == 'logout' ? logoutIcon : item.icon == 'tenant' ? tenantIcon : prefixIcon)" alt="">
+                            <img class="icon" :src="getImgSrc(item.icon == 'zhishiku' ? knowledgeIcon :  item.icon == 'logout' ? logoutIcon : item.icon == 'tenant' ? tenantIcon : prefixIcon)" alt="">
                         </div>
-                        <span class="menu_title">{{ item.title }}</span>
+                        <span class="menu_title">{{ item.path === 'knowledge-bases' && kbMenuItem ? kbMenuItem.title : item.title }}</span>
                     </div>
                 </div>
             </div>
@@ -73,16 +96,16 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { onMounted, watch, computed, ref, reactive } from 'vue';
+import { onMounted, watch, computed, ref, reactive, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getSessionsList, delSession } from "@/api/chat/index";
+import { getKnowledgeBaseById, listKnowledgeBases, uploadKnowledgeFile } from '@/api/knowledge-base';
+import { kbFileTypeVerification } from '@/utils/index';
 import { useMenuStore } from '@/stores/menu';
 import { useAuthStore } from '@/stores/auth';
-import useKnowledgeBase from '@/hooks/useKnowledgeBase';
 import { MessagePlugin } from "tdesign-vue-next";
-let { requestMethod } = useKnowledgeBase()
 let uploadInput = ref();
 const usemenuStore = useMenuStore();
 const authStore = useAuthStore();
@@ -97,52 +120,203 @@ const submenuscrollContainer = ref(null);
 // 计算总页数
 const totalPages = computed(() => Math.ceil(total.value / page_size.value));
 const hasMore = computed(() => currentPage.value < totalPages.value);
+type MenuItem = { title: string; icon: string; path: string; childrenPath?: string; children?: any[] };
 const { menuArr } = storeToRefs(usemenuStore);
-let activeSubmenu = ref(-1);
+let activeSubmenu = ref<number>(-1);
+
+// 是否处于知识库详情页
+const isInKnowledgeBase = computed<boolean>(() => {
+    return route.name === 'knowledgeBaseDetail' || route.name === 'kbCreatChat' || route.name === 'chat' || route.name === 'knowledgeBaseSettings';
+});
+
+// 统一的菜单项激活状态判断
+const isMenuItemActive = (itemPath: string): boolean => {
+    const currentRoute = route.name;
+    
+    switch (itemPath) {
+        case 'knowledge-bases':
+            return currentRoute === 'knowledgeBaseList' || 
+                   currentRoute === 'knowledgeBaseDetail' || 
+                   currentRoute === 'knowledgeBaseSettings';
+        case 'creatChat':
+            return currentRoute === 'kbCreatChat';
+        case 'tenant':
+            return currentRoute === 'tenant';
+        default:
+            return itemPath === currentpath.value;
+    }
+};
+
+// 统一的图标激活状态判断
+const getIconActiveState = (itemPath: string) => {
+    const currentRoute = route.name;
+    
+    return {
+        isKbActive: itemPath === 'knowledge-bases' && (
+            currentRoute === 'knowledgeBaseList' || 
+            currentRoute === 'knowledgeBaseDetail' || 
+            currentRoute === 'knowledgeBaseSettings'
+        ),
+        isCreatChatActive: itemPath === 'creatChat' && currentRoute === 'kbCreatChat',
+        isTenantActive: itemPath === 'tenant' && currentRoute === 'tenant',
+        isChatActive: itemPath === 'chat' && currentRoute === 'chat'
+    };
+};
 
 // 分离上下两部分菜单
-const topMenuItems = computed(() => {
-    return menuArr.value.filter(item => 
-        item.path === 'knowledgeBase' || item.path === 'creatChat'
+const topMenuItems = computed<MenuItem[]>(() => {
+    return (menuArr.value as unknown as MenuItem[]).filter((item: MenuItem) => 
+        item.path === 'knowledge-bases' || (isInKnowledgeBase.value && item.path === 'creatChat')
     );
 });
 
-const bottomMenuItems = computed(() => {
-    return menuArr.value.filter(item => 
-        item.path !== 'knowledgeBase' && item.path !== 'creatChat'
-    );
+const bottomMenuItems = computed<MenuItem[]>(() => {
+    return (menuArr.value as unknown as MenuItem[]).filter((item: MenuItem) => {
+        if (item.path === 'knowledge-bases' || item.path === 'creatChat') {
+            return false;
+        }
+        return true;
+    });
 });
+
+// 当前知识库名称和列表
+const currentKbName = ref<string>('')
+const allKnowledgeBases = ref<Array<{ id: string; name: string; embedding_model_id?: string; summary_model_id?: string }>>([])
+const showKbDropdown = ref<boolean>(false)
+
+// 过滤已初始化的知识库
+const initializedKnowledgeBases = computed(() => {
+    return allKnowledgeBases.value.filter(kb => 
+        kb.embedding_model_id && kb.embedding_model_id !== '' && 
+        kb.summary_model_id && kb.summary_model_id !== ''
+    )
+})
+
+// 动态更新知识库菜单项标题
+const kbMenuItem = computed(() => {
+    const kbItem = topMenuItems.value.find(item => item.path === 'knowledge-bases')
+    if (kbItem && isInKnowledgeBase.value && currentKbName.value) {
+        return { ...kbItem, title: currentKbName.value }
+    }
+    return kbItem
+})
+
 const loading = ref(false)
-const uploadFile = () => {
+const uploadFile = async () => {
+    // 获取当前知识库ID
+    const currentKbId = await getCurrentKbId();
+    
+    // 检查当前知识库的初始化状态
+    if (currentKbId) {
+        try {
+            const kbResponse = await getKnowledgeBaseById(currentKbId);
+            const kb = kbResponse.data;
+            
+            // 检查知识库是否已初始化（有 EmbeddingModelID 和 SummaryModelID）
+            if (!kb.embedding_model_id || kb.embedding_model_id === '' || 
+                !kb.summary_model_id || kb.summary_model_id === '') {
+                MessagePlugin.warning("该知识库尚未完成初始化配置，请先前往设置页面配置模型信息后再上传文件");
+                return;
+            }
+        } catch (error) {
+            console.error('获取知识库信息失败:', error);
+            MessagePlugin.error("获取知识库信息失败，无法上传文件");
+            return;
+        }
+    }
+    
     uploadInput.value.click()
 }
-const upload = (e) => {
-    requestMethod(e.target.files[0], uploadInput)
+const upload = async (e: any) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // 文件类型验证
+    if (kbFileTypeVerification(file)) {
+        return;
+    }
+    
+    // 获取当前知识库ID
+    const currentKbId = (route.params as any)?.kbId as string;
+    if (!currentKbId) {
+        MessagePlugin.error("缺少知识库ID");
+        return;
+    }
+    
+    try {
+        const result = await uploadKnowledgeFile(currentKbId, { file });
+        const responseData = result as any;
+        console.log('上传API返回结果:', responseData);
+        
+        // 如果没有抛出异常，就认为上传成功，先触发刷新事件
+        console.log('文件上传完成，发送事件通知页面刷新，知识库ID:', currentKbId);
+        window.dispatchEvent(new CustomEvent('knowledgeFileUploaded', { 
+            detail: { kbId: currentKbId } 
+        }));
+        
+        // 然后处理UI消息
+        // 判断上传是否成功 - 检查多种可能的成功标识
+        const isSuccess = responseData.success || responseData.code === 200 || responseData.status === 'success' || (!responseData.error && responseData);
+        
+        if (isSuccess) {
+            MessagePlugin.info("上传成功！");
+        } else {
+            // 改进错误信息提取逻辑
+            let errorMessage = "上传失败！";
+            if (responseData.error && responseData.error.message) {
+                errorMessage = responseData.error.message;
+            } else if (responseData.message) {
+                errorMessage = responseData.message;
+            }
+            if (responseData.code === 'duplicate_file' || (responseData.error && responseData.error.code === 'duplicate_file')) {
+                errorMessage = "文件已存在";
+            }
+            MessagePlugin.error(errorMessage);
+        }
+    } catch (err: any) {
+        let errorMessage = "上传失败！";
+        if (err.code === 'duplicate_file') {
+            errorMessage = "文件已存在";
+        } else if (err.error && err.error.message) {
+            errorMessage = err.error.message;
+        } else if (err.message) {
+            errorMessage = err.message;
+        }
+        MessagePlugin.error(errorMessage);
+    } finally {
+        uploadInput.value.value = "";
+    }
 }
-const mouseenteBotDownr = (val) => {
+const mouseenteBotDownr = (val: number) => {
     activeSubmenu.value = val;
 }
 const mouseleaveBotDown = () => {
     activeSubmenu.value = -1;
 }
-const onVisibleChange = (e) => {
+const onVisibleChange = (_e: any) => {
 }
 
-const delCard = (index, item) => {
-    delSession(item.id).then(res => {
-        if (res && res.success) {
-            menuArr.value[1].children.splice(index, 1);
+const delCard = (index: number, item: any) => {
+    delSession(item.id).then((res: any) => {
+        if (res && (res as any).success) {
+            (menuArr.value as any[])[1]?.children?.splice(index, 1);
             if (item.id == route.params.chatid) {
-                router.push('/platform/creatChat');
+                // 删除当前会话后，跳转到当前知识库的创建聊天页面
+                const kbId = route.params.kbId;
+                if (kbId) {
+                    router.push(`/platform/knowledge-bases/${kbId}/creatChat`);
+                } else {
+                    router.push('/platform/knowledge-bases');
+                }
             }
         } else {
             MessagePlugin.error("删除失败，请稍后再试!");
         }
     })
 }
-const debounce = (fn, delay) => {
-    let timer
-    return (...args) => {
+const debounce = (fn: (...args: any[]) => void, delay: number) => {
+    let timer: ReturnType<typeof setTimeout>
+    return (...args: any[]) => {
         clearTimeout(timer)
         timer = setTimeout(() => fn(...args), delay)
     }
@@ -160,59 +334,131 @@ const checkScrollBottom = () => {
     }
 }
 const handleScroll = debounce(checkScrollBottom, 200)
-const getMessageList = () => {
+const getMessageList = async () => {
+    // 仅在知识库内部显示对话列表
+    if (!isInKnowledgeBase.value) {
+        usemenuStore.clearMenuArr();
+        currentKbName.value = '';
+        return;
+    }
+    let kbId = (route.params as any)?.kbId as string
+    // 新的路由格式：/platform/chat/:kbId/:chatid，直接从路由参数获取知识库ID
+    if (!kbId) {
+        usemenuStore.clearMenuArr();
+        currentKbName.value = '';
+        return;
+    }
+    
+    // 获取知识库名称和所有知识库列表
+    try {
+        const [kbRes, allKbRes]: any[] = await Promise.all([
+            getKnowledgeBaseById(kbId),
+            listKnowledgeBases()
+        ])
+        if (kbRes?.data?.name) {
+            currentKbName.value = kbRes.data.name
+        }
+        if (allKbRes?.data) {
+            allKnowledgeBases.value = allKbRes.data
+        }
+    } catch {}
+    
     if (loading.value) return;
     loading.value = true;
     usemenuStore.clearMenuArr();
-    getSessionsList(currentPage.value, page_size.value).then(res => {
+    getSessionsList(currentPage.value, page_size.value).then((res: any) => {
         if (res.data && res.data.length) {
-            res.data.forEach(item => {
-                let obj = { title: item.title ? item.title : "新会话", path: `chat/${item.id}`, id: item.id, isMore: false, isNoTitle: item.title ? false : true }
+            // 过滤出当前知识库的会话
+            const filtered = res.data.filter((s: any) => s.knowledge_base_id === kbId)
+            filtered.forEach((item: any) => {
+                let obj = { title: item.title ? item.title : "新会话", path: `chat/${kbId}/${item.id}`, id: item.id, isMore: false, isNoTitle: item.title ? false : true }
                 usemenuStore.updatemenuArr(obj)
             });
             loading.value = false;
         }
-        if (res.total) {
-            total.value = res.total;
+        if ((res as any).total) {
+            total.value = (res as any).total;
         }
     })
 }
 
-const openMore = (e) => { }
+const openMore = (_e: any) => { }
 onMounted(() => {
-    currentpath.value = route.name;
-    if (route.params.chatid) {
-        currentSecondpath.value = `${route.name}/${route.params.chatid}`;
+    const routeName = typeof route.name === 'string' ? route.name : (route.name ? String(route.name) : '')
+    currentpath.value = routeName;
+    if (route.params.chatid && route.params.kbId) {
+        currentSecondpath.value = `chat/${route.params.kbId}/${route.params.chatid}`;
     }
     getMessageList();
 });
 
 watch([() => route.name, () => route.params], (newvalue) => {
-    currentpath.value = newvalue[0];
-    if (newvalue[1].chatid) {
-        currentSecondpath.value = `${newvalue[0]}/${newvalue[1].chatid}`;
+    const nameStr = typeof newvalue[0] === 'string' ? (newvalue[0] as string) : (newvalue[0] ? String(newvalue[0]) : '')
+    currentpath.value = nameStr;
+    if (newvalue[1].chatid && newvalue[1].kbId) {
+        currentSecondpath.value = `chat/${newvalue[1].kbId}/${newvalue[1].chatid}`;
     } else {
         currentSecondpath.value = "";
     }
-
+    // 路由变化时刷新对话列表（仅在知识库内部）
+    getMessageList();
+    // 路由变化时更新图标状态
+    getIcon(nameStr);
 });
 let fileAddIcon = ref('file-add-green.svg');
 let knowledgeIcon = ref('zhishiku-green.svg');
 let prefixIcon = ref('prefixIcon.svg');
-let settingIcon = ref('setting.svg');
 let logoutIcon = ref('logout.svg');
 let tenantIcon = ref('user.svg'); // 使用专门的用户图标
 let pathPrefix = ref(route.name)
-const getIcon = (path) => {
-    fileAddIcon.value = path == 'knowledgeBase' ? 'file-add-green.svg' : 'file-add.svg';
-    knowledgeIcon.value = path == 'knowledgeBase' ? 'zhishiku-green.svg' : 'zhishiku.svg';
-    prefixIcon.value = path == 'creatChat' ? 'prefixIcon-green.svg' : path == 'knowledgeBase' ? 'prefixIcon-grey.svg' : 'prefixIcon.svg';
-    settingIcon.value = path == 'settings' ? 'setting-green.svg' : 'setting.svg';
-    tenantIcon.value = path == 'tenant' ? 'user-green.svg' : 'user.svg'; // 使用专门的用户图标
-    logoutIcon.value = 'logout.svg';
+  const getIcon = (path: string) => {
+      // 根据当前路由状态更新所有图标
+      const kbActiveState = getIconActiveState('knowledge-bases');
+      const creatChatActiveState = getIconActiveState('creatChat');
+      const tenantActiveState = getIconActiveState('tenant');
+      
+      // 上传图标：只在知识库相关页面显示绿色
+      fileAddIcon.value = kbActiveState.isKbActive ? 'file-add-green.svg' : 'file-add.svg';
+      
+      // 知识库图标：只在知识库页面显示绿色
+      knowledgeIcon.value = kbActiveState.isKbActive ? 'zhishiku-green.svg' : 'zhishiku.svg';
+      
+      // 对话图标：只在对话创建页面显示绿色，在知识库页面显示灰色，其他情况显示默认
+      prefixIcon.value = creatChatActiveState.isCreatChatActive ? 'prefixIcon-green.svg' : 
+                        kbActiveState.isKbActive ? 'prefixIcon-grey.svg' : 
+                        'prefixIcon.svg';
+      
+      // 租户图标：只在租户页面显示绿色
+      tenantIcon.value = tenantActiveState.isTenantActive ? 'user-green.svg' : 'user.svg';
+      
+      // 退出图标：始终显示默认
+      logoutIcon.value = 'logout.svg';
 }
-getIcon(route.name)
-const gotopage = (path) => {
+getIcon(typeof route.name === 'string' ? route.name as string : (route.name ? String(route.name) : ''))
+const handleMenuClick = async (path: string) => {
+    if (path === 'knowledge-bases') {
+        // 知识库菜单项：如果在知识库内部，跳转到当前知识库文件页；否则跳转到知识库列表
+        const kbId = await getCurrentKbId()
+        if (kbId) {
+            router.push(`/platform/knowledge-bases/${kbId}`)
+        } else {
+            router.push('/platform/knowledge-bases')
+        }
+      } else {
+          gotopage(path)
+      }
+}
+
+const getCurrentKbId = async (): Promise<string | null> => {
+    let kbId = (route.params as any)?.kbId as string
+    // 新的路由格式：/platform/chat/:kbId/:chatid，直接从路由参数获取
+    if (!kbId && route.name === 'chat' && (route.params as any)?.kbId) {
+        kbId = (route.params as any).kbId
+    }
+    return kbId || null
+}
+
+const gotopage = async (path: string) => {
     pathPrefix.value = path;
     // 处理退出登录
     if (path === 'logout') {
@@ -220,25 +466,83 @@ const gotopage = (path) => {
         router.push('/login');
         return;
     } else {
-        router.push(`/platform/${path}`);
+        if (path === 'creatChat') {
+            const kbId = await getCurrentKbId()
+            if (kbId) {
+                router.push(`/platform/knowledge-bases/${kbId}/creatChat`)
+            } else {
+                router.push(`/platform/knowledge-bases`)
+            }
+        } else {
+            router.push(`/platform/${path}`);
+        }
     }
     getIcon(path)
 }
 
-const getImgSrc = (url) => {
+const getImgSrc = (url: string) => {
     return new URL(`/src/assets/img/${url}`, import.meta.url).href;
 }
 
-const mouseenteMenu = (path) => {
-    if (pathPrefix.value != 'knowledgeBase' && pathPrefix.value != 'creatChat' && path != 'knowledgeBase') {
+const mouseenteMenu = (path: string) => {
+    if (pathPrefix.value != 'knowledge-bases' && pathPrefix.value != 'creatChat' && path != 'knowledge-bases') {
         prefixIcon.value = 'prefixIcon-grey.svg';
     }
 }
-const mouseleaveMenu = (path) => {
-    if (pathPrefix.value != 'knowledgeBase' && pathPrefix.value != 'creatChat' && path != 'knowledgeBase') {
-        getIcon(route.name)
+const mouseleaveMenu = (path: string) => {
+    if (pathPrefix.value != 'knowledge-bases' && pathPrefix.value != 'creatChat' && path != 'knowledge-bases') {
+        const nameStr = typeof route.name === 'string' ? route.name as string : (route.name ? String(route.name) : '')
+        getIcon(nameStr)
     }
 }
+
+// 知识库下拉相关方法
+const toggleKbDropdown = (event?: Event) => {
+    if (event) {
+        event.stopPropagation()
+    }
+    showKbDropdown.value = !showKbDropdown.value
+}
+
+const switchKnowledgeBase = (kbId: string, event?: Event) => {
+    if (event) {
+        event.stopPropagation()
+    }
+    showKbDropdown.value = false
+    const currentRoute = route.name
+    
+    // 路由跳转
+    if (currentRoute === 'knowledgeBaseDetail') {
+        router.push(`/platform/knowledge-bases/${kbId}`)
+    } else if (currentRoute === 'kbCreatChat') {
+        router.push(`/platform/knowledge-bases/${kbId}/creatChat`)
+    } else if (currentRoute === 'knowledgeBaseSettings') {
+        router.push(`/platform/knowledge-bases/${kbId}/settings`)
+    } else {
+        router.push(`/platform/knowledge-bases/${kbId}`)
+    }
+    
+    // 刷新右侧内容 - 通过触发页面重新加载或发送事件
+    nextTick(() => {
+        // 发送全局事件通知页面刷新知识库内容
+        window.dispatchEvent(new CustomEvent('knowledgeBaseChanged', { 
+            detail: { kbId } 
+        }))
+    })
+}
+
+// 点击外部关闭下拉菜单
+const handleClickOutside = () => {
+    showKbDropdown.value = false
+}
+
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside)
+})
+
+watch(() => route.params.kbId, () => {
+    showKbDropdown.value = false
+})
 
 </script>
 <style lang="less" scoped>
@@ -406,6 +710,10 @@ const mouseleaveMenu = (path) => {
         font-style: normal;
         font-weight: 600;
         line-height: 22px;
+        overflow: hidden;
+        white-space: nowrap;
+        max-width: 120px;
+        flex: 1;
     }
 
     .submenu {
@@ -490,6 +798,92 @@ const mouseleaveMenu = (path) => {
             color: #07c05f !important;
         }
     }
+}
+
+/* 知识库下拉菜单样式 */
+.kb-dropdown-icon {
+    margin-left: auto;
+    color: #666;
+    transition: transform 0.3s ease, color 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    
+    &.rotate-180 {
+        transform: rotate(180deg);
+    }
+    
+    &:hover {
+        color: #07c05f;
+    }
+    
+    &.active {
+        color: #07c05f;
+    }
+    
+    &.active:hover {
+        color: #05a04f;
+    }
+    
+    svg {
+        width: 12px;
+        height: 12px;
+        transition: inherit;
+    }
+}
+
+.kb-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.kb-dropdown-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 14px;
+    color: #333;
+    
+    &:hover {
+        background-color: #f5f5f5;
+    }
+    
+    &.active {
+        background-color: #07c05f1a;
+        color: #07c05f;
+        font-weight: 500;
+    }
+    
+    &:first-child {
+        border-radius: 6px 6px 0 0;
+    }
+    
+    &:last-child {
+        border-radius: 0 0 6px 6px;
+    }
+}
+
+.menu_item-box {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+.menu_box {
+    position: relative;
 }
 </style>
 <style lang="less">

@@ -91,17 +91,56 @@ check_platform() {
     log_info "当前架构：$TARGETARCH"
 }
 
+# 获取版本信息
+get_version_info() {
+    # 从VERSION文件获取版本号
+    if [ -f "VERSION" ]; then
+        VERSION=$(cat VERSION | tr -d '\n\r')
+    else
+        VERSION="unknown"
+    fi
+    
+    # 获取commit ID
+    if command -v git >/dev/null 2>&1; then
+        COMMIT_ID=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+    else
+        COMMIT_ID="unknown"
+    fi
+    
+    # 获取构建时间
+    BUILD_TIME=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+    
+    # 获取Go版本
+    if command -v go >/dev/null 2>&1; then
+        GO_VERSION=$(go version 2>/dev/null || echo "unknown")
+    else
+        GO_VERSION="unknown"
+    fi
+    
+    log_info "版本信息: $VERSION"
+    log_info "Commit ID: $COMMIT_ID"
+    log_info "构建时间: $BUILD_TIME"
+    log_info "Go版本: $GO_VERSION"
+}
+
 # 构建应用镜像
 build_app_image() {
     log_info "构建应用镜像 (weknora-app)..."
     
     cd "$PROJECT_ROOT"
     
+    # 获取版本信息
+    get_version_info
+    
     docker build \
         --platform $PLATFORM \
         --build-arg GOPRIVATE_ARG=${GOPRIVATE:-""} \
         --build-arg GOPROXY_ARG=${GOPROXY:-"https://goproxy.cn,direct"} \
         --build-arg GOSUMDB_ARG=${GOSUMDB:-"off"} \
+        --build-arg VERSION_ARG="$VERSION" \
+        --build-arg COMMIT_ID_ARG="$COMMIT_ID" \
+        --build-arg BUILD_TIME_ARG="$BUILD_TIME" \
+        --build-arg GO_VERSION_ARG="$GO_VERSION" \
         -f docker/Dockerfile.app \
         -t wechatopenai/weknora-app:latest \
         .

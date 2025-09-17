@@ -85,6 +85,7 @@ func (c *RemoteAPIChat) buildChatCompletionRequest(messages []Message,
 		Messages: c.convertMessages(messages),
 		Stream:   isStream,
 	}
+	thinking := false
 
 	// 添加可选参数
 	if opts != nil {
@@ -106,6 +107,13 @@ func (c *RemoteAPIChat) buildChatCompletionRequest(messages []Message,
 		if opts.PresencePenalty > 0 {
 			req.PresencePenalty = float32(opts.PresencePenalty)
 		}
+		if opts.Thinking != nil {
+			thinking = *opts.Thinking
+		}
+	}
+
+	req.ChatTemplateKwargs = map[string]interface{}{
+		"enable_thinking": thinking,
 	}
 
 	return req

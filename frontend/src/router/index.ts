@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { checkInitializationStatus } from '@/api/initialization'
+import { listKnowledgeBases } from '@/api/knowledge-base'
 import { useAuthStore } from '@/stores/auth'
 import { validateToken } from '@/api/auth'
 
@@ -8,19 +8,13 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      redirect: "/platform/knowledgeBase",
+      redirect: "/platform/knowledge-bases",
     },
     {
       path: "/login",
       name: "login",
       component: () => import("../views/auth/Login.vue"),
       meta: { requiresAuth: false, requiresInit: false }
-    },
-    {
-      path: "/initialization",
-      name: "initialization",
-      component: () => import("../views/initialization/InitializationConfig.vue"),
-      meta: { requiresInit: false } // 初始化页面不需要检查初始化状态
     },
     {
       path: "/knowledgeBase",
@@ -42,28 +36,35 @@ const router = createRouter({
           meta: { requiresInit: true, requiresAuth: true }
         },
         {
-          path: "knowledgeBase",
-          name: "knowledgeBase",
+          path: "knowledge-bases",
+          name: "knowledgeBaseList",
+          component: () => import("../views/knowledge/KnowledgeBaseList.vue"),
+          meta: { requiresInit: true, requiresAuth: true }
+        },
+        {
+          path: "knowledge-bases/:kbId",
+          name: "knowledgeBaseDetail",
           component: () => import("../views/knowledge/KnowledgeBase.vue"),
           meta: { requiresInit: true, requiresAuth: true }
         },
         {
-          path: "creatChat",
-          name: "creatChat",
+          path: "knowledge-bases/:kbId/creatChat",
+          name: "kbCreatChat",
           component: () => import("../views/creatChat/creatChat.vue"),
           meta: { requiresInit: true, requiresAuth: true }
         },
         {
-          path: "chat/:chatid",
-          name: "chat",
-          component: () => import("../views/chat/index.vue"),
+          path: "knowledge-bases/:kbId/settings",
+          name: "knowledgeBaseSettings",
+          component: () => import("../views/initialization/InitializationContent.vue"),
+          props: { isKbSettings: true },
           meta: { requiresInit: true, requiresAuth: true }
         },
         {
-            path: "settings",
-            name: "settings",
-            component: () => import("../views/settings/SystemSettings.vue"),
-            meta: { requiresInit: true }
+          path: "chat/:kbId/:chatid",
+          name: "chat",
+          component: () => import("../views/chat/index.vue"),
+          meta: { requiresInit: true, requiresAuth: true }
         },
       ],
     },
@@ -110,33 +111,7 @@ router.beforeEach(async (to, from, next) => {
     // }
   }
 
-  // 检查系统初始化状态
-  if (to.meta.requiresInit !== false) {
-    try {
-      const { initialized } = await checkInitializationStatus()
-      
-      if (initialized) {
-        // 系统已初始化，记录到本地存储并正常跳转
-        localStorage.setItem('system_initialized', 'true')
-        next()
-      } else {
-        // 系统未初始化，跳转到初始化页面
-        next('/initialization')
-      }
-    } catch (error) {
-      console.error('检查初始化状态失败:', error)
-      // 如果是401，跳转登录，不再误导去初始化
-      const status = (error as any)?.status
-      if (status === 401) {
-        next('/login')
-        return
-      }
-      // 其他错误默认认为需要初始化
-      next('/initialization')
-    }
-  } else {
-    next()
-  }
+  next()
 });
 
 export default router

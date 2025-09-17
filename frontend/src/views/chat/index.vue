@@ -38,6 +38,7 @@ const { output, onChunk, isStreaming, isLoading, error, startStream, stopStream 
 const route = useRoute();
 const router = useRouter();
 const session_id = ref(route.params.chatid);
+const knowledge_base_id = ref(route.params.kbId);
 const created_at = ref('');
 const limit = ref(20);
 const messagesList = reactive([]);
@@ -57,6 +58,7 @@ watch([() => route.params], (newvalue) => {
         }
         messagesList.splice(0);
         session_id.value = newvalue[0].chatid;
+        knowledge_base_id.value = newvalue[0].kbId;
         checkmenuTitle(session_id.value)
         let data = {
             session_id: session_id.value,
@@ -154,7 +156,14 @@ const sendMsg = async (value) => {
     loading.value = true;
     messagesList.push({ content: value, role: 'user' });
     scrollToBottom();
-    await startStream({ session_id: session_id.value, query: value, method: 'POST', url: '/api/v1/knowledge-chat' });
+    
+    await startStream({ 
+        session_id: session_id.value, 
+        knowledge_base_id: knowledge_base_id.value,
+        query: value, 
+        method: 'POST', 
+        url: '/api/v1/knowledge-chat' 
+    });
 }
 
 // 处理流式数据

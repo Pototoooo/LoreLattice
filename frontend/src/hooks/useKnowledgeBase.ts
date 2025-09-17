@@ -3,29 +3,32 @@ import { storeToRefs } from "pinia";
 import { formatStringDate, kbFileTypeVerification } from "../utils/index";
 import { MessagePlugin } from "tdesign-vue-next";
 import {
-  uploadKnowledgeBase,
-  getKnowledgeBase,
+  uploadKnowledgeFile,
+  listKnowledgeFiles,
   getKnowledgeDetails,
   delKnowledgeDetails,
   getKnowledgeDetailsCon,
 } from "@/api/knowledge-base/index";
 import { knowledgeStore } from "@/stores/knowledge";
+import { useRoute } from 'vue-router';
 const usemenuStore = knowledgeStore();
-export default function () {
+export default function (knowledgeBaseId?: string) {
+  const route = useRoute();
   const { cardList, total } = storeToRefs(usemenuStore);
   let moreIndex = ref(-1);
   const details = reactive({
     title: "",
     time: "",
-    md: [],
+    md: [] as any[],
     id: "",
     total: 0
   });
   const getKnowled = (query = { page: 1, page_size: 35 }) => {
-    getKnowledgeBase(query)
+    if (!knowledgeBaseId) return;
+    listKnowledgeFiles(knowledgeBaseId, query)
       .then((result: any) => {
         let { data, total: totalResult } = result;
-        let cardList_ = data.map((item) => {
+        let cardList_ = data.map((item: any) => {
             item["file_name"] = item.file_name.substring(
               0,
               item.file_name.lastIndexOf(".")
@@ -38,16 +41,16 @@ export default function () {
             };
         });
         if (query.page == 1) {
-          cardList.value = cardList_;
+          cardList.value = cardList_ as any[];
         } else {
-          cardList.value.push(...cardList_);
+          (cardList.value as any[]).push(...cardList_);
         }
         total.value = totalResult;
       })
-      .catch((err) => {});
+      .catch((_err) => {});
   };
-  const delKnowledge = (index: number, item) => {
-    cardList.value[index].isMore = false;
+  const delKnowledge = (index: number, item: any) => {
+    (cardList.value as any[])[index].isMore = false;
     moreIndex.value = -1;
     delKnowledgeDetails(item.id)
       .then((result: any) => {
@@ -58,7 +61,7 @@ export default function () {
           MessagePlugin.error("知识删除失败！");
         }
       })
-      .catch((err) => {
+      .catch((_err) => {
         MessagePlugin.error("知识删除失败！");
       });
   };
@@ -70,12 +73,30 @@ export default function () {
       moreIndex.value = -1;
     }
   };
-  const requestMethod = (file: any, uploadInput) => {
+  const requestMethod = (file: any, uploadInput: any) => {
     if (file instanceof File && uploadInput) {
       if (kbFileTypeVerification(file)) {
         return;
       }
-      uploadKnowledgeBase({ file })
+      // 每次上传时动态解析当前 kbId（优先：路由 -> URL -> 初始参数）
+      let currentKbId: string | undefined;
+      try {
+        currentKbId = (route.params as any)?.kbId as string;
+      } catch {}
+      if (!currentKbId && typeof window !== 'undefined') {
+        try {
+          const match = window.location.pathname.match(/knowledge-bases\/([^/]+)/);
+          if (match && match[1]) currentKbId = match[1];
+        } catch {}
+      }
+      if (!currentKbId) {
+        currentKbId = knowledgeBaseId;
+      }
+      if (!currentKbId) {
+        MessagePlugin.error("缺少知识库ID");
+        return;
+      }
+      uploadKnowledgeFile(currentKbId, { file })
         .then((result: any) => {
           if (result.success) {
             MessagePlugin.info("上传成功！");
@@ -83,27 +104,20 @@ export default function () {
           } else {
             // 改进错误信息提取逻辑
             let errorMessage = "上传失败！";
-            
-            // 优先从 error 对象中获取错误信息
             if (result.error && result.error.message) {
               errorMessage = result.error.message;
             } else if (result.message) {
               errorMessage = result.message;
             }
-            
-            // 检查错误码，如果是重复文件则显示特定提示
             if (result.code === 'duplicate_file' || (result.error && result.error.code === 'duplicate_file')) {
               errorMessage = "文件已存在";
             }
-            
             MessagePlugin.error(errorMessage);
           }
           uploadInput.value.value = "";
         })
         .catch((err: any) => {
-          // 改进 catch 中的错误处理
           let errorMessage = "上传失败！";
-          
           if (err.code === 'duplicate_file') {
             errorMessage = "文件已存在";
           } else if (err.error && err.error.message) {
@@ -111,7 +125,6 @@ export default function () {
           } else if (err.message) {
             errorMessage = err.message;
           }
-          
           MessagePlugin.error(errorMessage);
           uploadInput.value.value = "";
         });
@@ -119,7 +132,7 @@ export default function () {
       MessagePlugin.error("file文件类型错误！");
     }
   };
-  const getCardDetails = (item) => {
+  const getCardDetails = (item: any) => {
     Object.assign(details, {
       title: "",
       time: "",
@@ -137,23 +150,23 @@ export default function () {
           });
         }
       })
-      .catch((err) => {});
+      .catch((_err) => {});
       getfDetails(item.id, 1);
   };
-  const getfDetails = (id, page) => {
+  const getfDetails = (id: string, page: number) => {
     getKnowledgeDetailsCon(id, page)
       .then((result: any) => {
         if (result.success && result.data) {
           let { data, total: totalResult } = result;
           if (page == 1) {
-            details.md = data;
+            (details.md as any[]) = data;
           } else {
-            details.md.push(...data);
+            (details.md as any[]).push(...data);
           }
           details.total = totalResult;
         }
       })
-      .catch((err) => {});
+      .catch((_err) => {});
   };
   return {
     cardList,

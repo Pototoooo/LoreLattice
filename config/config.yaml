@@ -9,7 +9,7 @@ conversation:
   keyword_threshold: 0.3
   embedding_top_k: 10
   vector_threshold: 0.5
-  rerank_threshold: 0.7
+  rerank_threshold: 0.5
   rerank_top_k: 5
   fallback_strategy: "fixed"
   fallback_response: "抱歉，我无法回答这个问题。"

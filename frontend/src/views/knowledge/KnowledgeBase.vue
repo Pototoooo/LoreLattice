@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, reactive } from "vue";
+import { ref, onMounted, onUnmounted, watch, reactive, computed } from "vue";
 import DocContent from "@/components/doc-content.vue";
 import InputField from "@/components/Input-field.vue";
 import useKnowledgeBase from '@/hooks/useKnowledgeBase';
@@ -7,17 +7,21 @@ import { useRoute, useRouter } from 'vue-router';
 import EmptyKnowledge from '@/components/empty-knowledge.vue';
 import { getSessionsList, createSessions, generateSessionsTitle } from "@/api/chat/index";
 import { useMenuStore } from '@/stores/menu';
-import { getTestData } from '@/utils/request';
+import { MessagePlugin } from 'tdesign-vue-next';
 const usemenuStore = useMenuStore();
 const router = useRouter();
 import {
   batchQueryKnowledge,
+  listKnowledgeFiles,
 } from "@/api/knowledge-base/index";
-let { cardList, total, moreIndex, details, getKnowled, delKnowledge, openMore, onVisibleChange, getCardDetails, getfDetails } = useKnowledgeBase()
+import { formatStringDate } from "@/utils/index";
+const route = useRoute();
+const kbId = computed(() => (route.params as any).kbId as string || '');
+let { cardList, total, moreIndex, details, getKnowled, delKnowledge, openMore, onVisibleChange, getCardDetails, getfDetails } = useKnowledgeBase(kbId.value)
 let isCardDetails = ref(false);
-let timeout = null;
+let timeout: ReturnType<typeof setInterval> | null = null;
 let delDialog = ref(false)
-let knowledge = ref({})
+let knowledge = ref<KnowledgeCard>({ id: '', parse_status: '' })
 let knowledgeIndex = ref(-1)
 let knowledgeScroll = ref()
 let page = 1;
@@ -29,29 +33,93 @@ const getPageSize = () => {
   pageSize = Math.max(35, itemsInView);
 }
 getPageSize()
+// 直接调用 API 获取知识库文件列表
+const loadKnowledgeFiles = async (kbIdValue: string) => {
+  if (!kbIdValue) return;
+  
+  try {
+    const result = await listKnowledgeFiles(kbIdValue, { page: 1, page_size: pageSize });
+    
+    // 由于响应拦截器已经返回了 data，所以 result 就是响应的 data 部分
+    // 按照 useKnowledgeBase hook 中的方式处理
+    const { data, total: totalResult } = result as any;
+    
+    if (!data || !Array.isArray(data)) {
+      console.error('Invalid data format. Expected array, got:', typeof data, data);
+      return;
+    }
+    
+    const cardList_ = data.map((item: any) => {
+      item["file_name"] = item.file_name.substring(
+        0,
+        item.file_name.lastIndexOf(".")
+      );
+      return {
+        ...item,
+        updated_at: formatStringDate(new Date(item.updated_at)),
+        isMore: false,
+        file_type: item.file_type.toLocaleUpperCase(),
+      };
+    });
+    
+    cardList.value = cardList_ as any[];
+    total.value = totalResult;
+  } catch (err) {
+    console.error('Failed to load knowledge files:', err);
+  }
+};
+
+// 监听路由参数变化，重新获取知识库内容
+watch(() => kbId.value, (newKbId, oldKbId) => {
+  if (newKbId && newKbId !== oldKbId) {
+    loadKnowledgeFiles(newKbId);
+  }
+}, { immediate: false });
+
+// 监听文件上传事件
+const handleFileUploaded = (event: CustomEvent) => {
+  const uploadedKbId = event.detail.kbId;
+  console.log('接收到文件上传事件，上传的知识库ID:', uploadedKbId, '当前知识库ID:', kbId.value);
+  if (uploadedKbId && uploadedKbId === kbId.value) {
+    console.log('匹配当前知识库，开始刷新文件列表');
+    // 如果上传的文件属于当前知识库，使用 loadKnowledgeFiles 刷新文件列表
+    loadKnowledgeFiles(uploadedKbId);
+  }
+};
+
 onMounted(() => {
   getKnowled({ page: 1, page_size: pageSize });
+  
+  // 监听文件上传事件
+  window.addEventListener('knowledgeFileUploaded', handleFileUploaded as EventListener);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('knowledgeFileUploaded', handleFileUploaded as EventListener);
 });
 watch(() => cardList.value, (newValue) => {
   let analyzeList = [];
   analyzeList = newValue.filter(item => {
     return item.parse_status == 'pending' || item.parse_status == 'processing';
   })
-  clearInterval(timeout);
-  timeout = null;
+  if (timeout !== null) {
+    clearInterval(timeout);
+    timeout = null;
+  }
   if (analyzeList.length) {
     updateStatus(analyzeList)
   }
 }, { deep: true })
-const updateStatus = (analyzeList) => {
+type KnowledgeCard = { id: string; parse_status: string; description?: string; file_name?: string; updated_at?: string; file_type?: string; isMore?: boolean };
+const updateStatus = (analyzeList: KnowledgeCard[]) => {
   let query = ``;
   for (let i = 0; i < analyzeList.length; i++) {
     query += `ids=${analyzeList[i].id}&`;
   }
   timeout = setInterval(() => {
-    batchQueryKnowledge(query).then((result) => {
+    batchQueryKnowledge(query).then((result: any) => {
       if (result.success && result.data) {
-        result.data.forEach(item => {
+        (result.data as KnowledgeCard[]).forEach((item: KnowledgeCard) => {
           if (item.parse_status == 'failed' || item.parse_status == 'completed') {
             let index = cardList.value.findIndex(card => card.id == item.id);
             if (index != -1) {
@@ -70,12 +138,12 @@ const updateStatus = (analyzeList) => {
 const closeDoc = () => {
   isCardDetails.value = false;
 };
-const openCardDetails = (item) => {
+const openCardDetails = (item: KnowledgeCard) => {
   isCardDetails.value = true;
   getCardDetails(item);
 };
 
-const delCard = (index, item) => {
+const delCard = (index: number, item: KnowledgeCard) => {
   knowledgeIndex.value = index;
   knowledge.value = item;
   delDialog.value = true;
@@ -94,7 +162,7 @@ const handleScroll = () => {
     }
   }
 };
-const getDoc = (page) => {
+const getDoc = (page: number) => {
   getfDetails(details.id, page)
 };
 
@@ -108,51 +176,36 @@ const sendMsg = (value: string) => {
 };
 
 const getTitle = (session_id: string, value: string) => {
-  let obj = { title: '新会话', path: `chat/${session_id}`, id: session_id, isMore: false, isNoTitle: true };
+  let obj = { title: '新会话', path: `chat/${kbId.value}/${session_id}`, id: session_id, isMore: false, isNoTitle: true };
   usemenuStore.updataMenuChildren(obj);
   usemenuStore.changeIsFirstSession(true);
   usemenuStore.changeFirstQuery(value);
-  router.push(`/platform/chat/${session_id}`);
+  router.push(`/platform/chat/${kbId.value}/${session_id}`);
 };
 
 async function createNewSession(value: string): Promise<void> {
-  // 从localStorage获取设置中的知识库ID
-  const settingsStr = localStorage.getItem("WeKnora_settings");
-  let knowledgeBaseId = "";
+  // 优先使用当前页面的知识库ID
+  let sessionKbId = kbId.value;
   
-  if (settingsStr) {
-    try {
-      const settings = JSON.parse(settingsStr);
-      if (settings.knowledgeBaseId) {
-        knowledgeBaseId = settings.knowledgeBaseId;
-        createSessions({ knowledge_base_id: knowledgeBaseId }).then(res => {
-          if (res.data && res.data.id) {
-            getTitle(res.data.id, value);
-          } else {
-            // 错误处理
-            console.error("创建会话失败");
-          }
-        }).catch(error => {
-          console.error("创建会话出错:", error);
-        });
-        return;
+  // 如果当前页面没有知识库ID，尝试从localStorage获取设置中的知识库ID
+  if (!sessionKbId) {
+    const settingsStr = localStorage.getItem("WeKnora_settings");
+    if (settingsStr) {
+      try {
+        const settings = JSON.parse(settingsStr);
+        sessionKbId = settings.knowledgeBaseId;
+      } catch (e) {
+        console.error("解析设置失败:", e);
       }
-    } catch (e) {
-      console.error("解析设置失败:", e);
     }
   }
   
-  // 如果设置中没有知识库ID，则使用测试数据
-  const testData = getTestData();
-  if (!testData || !testData.knowledge_bases || testData.knowledge_bases.length === 0) {
-    console.error("测试数据未初始化或不包含知识库");
+  if (!sessionKbId) {
+    MessagePlugin.warning("请先选择一个知识库");
     return;
   }
-
-  // 使用第一个知识库ID
-  knowledgeBaseId = testData.knowledge_bases[0].id;
-
-  createSessions({ knowledge_base_id: knowledgeBaseId }).then(res => {
+  
+  createSessions({ knowledge_base_id: sessionKbId }).then(res => {
     if (res.data && res.data.id) {
       getTitle(res.data.id, value);
     } else {
