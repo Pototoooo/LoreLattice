@@ -1,5 +1,5 @@
 <template>
-    <div class="main" ref="dropzone" @dragover="dragover" @drop="drop" @dragstart="dragstart">
+    <div class="main" ref="dropzone">
         <Menu></Menu>
         <RouterView />
         <div class="upload-mask" v-show="ismask">
@@ -10,34 +10,26 @@
 </template>
 <script setup lang="ts">
 import Menu from '@/components/menu.vue'
-import { ref } from 'vue';
-import { useRouter, useRoute } from 'vue-router'
-import { storeToRefs } from "pinia";
-import { knowledgeStore } from "@/stores/knowledge";
-const usemenuStore = knowledgeStore();
+import { ref, onMounted, onUnmounted } from 'vue';
+import { useRoute } from 'vue-router'
 import useKnowledgeBase from '@/hooks/useKnowledgeBase'
 import UploadMask from '@/components/upload-mask.vue'
 import { getKnowledgeBaseById } from '@/api/knowledge-base/index'
 import { MessagePlugin } from 'tdesign-vue-next'
+
 let { requestMethod } = useKnowledgeBase()
-const router = useRouter();
 const route = useRoute();
 let ismask = ref(false)
-let dropzone = ref();
 let uploadInput = ref();
 
 // 获取当前知识库ID
-const getCurrentKbId = async (): Promise<string | null> => {
-    let kbId = (route.params as any)?.kbId as string
-    if (!kbId && route.name === 'chat' && (route.params as any)?.kbId) {
-        kbId = (route.params as any).kbId
-    }
-    return kbId || null
+const getCurrentKbId = (): string | null => {
+    return (route.params as any)?.kbId as string || null
 }
 
 // 检查知识库初始化状态
 const checkKnowledgeBaseInitialization = async (): Promise<boolean> => {
-    const currentKbId = await getCurrentKbId();
+    const currentKbId = getCurrentKbId();
     
     if (!currentKbId) {
         MessagePlugin.error("缺少知识库ID");
@@ -48,53 +40,74 @@ const checkKnowledgeBaseInitialization = async (): Promise<boolean> => {
         const kbResponse = await getKnowledgeBaseById(currentKbId);
         const kb = kbResponse.data;
         
-        // 检查知识库是否已初始化（有 EmbeddingModelID 和 SummaryModelID）
-        if (!kb.embedding_model_id || kb.embedding_model_id === '' || 
-            !kb.summary_model_id || kb.summary_model_id === '') {
+        if (!kb.embedding_model_id || !kb.summary_model_id) {
             MessagePlugin.warning("该知识库尚未完成初始化配置，请先前往设置页面配置模型信息后再上传文件");
             return false;
         }
         return true;
     } catch (error) {
-        console.error('获取知识库信息失败:', error);
         MessagePlugin.error("获取知识库信息失败，无法上传文件");
         return false;
     }
 }
 
-const dragover = (event: DragEvent) => {
+
+// 全局拖拽事件处理
+const handleGlobalDragEnter = (event: DragEvent) => {
     event.preventDefault();
-    ismask.value = true;
-    if (((window.innerWidth - event.clientX) < 50) || ((window.innerHeight - event.clientY) < 50) || event.clientX < 50 || event.clientY < 50) {
-        ismask.value = false
+    if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = 'all';
     }
+    ismask.value = true;
 }
-const drop = async (event: DragEvent) => {
+
+const handleGlobalDragOver = (event: DragEvent) => {
     event.preventDefault();
-    ismask.value = false
+    if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = 'copy';
+    }
+    ismask.value = true;
+}
+
+const handleGlobalDrop = async (event: DragEvent) => {
+    event.preventDefault();
+    ismask.value = false;
     
-    // 检查知识库初始化状态
+    const DataTransferFiles = event.dataTransfer?.files ? Array.from(event.dataTransfer.files) : [];
+    const DataTransferItemList = event.dataTransfer?.items ? Array.from(event.dataTransfer.items) : [];
+    
     const isInitialized = await checkKnowledgeBaseInitialization();
     if (!isInitialized) {
         return;
     }
     
-    const DataTransferItemList = event.dataTransfer?.items;
-    if (DataTransferItemList) {
-        for (const dataTransferItem of DataTransferItemList) {
+    if (DataTransferFiles.length > 0) {
+        DataTransferFiles.forEach(file => requestMethod(file, uploadInput));
+    } else if (DataTransferItemList.length > 0) {
+        DataTransferItemList.forEach(dataTransferItem => {
             const fileEntry = dataTransferItem.webkitGetAsEntry() as FileSystemFileEntry | null;
             if (fileEntry) {
-                fileEntry.file((file: File) => {
-                    requestMethod(file, uploadInput)
-                    // 修复页面跳转问题：不跳转，让上传成功后的逻辑处理
-                })
+                fileEntry.file((file: File) => requestMethod(file, uploadInput));
             }
-        }
+        });
+    } else {
+        MessagePlugin.warning('请拖拽文件而不是文本或链接');
     }
 }
-const dragstart = (event: DragEvent) => {
-    event.preventDefault();
-}
+
+// 组件挂载时添加全局事件监听器
+onMounted(() => {
+    document.addEventListener('dragenter', handleGlobalDragEnter, true);
+    document.addEventListener('dragover', handleGlobalDragOver, true);
+    document.addEventListener('drop', handleGlobalDrop, true);
+});
+
+// 组件卸载时移除全局事件监听器
+onUnmounted(() => {
+    document.removeEventListener('dragenter', handleGlobalDragEnter, true);
+    document.removeEventListener('dragover', handleGlobalDragOver, true);
+    document.removeEventListener('drop', handleGlobalDrop, true);
+});
 </script>
 <style lang="less">
 .main {
