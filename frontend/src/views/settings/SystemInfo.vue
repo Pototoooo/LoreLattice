@@ -411,13 +411,13 @@ onMounted(() => {
   h2 {
     font-size: 20px;
     font-weight: 600;
-    color: var(--td-text-color-primary);
+    color: #333333;
     margin: 0 0 8px 0;
   }
 
   .section-description {
     font-size: 14px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
     margin: 0;
     line-height: 1.5;
   }
@@ -429,7 +429,7 @@ onMounted(() => {
   gap: 12px;
   padding: 40px 0;
   justify-content: center;
-  color: var(--td-text-color-secondary);
+  color: #666666;
   font-size: 14px;
 }
 
@@ -448,7 +448,7 @@ onMounted(() => {
   align-items: flex-start;
   justify-content: space-between;
   padding: 20px 0;
-  border-bottom: 1px solid var(--td-component-border);
+  border-bottom: 1px solid #e5e7eb;
 
   &:last-child {
     border-bottom: none;
@@ -463,14 +463,14 @@ onMounted(() => {
   label {
     font-size: 15px;
     font-weight: 500;
-    color: var(--td-text-color-primary);
+    color: #333333;
     display: block;
     margin-bottom: 4px;
   }
 
   .desc {
     font-size: 13px;
-    color: var(--td-text-color-secondary);
+  color: #666666;
     margin: 0;
     line-height: 1.5;
   }
@@ -485,12 +485,12 @@ onMounted(() => {
 
   .info-value {
     font-size: 14px;
-    color: var(--td-text-color-primary);
+    color: #333333;
     text-align: right;
     word-break: break-word;
 
     .commit-info {
-      color: var(--td-text-color-placeholder);
+      color: #999999;
       font-size: 12px;
       margin-left: 6px;
     }
@@ -512,8 +512,8 @@ onMounted(() => {
 
   .usage-text {
     font-size: 14px;
-    font-weight: 500;
-    color: var(--td-text-color-primary);
+  font-weight: 500;
+    color: #333333;
     min-width: 50px;
     text-align: right;
   }
@@ -522,7 +522,7 @@ onMounted(() => {
 .info-section-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--td-text-color-primary);
+  color: #333333;
   margin-top: 24px;
   margin-bottom: 12px;
 

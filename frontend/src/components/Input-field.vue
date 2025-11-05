@@ -219,24 +219,24 @@ const getImgSrc = (url: string) => {
   max-height: 250px !important;
   min-height: 112px !important;
   resize: none;
-  color: var(--td-text-color-primary);
+  color: #000000e6;
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
   font-family: "PingFang SC";
   padding: 16px 12px 52px 16px;  /* 增加底部padding为控制栏腾出空间 */
   border-radius: 12px;
-  border: 1px solid var(--td-component-border);
+  border: 1px solid #E7E7E7;
   box-sizing: border-box;
-  background: var(--td-bg-color-container);
-  box-shadow: var(--td-shadow-1);
+  background: #FFF;
+  box-shadow: 0 6px 6px 0 #0000000a, 0 12px 12px -1px #00000014;
 
   &:focus {
-    border: 1px solid var(--td-brand-color);
+    border: 1px solid #07C05F;
   }
 
   &::placeholder {
-    color: var(--td-text-color-placeholder);
+    color: #00000066;
     font-family: "PingFang SC";
     font-size: 16px;
     font-weight: 400;
@@ -271,14 +271,14 @@ const getImgSrc = (url: string) => {
   gap: 4px;
   padding: 6px 10px;
   border-radius: 6px;
-  background: var(--td-bg-color-component);
+  background: #f5f5f5;
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
   flex-shrink: 0;
 
   &:hover {
-    background: var(--td-bg-color-component-hover);
+    background: #e6e6e6;
     transform: scale(1.02);
   }
 
@@ -291,7 +291,7 @@ const getImgSrc = (url: string) => {
     cursor: not-allowed;
     
     &:hover {
-      background: var(--td-bg-color-component);
+      background: #f5f5f5;
       transform: none;
     }
   }
@@ -303,10 +303,10 @@ const getImgSrc = (url: string) => {
   padding: 0;
 
   &.active {
-    background: var(--td-brand-color-light);
+    background: rgba(7, 192, 95, 0.1);
     
     &:hover {
-      background: var(--td-brand-color-focus);
+      background: rgba(7, 192, 95, 0.15);
     }
   }
 }
@@ -323,24 +323,24 @@ const getImgSrc = (url: string) => {
   min-width: auto;
   
   &.active {
-    background: var(--td-brand-color-light);
-    color: var(--td-brand-color);
+    background: rgba(7, 192, 95, 0.1);
+    color: #07C05F;
     
     &:hover {
-      background: var(--td-brand-color-focus);
+      background: rgba(7, 192, 95, 0.15);
     }
   }
 }
 
 .kb-btn-text {
   font-size: 13px;
-  color: var(--td-text-color-secondary);
+  color: #666;
   font-weight: 500;
   white-space: nowrap;
 }
 
 .kb-btn.active .kb-btn-text {
-  color: var(--td-brand-color);
+  color: #07C05F;
 }
 
 .dropdown-arrow {
@@ -372,16 +372,16 @@ const getImgSrc = (url: string) => {
   align-items: center;
   gap: 4px;
   padding: 4px 8px;
-  background: var(--td-brand-color-light);
-  border: 1px solid var(--td-brand-color-3);
+  background: rgba(7, 192, 95, 0.1);
+  border: 1px solid rgba(7, 192, 95, 0.3);
   border-radius: 4px;
   font-size: 12px;
-  color: var(--td-brand-color);
+  color: #07C05F;
   white-space: nowrap;
   transition: all 0.15s ease;
   
   &:hover {
-    background: var(--td-brand-color-focus);
+    background: rgba(7, 192, 95, 0.15);
   }
 }
 
@@ -404,12 +404,12 @@ const getImgSrc = (url: string) => {
 }
 
 .more-tag {
-  background: var(--td-bg-color-component);
-  border-color: var(--td-component-border);
-  color: var(--td-text-color-secondary);
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #666;
   
   &:hover {
-    background: var(--td-bg-color-component-hover);
+    background: rgba(0, 0, 0, 0.08);
   }
 }
 
@@ -417,15 +417,15 @@ const getImgSrc = (url: string) => {
   width: 28px;
   height: 28px;
   padding: 0;
-  background-color: var(--td-brand-color);
+  background-color: #07C05F;
   
   &:hover:not(.disabled) {
-    background-color: var(--td-brand-color-hover);
+    background-color: #00a651;
     transform: scale(1.05);
   }
   
   &.disabled {
-    background-color: var(--td-brand-color-disabled);
+    background-color: #b5eccf;
   }
   
   img {

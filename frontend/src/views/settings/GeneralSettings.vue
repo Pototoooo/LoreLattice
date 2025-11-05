@@ -48,11 +48,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { MessagePlugin } from 'tdesign-vue-next'
-import { useUIStore } from '@/stores/ui'
-
-const uiStore = useUIStore()
 
 // 本地状态
 const localLanguage = ref('zh-CN')
@@ -71,13 +68,6 @@ onMounted(() => {
       console.error('加载常规设置失败:', e)
     }
   }
-  // 同步 store 的主题状态
-  localTheme.value = uiStore.theme
-})
-
-// 监听 store 的主题变化，同步到本地状态
-watch(() => uiStore.theme, (newTheme) => {
-  localTheme.value = newTheme
 })
 
 // 保存设置到 localStorage
@@ -98,8 +88,9 @@ const handleLanguageChange = () => {
 
 // 处理主题变化
 const handleThemeChange = () => {
-  uiStore.setTheme(localTheme.value as 'light' | 'dark')
+  saveSettings()
   MessagePlugin.success('主题设置已保存')
+  // TODO: 实际的主题切换逻辑可后续添加
 }
 </script>
 
@@ -114,13 +105,13 @@ const handleThemeChange = () => {
   h2 {
     font-size: 20px;
     font-weight: 600;
-    color: var(--td-text-color-primary);
+    color: #333333;
     margin: 0 0 8px 0;
   }
 
   .section-description {
     font-size: 14px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
     margin: 0;
     line-height: 1.5;
   }
@@ -137,7 +128,7 @@ const handleThemeChange = () => {
   align-items: flex-start;
   justify-content: space-between;
   padding: 20px 0;
-  border-bottom: 1px solid var(--td-component-border);
+  border-bottom: 1px solid #e5e7eb;
 
   &:last-child {
     border-bottom: none;
@@ -152,14 +143,14 @@ const handleThemeChange = () => {
   label {
     font-size: 15px;
     font-weight: 500;
-    color: var(--td-text-color-primary);
+    color: #333333;
     display: block;
     margin-bottom: 4px;
   }
 
   .desc {
     font-size: 13px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
     margin: 0;
     line-height: 1.5;
   }

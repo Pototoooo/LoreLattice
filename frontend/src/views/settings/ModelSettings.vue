@@ -466,13 +466,13 @@ onMounted(() => {
   h2 {
     font-size: 20px;
     font-weight: 600;
-    color: var(--td-text-color-primary);
+    color: #333333;
     margin: 0 0 8px 0;
   }
 
   .section-description {
     font-size: 14px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
     margin: 0;
     line-height: 1.5;
   }
@@ -480,10 +480,10 @@ onMounted(() => {
 
 .model-category-section {
   margin-bottom: 24px;
-  border: 1px solid var(--td-component-border);
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 24px;
-  background: var(--td-bg-color-container);
+  background: #ffffff;
 
   &:last-child {
     margin-bottom: 0;
@@ -502,13 +502,13 @@ onMounted(() => {
     h3 {
       font-size: 16px;
       font-weight: 600;
-      color: var(--td-text-color-primary);
+      color: #333333;
       margin: 0 0 4px 0;
     }
 
     p {
       font-size: 14px;
-      color: var(--td-text-color-secondary);
+      color: #666666;
       margin: 0;
       line-height: 1.5;
     }
@@ -543,16 +543,16 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border: 1px solid var(--td-component-border);
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
-  background: var(--td-bg-color-secondarycontainer);
+  background: #fafafa;
   transition: all 0.2s;
   position: relative;
   overflow: visible;
 
   &:hover {
-    border-color: var(--td-brand-color);
-    background: var(--td-bg-color-container);
+    border-color: #07C05F;
+    background: #ffffff;
   }
 }
 
@@ -563,7 +563,7 @@ onMounted(() => {
   .model-name {
     font-size: 14px;
     font-weight: 500;
-    color: var(--td-text-color-primary);
+    color: #333333;
     margin-bottom: 4px;
     display: flex;
     align-items: center;
@@ -575,22 +575,22 @@ onMounted(() => {
     align-items: center;
     gap: 10px;
     font-size: 12px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
 
     .source-tag {
       padding: 1px 6px;
-      background: var(--td-bg-color-component);
+      background: #e5e7eb;
       border-radius: 3px;
       font-size: 11px;
     }
 
     .model-id {
       font-family: monospace;
-      color: var(--td-text-color-secondary);
+      color: #666666;
     }
 
     .dimension {
-      color: var(--td-text-color-placeholder);
+      color: #999999;
     }
   }
 }
@@ -606,12 +606,12 @@ onMounted(() => {
   z-index: 1001; // 确保高于设置窗口的z-index (9999)
 
   .more-btn {
-    color: var(--td-text-color-secondary);
+    color: #666666;
     padding: 4px;
     
     &:hover {
-      background: var(--td-bg-color-component-hover);
-      color: var(--td-text-color-primary);
+      background: #f5f7fa;
+      color: #333333;
     }
   }
 }
@@ -626,7 +626,7 @@ onMounted(() => {
 
   .empty-text {
     font-size: 14px;
-    color: var(--td-text-color-placeholder);
+    color: #999999;
     margin: 0 0 16px 0;
   }
 }

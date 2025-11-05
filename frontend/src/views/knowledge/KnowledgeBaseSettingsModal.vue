@@ -464,9 +464,9 @@ onMounted(() => {
   width: 100%;
   max-width: 900px;
   height: 700px;
-  background: var(--td-bg-color-container);
+  background: #ffffff;
   border-radius: 12px;
-  box-shadow: var(--td-shadow-3);
+  box-shadow: 0 6px 28px rgba(15, 23, 42, 0.08);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -481,7 +481,7 @@ onMounted(() => {
   height: 32px;
   border: none;
   background: transparent;
-  color: var(--td-text-color-secondary);
+  color: #666666;
   cursor: pointer;
   border-radius: 6px;
   display: flex;
@@ -491,8 +491,8 @@ onMounted(() => {
   z-index: 10;
 
   &:hover {
-    background: var(--td-bg-color-container-hover);
-    color: var(--td-text-color-primary);
+    background: #f5f5f5;
+    color: #333333;
   }
 }
 
@@ -506,8 +506,8 @@ onMounted(() => {
 /* 左侧导航栏 */
 .settings-sidebar {
   width: 220px;
-  background-color: var(--td-bg-color-secondarycontainer);
-  border-right: 1px solid var(--td-component-border);
+  background-color: #f8f9fa;
+  border-right: 1px solid #e5e7eb;
   flex-shrink: 0;
   overflow-y: auto;
   display: flex;
@@ -516,13 +516,13 @@ onMounted(() => {
 
 .sidebar-header {
   padding: 24px 16px 16px;
-  border-bottom: 1px solid var(--td-component-border);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .sidebar-title {
   font-size: 18px;
   font-weight: 600;
-  color: var(--td-text-color-primary);
+  color: #333333;
   margin: 0;
 }
 
@@ -538,19 +538,19 @@ onMounted(() => {
   margin-bottom: 4px;
   border-radius: 6px;
   cursor: pointer;
-  color: var(--td-text-color-secondary);
+  color: #666666;
   font-size: 14px;
   transition: all 0.2s ease;
   user-select: none;
 
   &:hover {
-    background-color: var(--td-bg-color-container-hover);
-    color: var(--td-text-color-primary);
+    background-color: #e8f5ed;
+    color: #333333;
   }
 
   &.active {
-    background-color: var(--td-brand-color-light);
-    color: var(--td-brand-color);
+    background-color: rgba(7, 192, 95, 0.1);
+    color: #07C05F;
     font-weight: 500;
   }
 }
@@ -573,7 +573,7 @@ onMounted(() => {
 .settings-content {
   flex: 1;
   overflow-y: auto;
-  background-color: var(--td-bg-color-container);
+  background-color: #ffffff;
   display: flex;
   flex-direction: column;
 }
@@ -603,11 +603,11 @@ onMounted(() => {
 /* 底部保存按钮 */
 .settings-footer {
   padding: 16px 48px;
-  border-top: 1px solid var(--td-component-border);
+  border-top: 1px solid #e5e7eb;
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  background: var(--td-bg-color-container);
+  background: #ffffff;
 }
 
 /* 弹窗动画 */
@@ -640,29 +640,29 @@ onMounted(() => {
 }
 
 .settings-sidebar::-webkit-scrollbar-track {
-  background: var(--td-bg-color-secondarycontainer);
+  background: #f8f9fa;
 }
 
 .settings-sidebar::-webkit-scrollbar-thumb {
-  background: var(--td-bg-color-component);
+  background: #d0d0d0;
   border-radius: 3px;
 }
 
 .settings-sidebar::-webkit-scrollbar-thumb:hover {
-  background: var(--td-bg-color-component-hover);
+  background: #b0b0b0;
 }
 
 .content-wrapper::-webkit-scrollbar-track {
-  background: var(--td-bg-color-container);
+  background: #ffffff;
 }
 
 .content-wrapper::-webkit-scrollbar-thumb {
-  background: var(--td-bg-color-component);
+  background: #d0d0d0;
   border-radius: 3px;
 }
 
 .content-wrapper::-webkit-scrollbar-thumb:hover {
-  background: var(--td-bg-color-component-hover);
+  background: #b0b0b0;
 }
 </style>
 

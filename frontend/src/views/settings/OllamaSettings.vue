@@ -393,13 +393,13 @@ onMounted(async () => {
   h2 {
     font-size: 20px;
     font-weight: 600;
-    color: var(--td-text-color-primary);
+    color: #333333;
     margin: 0 0 8px 0;
   }
 
   .section-description {
     font-size: 14px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
     margin: 0;
     line-height: 1.5;
   }
@@ -416,7 +416,7 @@ onMounted(async () => {
   align-items: flex-start;
   justify-content: space-between;
   padding: 20px 0;
-  border-bottom: 1px solid var(--td-component-border);
+  border-bottom: 1px solid #e5e7eb;
 
   &:last-child {
     border-bottom: none;
@@ -431,14 +431,14 @@ onMounted(async () => {
   label {
     font-size: 15px;
     font-weight: 500;
-    color: var(--td-text-color-primary);
+    color: #333333;
     display: block;
     margin-bottom: 4px;
   }
 
   .desc {
     font-size: 13px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
     margin: 0;
     line-height: 1.5;
   }
@@ -467,11 +467,11 @@ onMounted(async () => {
       font-size: 18px;
 
       &.success {
-        color: var(--td-success-color);
+        color: #07C05F;
       }
 
       &.error {
-        color: var(--td-error-color);
+        color: #e34d59;
       }
 
       &.spinning {
@@ -483,10 +483,10 @@ onMounted(async () => {
 
 .model-category-section {
   margin-bottom: 24px;
-  border: 1px solid var(--td-component-border);
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 24px;
-  background: var(--td-bg-color-container);
+  background: #ffffff;
 
   &:last-child {
     margin-bottom: 0;
@@ -505,13 +505,13 @@ onMounted(async () => {
     h3 {
       font-size: 16px;
       font-weight: 600;
-      color: var(--td-text-color-primary);
+      color: #333333;
       margin: 0 0 4px 0;
     }
 
     p {
       font-size: 14px;
-      color: var(--td-text-color-secondary);
+      color: #666666;
       margin: 0;
       line-height: 1.5;
     }
@@ -524,7 +524,7 @@ onMounted(async () => {
   justify-content: center;
   gap: 8px;
   padding: 60px;
-  color: var(--td-text-color-secondary);
+  color: #666666;
   font-size: 14px;
 }
 
@@ -543,14 +543,14 @@ onMounted(async () => {
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border: 1px solid var(--td-component-border);
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
-  background: var(--td-bg-color-secondarycontainer);
+  background: #fafafa;
   transition: all 0.2s;
 
   &:hover {
-    border-color: var(--td-brand-color);
-    background: var(--td-bg-color-container);
+    border-color: #07C05F;
+    background: #ffffff;
   }
 }
 
@@ -561,7 +561,7 @@ onMounted(async () => {
   .model-name {
     font-size: 14px;
     font-weight: 500;
-    color: var(--td-text-color-primary);
+    color: #333333;
     margin-bottom: 4px;
     font-family: monospace;
   }
@@ -570,7 +570,7 @@ onMounted(async () => {
     display: flex;
     gap: 12px;
     font-size: 12px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
   }
 }
 
@@ -586,7 +586,7 @@ onMounted(async () => {
 
   .download-progress {
     padding: 12px;
-    background: var(--td-bg-color-component);
+    background: #f5f7fa;
     border-radius: 6px;
 
     .progress-info {
@@ -594,14 +594,14 @@ onMounted(async () => {
       justify-content: space-between;
       margin-bottom: 8px;
       font-size: 13px;
-      color: var(--td-text-color-primary);
+      color: #333333;
     }
   }
 
   .recommended-models {
     .recommended-label {
       font-size: 13px;
-      color: var(--td-text-color-secondary);
+      color: #666666;
       margin: 0 0 10px 0;
       font-weight: 500;
     }
@@ -617,9 +617,9 @@ onMounted(async () => {
         font-size: 12px;
 
         &:hover {
-          background: var(--td-brand-color);
-          color: var(--td-text-color-anti);
-          border-color: var(--td-brand-color);
+          background: #07C05F;
+          color: #ffffff;
+          border-color: #07C05F;
         }
       }
     }
@@ -632,7 +632,7 @@ onMounted(async () => {
 
   .empty-text {
     font-size: 14px;
-    color: var(--td-text-color-placeholder);
+    color: #999999;
     margin: 0;
   }
 }

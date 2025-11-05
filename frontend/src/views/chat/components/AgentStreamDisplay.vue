@@ -480,7 +480,7 @@ const formatJSON = (obj: any): string => {
   
   .collapse-text {
     font-size: 13px;
-    color: var(--td-text-color-primary);
+    color: #333333;
     font-weight: 500;
     letter-spacing: -0.01em;
   }
@@ -495,15 +495,15 @@ const formatJSON = (obj: any): string => {
   animation: fadeInUp 0.3s ease-out;
   
   .thinking-phase {
-    background: var(--td-bg-color-container);
+    background: #ffffff;
     border-radius: 8px;
     padding: 1px 14px;
-    border-left: 3px solid var(--td-component-border);
-    box-shadow: var(--td-shadow-1);
+    border-left: 3px solid #d1d5db;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     
     &.thinking-active {
-      border-left-color: var(--td-brand-color);
+      border-left-color: #07c05f;
       box-shadow: 0 2px 4px rgba(7, 192, 95, 0.08);
       animation: pulseBorder 2s ease-in-out infinite;
     }
@@ -511,7 +511,7 @@ const formatJSON = (obj: any): string => {
   
   .thinking-content {
     font-size: 14px;
-    color: var(--td-text-color-primary);
+    color: #333333;
     line-height: 1.6;
     
     &.markdown-content {
@@ -551,16 +551,16 @@ const formatJSON = (obj: any): string => {
       }
       
       :deep(blockquote) {
-        border-left: 3px solid var(--td-brand-color);
+        border-left: 3px solid #07c05f;
         padding-left: 12px;
         margin: 8px 0;
-        color: var(--td-text-color-secondary);
+        color: #666;
       }
       
       :deep(h1), :deep(h2), :deep(h3), :deep(h4), :deep(h5), :deep(h6) {
         margin: 12px 0 8px 0;
         font-weight: 600;
-        color: var(--td-text-color-primary);
+        color: #333;
       }
       
       :deep(a) {
@@ -623,9 +623,9 @@ const formatJSON = (obj: any): string => {
   .tool-summary {
     padding: 8px 14px;
     font-size: 13px;
-    color: var(--td-text-color-primary);
-    background: var(--td-bg-color-container);
-    border-top: 1px solid var(--td-component-border);
+    color: #333333;
+    background: #ffffff;
+    border-top: 1px solid #f0f0f0;
     line-height: 1.6;
     font-weight: 500;
     animation: slideIn 0.25s ease-out;
@@ -633,11 +633,11 @@ const formatJSON = (obj: any): string => {
     .tool-summary-markdown {
       font-weight: 400;
       line-height: 1.6;
-      color: var(--td-text-color-primary);
+      color: #333333;
       
       :deep(p) {
         margin: 4px 0;
-        color: var(--td-text-color-primary);
+        color: #333333;
       }
       
       :deep(ul), :deep(ol) {
@@ -646,17 +646,17 @@ const formatJSON = (obj: any): string => {
       }
       
       :deep(code) {
-        background: var(--td-bg-color-component);
+        background: #f5f5f5;
         padding: 2px 6px;
         border-radius: 4px;
         font-size: 12px;
-        color: var(--td-brand-color);
+        color: #07c05f;
         font-weight: 500;
       }
       
       :deep(strong) {
         font-weight: 600;
-        color: var(--td-text-color-primary);
+        color: #333333;
       }
     }
   }
@@ -708,8 +708,8 @@ const formatJSON = (obj: any): string => {
   }
   
   &.pending {
-    color: var(--td-text-color-secondary);
-    background: var(--td-bg-color-component);
+    color: #666666;
+    background: rgba(102, 102, 102, 0.1);
     animation: pulse 1.5s ease-in-out infinite;
   }
 }
@@ -782,12 +782,12 @@ const formatJSON = (obj: any): string => {
 .action-name {
   font-size: 14px;
   font-weight: 500;
-  color: var(--td-text-color-primary);
+  color: #333;
 }
 
 .expand-icon {
   font-size: 12px;
-  color: var(--td-brand-color);
+  color: #07c05f;
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
   font-weight: 600;
   opacity: 0.8;
@@ -804,8 +804,8 @@ const formatJSON = (obj: any): string => {
 
 .action-details {
   padding: 0 12px 12px 12px;
-  border-top: 1px solid var(--td-component-border);
-  background: var(--td-bg-color-container);
+  border-top: 1px solid #e5e7eb;
+  background: #fff;
 }
 
 .detail-row {
@@ -818,15 +818,15 @@ const formatJSON = (obj: any): string => {
 .detail-label {
   font-size: 12px;
   font-weight: 600;
-  color: var(--td-text-color-secondary);
+  color: #666;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .detail-value {
   font-size: 13px;
-  color: var(--td-brand-color);
-  background: var(--td-brand-color-light);
+  color: #07c05f;
+  background: rgba(7, 192, 95, 0.05);
   padding: 2px 6px;
   border-radius: 3px;
   font-family: 'Monaco', 'Courier New', monospace;
@@ -835,25 +835,25 @@ const formatJSON = (obj: any): string => {
 
 .detail-code {
   font-size: 12px;
-  background: var(--td-bg-color-component);
+  background: #f5f5f5;
   padding: 8px;
   border-radius: 4px;
   font-family: 'Monaco', 'Courier New', monospace;
-  color: var(--td-text-color-primary);
+  color: #333;
   margin: 0;
   overflow-x: auto;
-  border: 1px solid var(--td-component-border);
+  border: 1px solid #e5e7eb;
 }
 
 .detail-output {
   font-size: 13px;
-  color: var(--td-text-color-primary);
-  background: var(--td-bg-color-component);
+  color: #333;
+  background: #f5f5f5;
   padding: 8px;
   border-radius: 4px;
   white-space: pre-wrap;
   word-break: break-word;
-  border: 1px solid var(--td-component-border);
+  border: 1px solid #e5e7eb;
 }
 
 .loading-indicator {

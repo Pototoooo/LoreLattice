@@ -193,7 +193,7 @@ watch(() => uiStore.showKBSettingsModal, (newVal, oldVal) => {
 <style scoped lang="less">
 .kb-list-container {
   padding: 20px;
-  background: var(--td-bg-color-container);
+  background: #fff;
   margin: 0 20px 0 20px;
   height: calc(100vh);
   overflow-y: auto;
@@ -205,7 +205,7 @@ watch(() => uiStore.showKBSettingsModal, (newVal, oldVal) => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
-  h2 { margin: 0; font-size: 20px; font-weight: 600; color: var(--td-text-color-primary); }
+  h2 { margin: 0; font-size: 20px; font-weight: 600; }
 }
 
 .warning-banner {
@@ -214,14 +214,14 @@ watch(() => uiStore.showKBSettingsModal, (newVal, oldVal) => {
   gap: 8px;
   padding: 12px 16px;
   margin-bottom: 16px;
-  background: var(--td-warning-color-light);
-  border: 1px solid var(--td-warning-color-3);
+  background: #fff7e6;
+  border: 1px solid #ffd591;
   border-radius: 6px;
-  color: var(--td-warning-color);
+  color: #d46b08;
   font-size: 14px;
   
   .t-icon {
-    color: var(--td-warning-color);
+    color: #d46b08;
     flex-shrink: 0;
   }
 }
@@ -232,21 +232,21 @@ watch(() => uiStore.showKBSettingsModal, (newVal, oldVal) => {
   gap: 8px;
   
   .warning-icon {
-    color: var(--td-warning-color);
+    color: #ff8800;
     cursor: pointer;
     font-size: 16px;
     font-weight: bold;
     transition: color 0.2s;
     
     &:hover {
-      color: var(--td-warning-color-hover);
+      color: #d46b08;
     }
   }
 }
 
 .description-cell {
   .description-text {
-    color: var(--td-text-color-primary);
+    color: #000000e6;
     font-size: 14px;
   }
 }

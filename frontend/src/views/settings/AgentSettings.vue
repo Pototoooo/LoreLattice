@@ -554,13 +554,13 @@ const handleAllowedToolsChange = async (value: string[]) => {
   h2 {
     font-size: 20px;
     font-weight: 600;
-    color: var(--td-text-color-primary);
+    color: #333333;
     margin: 0 0 8px 0;
   }
 
   .section-description {
     font-size: 14px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
     margin: 0;
     line-height: 1.5;
   }
@@ -577,7 +577,7 @@ const handleAllowedToolsChange = async (value: string[]) => {
   align-items: flex-start;
   justify-content: space-between;
   padding: 20px 0;
-  border-bottom: 1px solid var(--td-component-border);
+  border-bottom: 1px solid #e5e7eb;
 
   &:last-child {
     border-bottom: none;
@@ -606,14 +606,14 @@ const handleAllowedToolsChange = async (value: string[]) => {
   label {
     font-size: 15px;
     font-weight: 500;
-    color: var(--td-text-color-primary);
+    color: #333333;
     display: block;
     margin-bottom: 4px;
   }
 
   .desc {
     font-size: 13px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
     margin: 0;
     line-height: 1.5;
   }
@@ -637,7 +637,7 @@ const handleAllowedToolsChange = async (value: string[]) => {
   .value-display {
     font-size: 14px;
     font-weight: 500;
-    color: var(--td-text-color-primary);
+    color: #333333;
     min-width: 40px;
     text-align: right;
   }
@@ -651,12 +651,12 @@ const handleAllowedToolsChange = async (value: string[]) => {
   
   .model-icon {
     font-size: 14px;
-    color: var(--td-brand-color);
+    color: #07C05F;
   }
   
   .add-icon {
     font-size: 14px;
-    color: var(--td-brand-color);
+    color: #07C05F;
   }
   
   .model-name {
@@ -666,7 +666,7 @@ const handleAllowedToolsChange = async (value: string[]) => {
   
   &.add {
     .model-name {
-      color: var(--td-brand-color);
+      color: #07C05F;
       font-weight: 500;
     }
   }

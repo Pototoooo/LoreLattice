@@ -149,13 +149,13 @@ const emitUpdate = () => {
   h2 {
     font-size: 20px;
     font-weight: 600;
-    color: var(--td-text-color-primary);
+    color: #333333;
     margin: 0 0 8px 0;
   }
 
   .section-description {
     font-size: 14px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
     margin: 0;
     line-height: 1.5;
   }
@@ -172,7 +172,7 @@ const emitUpdate = () => {
   align-items: flex-start;
   justify-content: space-between;
   padding: 20px 0;
-  border-bottom: 1px solid var(--td-component-border);
+  border-bottom: 1px solid #e5e7eb;
 
   &:last-child {
     border-bottom: none;
@@ -187,14 +187,14 @@ const emitUpdate = () => {
   label {
     font-size: 15px;
     font-weight: 500;
-    color: var(--td-text-color-primary);
+    color: #333333;
     display: block;
     margin-bottom: 4px;
   }
 
   .desc {
     font-size: 13px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
     margin: 0;
     line-height: 1.5;
   }
@@ -218,7 +218,7 @@ const emitUpdate = () => {
 
 .value-display {
   font-size: 14px;
-  color: var(--td-text-color-primary);
+  color: #333333;
   font-weight: 500;
   min-width: 80px;
   text-align: right;

@@ -554,14 +554,14 @@ watch(() => route.params.kbId, () => {
 </script>
 <style lang="less" scoped>
 .del_submenu {
-    color: var(--td-error-color);
+    color: #fa5151;
     cursor: pointer;
 }
 
 .aside_box {
     min-width: 260px;
     padding: 8px;
-    background: var(--td-bg-color-container);
+    background: #fff;
     box-sizing: border-box;
     height: 100vh;
     overflow: hidden;
@@ -585,19 +585,10 @@ watch(() => route.params.kbId, () => {
         height: 30px;
         margin-right: 7.25px;
     }
-    
-    /* 暗色模式下的Logo滤镜 */
-    :root[theme-mode="dark"] .logo {
-        filter: brightness(0) invert(1);
-    }
-    
-    :root[theme-mode="dark"] .logo_img {
-        filter: brightness(0) invert(1);
-    }
 
     .logo_txt {
         transform: rotate(0.049deg);
-        color: var(--td-text-color-primary);
+        color: #000000;
         font-family: "TencentSans";
         font-size: 24.12px;
         font-style: normal;
@@ -639,28 +630,28 @@ watch(() => route.params.kbId, () => {
     }
 
     .upload-file-wrap:hover {
-        background-color: var(--td-brand-color-light);
-        color: var(--td-brand-color);
+        background-color: #dbede4;
+        color: #07C05F;
 
     }
 
     .upload-file-icon {
         width: 20px;
         height: 20px;
-        color: var(--td-text-color-secondary);
+        color: rgba(0, 0, 0, 0.6);
     }
 
     .active-upload {
-        color: var(--td-brand-color);
+        color: #07C05F;
     }
 
     .menu_item_active {
         border-radius: 4px;
-        background: var(--td-brand-color-light) !important;
+        background: #07c05f1a !important;
 
         .menu_icon,
         .menu_title {
-            color: var(--td-brand-color) !important;
+            color: #07c05f !important;
         }
     }
 
@@ -668,7 +659,7 @@ watch(() => route.params.kbId, () => {
 
         .menu_icon,
         .menu_title {
-            color: var(--td-text-color-primary);
+            color: #000000e6;
         }
     }
 
@@ -695,12 +686,12 @@ watch(() => route.params.kbId, () => {
 
         &:hover {
             border-radius: 4px;
-            background: var(--td-bg-color-container-hover);
-            color: var(--td-text-color-secondary);
+            background: #30323605;
+            color: #00000099;
 
             .menu_icon,
             .menu_title {
-                color: var(--td-text-color-secondary);
+                color: #00000099;
             }
         }
     }
@@ -708,7 +699,7 @@ watch(() => route.params.kbId, () => {
     .menu_icon {
         display: flex;
         margin-right: 10px;
-        color: var(--td-text-color-secondary);
+        color: #00000099;
 
         .icon {
             width: 20px;
@@ -719,7 +710,7 @@ watch(() => route.params.kbId, () => {
     }
 
     .menu_title {
-        color: var(--td-text-color-secondary);
+        color: #00000099;
         text-overflow: ellipsis;
         font-family: "PingFang SC";
         font-size: 14px;
@@ -754,7 +745,7 @@ watch(() => route.params.kbId, () => {
         cursor: pointer;
         display: flex;
         align-items: center;
-        color: var(--td-text-color-secondary);
+        color: #00000099;
         font-weight: 400;
         line-height: 22px;
         height: 36px;
@@ -775,14 +766,14 @@ watch(() => route.params.kbId, () => {
         .menu-more {
             display: inline-block;
             font-weight: bold;
-            color: var(--td-brand-color);
+            color: #07C05F;
         }
 
         .dot {
             width: 4px;
             height: 4px;
             border-radius: 50%;
-            background: var(--td-brand-color);
+            background: #07C05F;
         }
 
         .sub_title {
@@ -790,12 +781,12 @@ watch(() => route.params.kbId, () => {
         }
 
         &:hover {
-            background: var(--td-bg-color-container-hover);
-            color: var(--td-text-color-secondary);
+            background: #30323605;
+            color: #00000099;
             border-radius: 3px;
 
             .menu-more {
-                color: var(--td-text-color-secondary);
+                color: #00000099;
             }
 
             .submenu_title {
@@ -806,12 +797,12 @@ watch(() => route.params.kbId, () => {
     }
 
     .submenu_item_active {
-        background: var(--td-brand-color-light) !important;
-        color: var(--td-brand-color) !important;
+        background: #07c05f1a !important;
+        color: #07c05f !important;
         border-radius: 3px;
 
         .menu-more {
-            color: var(--td-brand-color) !important;
+            color: #07c05f !important;
         }
     }
 }
@@ -819,7 +810,7 @@ watch(() => route.params.kbId, () => {
 /* 知识库下拉菜单样式 */
 .kb-dropdown-icon {
     margin-left: auto;
-    color: var(--td-text-color-secondary);
+    color: #666;
     transition: transform 0.3s ease, color 0.2s ease;
     cursor: pointer;
     display: flex;
@@ -833,15 +824,15 @@ watch(() => route.params.kbId, () => {
     }
     
     &:hover {
-        color: var(--td-brand-color);
+        color: #07c05f;
     }
     
     &.active {
-        color: var(--td-brand-color);
+        color: #07c05f;
     }
     
     &.active:hover {
-        color: var(--td-brand-color-hover);
+        color: #05a04f;
     }
     
     svg {
@@ -856,10 +847,10 @@ watch(() => route.params.kbId, () => {
     top: 100%;
     left: 0;
     right: 0;
-    background: var(--td-bg-color-container);
-    border: 1px solid var(--td-component-border);
+    background: #fff;
+    border: 1px solid #e5e7eb;
     border-radius: 6px;
-    box-shadow: var(--td-shadow-2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     max-height: 200px;
     overflow-y: auto;
@@ -870,15 +861,15 @@ watch(() => route.params.kbId, () => {
     cursor: pointer;
     transition: background-color 0.2s ease;
     font-size: 14px;
-    color: var(--td-text-color-primary);
+    color: #333;
     
     &:hover {
-        background-color: var(--td-bg-color-container-hover);
+        background-color: #f5f5f5;
     }
     
     &.active {
-        background-color: var(--td-brand-color-light);
-        color: var(--td-brand-color);
+        background-color: #07c05f1a;
+        color: #07c05f;
         font-weight: 500;
     }
     
@@ -904,15 +895,15 @@ watch(() => route.params.kbId, () => {
 </style>
 <style lang="less">
 .upload-popup {
-    background-color: var(--td-gray-color-13);
-    color: var(--td-text-color-anti);
-    border-color: var(--td-gray-color-13) !important;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #FFFFFF;
+    border-color: rgba(0, 0, 0, 0.9) !important;
     box-shadow: none;
     margin-bottom: 10px !important;
 
     .t-popup__arrow::before {
-        border-color: var(--td-gray-color-13) !important;
-        background-color: var(--td-gray-color-13) !important;
+        border-color: rgba(0, 0, 0, 0.9) !important;
+        background-color: rgba(0, 0, 0, 0.9) !important;
         box-shadow: none !important;
     }
 }
@@ -934,22 +925,22 @@ watch(() => route.params.kbId, () => {
 // 退出登录确认框样式
 :deep(.t-popconfirm) {
     .t-popconfirm__content {
-        background: var(--td-bg-color-container);
-        border: 1px solid var(--td-component-border);
+        background: #fff;
+        border: 1px solid #e7e7e7;
         border-radius: 6px;
-        box-shadow: var(--td-shadow-2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         padding: 12px 16px;
         font-size: 14px;
-        color: var(--td-text-color-primary);
+        color: #333;
         max-width: 200px;
     }
     
     .t-popconfirm__arrow {
-        border-bottom-color: var(--td-component-border);
+        border-bottom-color: #e7e7e7;
     }
     
     .t-popconfirm__arrow::after {
-        border-bottom-color: var(--td-bg-color-container);
+        border-bottom-color: #fff;
     }
     
     .t-popconfirm__buttons {
@@ -960,18 +951,18 @@ watch(() => route.params.kbId, () => {
     }
     
     .t-button--variant-outline {
-        border-color: var(--td-component-border);
-        color: var(--td-text-color-secondary);
+        border-color: #d9d9d9;
+        color: #666;
     }
     
     .t-button--theme-danger {
-        background-color: var(--td-error-color);
-        border-color: var(--td-error-color);
+        background-color: #ff4d4f;
+        border-color: #ff4d4f;
     }
     
     .t-button--theme-danger:hover {
-        background-color: var(--td-error-color-hover);
-        border-color: var(--td-error-color-hover);
+        background-color: #ff7875;
+        border-color: #ff7875;
     }
 }
 </style>

@@ -161,7 +161,7 @@ onUnmounted(() => {
   background: transparent;
 
   &:hover {
-    background: var(--td-bg-color-component-hover);
+    background: #f5f7fa;
   }
 
   &:active {
@@ -175,7 +175,7 @@ onUnmounted(() => {
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  background: linear-gradient(135deg, var(--td-brand-color) 0%, var(--td-brand-color-active) 100%);
+  background: linear-gradient(135deg, #07C05F 0%, #05A34E 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -187,7 +187,7 @@ onUnmounted(() => {
   }
 
   .avatar-placeholder {
-    color: var(--td-text-color-anti);
+    color: #ffffff;
     font-size: 16px;
     font-weight: 600;
   }
@@ -201,7 +201,7 @@ onUnmounted(() => {
   .user-name {
     font-size: 14px;
     font-weight: 500;
-    color: var(--td-text-color-primary);
+    color: #333333;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -209,7 +209,7 @@ onUnmounted(() => {
 
   .user-email {
     font-size: 12px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -218,7 +218,7 @@ onUnmounted(() => {
 
 .dropdown-icon {
   font-size: 16px;
-  color: var(--td-text-color-secondary);
+  color: #666666;
   flex-shrink: 0;
   transition: transform 0.2s;
 }
@@ -229,10 +229,10 @@ onUnmounted(() => {
   left: 8px;
   right: 8px;
   margin-bottom: 8px;
-  background: var(--td-bg-color-container);
+  background: #ffffff;
   border-radius: 8px;
-  box-shadow: var(--td-shadow-2);
-  border: 1px solid var(--td-component-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e5e7eb;
   overflow: hidden;
   z-index: 1000;
 }
@@ -245,33 +245,33 @@ onUnmounted(() => {
   cursor: pointer;
   transition: all 0.2s;
   font-size: 14px;
-  color: var(--td-text-color-primary);
+  color: #333333;
 
   &:hover {
-    background: var(--td-bg-color-component-hover);
+    background: #f5f7fa;
   }
 
   &.danger {
-    color: var(--td-error-color);
+    color: #e34d59;
 
     &:hover {
-      background: var(--td-error-color-light);
+      background: #fef0f0;
     }
 
     .menu-icon {
-      color: var(--td-error-color);
+      color: #e34d59;
     }
   }
 
   .menu-icon {
     font-size: 16px;
-    color: var(--td-text-color-secondary);
+    color: #666666;
   }
 }
 
 .menu-divider {
   height: 1px;
-  background: var(--td-component-border);
+  background: #e5e7eb;
   margin: 4px 0;
 }
 
