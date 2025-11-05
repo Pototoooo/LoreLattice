@@ -30,6 +30,7 @@ import (
 	"github.com/Tencent/WeKnora/internal/application/service/file"
 	"github.com/Tencent/WeKnora/internal/application/service/retriever"
 	"github.com/Tencent/WeKnora/internal/config"
+	"github.com/Tencent/WeKnora/internal/event"
 	"github.com/Tencent/WeKnora/internal/handler"
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/models/embedding"
@@ -89,8 +90,6 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(service.NewTenantService))
 	must(container.Provide(service.NewKnowledgeBaseService))
 	must(container.Provide(service.NewKnowledgeService))
-	must(container.Provide(service.NewSessionService))
-	must(container.Provide(service.NewMessageService))
 	must(container.Provide(service.NewChunkService))
 	must(container.Provide(embedding.NewBatchEmbedder))
 	must(container.Provide(service.NewModelService))
@@ -98,6 +97,14 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(service.NewEvaluationService))
 	must(container.Provide(service.NewUserService))
 	must(container.Provide(service.NewChunkExtractService))
+	must(container.Provide(service.NewMessageService))
+
+	// Agent service layer (requires event bus)
+	must(container.Provide(event.NewEventBus))
+	must(container.Provide(service.NewAgentService))
+
+	// Session service (depends on agent service)
+	must(container.Provide(service.NewSessionService))
 
 	// Chat pipeline components for processing chat requests
 	must(container.Provide(chatpipline.NewEventManager))

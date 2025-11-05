@@ -75,38 +75,9 @@
             </div>
         </div>
         
-        <!-- 下半部分：账户信息、系统设置、退出登录 -->
+        <!-- 下半部分：用户菜单 -->
         <div class="menu_bottom">
-            <div class="menu_box" v-for="(item, index) in bottomMenuItems" :key="'bottom-' + index">
-                <div v-if="item.path === 'logout'">
-                    <t-popconfirm 
-                        content="确定要退出登录吗？" 
-                        @confirm="handleLogout"
-                        placement="top"
-                        :show-arrow="true"
-                    >
-                        <div @mouseenter="mouseenteMenu(item.path)" @mouseleave="mouseleaveMenu(item.path)"
-                            :class="['menu_item', 'logout-item']">
-                            <div class="menu_item-box">
-                                <div class="menu_icon">
-                                    <img class="icon" :src="getImgSrc(logoutIcon)" alt="">
-                                </div>
-                                <span class="menu_title">{{ item.title }}</span>
-                            </div>
-                        </div>
-                    </t-popconfirm>
-                </div>
-                <div v-else @click="handleMenuClick(item.path)"
-                    @mouseenter="mouseenteMenu(item.path)" @mouseleave="mouseleaveMenu(item.path)"
-                    :class="['menu_item', item.childrenPath && item.childrenPath == currentpath ? 'menu_item_c_active' : (item.path == currentpath) ? 'menu_item_active' : '']">
-                    <div class="menu_item-box">
-                        <div class="menu_icon">
-                            <img class="icon" :src="getImgSrc(item.icon == 'zhishiku' ? knowledgeIcon : item.icon == 'tenant' ? tenantIcon : prefixIcon)" alt="">
-                        </div>
-                        <span class="menu_title">{{ item.path === 'knowledge-bases' && kbMenuItem ? kbMenuItem.title : item.title }}</span>
-                    </div>
-                </div>
-            </div>
+            <UserMenu />
         </div>
         
         <input type="file" @change="upload" style="display: none" ref="uploadInput"
@@ -123,10 +94,13 @@ import { getKnowledgeBaseById, listKnowledgeBases, uploadKnowledgeFile } from '@
 import { kbFileTypeVerification } from '@/utils/index';
 import { useMenuStore } from '@/stores/menu';
 import { useAuthStore } from '@/stores/auth';
+import { useUIStore } from '@/stores/ui';
 import { MessagePlugin } from "tdesign-vue-next";
+import UserMenu from '@/components/UserMenu.vue';
 let uploadInput = ref();
 const usemenuStore = useMenuStore();
 const authStore = useAuthStore();
+const uiStore = useUIStore();
 const route = useRoute();
 const router = useRouter();
 const currentpath = ref('');
@@ -160,9 +134,9 @@ const isMenuItemActive = (itemPath: string): boolean => {
                    currentRoute === 'knowledgeBaseDetail' || 
                    currentRoute === 'knowledgeBaseSettings';
         case 'creatChat':
-            return currentRoute === 'kbCreatChat';
-        case 'tenant':
-            return currentRoute === 'tenant';
+            return currentRoute === 'kbCreatChat' || currentRoute === 'globalCreatChat';
+        case 'settings':
+            return currentRoute === 'settings';
         default:
             return itemPath === currentpath.value;
     }
@@ -178,8 +152,8 @@ const getIconActiveState = (itemPath: string) => {
             currentRoute === 'knowledgeBaseDetail' || 
             currentRoute === 'knowledgeBaseSettings'
         ),
-        isCreatChatActive: itemPath === 'creatChat' && currentRoute === 'kbCreatChat',
-        isTenantActive: itemPath === 'tenant' && currentRoute === 'tenant',
+        isCreatChatActive: itemPath === 'creatChat' && (currentRoute === 'kbCreatChat' || currentRoute === 'globalCreatChat'),
+        isSettingsActive: itemPath === 'settings' && currentRoute === 'settings',
         isChatActive: itemPath === 'chat' && currentRoute === 'chat'
     };
 };
@@ -187,7 +161,7 @@ const getIconActiveState = (itemPath: string) => {
 // 分离上下两部分菜单
 const topMenuItems = computed<MenuItem[]>(() => {
     return (menuArr.value as unknown as MenuItem[]).filter((item: MenuItem) => 
-        item.path === 'knowledge-bases' || (isInKnowledgeBase.value && item.path === 'creatChat')
+        item.path === 'knowledge-bases' || item.path === 'creatChat'
     );
 });
 
@@ -430,13 +404,13 @@ let fileAddIcon = ref('file-add-green.svg');
 let knowledgeIcon = ref('zhishiku-green.svg');
 let prefixIcon = ref('prefixIcon.svg');
 let logoutIcon = ref('logout.svg');
-let tenantIcon = ref('user.svg'); // 使用专门的用户图标
+let settingIcon = ref('setting.svg'); // 设置图标
 let pathPrefix = ref(route.name)
   const getIcon = (path: string) => {
       // 根据当前路由状态更新所有图标
       const kbActiveState = getIconActiveState('knowledge-bases');
       const creatChatActiveState = getIconActiveState('creatChat');
-      const tenantActiveState = getIconActiveState('tenant');
+      const settingsActiveState = getIconActiveState('settings');
       
       // 上传图标：只在知识库相关页面显示绿色
       fileAddIcon.value = kbActiveState.isKbActive ? 'file-add-green.svg' : 'file-add.svg';
@@ -449,8 +423,8 @@ let pathPrefix = ref(route.name)
                         kbActiveState.isKbActive ? 'prefixIcon-grey.svg' : 
                         'prefixIcon.svg';
       
-      // 租户图标：只在租户页面显示绿色
-      tenantIcon.value = tenantActiveState.isTenantActive ? 'user-green.svg' : 'user.svg';
+      // 设置图标：只在设置页面显示绿色
+      settingIcon.value = settingsActiveState.isSettingsActive ? 'setting-green.svg' : 'setting.svg';
       
       // 退出图标：始终显示默认
       logoutIcon.value = 'logout.svg';
@@ -465,6 +439,10 @@ const handleMenuClick = async (path: string) => {
         } else {
             router.push('/platform/knowledge-bases')
         }
+    } else if (path === 'settings') {
+        // 设置菜单项：打开设置弹窗并跳转路由
+        uiStore.openSettings()
+        router.push('/platform/settings')
     } else {
         gotopage(path)
     }
@@ -493,11 +471,14 @@ const gotopage = async (path: string) => {
         return;
     } else {
         if (path === 'creatChat') {
+            // 尝试获取当前知识库ID
             const kbId = await getCurrentKbId()
             if (kbId) {
+                // 如果在知识库内部，进入该知识库的对话页
                 router.push(`/platform/knowledge-bases/${kbId}/creatChat`)
             } else {
-                router.push(`/platform/knowledge-bases`)
+                // 如果不在知识库内，也进入对话创建页，让用户通过 @ 按钮选择知识库
+                router.push(`/platform/creatChat`)
             }
         } else {
             router.push(`/platform/${path}`);

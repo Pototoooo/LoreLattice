@@ -3,6 +3,7 @@ package interfaces
 import (
 	"context"
 
+	"github.com/Tencent/WeKnora/internal/event"
 	"github.com/Tencent/WeKnora/internal/types"
 )
 
@@ -30,6 +31,9 @@ type SessionService interface {
 	KnowledgeQAByEvent(ctx context.Context, chatManage *types.ChatManage, eventList []types.EventType) error
 	// SearchKnowledge performs knowledge-based search, without summarization
 	SearchKnowledge(ctx context.Context, knowledgeBaseID, query string) ([]*types.SearchResult, error)
+	// AgentQA performs agent-based question answering with conversation history and streaming support
+	// eventBus is optional - if nil, uses service's default EventBus
+	AgentQA(ctx context.Context, session *types.Session, query string, assistantMessageID string, eventBus *event.EventBus) ([]*types.SearchResult, error)
 }
 
 // SessionRepository defines the session repository interface

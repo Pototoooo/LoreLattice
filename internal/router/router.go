@@ -192,6 +192,12 @@ func RegisterChatRoutes(r *gin.RouterGroup, handler *handler.SessionHandler) {
 		knowledgeChat.POST("/:session_id", handler.KnowledgeQA)
 	}
 
+	// Agent-based chat
+	agentChat := r.Group("/agent-chat")
+	{
+		agentChat.POST("/:session_id", handler.AgentQA)
+	}
+
 	// 新增知识检索接口，不需要session_id
 	knowledgeSearch := r.Group("/knowledge-search")
 	{
@@ -209,6 +215,11 @@ func RegisterTenantRoutes(r *gin.RouterGroup, handler *handler.TenantHandler) {
 		tenantRoutes.PUT("/:id", handler.UpdateTenant)
 		tenantRoutes.DELETE("/:id", handler.DeleteTenant)
 		tenantRoutes.GET("", handler.ListTenants)
+
+		// Agent configuration management (tenant-level)
+		// Tenant ID is obtained from authentication context
+		tenantRoutes.GET("/agent-config", handler.GetTenantAgentConfig)
+		tenantRoutes.PUT("/agent-config", handler.UpdateTenantAgentConfig)
 	}
 }
 

@@ -1,0 +1,110 @@
+package types
+
+import (
+	"context"
+	"database/sql/driver"
+	"encoding/json"
+	"time"
+)
+
+// AgentConfig represents the configuration for an agent session
+type AgentConfig struct {
+	Enabled           bool     `json:"enabled"`            // Whether agent mode is enabled
+	MaxIterations     int      `json:"max_iterations"`     // Maximum number of ReAct iterations
+	ReflectionEnabled bool     `json:"reflection_enabled"` // Whether to enable reflection
+	AllowedTools      []string `json:"allowed_tools"`      // List of allowed tool names
+	Temperature       float64  `json:"temperature"`        // LLM temperature for agent
+	ThinkingModelID   string   `json:"thinking_model_id"`  // Model ID for reasoning
+	RerankModelID     string   `json:"rerank_model_id"`    // Model ID for reranking search results
+	KnowledgeBases    []string `json:"knowledge_bases"`    // Accessible knowledge base IDs
+}
+
+// Value implements driver.Valuer interface for AgentConfig
+func (c AgentConfig) Value() (driver.Value, error) {
+	return json.Marshal(c)
+}
+
+// Scan implements sql.Scanner interface for AgentConfig
+func (c *AgentConfig) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+	b, ok := value.([]byte)
+	if !ok {
+		return nil
+	}
+	return json.Unmarshal(b, c)
+}
+
+// Tool defines the interface that all agent tools must implement
+type Tool interface {
+	// Name returns the unique identifier for this tool
+	Name() string
+
+	// Description returns a human-readable description of what the tool does
+	Description() string
+
+	// Parameters returns the JSON Schema for the tool's parameters
+	Parameters() map[string]interface{}
+
+	// Execute runs the tool with the given arguments
+	Execute(ctx context.Context, args map[string]interface{}) (*ToolResult, error)
+}
+
+// ToolResult represents the result of a tool execution
+type ToolResult struct {
+	Success bool                   `json:"success"`         // Whether the tool executed successfully
+	Output  string                 `json:"output"`          // Human-readable output
+	Data    map[string]interface{} `json:"data,omitempty"`  // Structured data for programmatic use
+	Error   string                 `json:"error,omitempty"` // Error message if execution failed
+}
+
+// ToolCall represents a single tool invocation within an agent step
+type ToolCall struct {
+	ID         string                 `json:"id"`                   // Function call ID from LLM
+	Name       string                 `json:"name"`                 // Tool name
+	Args       map[string]interface{} `json:"args"`                 // Tool arguments
+	Result     *ToolResult            `json:"result"`               // Execution result (contains Output)
+	Reflection string                 `json:"reflection,omitempty"` // Agent's reflection on this tool call result (if enabled)
+	Duration   int64                  `json:"duration"`             // Execution time in milliseconds
+}
+
+// AgentStep represents one iteration of the ReAct loop
+type AgentStep struct {
+	Iteration int        `json:"iteration"`  // Iteration number (0-indexed)
+	Thought   string     `json:"thought"`    // LLM's reasoning/thinking (Think phase)
+	ToolCalls []ToolCall `json:"tool_calls"` // Tools called in this step (Act phase)
+	Timestamp time.Time  `json:"timestamp"`  // When this step occurred
+}
+
+// GetObservations returns observations from all tool calls in this step
+// This is a convenience method to maintain backward compatibility
+func (s *AgentStep) GetObservations() []string {
+	observations := make([]string, 0, len(s.ToolCalls))
+	for _, tc := range s.ToolCalls {
+		if tc.Result != nil && tc.Result.Output != "" {
+			observations = append(observations, tc.Result.Output)
+		}
+		if tc.Reflection != "" {
+			observations = append(observations, "Reflection: "+tc.Reflection)
+		}
+	}
+	return observations
+}
+
+// AgentState tracks the execution state of an agent across iterations
+type AgentState struct {
+	CurrentRound  int             `json:"current_round"`  // Current round number
+	RoundSteps    []AgentStep     `json:"round_steps"`    // All steps taken so far in the current round
+	Plan          []string        `json:"plan,omitempty"` // Execution plan (if planning enabled)
+	IsComplete    bool            `json:"is_complete"`    // Whether agent has finished
+	FinalAnswer   string          `json:"final_answer"`   // The final answer to the query
+	KnowledgeRefs []*SearchResult `json:"knowledge_refs"` // Collected knowledge references
+}
+
+// FunctionDefinition represents a function definition for LLM function calling
+type FunctionDefinition struct {
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	Parameters  map[string]interface{} `json:"parameters"`
+}

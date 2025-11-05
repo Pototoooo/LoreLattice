@@ -14,7 +14,7 @@ type memoryStreamInfo struct {
 	sessionID           string
 	requestID           string
 	query               string
-	content             string
+	events              []interfaces.StreamEvent
 	knowledgeReferences types.References
 	lastUpdated         time.Time
 	isCompleted         bool
@@ -54,19 +54,61 @@ func (m *MemoryStreamManager) RegisterStream(ctx context.Context, sessionID, req
 	return nil
 }
 
-// UpdateStream 更新流内容
-func (m *MemoryStreamManager) UpdateStream(ctx context.Context,
-	sessionID, requestID string, content string, references types.References,
+// PushEvent 推送事件到流（追加模式）
+func (m *MemoryStreamManager) PushEvent(ctx context.Context,
+	sessionID, requestID string, event interfaces.StreamEvent,
 ) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
 	if sessionMap, exists := m.activeStreams[sessionID]; exists {
 		if stream, found := sessionMap[requestID]; found {
-			stream.content += content
-			if len(references) > 0 {
-				stream.knowledgeReferences = references
+			stream.events = append(stream.events, event)
+			stream.lastUpdated = time.Now()
+		}
+	}
+	return nil
+}
+
+// ReplaceEvent 通过 ID 替换事件（用于流式进度更新）
+func (m *MemoryStreamManager) ReplaceEvent(ctx context.Context,
+	sessionID, requestID string, event interfaces.StreamEvent,
+) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if sessionMap, exists := m.activeStreams[sessionID]; exists {
+		if stream, found := sessionMap[requestID]; found {
+			// 通过 ID 精确查找并替换
+			replaced := false
+			for i := range stream.events {
+				if stream.events[i].ID == event.ID {
+					// 找到了，替换
+					stream.events[i] = event
+					replaced = true
+					break
+				}
 			}
+			// 没找到，追加
+			if !replaced {
+				stream.events = append(stream.events, event)
+			}
+			stream.lastUpdated = time.Now()
+		}
+	}
+	return nil
+}
+
+// UpdateReferences 更新知识引用
+func (m *MemoryStreamManager) UpdateReferences(ctx context.Context,
+	sessionID, requestID string, references types.References,
+) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if sessionMap, exists := m.activeStreams[sessionID]; exists {
+		if stream, found := sessionMap[requestID]; found {
+			stream.knowledgeReferences = references
 			stream.lastUpdated = time.Now()
 		}
 	}
@@ -109,7 +151,7 @@ func (m *MemoryStreamManager) GetStream(ctx context.Context,
 				SessionID:           stream.sessionID,
 				RequestID:           stream.requestID,
 				Query:               stream.query,
-				Content:             stream.content,
+				Events:              stream.events,
 				KnowledgeReferences: stream.knowledgeReferences,
 				LastUpdated:         stream.lastUpdated,
 				IsCompleted:         stream.isCompleted,

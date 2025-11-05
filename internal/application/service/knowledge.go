@@ -1545,7 +1545,7 @@ func (s *knowledgeService) UpdateImageInfo(ctx context.Context, knowledgeID stri
 	image := images[0]
 
 	// Retrieve all chunks with the given parent chunk ID
-	chunk, err := s.chunkService.GetChunkByID(ctx, knowledgeID, chunkID)
+	chunk, err := s.chunkService.GetChunkByID(ctx, chunkID)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get chunk: %v", err)
 		return err

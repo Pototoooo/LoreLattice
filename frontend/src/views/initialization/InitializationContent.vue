@@ -971,6 +971,88 @@
                 </div>
             </div>
 
+            <!-- Agent 智能问答配置区域 -->
+            <div class="config-section">
+                <h3>
+                    <t-icon name="service" class="section-icon" />Agent 智能问答配置
+                    <t-tag v-if="formData.agent.enabled" theme="success" size="small" style="margin-left: 8px">已启用</t-tag>
+                    <t-tag v-else theme="default" size="small" style="margin-left: 8px">未启用</t-tag>
+                </h3>
+                
+                <div class="form-row">
+                    <t-form-item name="agent.enabled">
+                        <div class="checkbox-with-label">
+                            <t-switch v-model="formData.agent.enabled" size="large">
+                                <template #label="slotProps">
+                                    {{ slotProps.value ? '已启用' : '已禁用' }}
+                                </template>
+                            </t-switch>
+                            <div class="help-text" style="margin-left: 16px">
+                                启用 Agent 模式，通过 ReAct 推理框架回答复杂问题
+                                <t-button variant="text" size="small" @click="showAgentHelp = true">
+                                    了解更多
+                                </t-button>
+                            </div>
+                        </div>
+                    </t-form-item>
+                </div>
+
+                <!-- Agent 详细配置（启用后显示） -->
+                <div v-if="formData.agent.enabled" class="agent-detail-config">
+                    <div class="form-row">
+                        <t-form-item label="最大推理步数" name="agent.maxIterations">
+                            <t-input-number 
+                                v-model="formData.agent.maxIterations" 
+                                :min="1" 
+                                :max="20"
+                                style="width: 200px;"
+                            />
+                            <div class="field-description">Agent 最多执行多少步推理，建议 5-10 步</div>
+                        </t-form-item>
+                    </div>
+
+                    <div class="form-row">
+                        <t-form-item label="温度参数" name="agent.temperature">
+                            <t-slider 
+                                v-model="formData.agent.temperature" 
+                                :min="0" 
+                                :max="1"
+                                :step="0.1"
+                                :marks="{ 0: '精确', 0.5: '平衡', 1: '创造' }"
+                                style="width: 400px;"
+                            />
+                            <div class="field-description">控制回答的随机性，0=更精确，1=更有创造性</div>
+                        </t-form-item>
+                    </div>
+
+                    <div class="form-row">
+                        <t-form-item label="思考模型ID" name="agent.thinkingModelId">
+                            <t-input 
+                                v-model="formData.agent.thinkingModelId" 
+                                placeholder="留空使用默认 LLM 模型"
+                                style="width: 400px;"
+                            />
+                            <div class="field-description">指定用于 Agent 推理的模型 ID</div>
+                        </t-form-item>
+                    </div>
+
+                    <div class="form-row">
+                        <t-form-item label="允许的工具" name="agent.allowedTools">
+                            <t-checkbox-group v-model="formData.agent.allowedTools">
+                                <t-checkbox value="knowledge_search">知识库检索</t-checkbox>
+                                <t-checkbox value="multi_kb_search">多知识库检索</t-checkbox>
+                                <t-checkbox value="list_knowledge_bases">列出知识库</t-checkbox>
+                                <t-checkbox value="get_chunk_detail">获取文档块详情</t-checkbox>
+                                <t-checkbox value="get_related_chunks">获取相关文档块</t-checkbox>
+                                <t-checkbox value="query_knowledge_graph">查询知识图谱</t-checkbox>
+                                <t-checkbox value="get_document_info">获取文档信息</t-checkbox>
+                            </t-checkbox-group>
+                            <div class="field-description">选择 Agent 可以使用的工具</div>
+                        </t-form-item>
+                    </div>
+                </div>
+            </div>
+
             <!-- 提交按钮区域 -->
             <div class="submit-section">
                 <t-button theme="primary" type="button" size="large" 
@@ -992,6 +1074,62 @@
                 </div>
             </div>
         </t-form>
+
+        <!-- Agent 帮助对话框 -->
+        <t-dialog
+            v-model:visible="showAgentHelp"
+            header="Agent 智能问答模式说明"
+            width="600px"
+            :footer="false"
+        >
+            <div class="agent-help-content">
+                <h4>什么是 Agent 模式？</h4>
+                <p>Agent 模式基于 ReAct (Reasoning + Acting) 框架，能够通过以下方式回答复杂问题：</p>
+                <ul>
+                    <li><strong>多步推理</strong>：Agent 会分步思考和分析问题</li>
+                    <li><strong>工具调用</strong>：根据需要调用知识库检索等工具</li>
+                    <li><strong>自我反思</strong>：评估中间结果并调整策略</li>
+                    <li><strong>上下文记忆</strong>：支持多轮连续对话</li>
+                </ul>
+
+                <h4>适用场景</h4>
+                <ul>
+                    <li>需要对比分析多个文档</li>
+                    <li>需要多步推理的复杂问题</li>
+                    <li>需要在多个知识库中查找信息</li>
+                    <li>需要深度分析和总结</li>
+                </ul>
+
+                <h4>与普通模式的区别</h4>
+                <table class="comparison-table">
+                    <tr>
+                        <th>特性</th>
+                        <th>普通模式</th>
+                        <th>Agent 模式</th>
+                    </tr>
+                    <tr>
+                        <td>推理方式</td>
+                        <td>单次检索+生成</td>
+                        <td>多步推理循环</td>
+                    </tr>
+                    <tr>
+                        <td>工具使用</td>
+                        <td>固定流程</td>
+                        <td>动态决策</td>
+                    </tr>
+                    <tr>
+                        <td>适用问题</td>
+                        <td>简单直接问题</td>
+                        <td>复杂推理问题</td>
+                    </tr>
+                    <tr>
+                        <td>响应时间</td>
+                        <td>快</td>
+                        <td>相对较慢</td>
+                    </tr>
+                </table>
+            </div>
+        </t-dialog>
         </div>
     </div>
 </template>
@@ -1188,8 +1326,18 @@ const formData = reactive({
         tags: [] as string[],
         nodes: [] as Node[],
         relations: [] as Relation[]
+    },
+    agent: {
+        enabled: false,
+        maxIterations: 5,
+        temperature: 0.7,
+        thinkingModelId: '',
+        allowedTools: ['knowledge_search', 'multi_kb_search', 'list_knowledge_bases']
     }
 });
+
+// Agent 帮助对话框状态
+const showAgentHelp = ref(false);
 
 // 输入防抖定时器
 const inputDebounceTimers = reactive<Record<string, any>>({});
@@ -1635,6 +1783,18 @@ const loadCurrentConfig = async () => {
                 }
                 tagOptions.value.push({ label: tag, value: tag });
             }
+        }
+        
+        // 回填 Agent 配置
+        if ((config as any).agent) {
+            Object.assign(formData.agent, {
+                enabled: (config as any).agent.enabled || false,
+                maxIterations: (config as any).agent.maxIterations || 5,
+                temperature: (config as any).agent.temperature || 0.7,
+                thinkingModelId: (config as any).agent.thinkingModelId || '',
+                allowedTools: (config as any).agent.allowedTools || ['knowledge_search', 'multi_kb_search', 'list_knowledge_bases']
+            });
+            console.log('Agent config loaded:', formData.agent);
         }
         
         // 在配置加载完成后，检查模型状态
@@ -3563,5 +3723,82 @@ onMounted(async () => {
 
 .select-input-node > li:hover {
     background-color: var(--td-bg-color-container-hover);
+}
+
+/* Agent 配置样式 */
+.agent-detail-config {
+    margin-top: 16px;
+    padding-left: 20px;
+    border-left: 3px solid #0052d9;
+}
+
+.checkbox-with-label {
+    display: flex;
+    align-items: center;
+}
+
+.field-description {
+    font-size: 12px;
+    color: #00000099;
+    margin-top: 4px;
+}
+
+/* Agent 帮助对话框样式 */
+.agent-help-content {
+    h4 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #000000;
+        margin: 16px 0 8px 0;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    p {
+        font-size: 14px;
+        color: #00000099;
+        line-height: 1.6;
+        margin: 8px 0;
+    }
+
+    ul {
+        margin: 8px 0;
+        padding-left: 20px;
+
+        li {
+            font-size: 14px;
+            color: #00000099;
+            line-height: 1.8;
+
+            strong {
+                color: #000000;
+            }
+        }
+    }
+
+    .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+        font-size: 13px;
+
+        th, td {
+            border: 1px solid #e7e7e7;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        td {
+            color: #00000099;
+        }
+    }
 }
 </style>

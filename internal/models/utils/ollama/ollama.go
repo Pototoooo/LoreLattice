@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/ollama/ollama/api"
@@ -243,7 +244,15 @@ func (s *OllamaService) GetModelInfo(ctx context.Context, modelName string) (*ap
 	return resp, nil
 }
 
-// ListModels lists all available models
+// OllamaModelInfo represents detailed information about an Ollama model
+type OllamaModelInfo struct {
+	Name       string    `json:"name"`
+	Size       int64     `json:"size"`
+	Digest     string    `json:"digest"`
+	ModifiedAt time.Time `json:"modified_at"`
+}
+
+// ListModels lists all available models with basic info (names only)
 func (s *OllamaService) ListModels(ctx context.Context) ([]string, error) {
 	listResp, err := s.client.List(ctx)
 	if err != nil {
@@ -256,6 +265,26 @@ func (s *OllamaService) ListModels(ctx context.Context) ([]string, error) {
 	}
 
 	return modelNames, nil
+}
+
+// ListModelsDetailed lists all available models with detailed information
+func (s *OllamaService) ListModelsDetailed(ctx context.Context) ([]OllamaModelInfo, error) {
+	listResp, err := s.client.List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get model list: %w", err)
+	}
+
+	models := make([]OllamaModelInfo, len(listResp.Models))
+	for i, model := range listResp.Models {
+		models[i] = OllamaModelInfo{
+			Name:       model.Name,
+			Size:       model.Size,
+			Digest:     model.Digest,
+			ModifiedAt: model.ModifiedAt,
+		}
+	}
+
+	return models, nil
 }
 
 // DeleteModel deletes a model

@@ -100,8 +100,16 @@ export function checkOllamaStatus(): Promise<{ available: boolean; version?: str
     });
 }
 
-// 列出已安装的 Ollama 模型
-export function listOllamaModels(): Promise<string[]> {
+// Ollama 模型详细信息接口
+export interface OllamaModelInfo {
+    name: string;
+    size: number;
+    digest: string;
+    modified_at: string;
+}
+
+// 列出已安装的 Ollama 模型（详细信息）
+export function listOllamaModels(): Promise<OllamaModelInfo[]> {
     return new Promise((resolve, reject) => {
         get('/api/v1/initialization/ollama/models')
             .then((response: any) => {

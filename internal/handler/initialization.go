@@ -23,6 +23,7 @@ import (
 	"github.com/Tencent/WeKnora/internal/models/utils/ollama"
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Tencent/WeKnora/internal/utils"
 	"github.com/Tencent/WeKnora/services/docreader/src/client"
 	"github.com/Tencent/WeKnora/services/docreader/src/proto"
 	"github.com/gin-gonic/gin"
@@ -156,14 +157,13 @@ func (h *InitializationHandler) InitializeByKB(c *gin.Context) {
 	ctx := c.Request.Context()
 	kbIdStr := c.Param("kbId")
 
-	logger.Infof(ctx, "Starting knowledge base configuration update, kbId: %s", kbIdStr)
-
 	var req InitializationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		logger.Error(ctx, "Failed to parse initialization request", err)
 		c.Error(errors.NewBadRequestError(err.Error()))
 		return
 	}
+	logger.Infof(ctx, "Starting knowledge base configuration update, kbId: %s, request: %s", kbIdStr, utils.ToJSON(req))
 
 	// 获取指定知识库信息
 	kb, err := h.kbService.GetKnowledgeBaseByID(ctx, kbIdStr)
@@ -333,9 +333,31 @@ func (h *InitializationHandler) InitializeByKB(c *gin.Context) {
 			}
 		}
 
-		// 检查模型是否已存在
-		existingModel, err := h.modelService.GetModelByID(ctx, model.ID)
-		if err == nil && existingModel != nil {
+		// 根据模型类型从知识库获取已有的模型ID
+		var existingModelID string
+		switch modelInfo.modelType {
+		case types.ModelTypeEmbedding:
+			existingModelID = kb.EmbeddingModelID
+		case types.ModelTypeKnowledgeQA:
+			existingModelID = kb.SummaryModelID
+		case types.ModelTypeRerank:
+			existingModelID = kb.RerankModelID
+		case types.ModelTypeVLLM:
+			existingModelID = kb.VLMModelID
+		}
+
+		// 如果知识库中已经有对应类型的模型ID，尝试获取并更新
+		var existingModel *types.Model
+		if existingModelID != "" {
+			existingModel, err = h.modelService.GetModelByID(ctx, existingModelID)
+			if err != nil {
+				// 模型不存在或获取失败，记录日志但继续创建新模型
+				logger.Warnf(ctx, "Failed to get existing model %s: %v, will create new one", existingModelID, err)
+				existingModel = nil
+			}
+		}
+
+		if existingModel != nil {
 			// 更新现有模型
 			existingModel.Name = model.Name
 			existingModel.Source = model.Source
@@ -740,7 +762,8 @@ func (h *InitializationHandler) ListOllamaModels(c *gin.Context) {
 		}
 	}
 
-	models, err := h.ollamaService.ListModels(ctx)
+	// 使用 ListModelsDetailed 获取包含大小等详细信息的模型列表
+	models, err := h.ollamaService.ListModelsDetailed(ctx)
 	if err != nil {
 		logger.ErrorWithFields(ctx, err, nil)
 		c.Error(errors.NewInternalServerError("获取模型列表失败: " + err.Error()))
@@ -916,7 +939,7 @@ func (h *InitializationHandler) GetCurrentConfigByKB(c *gin.Context) {
 	}
 
 	// 构建配置响应
-	config := buildConfigResponse(models, kb, hasFiles)
+	config := h.buildConfigResponse(ctx, models, kb, hasFiles)
 
 	logger.Info(ctx, "Knowledge base configuration retrieved successfully", "kbId", kbIdStr)
 	c.JSON(http.StatusOK, gin.H{
@@ -926,7 +949,7 @@ func (h *InitializationHandler) GetCurrentConfigByKB(c *gin.Context) {
 }
 
 // buildConfigResponse 构建配置响应数据
-func buildConfigResponse(models []*types.Model,
+func (h *InitializationHandler) buildConfigResponse(ctx context.Context, models []*types.Model,
 	kb *types.KnowledgeBase, hasFiles bool,
 ) map[string]interface{} {
 	config := map[string]interface{}{

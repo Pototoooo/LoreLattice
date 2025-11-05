@@ -18,7 +18,6 @@ import (
 
 func NewChunkExtractTask(ctx context.Context, client *asynq.Client, tenantID uint, chunkID string, modelID string) error {
 	if strings.ToLower(os.Getenv("NEO4J_ENABLE")) != "true" {
-		logger.Debugf(ctx, "NOT SUPPORT RETRIEVE GRAPH")
 		return nil
 	}
 	payload, err := json.Marshal(types.ExtractChunkPayload{

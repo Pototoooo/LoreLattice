@@ -44,6 +44,30 @@ type SummaryConfig struct {
 	MaxCompletionTokens int `json:"max_completion_tokens"`
 }
 
+// ContextCompressionStrategy represents the strategy for context compression
+type ContextCompressionStrategy string
+
+const (
+	// ContextCompressionSlidingWindow keeps the most recent N messages
+	ContextCompressionSlidingWindow ContextCompressionStrategy = "sliding_window"
+	// ContextCompressionSmart uses LLM to summarize old messages
+	ContextCompressionSmart ContextCompressionStrategy = "smart"
+)
+
+// ContextConfig configures LLM context management
+// This is separate from message storage and manages token limits
+type ContextConfig struct {
+	// Maximum tokens allowed in LLM context
+	MaxTokens int `json:"max_tokens"`
+	// Compression strategy: "sliding_window" or "smart"
+	CompressionStrategy ContextCompressionStrategy `json:"compression_strategy"`
+	// For sliding_window: number of messages to keep
+	// For smart: number of recent messages to keep uncompressed
+	RecentMessageCount int `json:"recent_message_count"`
+	// Enable context management (default: true)
+	Enabled bool `json:"enabled"`
+}
+
 // Session represents the session
 type Session struct {
 	// ID
@@ -69,6 +93,8 @@ type Session struct {
 	RerankThreshold   float64          `json:"rerank_threshold"`                    // 排序阈值
 	SummaryModelID    string           `json:"summary_model_id"`                    // 总结模型ID
 	SummaryParameters *SummaryConfig   `json:"summary_parameters" gorm:"type:json"` // 总结模型参数
+	AgentConfig       *AgentConfig     `json:"agent_config" gorm:"type:json"`       // Agent 配置（可选）
+	ContextConfig     *ContextConfig   `json:"context_config" gorm:"type:json"`     // 上下文管理配置（可选）
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
@@ -109,6 +135,23 @@ func (c *SummaryConfig) Value() (driver.Value, error) {
 
 // Scan implements the sql.Scanner interface, used to convert database value to SummaryConfig
 func (c *SummaryConfig) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+	b, ok := value.([]byte)
+	if !ok {
+		return nil
+	}
+	return json.Unmarshal(b, c)
+}
+
+// Value implements the driver.Valuer interface, used to convert ContextConfig to database value
+func (c *ContextConfig) Value() (driver.Value, error) {
+	return json.Marshal(c)
+}
+
+// Scan implements the sql.Scanner interface, used to convert database value to ContextConfig
+func (c *ContextConfig) Scan(value interface{}) error {
 	if value == nil {
 		return nil
 	}

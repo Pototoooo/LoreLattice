@@ -13,13 +13,13 @@ import (
 
 // redisStreamInfo Redis存储的流信息
 type redisStreamInfo struct {
-	SessionID           string           `json:"session_id"`
-	RequestID           string           `json:"request_id"`
-	Query               string           `json:"query"`
-	Content             string           `json:"content"`
-	KnowledgeReferences types.References `json:"knowledge_references"`
-	LastUpdated         time.Time        `json:"last_updated"`
-	IsCompleted         bool             `json:"is_completed"`
+	SessionID           string                   `json:"session_id"`
+	RequestID           string                   `json:"request_id"`
+	Query               string                   `json:"query"`
+	Events              []interfaces.StreamEvent `json:"events"`
+	KnowledgeReferences types.References         `json:"knowledge_references"`
+	LastUpdated         time.Time                `json:"last_updated"`
+	IsCompleted         bool                     `json:"is_completed"`
 }
 
 // RedisStreamManager 基于Redis的流管理器实现
@@ -83,8 +83,8 @@ func (r *RedisStreamManager) RegisterStream(ctx context.Context, sessionID, requ
 	return r.client.Set(ctx, key, data, r.ttl).Err()
 }
 
-// UpdateStream 更新流内容
-func (r *RedisStreamManager) UpdateStream(ctx context.Context, sessionID, requestID string, content string, references types.References) error {
+// PushEvent 推送事件到流
+func (r *RedisStreamManager) PushEvent(ctx context.Context, sessionID, requestID string, event interfaces.StreamEvent) error {
 	key := r.buildKey(sessionID, requestID)
 
 	// 获取当前数据
@@ -101,11 +101,84 @@ func (r *RedisStreamManager) UpdateStream(ctx context.Context, sessionID, reques
 		return fmt.Errorf("解析流数据失败: %w", err)
 	}
 
-	// 更新数据
-	info.Content += content
-	if len(references) > 0 {
-		info.KnowledgeReferences = references
+	// 追加事件
+	info.Events = append(info.Events, event)
+	info.LastUpdated = time.Now()
+
+	// 保存回Redis
+	updatedData, err := json.Marshal(info)
+	if err != nil {
+		return fmt.Errorf("序列化更新的流信息失败: %w", err)
 	}
+
+	return r.client.Set(ctx, key, updatedData, r.ttl).Err()
+}
+
+// ReplaceEvent 通过 ID 替换事件（用于流式进度更新）
+func (r *RedisStreamManager) ReplaceEvent(ctx context.Context, sessionID, requestID string, event interfaces.StreamEvent) error {
+	key := r.buildKey(sessionID, requestID)
+
+	// 获取当前数据
+	data, err := r.client.Get(ctx, key).Bytes()
+	if err != nil {
+		if err == redis.Nil {
+			return nil // 键不存在，可能已过期
+		}
+		return fmt.Errorf("获取流数据失败: %w", err)
+	}
+
+	var info redisStreamInfo
+	if err := json.Unmarshal(data, &info); err != nil {
+		return fmt.Errorf("解析流数据失败: %w", err)
+	}
+
+	// 通过 ID 精确查找并替换
+	replaced := false
+	for i := range info.Events {
+		if info.Events[i].ID == event.ID {
+			// 找到了，替换
+			info.Events[i] = event
+			replaced = true
+			break
+		}
+	}
+
+	// 没找到，追加
+	if !replaced {
+		info.Events = append(info.Events, event)
+	}
+
+	info.LastUpdated = time.Now()
+
+	// 保存回Redis
+	updatedData, err := json.Marshal(info)
+	if err != nil {
+		return fmt.Errorf("序列化更新的流信息失败: %w", err)
+	}
+
+	return r.client.Set(ctx, key, updatedData, r.ttl).Err()
+}
+
+// UpdateReferences 更新知识引用
+func (r *RedisStreamManager) UpdateReferences(ctx context.Context, sessionID, requestID string, references types.References) error {
+	key := r.buildKey(sessionID, requestID)
+
+	// 获取当前数据
+	data, err := r.client.Get(ctx, key).Bytes()
+	if err != nil {
+		if err == redis.Nil {
+			return nil // 键不存在，可能已过期
+		}
+		return fmt.Errorf("获取流数据失败: %w", err)
+	}
+
+	var info redisStreamInfo
+	if err := json.Unmarshal(data, &info); err != nil {
+		return fmt.Errorf("解析流数据失败: %w", err)
+	}
+
+	// 更新知识引用
+	info.KnowledgeReferences = references
 	info.LastUpdated = time.Now()
 
 	// 保存回Redis
@@ -176,7 +249,7 @@ func (r *RedisStreamManager) GetStream(ctx context.Context, sessionID, requestID
 		SessionID:           info.SessionID,
 		RequestID:           info.RequestID,
 		Query:               info.Query,
-		Content:             info.Content,
+		Events:              info.Events,
 		KnowledgeReferences: info.KnowledgeReferences,
 		LastUpdated:         info.LastUpdated,
 		IsCompleted:         info.IsCompleted,

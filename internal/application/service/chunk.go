@@ -73,19 +73,14 @@ func (s *chunkService) CreateChunks(ctx context.Context, chunks []*types.Chunk) 
 // Returns:
 //   - *types.Chunk: Retrieved chunk if found
 //   - error: Any error encountered during retrieval
-func (s *chunkService) GetChunkByID(ctx context.Context, knowledgeID string, id string) (*types.Chunk, error) {
-	logger.Info(ctx, "Start getting chunk by ID")
-	logger.Infof(ctx, "Getting chunk, ID: %s, knowledge ID: %s", id, knowledgeID)
-
+func (s *chunkService) GetChunkByID(ctx context.Context, id string) (*types.Chunk, error) {
 	tenantID := ctx.Value(types.TenantIDContextKey).(uint)
-	logger.Infof(ctx, "Tenant ID: %d", tenantID)
-
+	logger.Infof(ctx, "Getting chunk by ID, ID: %s, tenant ID: %d", id, tenantID)
 	chunk, err := s.chunkRepository.GetChunkByID(ctx, tenantID, id)
 	if err != nil {
 		logger.ErrorWithFields(ctx, err, map[string]interface{}{
-			"chunk_id":     id,
-			"knowledge_id": knowledgeID,
-			"tenant_id":    tenantID,
+			"chunk_id":  id,
+			"tenant_id": tenantID,
 		})
 		return nil, err
 	}

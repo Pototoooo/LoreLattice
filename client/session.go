@@ -49,10 +49,23 @@ type SummaryConfig struct {
 	MaxCompletionTokens int     `json:"max_completion_tokens"`
 }
 
+// AgentConfig defines agent configuration for agent mode
+type AgentConfig struct {
+	Enabled           bool     `json:"enabled"`            // Whether agent mode is enabled
+	EnablePlanning    bool     `json:"enable_planning"`    // Whether to plan before executing
+	MaxIterations     int      `json:"max_iterations"`     // Maximum number of ReAct iterations
+	ReflectionEnabled bool     `json:"reflection_enabled"` // Whether to enable reflection
+	AllowedTools      []string `json:"allowed_tools"`      // List of allowed tool names
+	Temperature       float64  `json:"temperature"`        // LLM temperature for agent
+	ThinkingModelID   string   `json:"thinking_model_id"`  // Model ID for reasoning
+	KnowledgeBases    []string `json:"knowledge_bases"`    // Accessible knowledge base IDs
+}
+
 // CreateSessionRequest session creation request
 type CreateSessionRequest struct {
-	KnowledgeBaseID string           `json:"knowledge_base_id"` // Associated knowledge base ID
+	KnowledgeBaseID string           `json:"knowledge_base_id"` // Associated knowledge base ID (optional in agent mode)
 	SessionStrategy *SessionStrategy `json:"session_strategy"`  // Session strategy
+	AgentConfig     *AgentConfig     `json:"agent_config"`      // Agent configuration (optional, for agent mode)
 }
 
 // Session session information
@@ -73,6 +86,7 @@ type Session struct {
 	RerankThreshold   float64        `json:"reranking_threshold"` // Reranking threshold
 	SummaryModelID    string         `json:"summary_model_id"`
 	SummaryParameters *SummaryConfig `json:"summary_parameters"`
+	AgentConfig       *AgentConfig   `json:"agent_config"` // Agent configuration (optional)
 	CreatedAt         string         `json:"created_at"`
 	UpdatedAt         string         `json:"updated_at"`
 }

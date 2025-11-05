@@ -8,10 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	InitDefaultTenantID uint = 1
-)
-
 // Tenant represents the tenant
 type Tenant struct {
 	// ID
@@ -32,6 +28,8 @@ type Tenant struct {
 	StorageQuota int64 `yaml:"storage_quota" json:"storage_quota" gorm:"default:10737418240"`
 	// Storage used (Bytes)
 	StorageUsed int64 `yaml:"storage_used" json:"storage_used" gorm:"default:0"`
+	// Global Agent configuration for this tenant (default for all sessions)
+	AgentConfig *AgentConfig `yaml:"agent_config" json:"agent_config" gorm:"type:json"`
 	// Creation time
 	CreatedAt time.Time `yaml:"created_at" json:"created_at"`
 	// Last updated time

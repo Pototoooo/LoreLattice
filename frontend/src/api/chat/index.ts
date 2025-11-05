@@ -18,6 +18,11 @@ export async function knowledgeChat(data: { session_id: string; query: string; }
   return postChat(`/api/v1/knowledge-chat/${data.session_id}`, { query: data.query });
 }
 
+// Agent chat with streaming support
+export async function agentChat(data: { session_id: string; query: string; }) {
+  return postChat(`/api/v1/agent-chat/${data.session_id}`, { query: data.query });
+}
+
 export async function getMessageList(data: { session_id: string; limit: number, created_at: string }) {
   if (data.created_at) {
     return get(`/api/v1/messages/${data.session_id}/load?before_time=${encodeURIComponent(data.created_at)}&limit=${data.limit}`);

@@ -9,10 +9,12 @@ import (
 
 	"github.com/Tencent/WeKnora/internal/config"
 	"github.com/Tencent/WeKnora/internal/errors"
+	"github.com/Tencent/WeKnora/internal/event"
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // SessionHandler handles all HTTP requests related to conversation sessions
@@ -32,13 +34,14 @@ func NewSessionHandler(
 	config *config.Config,
 	knowledgebaseService interfaces.KnowledgeBaseService,
 ) *SessionHandler {
-	return &SessionHandler{
+	handler := &SessionHandler{
 		sessionService:       sessionService,
 		messageService:       messageService,
 		streamManager:        streamManager,
 		config:               config,
 		knowledgebaseService: knowledgebaseService,
 	}
+	return handler
 }
 
 // SessionStrategy defines the configuration for a conversation session strategy
@@ -73,10 +76,12 @@ type SessionStrategy struct {
 
 // CreateSessionRequest represents a request to create a new session
 type CreateSessionRequest struct {
-	// ID of the associated knowledge base
-	KnowledgeBaseID string `json:"knowledge_base_id" binding:"required"`
+	// ID of the associated knowledge base (optional in agent mode)
+	KnowledgeBaseID string `json:"knowledge_base_id"`
 	// Session strategy configuration
 	SessionStrategy *SessionStrategy `json:"session_strategy"`
+	// Agent configuration (optional, for agent mode)
+	AgentConfig *types.AgentConfig `json:"agent_config"`
 }
 
 // CreateSession handles the creation of a new conversation session
@@ -101,24 +106,37 @@ func (h *SessionHandler) CreateSession(c *gin.Context) {
 		return
 	}
 
-	// Validate knowledge base ID
-	if request.KnowledgeBaseID == "" {
-		logger.Error(ctx, "Knowledge base ID is empty")
-		c.Error(errors.NewBadRequestError("Knowledge base cannot be empty"))
+	// Validate session creation request
+	// - Traditional RAG mode: requires KnowledgeBaseID
+	// - Agent mode: KnowledgeBaseID is optional
+	//   - If AgentConfig.KnowledgeBases is specified, use those
+	//   - If session.KnowledgeBaseID is specified, use that
+	//   - Otherwise, default to all knowledge bases under the tenant
+	isAgentMode := request.AgentConfig != nil && request.AgentConfig.Enabled
+	hasKnowledgeBase := request.KnowledgeBaseID != ""
+	hasAgentKnowledgeBases := request.AgentConfig != nil && len(request.AgentConfig.KnowledgeBases) > 0
+
+	// In traditional RAG mode, knowledge base ID is required
+	if !isAgentMode && !hasKnowledgeBase {
+		logger.Error(ctx, "Traditional RAG mode requires knowledge_base_id")
+		c.Error(errors.NewBadRequestError("knowledge_base_id is required for non-agent sessions"))
 		return
 	}
 
 	logger.Infof(
 		ctx,
-		"Processing session creation request, tenant ID: %d, knowledge base ID: %s",
+		"Processing session creation request, tenant ID: %d, knowledge base ID: %s, agent mode: %v, agent KBs: %v",
 		tenantID.(uint),
 		request.KnowledgeBaseID,
+		isAgentMode,
+		hasAgentKnowledgeBases,
 	)
 
 	// Create session object with base properties
 	createdSession := &types.Session{
 		TenantID:        tenantID.(uint),
 		KnowledgeBaseID: request.KnowledgeBaseID,
+		AgentConfig:     request.AgentConfig, // Set agent config if provided
 	}
 
 	// If summary model parameters are empty, set defaults
@@ -190,24 +208,33 @@ func (h *SessionHandler) CreateSession(c *gin.Context) {
 		logger.Debug(ctx, "Using default session strategy")
 	}
 
-	kb, err := h.knowledgebaseService.GetKnowledgeBaseByID(ctx, request.KnowledgeBaseID)
-	if err != nil {
-		logger.Error(ctx, "Failed to get knowledge base", err)
-		c.Error(errors.NewInternalServerError(err.Error()))
-		return
-	}
+	// Only fetch knowledge base if KnowledgeBaseID is provided
+	// In agent mode, knowledge bases may be configured in AgentConfig instead
+	if request.KnowledgeBaseID != "" {
+		kb, err := h.knowledgebaseService.GetKnowledgeBaseByID(ctx, request.KnowledgeBaseID)
+		if err != nil {
+			logger.Error(ctx, "Failed to get knowledge base", err)
+			c.Error(errors.NewInternalServerError(err.Error()))
+			return
+		}
 
-	// Get model IDs from knowledge base if not provided
-	if createdSession.SummaryModelID == "" {
-		createdSession.SummaryModelID = kb.SummaryModelID
-	}
-	if createdSession.RerankModelID == "" {
-		createdSession.RerankModelID = kb.RerankModelID
+		// Use knowledge base's models if session doesn't specify them
+		if createdSession.RerankModelID == "" {
+			createdSession.RerankModelID = kb.RerankModelID
+		}
+		if createdSession.SummaryModelID == "" {
+			createdSession.SummaryModelID = kb.SummaryModelID
+		}
+
+		logger.Debugf(ctx, "Knowledge base fetched: %s, rerank model: %s, summary model: %s",
+			kb.ID, kb.RerankModelID, kb.SummaryModelID)
+	} else {
+		logger.Debug(ctx, "No knowledge base ID provided, skipping knowledge base fetch (agent mode)")
 	}
 
 	// Call service to create session
 	logger.Infof(ctx, "Calling session service to create session")
-	createdSession, err = h.sessionService.CreateSession(ctx, createdSession)
+	createdSession, err := h.sessionService.CreateSession(ctx, createdSession)
 	if err != nil {
 		logger.ErrorWithFields(ctx, err, nil)
 		c.Error(errors.NewInternalServerError(err.Error()))
@@ -590,29 +617,32 @@ func (h *SessionHandler) ContinueStream(c *gin.Context) {
 		})
 	}
 
-	// Send existing content
-	if streamInfo.Content != "" {
-		logger.Debug(ctx, "Sending current existing content")
-		c.SSEvent("message", &types.StreamResponse{
-			ID:           message.RequestID,
-			ResponseType: types.ResponseTypeAnswer,
-			Content:      streamInfo.Content,
-			Done:         streamInfo.IsCompleted,
-		})
+	// Replay existing events
+	if len(streamInfo.Events) > 0 {
+		logger.Debugf(ctx, "Replaying %d existing events", len(streamInfo.Events))
+		for _, evt := range streamInfo.Events {
+			c.SSEvent("message", &types.StreamResponse{
+				ID:           message.RequestID,
+				ResponseType: evt.Type,
+				Content:      evt.Content,
+				Done:         evt.Done,
+				Data:         evt.Data,
+			})
+		}
 	}
 
-	// Create channels to monitor content updates
-	contentCh := make(chan string, 10)
+	// Create channels to monitor event updates
+	eventIndexCh := make(chan int, 10)
 	doneCh := make(chan bool, 1)
 
-	logger.Debug(ctx, "Starting content update monitoring")
+	logger.Debug(ctx, "Starting event update monitoring")
 
-	// Start a goroutine to monitor for content updates
+	// Start a goroutine to monitor for new events
 	go func() {
 		ticker := time.NewTicker(100 * time.Millisecond)
 		defer ticker.Stop()
 
-		currentContent := streamInfo.Content
+		currentEventCount := len(streamInfo.Events)
 
 		for {
 			select {
@@ -636,12 +666,11 @@ func (h *SessionHandler) ContinueStream(c *gin.Context) {
 					return
 				}
 
-				// Calculate new content delta
-				if len(latestStreamInfo.Content) > len(currentContent) {
-					newContent := latestStreamInfo.Content[len(currentContent):]
-					contentCh <- newContent
-					currentContent = latestStreamInfo.Content
-					logger.Debugf(ctx, "Sending new content: %d bytes", len(newContent))
+				// Check for new events
+				if len(latestStreamInfo.Events) > currentEventCount {
+					eventIndexCh <- currentEventCount
+					currentEventCount = len(latestStreamInfo.Events)
+					logger.Debugf(ctx, "Detected %d new events", len(latestStreamInfo.Events)-currentEventCount)
 				}
 
 			case <-c.Request.Context().Done():
@@ -653,7 +682,7 @@ func (h *SessionHandler) ContinueStream(c *gin.Context) {
 
 	logger.Info(ctx, "Starting stream response")
 
-	// Stream updated content to client
+	// Stream new events to client
 	c.Stream(func(w io.Writer) bool {
 		select {
 		case <-c.Request.Context().Done():
@@ -670,14 +699,22 @@ func (h *SessionHandler) ContinueStream(c *gin.Context) {
 			})
 			return false
 
-		case content := <-contentCh:
-			logger.Debugf(ctx, "Sending content fragment: %d bytes", len(content))
-			c.SSEvent("message", &types.StreamResponse{
-				ID:           message.RequestID,
-				ResponseType: types.ResponseTypeAnswer,
-				Content:      content,
-				Done:         false,
-			})
+		case startIdx := <-eventIndexCh:
+			// Send new events
+			latestStreamInfo, err := h.streamManager.GetStream(ctx, sessionID, messageID)
+			if err == nil && latestStreamInfo != nil {
+				for i := startIdx; i < len(latestStreamInfo.Events); i++ {
+					evt := latestStreamInfo.Events[i]
+					logger.Debugf(ctx, "Sending new event: %s", evt.Type)
+					c.SSEvent("message", &types.StreamResponse{
+						ID:           message.RequestID,
+						ResponseType: evt.Type,
+						Content:      evt.Content,
+						Done:         evt.Done,
+						Data:         evt.Data,
+					})
+				}
+			}
 			return true
 		}
 	})
@@ -786,11 +823,25 @@ func (h *SessionHandler) KnowledgeQA(c *gin.Context) {
 			c.Writer.Flush()
 			if response.ResponseType == types.ResponseTypeAnswer {
 				assistantMessage.Content += response.Content
-				// Update stream manager with new content
-				if err := h.streamManager.UpdateStream(
-					ctx, sessionID, assistantMessage.ID, response.Content, searchResults,
+				// Push event to stream for replay on refresh
+				if err := h.streamManager.PushEvent(
+					ctx, sessionID, assistantMessage.ID, interfaces.StreamEvent{
+						ID:        uuid.New().String(),
+						Type:      response.ResponseType,
+						Content:   response.Content,
+						Done:      response.Done,
+						Timestamp: time.Now(),
+					},
 				); err != nil {
-					logger.GetLogger(ctx).Error("Update stream content failed", "error", err)
+					logger.GetLogger(ctx).Error("Push answer event to stream failed", "error", err)
+				}
+			}
+			if response.ResponseType == types.ResponseTypeReferences {
+				// Update references
+				if err := h.streamManager.UpdateReferences(
+					ctx, sessionID, assistantMessage.ID, searchResults,
+				); err != nil {
+					logger.GetLogger(ctx).Error("Update stream references failed", "error", err)
 				}
 			}
 		}
@@ -802,4 +853,142 @@ func (h *SessionHandler) completeAssistantMessage(ctx context.Context, assistant
 	assistantMessage.UpdatedAt = time.Now()
 	assistantMessage.IsCompleted = true
 	_ = h.messageService.UpdateMessage(ctx, assistantMessage)
+}
+
+// AgentQA handles agent-based question answering with conversation history and streaming
+func (h *SessionHandler) AgentQA(c *gin.Context) {
+	ctx := logger.CloneContext(c.Request.Context())
+
+	logger.Info(ctx, "Start processing agent QA request")
+
+	// Get session ID from URL parameter
+	sessionID := c.Param("session_id")
+	if sessionID == "" {
+		logger.Error(ctx, "Session ID is empty")
+		c.Error(errors.NewBadRequestError(errors.ErrInvalidSessionID.Error()))
+		return
+	}
+
+	// Parse request body
+	var request CreateKnowledgeQARequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		logger.Error(ctx, "Failed to parse request data", err)
+		c.Error(errors.NewBadRequestError(err.Error()))
+		return
+	}
+
+	// Create assistant message
+	assistantMessage := &types.Message{
+		SessionID:   sessionID,
+		Role:        "assistant",
+		RequestID:   c.GetString(types.RequestIDContextKey.String()),
+		IsCompleted: false,
+	}
+	defer h.completeAssistantMessage(ctx, assistantMessage)
+
+	// Validate query content
+	if request.Query == "" {
+		logger.Error(ctx, "Query content is empty")
+		c.Error(errors.NewBadRequestError("Query content cannot be empty"))
+		return
+	}
+
+	logger.Infof(ctx, "Agent QA request, session ID: %s, query: %s", sessionID, request.Query)
+
+	// Get session information first
+	session, err := h.sessionService.GetSession(ctx, sessionID)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to get session, session ID: %s, error: %v", sessionID, err)
+		c.Error(errors.NewNotFoundError("Session not found"))
+		return
+	}
+
+	// Emit agent query event to create user message
+	requestID := c.GetString(types.RequestIDContextKey.String())
+	if err := event.Emit(ctx, event.Event{
+		Type:      event.EventAgentQuery,
+		SessionID: sessionID,
+		RequestID: requestID,
+		Data: event.AgentQueryData{
+			SessionID: sessionID,
+			Query:     request.Query,
+			RequestID: requestID,
+		},
+	}); err != nil {
+		logger.Errorf(ctx, "Failed to emit agent query event: %v", err)
+		c.Error(errors.NewInternalServerError(err.Error()))
+		return
+	}
+
+	// Create assistant message (response)
+	assistantMessage.CreatedAt = time.Now()
+	assistantMessagePtr, err := h.messageService.CreateMessage(ctx, assistantMessage)
+	if err != nil {
+		c.Error(errors.NewInternalServerError(err.Error()))
+		return
+	}
+	assistantMessage = assistantMessagePtr
+
+	logger.Infof(ctx, "Calling agent QA service, session ID: %s", sessionID)
+
+	// Register new stream with stream manager
+	if err := h.streamManager.RegisterStream(ctx, sessionID, assistantMessage.ID, request.Query); err != nil {
+		logger.GetLogger(ctx).Error("Register stream failed", "error", err)
+	}
+
+	// Set headers for SSE
+	c.Header("Content-Type", "text/event-stream")
+	c.Header("Cache-Control", "no-cache")
+	c.Header("Connection", "keep-alive")
+	c.Header("X-Accel-Buffering", "no")
+
+	eventBus := event.NewEventBus()
+	// Create stream handler with dedicated EventBus BEFORE calling AgentQA
+	streamHandler := NewAgentStreamHandler(
+		ctx, c, sessionID, assistantMessage.ID, requestID,
+		assistantMessage, h.streamManager, eventBus,
+	)
+
+	// Subscribe to events on the dedicated EventBus
+	streamHandler.Subscribe()
+
+	// Call service to perform agent QA
+	go func() {
+		searchResults, err := h.sessionService.AgentQA(ctx, session, request.Query, assistantMessage.ID, eventBus)
+		if err != nil {
+			logger.ErrorWithFields(ctx, err, nil)
+			// Emit error event to dedicated EventBus
+			eventBus.Emit(ctx, event.Event{
+				Type:      event.EventError,
+				SessionID: sessionID,
+				Data: event.ErrorData{
+					Error:     err.Error(),
+					Stage:     "agent_execution",
+					SessionID: sessionID,
+				},
+			})
+			return
+		}
+		assistantMessage.KnowledgeReferences = searchResults
+	}()
+
+	// Handle events for SSE (blocking until connection is done)
+	h.handleAgentEventsForSSEWithHandler(ctx, c, sessionID, assistantMessage.ID)
+}
+
+// handleAgentEventsForSSEWithHandler handles agent events for SSE streaming using an existing handler
+// The handler is already subscribed to events and AgentQA is already running
+func (h *SessionHandler) handleAgentEventsForSSEWithHandler(
+	ctx context.Context,
+	c *gin.Context,
+	sessionID, assistantMessageID string,
+) {
+	// Wait for completion - events are already being handled by streamHandler
+	// The connection will be closed when the gin context is done
+	<-c.Request.Context().Done()
+
+	// Complete stream when done
+	if err := h.streamManager.CompleteStream(ctx, sessionID, assistantMessageID); err != nil {
+		logger.GetLogger(ctx).Error("Complete stream failed", "error", err)
+	}
 }

@@ -3,10 +3,12 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	chatpipline "github.com/Tencent/WeKnora/internal/application/service/chat_pipline"
 	"github.com/Tencent/WeKnora/internal/config"
+	"github.com/Tencent/WeKnora/internal/event"
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/models/chat"
 	"github.com/Tencent/WeKnora/internal/tracing"
@@ -23,7 +25,10 @@ type sessionService struct {
 	messageRepo          interfaces.MessageRepository    // Repository for message data
 	knowledgeBaseService interfaces.KnowledgeBaseService // Service for knowledge base operations
 	modelService         interfaces.ModelService         // Service for model operations
+	tenantService        interfaces.TenantService        // Service for tenant operations
 	eventManager         *chatpipline.EventManager       // Event manager for chat pipeline
+	agentService         interfaces.AgentService         // Service for agent operations
+	contextManager       interfaces.ContextManager       // LLM context manager (separate from message storage)
 }
 
 // NewSessionService creates a new session service instance with all required dependencies
@@ -32,15 +37,25 @@ func NewSessionService(cfg *config.Config,
 	messageRepo interfaces.MessageRepository,
 	knowledgeBaseService interfaces.KnowledgeBaseService,
 	modelService interfaces.ModelService,
+	tenantService interfaces.TenantService,
 	eventManager *chatpipline.EventManager,
+	agentService interfaces.AgentService,
 ) interfaces.SessionService {
+	// Create default context manager with sliding window strategy
+	// Default: 8192 tokens max, keep last 20 messages
+	defaultStrategy := NewSlidingWindowStrategy(20)
+	contextManager := NewContextManager(defaultStrategy, 8192)
+
 	return &sessionService{
 		cfg:                  cfg,
 		sessionRepo:          sessionRepo,
 		messageRepo:          messageRepo,
 		knowledgeBaseService: knowledgeBaseService,
 		modelService:         modelService,
+		tenantService:        tenantService,
 		eventManager:         eventManager,
+		agentService:         agentService,
+		contextManager:       contextManager,
 	}
 }
 
@@ -515,3 +530,192 @@ func (s *sessionService) SearchKnowledge(ctx context.Context,
 	logger.Infof(ctx, "Knowledge base search completed, found %d results", len(chatManage.MergeResult))
 	return chatManage.MergeResult, nil
 }
+
+// AgentQA performs agent-based question answering with conversation history and streaming support
+func (s *sessionService) AgentQA(ctx context.Context, session *types.Session, query string, assistantMessageID string, eventBus *event.EventBus) (
+	[]*types.SearchResult, error,
+) {
+	sessionID := session.ID
+	tenantID := ctx.Value(types.TenantIDContextKey).(uint)
+	logger.Infof(ctx, "Start agent-based question answering, session ID: %s, tenant ID: %d, query: %s", sessionID, tenantID, query)
+
+	// Get effective agent configuration (session > tenant)
+	var agentConfig *types.AgentConfig
+
+	// Fall back to tenant-level agent config (global default)
+	tenantInfo := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
+	if tenantInfo.AgentConfig != nil && tenantInfo.AgentConfig.Enabled {
+		logger.Infof(ctx, "Using tenant-level agent config for tenant: %d", tenantInfo.ID)
+		agentConfig = tenantInfo.AgentConfig
+	}
+
+	// Check if agent is enabled (either from session or tenant)
+	if agentConfig == nil || !agentConfig.Enabled {
+		logger.Warnf(ctx, "Agent not enabled for session: %s (neither session nor tenant has agent config)", sessionID)
+		return nil, errors.New("agent not enabled for this session")
+	}
+
+	// Set knowledge bases for agent if not already configured
+	// Priority: AgentConfig.KnowledgeBases > Session.KnowledgeBaseID > All tenant knowledge bases
+	if len(agentConfig.KnowledgeBases) == 0 {
+		if session.KnowledgeBaseID != "" {
+			// Use session's knowledge base as fallback
+			agentConfig.KnowledgeBases = []string{session.KnowledgeBaseID}
+			logger.Infof(ctx, "Using session's knowledge base for agent: %s", session.KnowledgeBaseID)
+		} else {
+			// Default to all knowledge bases under the tenant
+			logger.Infof(ctx, "No knowledge bases specified, fetching all knowledge bases for tenant")
+			allKBs, err := s.knowledgeBaseService.ListKnowledgeBases(ctx)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to list knowledge bases for tenant: %v", err)
+				return nil, fmt.Errorf("failed to list knowledge bases: %w", err)
+			}
+
+			if len(allKBs) == 0 {
+				logger.Warnf(ctx, "No knowledge bases available for agent session: %s", sessionID)
+				return nil, errors.New("no knowledge bases available for agent")
+			}
+
+			// Extract knowledge base IDs
+			agentConfig.KnowledgeBases = make([]string, len(allKBs))
+			for i, kb := range allKBs {
+				agentConfig.KnowledgeBases[i] = kb.ID
+			}
+			logger.Infof(ctx, "Agent defaulting to all %d knowledge base(s) in tenant: %v",
+				len(agentConfig.KnowledgeBases), agentConfig.KnowledgeBases)
+		}
+	} else {
+		logger.Infof(ctx, "Agent configured with %d knowledge base(s): %v", len(agentConfig.KnowledgeBases), agentConfig.KnowledgeBases)
+	}
+
+	// Set ThinkingModelID from session's SummaryModelID if not already set
+	if agentConfig.ThinkingModelID == "" && session.SummaryModelID != "" {
+		agentConfig.ThinkingModelID = session.SummaryModelID
+		logger.Infof(ctx, "Using session's SummaryModelID as ThinkingModelID: %s", session.SummaryModelID)
+	}
+
+	// Create agent engine with EventBus
+	logger.Info(ctx, "Creating agent engine")
+	engine, err := s.agentService.CreateAgentEngine(ctx, agentConfig, eventBus)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create agent engine: %v", err)
+		return nil, err
+	}
+
+	// Get LLM context from context manager
+	llmContext, err := s.getContextForSession(ctx, session, sessionID)
+	if err != nil {
+		logger.Warnf(ctx, "Failed to get LLM context: %v, continuing without history", err)
+		llmContext = []chat.Message{}
+	}
+	logger.Infof(ctx, "Loaded %d messages from LLM context manager", len(llmContext))
+
+	// Execute agent with streaming (asynchronously)
+	// Events will be emitted to EventBus and handled by the Handler layer
+	logger.Info(ctx, "Executing agent with streaming")
+	go func() {
+		if _, err := engine.Execute(ctx, sessionID, query, llmContext); err != nil {
+			logger.Errorf(ctx, "Agent execution failed: %v", err)
+			// Emit error event to the EventBus used by this agent
+			eventBus.Emit(ctx, event.Event{
+				Type:      event.EventError,
+				SessionID: sessionID,
+				Data: event.ErrorData{
+					Error:     err.Error(),
+					Stage:     "agent_execution",
+					SessionID: sessionID,
+				},
+			})
+		}
+	}()
+
+	// Return empty - events will be handled by Handler via EventBus subscription
+	return nil, nil
+}
+
+// getContextForSession retrieves LLM context for a session
+// Uses context manager which handles token limits and compression automatically
+// This is separate from the message storage/conversation history
+func (s *sessionService) getContextForSession(ctx context.Context, session *types.Session, sessionID string) ([]chat.Message, error) {
+	// Check if session has custom context configuration
+	var contextManager interfaces.ContextManager
+
+	if session.ContextConfig != nil && session.ContextConfig.Enabled {
+		// Create custom context manager based on session configuration
+		logger.Infof(ctx, "Using custom context config for session %s: strategy=%s, max_tokens=%d, recent_count=%d",
+			sessionID, session.ContextConfig.CompressionStrategy, session.ContextConfig.MaxTokens, session.ContextConfig.RecentMessageCount)
+
+		var strategy interfaces.CompressionStrategy
+		switch session.ContextConfig.CompressionStrategy {
+		case types.ContextCompressionSlidingWindow:
+			strategy = NewSlidingWindowStrategy(session.ContextConfig.RecentMessageCount)
+		case types.ContextCompressionSmart:
+			// For smart compression, we need the chat model
+			chatModel, err := s.modelService.GetChatModel(ctx, session.SummaryModelID)
+			if err != nil {
+				logger.Warnf(ctx, "Failed to get chat model for smart compression, falling back to sliding window: %v", err)
+				strategy = NewSlidingWindowStrategy(session.ContextConfig.RecentMessageCount)
+			} else {
+				strategy = NewSmartCompressionStrategy(session.ContextConfig.RecentMessageCount, chatModel, 5)
+			}
+		default:
+			logger.Warnf(ctx, "Unknown compression strategy %s, using sliding window", session.ContextConfig.CompressionStrategy)
+			strategy = NewSlidingWindowStrategy(session.ContextConfig.RecentMessageCount)
+		}
+
+		contextManager = NewContextManager(strategy, session.ContextConfig.MaxTokens)
+	} else {
+		// Use default context manager
+		logger.Debugf(ctx, "Using default context manager for session %s", sessionID)
+		contextManager = s.contextManager
+	}
+
+	// Get context from the context manager
+	history, err := contextManager.GetContext(ctx, sessionID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get context: %w", err)
+	}
+
+	// Log context statistics
+	stats, _ := contextManager.GetContextStats(ctx, sessionID)
+	if stats != nil {
+		logger.Infof(ctx, "LLM context stats for session %s: messages=%d, tokens=~%d, compressed=%v",
+			sessionID, stats.MessageCount, stats.TokenCount, stats.IsCompressed)
+	}
+
+	return history, nil
+}
+
+// AddMessageToContext adds a message to the LLM context
+// This should be called after saving a message to the database
+// The context manager handles token limits and compression automatically
+func (s *sessionService) AddMessageToContext(ctx context.Context, session *types.Session, sessionID string, message chat.Message) error {
+	// Determine which context manager to use
+	var contextManager interfaces.ContextManager
+
+	if session.ContextConfig != nil && session.ContextConfig.Enabled {
+		// Create custom context manager based on session configuration
+		var strategy interfaces.CompressionStrategy
+		switch session.ContextConfig.CompressionStrategy {
+		case types.ContextCompressionSlidingWindow:
+			strategy = NewSlidingWindowStrategy(session.ContextConfig.RecentMessageCount)
+		case types.ContextCompressionSmart:
+			chatModel, err := s.modelService.GetChatModel(ctx, session.SummaryModelID)
+			if err != nil {
+				strategy = NewSlidingWindowStrategy(session.ContextConfig.RecentMessageCount)
+			} else {
+				strategy = NewSmartCompressionStrategy(session.ContextConfig.RecentMessageCount, chatModel, 5)
+			}
+		default:
+			strategy = NewSlidingWindowStrategy(session.ContextConfig.RecentMessageCount)
+		}
+		contextManager = NewContextManager(strategy, session.ContextConfig.MaxTokens)
+	} else {
+		contextManager = s.contextManager
+	}
+
+	// Add message to context
+	return contextManager.AddMessage(ctx, sessionID, message)
+}
+
+// processAgentEvents is no longer needed - events are handled directly by Handler layer via EventBus subscription

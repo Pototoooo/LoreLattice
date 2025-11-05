@@ -5,9 +5,26 @@ import (
 	"encoding/json"
 )
 
+// LLMToolCall represents a function/tool call from the LLM
+type LLMToolCall struct {
+	ID       string       `json:"id"`
+	Type     string       `json:"type"` // "function"
+	Function FunctionCall `json:"function"`
+}
+
+// FunctionCall represents the function details
+type FunctionCall struct {
+	Name      string `json:"name"`
+	Arguments string `json:"arguments"` // JSON string
+}
+
 // ChatResponse chat response
 type ChatResponse struct {
 	Content string `json:"content"`
+	// Tool calls requested by the model
+	ToolCalls []LLMToolCall `json:"tool_calls,omitempty"`
+	// Finish reason
+	FinishReason string `json:"finish_reason,omitempty"` // "stop", "tool_calls", "length", etc.
 	// Usage information
 	Usage struct {
 		// Prompt tokens
@@ -27,6 +44,16 @@ const (
 	ResponseTypeAnswer ResponseType = "answer"
 	// References response type
 	ResponseTypeReferences ResponseType = "references"
+	// Thinking response type (for agent thought process)
+	ResponseTypeThinking ResponseType = "thinking"
+	// Tool call response type (for agent tool invocations)
+	ResponseTypeToolCall ResponseType = "tool_call"
+	// Tool result response type (for agent tool results)
+	ResponseTypeToolResult ResponseType = "tool_result"
+	// Error response type
+	ResponseTypeError ResponseType = "error"
+	// Reflection response type (for agent reflection)
+	ResponseTypeReflection ResponseType = "reflection"
 )
 
 // StreamResponse stream response
@@ -40,7 +67,11 @@ type StreamResponse struct {
 	// Whether the response is complete
 	Done bool `json:"done"`
 	// Knowledge references
-	KnowledgeReferences References `json:"knowledge_references"`
+	KnowledgeReferences References `json:"knowledge_references,omitempty"`
+	// Tool calls for streaming (partial)
+	ToolCalls []LLMToolCall `json:"tool_calls,omitempty"`
+	// Additional metadata for enhanced display
+	Data map[string]interface{} `json:"data,omitempty"`
 }
 
 // References references

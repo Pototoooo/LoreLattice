@@ -1,0 +1,287 @@
+package service
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/Tencent/WeKnora/internal/agent"
+	"github.com/Tencent/WeKnora/internal/agent/tools"
+	"github.com/Tencent/WeKnora/internal/config"
+	"github.com/Tencent/WeKnora/internal/event"
+	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Tencent/WeKnora/internal/models/chat"
+	"github.com/Tencent/WeKnora/internal/models/rerank"
+	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"gorm.io/gorm"
+)
+
+// agentService implements agent-related business logic
+type agentService struct {
+	cfg                  *config.Config
+	modelService         interfaces.ModelService
+	knowledgeBaseService interfaces.KnowledgeBaseService
+	knowledgeService     interfaces.KnowledgeService
+	chunkService         interfaces.ChunkService
+	eventBus             *event.EventBus
+	db                   *gorm.DB
+}
+
+// NewAgentService creates a new agent service
+func NewAgentService(
+	cfg *config.Config,
+	modelService interfaces.ModelService,
+	knowledgeBaseService interfaces.KnowledgeBaseService,
+	knowledgeService interfaces.KnowledgeService,
+	chunkService interfaces.ChunkService,
+	eventBus *event.EventBus,
+	db *gorm.DB,
+) interfaces.AgentService {
+	return &agentService{
+		cfg:                  cfg,
+		modelService:         modelService,
+		knowledgeBaseService: knowledgeBaseService,
+		knowledgeService:     knowledgeService,
+		chunkService:         chunkService,
+		eventBus:             eventBus,
+		db:                   db,
+	}
+}
+
+// CreateAgentEngineWithEventBus creates an agent engine with the given configuration and EventBus
+func (s *agentService) CreateAgentEngine(
+	ctx context.Context,
+	config *types.AgentConfig,
+	eventBus *event.EventBus,
+) (interfaces.AgentEngine, error) {
+	logger.Infof(ctx, "Creating agent engine with custom EventBus")
+
+	// Validate config
+	if err := s.ValidateConfig(config); err != nil {
+		return nil, fmt.Errorf("invalid agent config: %w", err)
+	}
+
+	chatModel, err := s.modelService.GetChatModel(ctx, config.ThinkingModelID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get thinking model: %w", err)
+	}
+
+	if chatModel == nil {
+		return nil, fmt.Errorf("chat model is nil after initialization")
+	}
+
+	rerankModel, err := s.modelService.GetRerankModel(ctx, config.RerankModelID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get rerank model: %w", err)
+	}
+
+	if rerankModel == nil {
+		return nil, fmt.Errorf("rerank model is nil after initialization")
+	}
+
+	// Create tool registry
+	toolRegistry := tools.NewToolRegistry(s.knowledgeBaseService, s.knowledgeService, s.chunkService, s.db)
+
+	// Register tools
+	if err := s.registerTools(ctx, toolRegistry, config, chatModel, rerankModel); err != nil {
+		return nil, fmt.Errorf("failed to register tools: %w", err)
+	}
+
+	// Get knowledge base detailed information for prompt
+	kbInfos, err := s.getKnowledgeBaseInfos(ctx, config.KnowledgeBases)
+	if err != nil {
+		logger.Warnf(ctx, "Failed to get knowledge base details, using IDs only: %v", err)
+		// Create fallback info with IDs only
+		kbInfos = make([]*agent.KnowledgeBaseInfo, 0, len(config.KnowledgeBases))
+		for _, kbID := range config.KnowledgeBases {
+			kbInfos = append(kbInfos, &agent.KnowledgeBaseInfo{
+				ID:          kbID,
+				Name:        kbID, // Use ID as name when details unavailable
+				Description: "",
+				DocCount:    0,
+			})
+		}
+	}
+
+	// Create engine with provided EventBus
+	engine := agent.NewAgentEngine(
+		config,
+		chatModel,
+		toolRegistry,
+		s.knowledgeBaseService,
+		eventBus,
+		kbInfos,
+	)
+
+	return engine, nil
+}
+
+// registerTools registers tools based on the agent configuration
+func (s *agentService) registerTools(
+	ctx context.Context,
+	registry *tools.ToolRegistry,
+	config *types.AgentConfig,
+	chatModel chat.Chat,
+	rerankModel rerank.Reranker,
+) error {
+	// If no specific tools allowed, register default tools
+	allowedTools := config.AllowedTools
+	if len(allowedTools) == 0 {
+		// Register default tools from config
+		if s.cfg.Agent != nil && len(s.cfg.Agent.DefaultTools) > 0 {
+			allowedTools = s.cfg.Agent.DefaultTools
+		} else {
+			// Fallback to all tools
+			allowedTools = []string{
+				"thinking",
+				"todo_write",
+				"knowledge_search",
+				"get_related_chunks",
+				"query_knowledge_graph",
+				"get_document_info",
+				"database_query",
+			}
+		}
+	}
+	// Get tenant ID from context
+	tenantID := uint(0)
+	if tid, ok := ctx.Value(types.TenantIDContextKey).(uint); ok {
+		tenantID = tid
+	}
+	logger.Infof(ctx, "Registering tools: %v, tenant ID: %d", allowedTools, tenantID)
+
+	// Register each allowed tool
+	for _, toolName := range allowedTools {
+		switch toolName {
+		case "thinking":
+			registry.RegisterTool(tools.NewThinkingTool())
+		case "todo_write":
+			registry.RegisterTool(tools.NewTodoWriteTool())
+		case "knowledge_search":
+			registry.RegisterTool(tools.NewKnowledgeSearchTool(s.knowledgeBaseService, tenantID, config.KnowledgeBases, rerankModel))
+		case "get_related_chunks":
+			registry.RegisterTool(tools.NewGetRelatedChunksTool(s.chunkService, s.knowledgeBaseService))
+		case "query_knowledge_graph":
+			registry.RegisterTool(tools.NewQueryKnowledgeGraphTool(s.knowledgeBaseService))
+		case "get_document_info":
+			registry.RegisterTool(tools.NewGetDocumentInfoTool(s.knowledgeService, s.chunkService))
+		case "database_query":
+			registry.RegisterTool(tools.NewDatabaseQueryTool(s.db, tenantID))
+		default:
+			logger.Warnf(ctx, "Unknown tool: %s", toolName)
+		}
+	}
+
+	logger.Infof(ctx, "Registered %d tools", len(registry.ListTools()))
+	return nil
+}
+
+// ValidateConfig validates the agent configuration
+func (s *agentService) ValidateConfig(config *types.AgentConfig) error {
+	if config == nil {
+		return fmt.Errorf("config cannot be nil")
+	}
+
+	if !config.Enabled {
+		return fmt.Errorf("agent is not enabled")
+	}
+
+	if config.MaxIterations <= 0 {
+		config.MaxIterations = 5 // Default
+	}
+
+	if config.MaxIterations > 20 {
+		return fmt.Errorf("max iterations too high: %d (max 20)", config.MaxIterations)
+	}
+
+	if config.ThinkingModelID == "" {
+		return fmt.Errorf("ThinkingModelID is required but not set")
+	}
+
+	return nil
+}
+
+// getKnowledgeBaseInfos retrieves detailed information for knowledge bases
+func (s *agentService) getKnowledgeBaseInfos(ctx context.Context, kbIDs []string) ([]*agent.KnowledgeBaseInfo, error) {
+	if len(kbIDs) == 0 {
+		return []*agent.KnowledgeBaseInfo{}, nil
+	}
+
+	kbInfos := make([]*agent.KnowledgeBaseInfo, 0, len(kbIDs))
+
+	for _, kbID := range kbIDs {
+		// Get knowledge base details
+		kb, err := s.knowledgeBaseService.GetKnowledgeBaseByID(ctx, kbID)
+		if err != nil {
+			logger.Warnf(ctx, "Failed to get knowledge base %s: %v", kbID, err)
+			// Add fallback info
+			kbInfos = append(kbInfos, &agent.KnowledgeBaseInfo{
+				ID:          kbID,
+				Name:        kbID,
+				Description: "",
+				DocCount:    0,
+				RecentDocs:  []agent.RecentDocInfo{},
+			})
+			continue
+		}
+
+		// Get document count and recent documents
+		docCount := 0
+		recentDocs := []agent.RecentDocInfo{}
+
+		// Get recent documents using paged query (first 10, assumed to be sorted by created_at desc)
+		pageResult, err := s.knowledgeService.ListPagedKnowledgeByKnowledgeBaseID(ctx, kbID, &types.Pagination{
+			Page:     1,
+			PageSize: 10,
+		})
+
+		if err == nil && pageResult != nil {
+			docCount = int(pageResult.Total)
+
+			// Convert to Knowledge slice
+			if knowledges, ok := pageResult.Data.([]*types.Knowledge); ok {
+				for _, k := range knowledges {
+					if len(recentDocs) >= 10 {
+						break
+					}
+					recentDocs = append(recentDocs, agent.RecentDocInfo{
+						Title:     k.Title,
+						FileName:  k.FileName,
+						Type:      k.FileType,
+						CreatedAt: k.CreatedAt.Format("2006-01-02"),
+					})
+				}
+			}
+		} else {
+			// Fallback: use ListKnowledgeByKnowledgeBaseID
+			knowledges, err := s.knowledgeService.ListKnowledgeByKnowledgeBaseID(ctx, kbID)
+			if err == nil && knowledges != nil {
+				docCount = len(knowledges)
+				// Get up to 10 most recent (assuming the list is already sorted)
+				for i, k := range knowledges {
+					if i >= 10 {
+						break
+					}
+					recentDocs = append(recentDocs, agent.RecentDocInfo{
+						KnowledgeID: k.ID,
+						Title:       k.Title,
+						FileName:    k.FileName,
+						FileSize:    k.FileSize,
+						Type:        k.FileType,
+						CreatedAt:   k.CreatedAt.Format("2006-01-02"),
+					})
+				}
+			}
+		}
+
+		kbInfos = append(kbInfos, &agent.KnowledgeBaseInfo{
+			ID:          kb.ID,
+			Name:        kb.Name,
+			Description: kb.Description,
+			DocCount:    docCount,
+			RecentDocs:  recentDocs,
+		})
+	}
+
+	return kbInfos, nil
+}

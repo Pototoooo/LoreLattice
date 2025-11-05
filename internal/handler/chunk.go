@@ -113,7 +113,7 @@ func (h *ChunkHandler) validateAndGetChunk(c *gin.Context) (*types.Chunk, string
 	logger.Infof(ctx, "Retrieving knowledge chunk information, knowledge ID: %s, chunk ID: %s", knowledgeID, id)
 
 	// Get existing chunk
-	chunk, err := h.service.GetChunkByID(ctx, knowledgeID, id)
+	chunk, err := h.service.GetChunkByID(ctx, id)
 	if err != nil {
 		if err == service.ErrChunkNotFound {
 			logger.Warnf(ctx, "Chunk not found, knowledge ID: %s, chunk ID: %s", knowledgeID, id)

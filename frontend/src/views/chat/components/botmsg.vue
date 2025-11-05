@@ -2,7 +2,8 @@
     <div class="bot_msg">
         <div style="display: flex;flex-direction: column; gap:8px">
             <docInfo :session="session"></docInfo>
-            <deepThink :deepSession="session" v-if="session.showThink"></deepThink>
+            <AgentStreamDisplay :session="session" v-if="session.isAgentMode"></AgentStreamDisplay>
+            <deepThink :deepSession="session" v-if="session.showThink && !session.isAgentMode"></deepThink>
         </div>
         <div ref="parentMd">
             <!-- 消息正在总结中则渲染加载gif  -->
@@ -22,6 +23,7 @@ import { onMounted, watch, computed, ref, reactive, defineProps, nextTick } from
 import { marked } from 'marked';
 import docInfo from './docInfo.vue';
 import deepThink from './deepThink.vue';
+import AgentStreamDisplay from './AgentStreamDisplay.vue';
 import picturePreview from '@/components/picture-preview.vue';
 import { sanitizeHTML, safeMarkdownToHTML, createSafeImage, isValidImageURL } from '@/utils/security';
 

@@ -2,6 +2,7 @@ package chatpipline
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/types"
@@ -54,6 +55,10 @@ func (p *PluginChatCompletionStream) OnEvent(ctx context.Context,
 	if err != nil {
 		logger.Errorf(ctx, "Failed to call chat stream model: %v", err)
 		return ErrModelCall.WithError(err)
+	}
+	if responseChan == nil {
+		logger.Error(ctx, "Chat stream returned nil channel")
+		return ErrModelCall.WithError(errors.New("chat stream returned nil channel"))
 	}
 
 	logger.Info(ctx, "Chat stream initiated successfully")

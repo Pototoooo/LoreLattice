@@ -32,7 +32,9 @@ import usermsg from './components/usermsg.vue';
 import { getMessageList, generateSessionsTitle } from "@/api/chat/index";
 import { useStream } from '../../api/chat/streame'
 import { useMenuStore } from '@/stores/menu';
+import { useSettingsStore } from '@/stores/settings';
 const usemenuStore = useMenuStore();
+const useSettingsStoreInstance = useSettingsStore();
 const { menuArr, isFirstSession, firstQuery } = storeToRefs(usemenuStore);
 const { output, onChunk, isStreaming, isLoading, error, startStream, stopStream } = useStream();
 const route = useRoute();
@@ -109,7 +111,11 @@ const handleMsgList = async (data, isScrollType = false, newScrollHeight) => {
     let chatlist = data.reverse()
     for (let i = 0, len = chatlist.length; i < len; i++) {
         let item = chatlist[i];
-        item.thinking = false;
+        item.isAgentMode = false; // Agent 模式标记
+        item.agentEventStream = item.agentEventStream || [];
+        item._eventMap = new Map();
+        item._pendingToolCalls = new Map();
+        
         if (item.content) {
             if (!item.content.includes('<think>') && !item.content.includes('<\/think>')) {
                 item.thinkContent = "";
@@ -157,18 +163,45 @@ const sendMsg = async (value) => {
     messagesList.push({ content: value, role: 'user' });
     scrollToBottom();
     
+    // 判断是否使用 Agent 模式
+    const isAgentMode = useSettingsStoreInstance.isAgentEnabled;
+    const chatUrl = isAgentMode ? '/api/v1/agent-chat' : '/api/v1/knowledge-chat';
+    
     await startStream({ 
         session_id: session_id.value, 
         knowledge_base_id: knowledge_base_id.value,
         query: value, 
         method: 'POST', 
-        url: '/api/v1/knowledge-chat' 
+        url: chatUrl
     });
 }
 
 // 处理流式数据
 onChunk((data) => {
     loading.value = false;
+    
+    // 日志：打印接收到的事件
+    console.log('[Agent Event Received]', {
+        response_type: data.response_type,
+        id: data.id,
+        done: data.done,
+        content_length: data.content?.length || 0,
+        content_preview: data.content ? data.content.substring(0, 50) : '',
+        data: data.data
+    });
+    
+    // 判断是否是 Agent 模式的响应
+    const isAgentResponse = data.response_type === 'thinking' || 
+                           data.response_type === 'tool_call' || 
+                           data.response_type === 'references';
+    
+    // Agent 模式处理
+    if (isAgentResponse || messagesList[messagesList.length - 1]?.isAgentMode) {
+        handleAgentChunk(data);
+        return;
+    }
+    
+    // 原有的知识库 QA 处理逻辑
     fullContent.value += data.content;
     let obj = { ...data, content: '', role: 'assistant', showThink: false };
 
@@ -203,6 +236,233 @@ onChunk((data) => {
     }
     updateAssistantSession(obj);
 })
+// 处理 Agent 流式数据 (Cursor-style UI)
+const handleAgentChunk = (data) => {
+    const message = messagesList.findLast((item) => item.request_id === data.id || item.id === data.id);
+    
+    if (!message) {
+        // 创建新的 Assistant 消息
+        const newMsg = {
+            id: data.id,
+            request_id: data.id,
+            role: 'assistant',
+            content: '',
+            isAgentMode: true,
+            // Event stream: ordered list of all agent events (thinking, tool calls, etc)
+            agentEventStream: [],
+            // Map to track event by event_id for quick lookup
+            _eventMap: new Map(),
+            knowledge_references: []
+        };
+        messagesList.push(newMsg);
+        scrollToBottom();
+        return;
+    }
+    
+    message.isAgentMode = true;
+    
+    switch(data.response_type) {
+        case 'thinking':
+            {
+                const eventId = data.data?.event_id;
+                console.log('[Thinking Event]', {
+                    event_id: eventId,
+                    done: data.done,
+                    content_length: data.content?.length || 0
+                });
+                
+                // Initialize structures
+                if (!message.agentEventStream) message.agentEventStream = [];
+                if (!message._eventMap) message._eventMap = new Map();
+                
+                if (!data.done) {
+                    // Check if this thinking event already exists
+                    let thinkingEvent = message._eventMap.get(eventId);
+                    
+                    if (!thinkingEvent) {
+                        // Create new thinking event
+                        console.log('[Thinking] Creating new thinking event, event_id:', eventId);
+                        thinkingEvent = {
+                            type: 'thinking',
+                            event_id: eventId,
+                            content: '',
+                            done: false,
+                            startTime: Date.now(),
+                            thinking: true
+                        };
+                        
+                        // Add to event stream
+                        message.agentEventStream.push(thinkingEvent);
+                        message._eventMap.set(eventId, thinkingEvent);
+                    }
+                    
+                    // Accumulate content
+                    if (data.content) {
+                        thinkingEvent.content += data.content;
+                        console.log('[Thinking] Event', eventId, 'accumulated:', thinkingEvent.content.length, 'chars');
+                    }
+                    
+                } else {
+                    // Thinking completed
+                    const thinkingEvent = message._eventMap.get(eventId);
+                    if (thinkingEvent) {
+                        console.log('[Thinking] Completing event, event_id:', eventId, 'content length:', thinkingEvent.content.length);
+                        
+                        // Mark as done
+                        thinkingEvent.done = true;
+                        thinkingEvent.thinking = false;
+                        thinkingEvent.duration_ms = data.data?.duration_ms || (Date.now() - thinkingEvent.startTime);
+                        thinkingEvent.completed_at = data.data?.completed_at || Date.now();
+                        
+                        console.log('[Thinking] Event completed, duration:', thinkingEvent.duration_ms, 'ms');
+                    } else {
+                        console.warn('[Thinking] Received done for unknown event_id:', eventId);
+                    }
+                }
+            }
+            break;
+            
+        case 'tool_call':
+            // Store pending tool call to pair with result later
+            if (data.data && data.data.tool_name) {
+                console.log('[Tool Call]', data.data.tool_name);
+                
+                if (!message.agentEventStream) message.agentEventStream = [];
+                if (!message._pendingToolCalls) message._pendingToolCalls = new Map();
+                
+                const toolCallId = data.data.tool_call_id || (data.data.tool_name + '_' + Date.now());
+                
+                // Create tool call event
+                const toolCallEvent = {
+                    type: 'tool_call',
+                    tool_call_id: toolCallId,
+                    tool_name: data.data.tool_name,
+                    arguments: data.data.arguments,
+                    timestamp: Date.now(),
+                    pending: true
+                };
+                
+                // Add to event stream
+                message.agentEventStream.push(toolCallEvent);
+                message._pendingToolCalls.set(toolCallId, toolCallEvent);
+            }
+            break;
+            
+        case 'tool_result':
+        case 'error':
+            // Tool result - update the corresponding tool call event
+            if (data.data) {
+                const toolCallId = data.data.tool_call_id;
+                const toolName = data.data.tool_name;
+                const success = data.response_type !== 'error' && data.data.success !== false;
+                
+                console.log('[Tool Result]', {
+                    tool_call_id: toolCallId,
+                    tool_name: toolName,
+                    success: success
+                });
+                
+                // Find and update the pending tool call event
+                let toolCallEvent = null;
+                if (message._pendingToolCalls) {
+                    if (toolCallId && message._pendingToolCalls.has(toolCallId)) {
+                        toolCallEvent = message._pendingToolCalls.get(toolCallId);
+                        message._pendingToolCalls.delete(toolCallId);
+                    } else {
+                        // Try to find by tool_name if no tool_call_id match
+                        for (const [key, value] of message._pendingToolCalls.entries()) {
+                            if (value.tool_name === toolName) {
+                                toolCallEvent = value;
+                                message._pendingToolCalls.delete(key);
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (toolCallEvent) {
+                    // Update the existing event with result
+                    toolCallEvent.pending = false;
+                    toolCallEvent.success = success;
+                    toolCallEvent.output = success ? (data.data.output || data.content) : (data.data.error || data.content);
+                    toolCallEvent.error = !success ? (data.data.error || data.content) : undefined;
+                    toolCallEvent.duration = data.data.duration_ms;
+                    toolCallEvent.display_type = data.data.display_type;
+                    toolCallEvent.tool_data = data.data;
+                    
+                    console.log('[Tool Result] Updated event in stream');
+                } else {
+                    console.warn('[Tool Result] No pending tool call found for', toolCallId || toolName);
+                }
+                
+                // If this is an error response without tool data, handle it
+                if (data.response_type === 'error' && !toolName) {
+                    message.content = data.content || '处理出错';
+                    isReplying.value = false;
+                }
+            } else if (data.response_type === 'error') {
+                // Generic error without tool context
+                message.content = data.content || '处理出错';
+                isReplying.value = false;
+            }
+            break;
+            
+
+        case 'references':
+            // 知识引用
+            if (data.knowledge_references) {
+                message.knowledge_references = data.knowledge_references;
+            }
+            break;
+            
+        case 'answer':
+            // 最终答案
+            message.thinking = false;
+            message.content = (message.content || '') + (data.content || '');
+            fullContent.value += data.content || '';
+            
+            // Add or update answer event in agentEventStream
+            if (!message.agentEventStream) message.agentEventStream = [];
+            
+            let answerEvent = message.agentEventStream.find((e) => e.type === 'answer');
+            if (!answerEvent) {
+                answerEvent = {
+                    type: 'answer',
+                    content: '',
+                    done: false
+                };
+                message.agentEventStream.push(answerEvent);
+            }
+            
+            answerEvent.content = message.content;
+            answerEvent.done = data.done;
+            
+            if (data.done) {
+                console.log('[Agent] Answer done, content length:', message.content?.length || 0);
+                
+                // 完成
+                isReplying.value = false;
+                fullContent.value = '';
+                
+                // 生成标题
+                if (isFirstSession.value || isNeedTitle.value) {
+                    generateSessionsTitle(session_id.value, {
+                        messages: [{ role: "user", content: userquery.value }]
+                    }).then(res => {
+                        if (res.data) {
+                            usemenuStore.changeIsFirstSession(false);
+                            usemenuStore.updatasessionTitle(session_id.value, res.data);
+                            isNeedTitle.value = false;
+                        }
+                    });
+                }
+            }
+            break;
+    }
+    
+    scrollToBottom();
+};
+
 const updateAssistantSession = (payload) => {
     const message = messagesList.findLast((item) => {
         if (item.request_id === payload.id) {
@@ -295,6 +555,30 @@ onBeforeRouteUpdate((to, from, next) => {
     }
 }
 
+
+.agent-mode-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
+    border: 1px solid #91d5ff;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    max-width: 800px;
+    width: 100%;
+
+    .agent-icon {
+        font-size: 20px;
+    }
+
+    .agent-text {
+        font-size: 14px;
+        font-weight: 500;
+        color: #0050b3;
+        flex: 1;
+    }
+}
 
 .msg_list {
     display: flex;

@@ -224,3 +224,173 @@ func (h *TenantHandler) ListTenants(c *gin.Context) {
 		},
 	})
 }
+
+// AgentConfigRequest represents the request body for updating agent configuration
+type AgentConfigRequest struct {
+	Enabled           bool     `json:"enabled"`
+	MaxIterations     int      `json:"max_iterations"`
+	ReflectionEnabled bool     `json:"reflection_enabled"`
+	AllowedTools      []string `json:"allowed_tools"`
+	Temperature       float64  `json:"temperature"`
+	ThinkingModelID   string   `json:"thinking_model_id"`
+	RerankModelID     string   `json:"rerank_model_id"`
+}
+
+// GetTenantAgentConfig retrieves the agent configuration for a tenant
+// This is the global agent configuration that applies to all sessions by default
+// Tenant ID is obtained from the authentication context
+func (h *TenantHandler) GetTenantAgentConfig(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	logger.Info(ctx, "Start retrieving tenant agent config")
+
+	// Get tenant ID from authentication context
+	tenantID := c.GetUint(types.TenantIDContextKey.String())
+	if tenantID == 0 {
+		logger.Error(ctx, "Tenant ID is empty")
+		c.Error(errors.NewBadRequestError("Tenant ID cannot be empty"))
+		return
+	}
+
+	tenant, err := h.service.GetTenantByID(ctx, tenantID)
+	if err != nil {
+		if appErr, ok := errors.IsAppError(err); ok {
+			logger.Error(ctx, "Failed to retrieve tenant: application error", appErr)
+			c.Error(appErr)
+		} else {
+			logger.ErrorWithFields(ctx, err, nil)
+			c.Error(errors.NewInternalServerError("Failed to retrieve tenant").WithDetails(err.Error()))
+		}
+		return
+	}
+	// 定义所有可用工具及其描述（与 internal/agent/tools 注册的工具对应）
+	availableTools := []gin.H{
+		{"name": "thinking", "label": "思考", "description": "AI 进行深度思考和推理"},
+		{"name": "todo_write", "label": "制定计划", "description": "为复杂任务制定执行计划"},
+		{"name": "knowledge_search", "label": "知识搜索", "description": "在知识库中搜索相关信息"},
+		{"name": "get_related_chunks", "label": "获取相关片段", "description": "查找相关的知识片段"},
+		{"name": "query_knowledge_graph", "label": "查询知识图谱", "description": "从知识图谱中查询关系"},
+		{"name": "get_document_info", "label": "获取文档信息", "description": "查看文档元数据"},
+		{"name": "database_query", "label": "查询数据库", "description": "查询数据库中的信息"},
+	}
+	if tenant.AgentConfig == nil {
+		// Return default config if not set
+		logger.Info(ctx, "Tenant has no agent config, returning defaults")
+
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"data": gin.H{
+				"enabled":            false,
+				"max_iterations":     5,
+				"reflection_enabled": false,
+				"allowed_tools":      []string{"knowledge_search", "knowledge_search"},
+				"temperature":        0.7,
+				"thinking_model_id":  "",
+				"rerank_model_id":    "",
+				"available_tools":    availableTools,
+			},
+		})
+		return
+	}
+
+	logger.Infof(ctx, "Retrieved tenant agent config successfully, Tenant ID: %d", tenantID)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data": gin.H{
+			"enabled":            tenant.AgentConfig.Enabled,
+			"max_iterations":     tenant.AgentConfig.MaxIterations,
+			"reflection_enabled": tenant.AgentConfig.ReflectionEnabled,
+			"allowed_tools":      tenant.AgentConfig.AllowedTools,
+			"temperature":        tenant.AgentConfig.Temperature,
+			"thinking_model_id":  tenant.AgentConfig.ThinkingModelID,
+			"rerank_model_id":    tenant.AgentConfig.RerankModelID,
+			"available_tools":    availableTools,
+		},
+	})
+}
+
+// UpdateTenantAgentConfig updates the agent configuration for a tenant
+// This sets the global agent configuration for all sessions in this tenant
+// Tenant ID is obtained from the authentication context
+func (h *TenantHandler) UpdateTenantAgentConfig(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	logger.Info(ctx, "Start updating tenant agent config")
+
+	// Get tenant ID from authentication context
+	tenantID := c.GetUint(types.TenantIDContextKey.String())
+	if tenantID == 0 {
+		logger.Error(ctx, "Tenant ID is empty")
+		c.Error(errors.NewBadRequestError("Tenant ID cannot be empty"))
+		return
+	}
+
+	var req AgentConfigRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Error(ctx, "Failed to parse request parameters", err)
+		c.Error(errors.NewValidationError("Invalid request data").WithDetails(err.Error()))
+		return
+	}
+
+	// Validate configuration
+	if req.Enabled {
+		if req.MaxIterations <= 0 || req.MaxIterations > 20 {
+			c.Error(errors.NewAgentInvalidMaxIterationsError())
+			return
+		}
+		if req.Temperature < 0 || req.Temperature > 2 {
+			c.Error(errors.NewAgentInvalidTemperatureError())
+			return
+		}
+		// thinking_model_id 不再强制要求，允许先启用 Agent 再设置模型
+		// 实际使用时会在 AgentQA 中进行验证
+		if len(req.AllowedTools) == 0 {
+			c.Error(errors.NewAgentMissingAllowedToolsError())
+			return
+		}
+	}
+
+	// Get existing tenant
+	tenant, err := h.service.GetTenantByID(ctx, tenantID)
+	if err != nil {
+		if appErr, ok := errors.IsAppError(err); ok {
+			logger.Error(ctx, "Failed to retrieve tenant: application error", appErr)
+			c.Error(appErr)
+		} else {
+			logger.ErrorWithFields(ctx, err, nil)
+			c.Error(errors.NewInternalServerError("Failed to retrieve tenant").WithDetails(err.Error()))
+		}
+		return
+	}
+
+	// Update agent configuration
+	tenant.AgentConfig = &types.AgentConfig{
+		Enabled:           req.Enabled,
+		MaxIterations:     req.MaxIterations,
+		ReflectionEnabled: req.ReflectionEnabled,
+		AllowedTools:      req.AllowedTools,
+		Temperature:       req.Temperature,
+		ThinkingModelID:   req.ThinkingModelID,
+		RerankModelID:     req.RerankModelID,
+		KnowledgeBases:    []string{}, // Will be set per session
+	}
+
+	updatedTenant, err := h.service.UpdateTenant(ctx, tenant)
+	if err != nil {
+		if appErr, ok := errors.IsAppError(err); ok {
+			logger.Error(ctx, "Failed to update tenant: application error", appErr)
+			c.Error(appErr)
+		} else {
+			logger.ErrorWithFields(ctx, err, nil)
+			c.Error(errors.NewInternalServerError("Failed to update tenant agent config").WithDetails(err.Error()))
+		}
+		return
+	}
+
+	logger.Infof(ctx, "Tenant agent config updated successfully, Tenant ID: %d", tenantID)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    updatedTenant.AgentConfig,
+		"message": "Agent configuration updated successfully",
+	})
+}

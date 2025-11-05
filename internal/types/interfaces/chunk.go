@@ -40,7 +40,7 @@ type ChunkService interface {
 	// CreateChunks creates chunks
 	CreateChunks(ctx context.Context, chunks []*types.Chunk) error
 	// GetChunkByID gets a chunk by id
-	GetChunkByID(ctx context.Context, knowledgeID string, id string) (*types.Chunk, error)
+	GetChunkByID(ctx context.Context, id string) (*types.Chunk, error)
 	// ListChunksByKnowledgeID lists chunks by knowledge id
 	ListChunksByKnowledgeID(ctx context.Context, knowledgeID string) ([]*types.Chunk, error)
 	// ListPagedChunksByKnowledgeID lists paged chunks by knowledge id

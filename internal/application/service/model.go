@@ -34,8 +34,19 @@ func NewModelService(repo interfaces.ModelRepository, ollamaService *ollama.Olla
 // For local models, it initiates an asynchronous download process
 // Remote models are immediately set to active status
 func (s *modelService) CreateModel(ctx context.Context, model *types.Model) error {
-	logger.Info(ctx, "Start creating model")
 	logger.Infof(ctx, "Creating model: %s, type: %s, source: %s", model.Name, model.Type, model.Source)
+
+	// If this model is set as default, unset other default models of the same type
+	if model.IsDefault {
+		logger.Infof(ctx, "Model is set as default, clearing other default models of type: %s", model.Type)
+		if err := s.clearOtherDefaultModels(ctx, model.TenantID, model.Type, ""); err != nil {
+			logger.ErrorWithFields(ctx, err, map[string]interface{}{
+				"model_type": model.Type,
+				"tenant_id":  model.TenantID,
+			})
+			return err
+		}
+	}
 
 	// Handle remote models (e.g., OpenAI, Azure)
 	if model.Source == types.ModelSourceRemote {
@@ -96,11 +107,13 @@ func (s *modelService) CreateModel(ctx context.Context, model *types.Model) erro
 // GetModelByID retrieves a model by its ID
 // Returns an error if the model is not found or is in a non-active state
 func (s *modelService) GetModelByID(ctx context.Context, id string) (*types.Model, error) {
-	logger.Info(ctx, "Start getting model by ID")
-	logger.Infof(ctx, "Getting model with ID: %s", id)
+	// Check if ID is empty
+	if id == "" {
+		logger.Error(ctx, "Model ID is empty")
+		return nil, errors.New("model ID cannot be empty")
+	}
 
 	tenantID := ctx.Value(types.TenantIDContextKey).(uint)
-	logger.Infof(ctx, "Tenant ID: %d", tenantID)
 
 	// Fetch model from repository
 	model, err := s.repo.GetByID(ctx, tenantID, id)
@@ -165,6 +178,19 @@ func (s *modelService) UpdateModel(ctx context.Context, model *types.Model) erro
 	logger.Info(ctx, "Start updating model")
 	logger.Infof(ctx, "Updating model ID: %s, name: %s", model.ID, model.Name)
 
+	// If this model is set as default, unset other default models of the same type
+	if model.IsDefault {
+		logger.Infof(ctx, "Model is set as default, clearing other default models of type: %s", model.Type)
+		if err := s.clearOtherDefaultModels(ctx, model.TenantID, model.Type, model.ID); err != nil {
+			logger.ErrorWithFields(ctx, err, map[string]interface{}{
+				"model_type": model.Type,
+				"tenant_id":  model.TenantID,
+				"model_id":   model.ID,
+			})
+			return err
+		}
+	}
+
 	// Update model in repository
 	err := s.repo.Update(ctx, model)
 	if err != nil {
@@ -204,9 +230,6 @@ func (s *modelService) DeleteModel(ctx context.Context, id string) error {
 // GetEmbeddingModel retrieves and initializes an embedding model instance
 // Takes a model ID and returns an Embedder interface implementation
 func (s *modelService) GetEmbeddingModel(ctx context.Context, modelId string) (embedding.Embedder, error) {
-	logger.Info(ctx, "Start getting embedding model")
-	logger.Infof(ctx, "Getting embedding model with ID: %s", modelId)
-
 	// Get the model details
 	model, err := s.GetModelByID(ctx, modelId)
 	if err != nil {
@@ -216,8 +239,7 @@ func (s *modelService) GetEmbeddingModel(ctx context.Context, modelId string) (e
 		return nil, err
 	}
 
-	logger.Info(ctx, "Creating embedder instance")
-	logger.Infof(ctx, "Model name: %s, source: %s", model.Name, model.Source)
+	logger.Infof(ctx, "Getting embedding model: %s, source: %s", model.Name, model.Source)
 
 	// Initialize the embedder with model configuration
 	embedder, err := embedding.NewEmbedder(embedding.Config{
@@ -244,9 +266,6 @@ func (s *modelService) GetEmbeddingModel(ctx context.Context, modelId string) (e
 // GetRerankModel retrieves and initializes a reranking model instance
 // Takes a model ID and returns a Reranker interface implementation
 func (s *modelService) GetRerankModel(ctx context.Context, modelId string) (rerank.Reranker, error) {
-	logger.Info(ctx, "Start getting rerank model")
-	logger.Infof(ctx, "Getting rerank model with ID: %s", modelId)
-
 	// Get the model details
 	model, err := s.GetModelByID(ctx, modelId)
 	if err != nil {
@@ -256,8 +275,7 @@ func (s *modelService) GetRerankModel(ctx context.Context, modelId string) (rera
 		return nil, err
 	}
 
-	logger.Info(ctx, "Creating reranker instance")
-	logger.Infof(ctx, "Model name: %s, source: %s", model.Name, model.Source)
+	logger.Infof(ctx, "Getting rerank model: %s, source: %s", model.Name, model.Source)
 
 	// Initialize the reranker with model configuration
 	reranker, err := rerank.NewReranker(&rerank.RerankerConfig{
@@ -282,11 +300,13 @@ func (s *modelService) GetRerankModel(ctx context.Context, modelId string) (rera
 // GetChatModel retrieves and initializes a chat model instance
 // Takes a model ID and returns a Chat interface implementation
 func (s *modelService) GetChatModel(ctx context.Context, modelId string) (chat.Chat, error) {
-	logger.Info(ctx, "Start getting chat model")
-	logger.Infof(ctx, "Getting chat model with ID: %s", modelId)
+	// Check if model ID is empty
+	if modelId == "" {
+		logger.Error(ctx, "Model ID is empty")
+		return nil, errors.New("model ID cannot be empty")
+	}
 
 	tenantID := ctx.Value(types.TenantIDContextKey).(uint)
-	logger.Infof(ctx, "Tenant ID: %d", tenantID)
 
 	// Get the model directly from repository to avoid status checks
 	model, err := s.repo.GetByID(ctx, tenantID, modelId)
@@ -303,8 +323,7 @@ func (s *modelService) GetChatModel(ctx context.Context, modelId string) (chat.C
 		return nil, ErrModelNotFound
 	}
 
-	logger.Info(ctx, "Creating chat model instance")
-	logger.Infof(ctx, "Model name: %s, source: %s", model.Name, model.Source)
+	logger.Infof(ctx, "Getting chat model: %s, source: %s", model.Name, model.Source)
 
 	// Initialize the chat model with model configuration
 	chatModel, err := chat.NewChat(&chat.ChatConfig{
@@ -322,6 +341,27 @@ func (s *modelService) GetChatModel(ctx context.Context, modelId string) (chat.C
 		return nil, err
 	}
 
-	logger.Info(ctx, "Chat model initialized successfully")
 	return chatModel, nil
+}
+
+// clearOtherDefaultModels sets IsDefault to false for all models of the same type
+// except the one with the given ID (if excludeID is not empty)
+// This ensures only one default model exists per type per tenant
+// Uses batch update for better performance
+func (s *modelService) clearOtherDefaultModels(ctx context.Context, tenantID uint, modelType types.ModelType, excludeID string) error {
+	logger.Infof(ctx, "Clearing other default models for type: %s, tenant: %d, exclude: %s", modelType, tenantID, excludeID)
+
+	// Use batch update to clear default status for all models of this type (excluding the specified ID)
+	err := s.repo.ClearDefaultByType(ctx, tenantID, modelType, excludeID)
+	if err != nil {
+		logger.ErrorWithFields(ctx, err, map[string]interface{}{
+			"model_type": modelType,
+			"tenant_id":  tenantID,
+			"exclude_id": excludeID,
+		})
+		return err
+	}
+
+	logger.Infof(ctx, "Successfully cleared other default models for type: %s", modelType)
+	return nil
 }
