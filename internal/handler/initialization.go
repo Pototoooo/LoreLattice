@@ -83,6 +83,49 @@ func NewInitializationHandler(
 	}
 }
 
+// KBModelConfigRequest 知识库模型配置请求（简化版，只传模型ID）
+type KBModelConfigRequest struct {
+	LLMModelID       string `json:"llmModelId" binding:"required"`
+	EmbeddingModelID string `json:"embeddingModelId" binding:"required"`
+	RerankModelID    string `json:"rerankModelId"` // 可选
+	VLLMModelID      string `json:"vllmModelId"`   // 可选
+
+	// 文档分块配置
+	DocumentSplitting struct {
+		ChunkSize    int      `json:"chunkSize"`
+		ChunkOverlap int      `json:"chunkOverlap"`
+		Separators   []string `json:"separators"`
+	} `json:"documentSplitting"`
+
+	// 多模态配置
+	Multimodal struct {
+		Enabled     bool   `json:"enabled"`
+		StorageType string `json:"storageType"` // "cos" or "minio"
+		COS         *struct {
+			SecretID   string `json:"secretId"`
+			SecretKey  string `json:"secretKey"`
+			Region     string `json:"region"`
+			BucketName string `json:"bucketName"`
+			AppID      string `json:"appId"`
+			PathPrefix string `json:"pathPrefix"`
+		} `json:"cos"`
+		Minio *struct {
+			BucketName string `json:"bucketName"`
+			UseSSL     bool   `json:"useSSL"`
+			PathPrefix string `json:"pathPrefix"`
+		} `json:"minio"`
+	} `json:"multimodal"`
+
+	// 知识图谱配置
+	NodeExtract struct {
+		Enabled   bool                  `json:"enabled"`
+		Text      string                `json:"text"`
+		Tags      []string              `json:"tags"`
+		Nodes     []types.GraphNode     `json:"nodes"`
+		Relations []types.GraphRelation `json:"relations"`
+	} `json:"nodeExtract"`
+}
+
 // InitializationRequest 初始化请求结构
 type InitializationRequest struct {
 	LLM struct {
@@ -150,6 +193,164 @@ type InitializationRequest struct {
 			Type  string `json:"type"`
 		} `json:"relations"`
 	} `json:"nodeExtract"`
+}
+
+// UpdateKBConfig 根据知识库ID和模型ID更新配置（简化版）
+func (h *InitializationHandler) UpdateKBConfig(c *gin.Context) {
+	ctx := c.Request.Context()
+	kbIdStr := c.Param("kbId")
+
+	var req KBModelConfigRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Error(ctx, "Failed to parse KB config request", err)
+		c.Error(errors.NewBadRequestError(err.Error()))
+		return
+	}
+	logger.Infof(ctx, "Starting KB configuration update with model IDs, kbId: %s", kbIdStr)
+
+	// 获取知识库信息
+	kb, err := h.kbService.GetKnowledgeBaseByID(ctx, kbIdStr)
+	if err != nil || kb == nil {
+		logger.ErrorWithFields(ctx, err, map[string]interface{}{"kbId": kbIdStr})
+		c.Error(errors.NewNotFoundError("知识库不存在"))
+		return
+	}
+
+	// 检查Embedding模型是否可以修改
+	if kb.EmbeddingModelID != "" && kb.EmbeddingModelID != req.EmbeddingModelID {
+		// 检查是否已有文件
+		knowledgeList, err := h.knowledgeService.ListPagedKnowledgeByKnowledgeBaseID(ctx,
+			kbIdStr, &types.Pagination{
+				Page:     1,
+				PageSize: 1,
+			})
+		if err == nil && knowledgeList != nil && knowledgeList.Total > 0 {
+			logger.Error(ctx, "Cannot change embedding model when files exist")
+			c.Error(errors.NewBadRequestError("知识库中已有文件，无法修改Embedding模型"))
+			return
+		}
+	}
+
+	// 从数据库获取模型详情并验证
+	llmModel, err := h.modelService.GetModelByID(ctx, req.LLMModelID)
+	if err != nil || llmModel == nil {
+		logger.Error(ctx, "LLM model not found", "modelId", req.LLMModelID)
+		c.Error(errors.NewBadRequestError("LLM模型不存在"))
+		return
+	}
+
+	embeddingModel, err := h.modelService.GetModelByID(ctx, req.EmbeddingModelID)
+	if err != nil || embeddingModel == nil {
+		logger.Error(ctx, "Embedding model not found", "modelId", req.EmbeddingModelID)
+		c.Error(errors.NewBadRequestError("Embedding模型不存在"))
+		return
+	}
+
+	// 更新知识库的模型ID
+	kb.SummaryModelID = req.LLMModelID
+	kb.EmbeddingModelID = req.EmbeddingModelID
+
+	// 处理可选的Rerank模型
+	if req.RerankModelID != "" {
+		rerankModel, err := h.modelService.GetModelByID(ctx, req.RerankModelID)
+		if err != nil || rerankModel == nil {
+			logger.Warn(ctx, "Rerank model not found", "modelId", req.RerankModelID)
+		} else {
+			kb.RerankModelID = req.RerankModelID
+		}
+	} else {
+		kb.RerankModelID = ""
+	}
+
+	// 处理可选的VLLM模型
+	if req.VLLMModelID != "" {
+		vllmModel, err := h.modelService.GetModelByID(ctx, req.VLLMModelID)
+		if err != nil || vllmModel == nil {
+			logger.Warn(ctx, "VLLM model not found", "modelId", req.VLLMModelID)
+		} else {
+			// 只存储模型ID
+			kb.VLMModelID = req.VLLMModelID
+		}
+	} else {
+		kb.VLMModelID = ""
+	}
+
+	// 更新文档分块配置
+	if req.DocumentSplitting.ChunkSize > 0 {
+		kb.ChunkingConfig.ChunkSize = req.DocumentSplitting.ChunkSize
+	}
+	if req.DocumentSplitting.ChunkOverlap >= 0 {
+		kb.ChunkingConfig.ChunkOverlap = req.DocumentSplitting.ChunkOverlap
+	}
+	if len(req.DocumentSplitting.Separators) > 0 {
+		kb.ChunkingConfig.Separators = req.DocumentSplitting.Separators
+	}
+
+	// 更新多模态配置
+	if req.Multimodal.Enabled {
+		switch strings.ToLower(req.Multimodal.StorageType) {
+		case "cos":
+			if req.Multimodal.COS != nil {
+				kb.StorageConfig = types.StorageConfig{
+					SecretID:   req.Multimodal.COS.SecretID,
+					SecretKey:  req.Multimodal.COS.SecretKey,
+					Region:     req.Multimodal.COS.Region,
+					BucketName: req.Multimodal.COS.BucketName,
+					AppID:      req.Multimodal.COS.AppID,
+					PathPrefix: req.Multimodal.COS.PathPrefix,
+					Provider:   "cos",
+				}
+			}
+		case "minio":
+			if req.Multimodal.Minio != nil {
+				kb.StorageConfig = types.StorageConfig{
+					BucketName: req.Multimodal.Minio.BucketName,
+					PathPrefix: req.Multimodal.Minio.PathPrefix,
+					Provider:   "minio",
+					SecretID:   os.Getenv("MINIO_ACCESS_KEY_ID"),
+					SecretKey:  os.Getenv("MINIO_SECRET_ACCESS_KEY"),
+				}
+			}
+		}
+	} else {
+		// 多模态未启用时，清空存储配置
+		kb.StorageConfig = types.StorageConfig{}
+	}
+
+	// 更新知识图谱配置
+	if req.NodeExtract.Enabled {
+		// 转换 Nodes 和 Relations 为指针类型
+		nodes := make([]*types.GraphNode, len(req.NodeExtract.Nodes))
+		for i := range req.NodeExtract.Nodes {
+			nodes[i] = &req.NodeExtract.Nodes[i]
+		}
+		relations := make([]*types.GraphRelation, len(req.NodeExtract.Relations))
+		for i := range req.NodeExtract.Relations {
+			relations[i] = &req.NodeExtract.Relations[i]
+		}
+
+		kb.ExtractConfig = &types.ExtractConfig{
+			Text:      req.NodeExtract.Text,
+			Tags:      req.NodeExtract.Tags,
+			Nodes:     nodes,
+			Relations: relations,
+		}
+	} else {
+		kb.ExtractConfig = nil
+	}
+
+	// 保存更新后的知识库
+	if err := h.kbRepository.UpdateKnowledgeBase(ctx, kb); err != nil {
+		logger.Error(ctx, "Failed to update knowledge base", err)
+		c.Error(errors.NewInternalServerError("更新知识库失败: " + err.Error()))
+		return
+	}
+
+	logger.Info(ctx, "KB configuration updated successfully", "kbId", kbIdStr)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "配置更新成功",
+	})
 }
 
 // InitializeByKB 根据知识库ID执行配置更新
@@ -989,19 +1190,22 @@ func (h *InitializationHandler) buildConfigResponse(ctx context.Context, models 
 			}
 			multimodal := config["multimodal"].(map[string]interface{})
 			multimodal["vlm"] = map[string]interface{}{
-				"modelName":     model.Name,
-				"baseUrl":       model.Parameters.BaseURL,
-				"apiKey":        model.Parameters.APIKey,
-				"interfaceType": kb.VLMConfig.InterfaceType,
+				"modelName": model.Name,
+				"baseUrl":   model.Parameters.BaseURL,
+				"apiKey":    model.Parameters.APIKey,
 			}
 		}
 	}
 
-	// 如果没有VLM模型，设置multimodal为disabled
+	// 判断多模态是否启用：有VLM模型ID或有存储配置
+	hasMultimodal := (kb.VLMModelID != "" || kb.StorageConfig.SecretID != "" || kb.StorageConfig.BucketName != "")
 	if config["multimodal"] == nil {
 		config["multimodal"] = map[string]interface{}{
-			"enabled": false,
+			"enabled": hasMultimodal,
 		}
+	} else {
+		// 如果已经设置过 multimodal，更新 enabled 状态
+		config["multimodal"].(map[string]interface{})["enabled"] = hasMultimodal
 	}
 
 	// 如果没有Rerank模型，设置rerank为disabled

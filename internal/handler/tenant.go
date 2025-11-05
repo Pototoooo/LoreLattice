@@ -334,7 +334,7 @@ func (h *TenantHandler) UpdateTenantAgentConfig(c *gin.Context) {
 
 	// Validate configuration
 	if req.Enabled {
-		if req.MaxIterations <= 0 || req.MaxIterations > 20 {
+		if req.MaxIterations <= 0 || req.MaxIterations > 30 {
 			c.Error(errors.NewAgentInvalidMaxIterationsError())
 			return
 		}

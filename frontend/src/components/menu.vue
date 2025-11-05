@@ -554,14 +554,14 @@ watch(() => route.params.kbId, () => {
 </script>
 <style lang="less" scoped>
 .del_submenu {
-    color: #fa5151;
+    color: var(--td-error-color);
     cursor: pointer;
 }
 
 .aside_box {
     min-width: 260px;
     padding: 8px;
-    background: #fff;
+    background: var(--td-bg-color-container);
     box-sizing: border-box;
     height: 100vh;
     overflow: hidden;
@@ -585,10 +585,19 @@ watch(() => route.params.kbId, () => {
         height: 30px;
         margin-right: 7.25px;
     }
+    
+    /* 暗色模式下的Logo滤镜 */
+    :root[theme-mode="dark"] .logo {
+        filter: brightness(0) invert(1);
+    }
+    
+    :root[theme-mode="dark"] .logo_img {
+        filter: brightness(0) invert(1);
+    }
 
     .logo_txt {
         transform: rotate(0.049deg);
-        color: #000000;
+        color: var(--td-text-color-primary);
         font-family: "TencentSans";
         font-size: 24.12px;
         font-style: normal;
@@ -630,28 +639,28 @@ watch(() => route.params.kbId, () => {
     }
 
     .upload-file-wrap:hover {
-        background-color: #dbede4;
-        color: #07C05F;
+        background-color: var(--td-brand-color-light);
+        color: var(--td-brand-color);
 
     }
 
     .upload-file-icon {
         width: 20px;
         height: 20px;
-        color: rgba(0, 0, 0, 0.6);
+        color: var(--td-text-color-secondary);
     }
 
     .active-upload {
-        color: #07C05F;
+        color: var(--td-brand-color);
     }
 
     .menu_item_active {
         border-radius: 4px;
-        background: #07c05f1a !important;
+        background: var(--td-brand-color-light) !important;
 
         .menu_icon,
         .menu_title {
-            color: #07c05f !important;
+            color: var(--td-brand-color) !important;
         }
     }
 
@@ -659,7 +668,7 @@ watch(() => route.params.kbId, () => {
 
         .menu_icon,
         .menu_title {
-            color: #000000e6;
+            color: var(--td-text-color-primary);
         }
     }
 
@@ -686,12 +695,12 @@ watch(() => route.params.kbId, () => {
 
         &:hover {
             border-radius: 4px;
-            background: #30323605;
-            color: #00000099;
+            background: var(--td-bg-color-container-hover);
+            color: var(--td-text-color-secondary);
 
             .menu_icon,
             .menu_title {
-                color: #00000099;
+                color: var(--td-text-color-secondary);
             }
         }
     }
@@ -699,7 +708,7 @@ watch(() => route.params.kbId, () => {
     .menu_icon {
         display: flex;
         margin-right: 10px;
-        color: #00000099;
+        color: var(--td-text-color-secondary);
 
         .icon {
             width: 20px;
@@ -710,7 +719,7 @@ watch(() => route.params.kbId, () => {
     }
 
     .menu_title {
-        color: #00000099;
+        color: var(--td-text-color-secondary);
         text-overflow: ellipsis;
         font-family: "PingFang SC";
         font-size: 14px;
@@ -745,7 +754,7 @@ watch(() => route.params.kbId, () => {
         cursor: pointer;
         display: flex;
         align-items: center;
-        color: #00000099;
+        color: var(--td-text-color-secondary);
         font-weight: 400;
         line-height: 22px;
         height: 36px;
@@ -766,14 +775,14 @@ watch(() => route.params.kbId, () => {
         .menu-more {
             display: inline-block;
             font-weight: bold;
-            color: #07C05F;
+            color: var(--td-brand-color);
         }
 
         .dot {
             width: 4px;
             height: 4px;
             border-radius: 50%;
-            background: #07C05F;
+            background: var(--td-brand-color);
         }
 
         .sub_title {
@@ -781,12 +790,12 @@ watch(() => route.params.kbId, () => {
         }
 
         &:hover {
-            background: #30323605;
-            color: #00000099;
+            background: var(--td-bg-color-container-hover);
+            color: var(--td-text-color-secondary);
             border-radius: 3px;
 
             .menu-more {
-                color: #00000099;
+                color: var(--td-text-color-secondary);
             }
 
             .submenu_title {
@@ -797,12 +806,12 @@ watch(() => route.params.kbId, () => {
     }
 
     .submenu_item_active {
-        background: #07c05f1a !important;
-        color: #07c05f !important;
+        background: var(--td-brand-color-light) !important;
+        color: var(--td-brand-color) !important;
         border-radius: 3px;
 
         .menu-more {
-            color: #07c05f !important;
+            color: var(--td-brand-color) !important;
         }
     }
 }
@@ -810,7 +819,7 @@ watch(() => route.params.kbId, () => {
 /* 知识库下拉菜单样式 */
 .kb-dropdown-icon {
     margin-left: auto;
-    color: #666;
+    color: var(--td-text-color-secondary);
     transition: transform 0.3s ease, color 0.2s ease;
     cursor: pointer;
     display: flex;
@@ -824,15 +833,15 @@ watch(() => route.params.kbId, () => {
     }
     
     &:hover {
-        color: #07c05f;
+        color: var(--td-brand-color);
     }
     
     &.active {
-        color: #07c05f;
+        color: var(--td-brand-color);
     }
     
     &.active:hover {
-        color: #05a04f;
+        color: var(--td-brand-color-hover);
     }
     
     svg {
@@ -847,10 +856,10 @@ watch(() => route.params.kbId, () => {
     top: 100%;
     left: 0;
     right: 0;
-    background: #fff;
-    border: 1px solid #e5e7eb;
+    background: var(--td-bg-color-container);
+    border: 1px solid var(--td-component-border);
     border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--td-shadow-2);
     z-index: 1000;
     max-height: 200px;
     overflow-y: auto;
@@ -861,15 +870,15 @@ watch(() => route.params.kbId, () => {
     cursor: pointer;
     transition: background-color 0.2s ease;
     font-size: 14px;
-    color: #333;
+    color: var(--td-text-color-primary);
     
     &:hover {
-        background-color: #f5f5f5;
+        background-color: var(--td-bg-color-container-hover);
     }
     
     &.active {
-        background-color: #07c05f1a;
-        color: #07c05f;
+        background-color: var(--td-brand-color-light);
+        color: var(--td-brand-color);
         font-weight: 500;
     }
     
@@ -895,15 +904,15 @@ watch(() => route.params.kbId, () => {
 </style>
 <style lang="less">
 .upload-popup {
-    background-color: rgba(0, 0, 0, 0.9);
-    color: #FFFFFF;
-    border-color: rgba(0, 0, 0, 0.9) !important;
+    background-color: var(--td-gray-color-13);
+    color: var(--td-text-color-anti);
+    border-color: var(--td-gray-color-13) !important;
     box-shadow: none;
     margin-bottom: 10px !important;
 
     .t-popup__arrow::before {
-        border-color: rgba(0, 0, 0, 0.9) !important;
-        background-color: rgba(0, 0, 0, 0.9) !important;
+        border-color: var(--td-gray-color-13) !important;
+        background-color: var(--td-gray-color-13) !important;
         box-shadow: none !important;
     }
 }
@@ -925,22 +934,22 @@ watch(() => route.params.kbId, () => {
 // 退出登录确认框样式
 :deep(.t-popconfirm) {
     .t-popconfirm__content {
-        background: #fff;
-        border: 1px solid #e7e7e7;
+        background: var(--td-bg-color-container);
+        border: 1px solid var(--td-component-border);
         border-radius: 6px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: var(--td-shadow-2);
         padding: 12px 16px;
         font-size: 14px;
-        color: #333;
+        color: var(--td-text-color-primary);
         max-width: 200px;
     }
     
     .t-popconfirm__arrow {
-        border-bottom-color: #e7e7e7;
+        border-bottom-color: var(--td-component-border);
     }
     
     .t-popconfirm__arrow::after {
-        border-bottom-color: #fff;
+        border-bottom-color: var(--td-bg-color-container);
     }
     
     .t-popconfirm__buttons {
@@ -951,18 +960,18 @@ watch(() => route.params.kbId, () => {
     }
     
     .t-button--variant-outline {
-        border-color: #d9d9d9;
-        color: #666;
+        border-color: var(--td-component-border);
+        color: var(--td-text-color-secondary);
     }
     
     .t-button--theme-danger {
-        background-color: #ff4d4f;
-        border-color: #ff4d4f;
+        background-color: var(--td-error-color);
+        border-color: var(--td-error-color);
     }
     
     .t-button--theme-danger:hover {
-        background-color: #ff7875;
-        border-color: #ff7875;
+        background-color: var(--td-error-color-hover);
+        border-color: var(--td-error-color-hover);
     }
 }
 </style>

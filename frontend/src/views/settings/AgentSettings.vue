@@ -57,7 +57,7 @@
           filterable
           placeholder="搜索模型..."
           @change="handleThinkingModelChange"
-          @focus="loadChatModels"
+          @focus="loadAllModels"
           style="width: 280px;"
         >
           <!-- 已有的对话模型 -->
@@ -98,7 +98,7 @@
           filterable
           placeholder="搜索模型..."
           @change="handleRerankModelChange"
-          @focus="loadRerankModels"
+          @focus="loadAllModels"
           style="width: 280px;"
         >
           <!-- 已有的 Rerank 模型 -->
@@ -209,16 +209,24 @@ const availableTools = ref<ToolDefinition[]>([])
 
 // 配置加载状态
 const loadingConfig = ref(false)
+const configLoaded = ref(false) // 防止重复加载
+const isInitializing = ref(true) // 标记是否正在初始化，防止初始化时触发保存
 
 // 初始化加载
 onMounted(async () => {
+  // 防止重复加载
+  if (configLoaded.value) return
+  
   loadingConfig.value = true
+  configLoaded.value = true
+  isInitializing.value = true
+  
   try {
     // 从后台加载配置
     const res = await getAgentConfig()
     const config = res.data
     
-    // 更新本地状态
+    // 更新本地状态（在初始化期间，不会触发保存）
     localAgentEnabled.value = config.enabled
     localMaxIterations.value = config.max_iterations
     localTemperature.value = config.temperature
@@ -227,17 +235,12 @@ onMounted(async () => {
     localAllowedTools.value = config.allowed_tools || []
     availableTools.value = config.available_tools || []
     
-    // 如果配置了思考模型，立即加载模型列表以显示模型名称
-    if (config.thinking_model_id) {
-      await loadChatModels()
+    // 统一加载所有模型（只调用一次API）
+    if (config.thinking_model_id || config.rerank_model_id) {
+      await loadAllModels()
     }
     
-    // 如果配置了 rerank 模型，立即加载模型列表以显示模型名称
-    if (config.rerank_model_id) {
-      await loadRerankModels()
-    }
-    
-    // 同步到store
+    // 同步到store（只更新本地存储，不触发API保存）
     settingsStore.toggleAgent(config.enabled)
     settingsStore.updateAgentConfig({
       maxIterations: config.max_iterations,
@@ -245,9 +248,13 @@ onMounted(async () => {
       thinkingModelId: config.thinking_model_id,
       rerankModelId: config.rerank_model_id
     })
+    
+    // 初始化完成
+    isInitializing.value = false
   } catch (error) {
     console.error('加载Agent配置失败:', error)
     MessagePlugin.error('加载Agent配置失败')
+    configLoaded.value = false // 加载失败时重置标记，允许重试
     
     // 失败时从store加载
     localAgentEnabled.value = settingsStore.isAgentEnabled
@@ -257,6 +264,7 @@ onMounted(async () => {
     localRerankModelId.value = settingsStore.agentConfig.rerankModelId
   } finally {
     loadingConfig.value = false
+    isInitializing.value = false // 确保初始化完成，即使失败也要允许后续操作
   }
 })
 
@@ -283,6 +291,11 @@ const getErrorMessage = (error: any): string => {
 
 // 处理 Agent 开关
 const handleAgentToggle = async (value: boolean) => {
+  // 如果正在初始化，不触发保存（但用户手动切换开关应该允许）
+  // 注意：这个可能不需要检查，因为用户手动切换开关应该保存
+  // 但为了安全，如果初始化时开关状态变化，也不保存
+  if (isInitializing.value) return
+  
   try {
     // 构建完整配置
     const config: AgentConfig = {
@@ -308,6 +321,9 @@ const handleAgentToggle = async (value: boolean) => {
 
 // 处理最大迭代次数变化
 const handleMaxIterationsChange = async (value: number) => {
+  // 如果正在初始化，不触发保存
+  if (isInitializing.value) return
+  
   try {
     const config: AgentConfig = {
       enabled: localAgentEnabled.value,
@@ -328,40 +344,39 @@ const handleMaxIterationsChange = async (value: number) => {
   }
 }
 
-// 加载对话模型列表
-const loadChatModels = async () => {
-  if (chatModels.value.length > 0) return // 已经加载过
+// 统一加载所有模型（只调用一次API）
+const loadAllModels = async () => {
+  if (chatModels.value.length > 0 && rerankModels.value.length > 0) return // 已经加载过
   
   loadingModels.value = true
   try {
     const allModels = await listModels()
-    // 只获取对话模型（KnowledgeQA 类型）
+    // 按类型过滤，避免重复调用
     chatModels.value = allModels.filter(m => m.type === 'KnowledgeQA')
+    rerankModels.value = allModels.filter(m => m.type === 'Rerank')
   } catch (error) {
+    console.error('加载模型列表失败:', error)
     MessagePlugin.error('加载模型列表失败')
   } finally {
     loadingModels.value = false
   }
 }
 
-// 加载 Rerank 模型列表
+// 加载对话模型列表（已废弃，使用 loadAllModels）
+const loadChatModels = async () => {
+  await loadAllModels()
+}
+
+// 加载 Rerank 模型列表（已废弃，使用 loadAllModels）
 const loadRerankModels = async () => {
-  if (rerankModels.value.length > 0) return // 已经加载过
-  
-  loadingModels.value = true
-  try {
-    const allModels = await listModels()
-    rerankModels.value = allModels.filter(m => m.type === 'Rerank')
-  } catch (error) {
-    console.error('加载 Rerank 模型列表失败:', error)
-    MessagePlugin.error('加载 Rerank 模型列表失败')
-  } finally {
-    loadingModels.value = false
-  }
+  await loadAllModels()
 }
 
 // 处理思考模型变化
 const handleThinkingModelChange = async (value: string) => {
+  // 如果正在初始化，不触发保存
+  if (isInitializing.value) return
+  
   // 如果选择添加新模型，跳转到模型配置页
   if (value === '__add_model__') {
     router.push('/settings?section=models')
@@ -391,6 +406,9 @@ const handleThinkingModelChange = async (value: string) => {
 // 监听模型选择，处理"添加模型"跳转
 // 处理 Rerank 模型变化
 const handleRerankModelChange = async (value: string) => {
+  // 如果正在初始化，不触发保存
+  if (isInitializing.value) return
+  
   // 如果选择添加新模型，跳转到模型配置页
   if (value === '__add_model__') {
     router.push('/settings?section=models&subsection=rerank')
@@ -474,6 +492,9 @@ watch(() => localRerankModelId.value, (newValue) => {
 
 // 处理温度参数变化
 const handleTemperatureChange = async (value: number) => {
+  // 如果正在初始化，不触发保存
+  if (isInitializing.value) return
+  
   try {
     const config: AgentConfig = {
       enabled: localAgentEnabled.value,
@@ -496,6 +517,9 @@ const handleTemperatureChange = async (value: number) => {
 
 // 处理允许工具变化
 const handleAllowedToolsChange = async (value: string[]) => {
+  // 如果正在初始化，不触发保存
+  if (isInitializing.value) return
+  
   try {
     const config: AgentConfig = {
       enabled: localAgentEnabled.value,
@@ -530,13 +554,13 @@ const handleAllowedToolsChange = async (value: string[]) => {
   h2 {
     font-size: 20px;
     font-weight: 600;
-    color: #333333;
+    color: var(--td-text-color-primary);
     margin: 0 0 8px 0;
   }
 
   .section-description {
     font-size: 14px;
-    color: #666666;
+    color: var(--td-text-color-secondary);
     margin: 0;
     line-height: 1.5;
   }
@@ -553,7 +577,7 @@ const handleAllowedToolsChange = async (value: string[]) => {
   align-items: flex-start;
   justify-content: space-between;
   padding: 20px 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--td-component-border);
 
   &:last-child {
     border-bottom: none;
@@ -582,14 +606,14 @@ const handleAllowedToolsChange = async (value: string[]) => {
   label {
     font-size: 15px;
     font-weight: 500;
-    color: #333333;
+    color: var(--td-text-color-primary);
     display: block;
     margin-bottom: 4px;
   }
 
   .desc {
     font-size: 13px;
-    color: #666666;
+    color: var(--td-text-color-secondary);
     margin: 0;
     line-height: 1.5;
   }
@@ -613,7 +637,7 @@ const handleAllowedToolsChange = async (value: string[]) => {
   .value-display {
     font-size: 14px;
     font-weight: 500;
-    color: #333333;
+    color: var(--td-text-color-primary);
     min-width: 40px;
     text-align: right;
   }
@@ -627,12 +651,12 @@ const handleAllowedToolsChange = async (value: string[]) => {
   
   .model-icon {
     font-size: 14px;
-    color: #07C05F;
+    color: var(--td-brand-color);
   }
   
   .add-icon {
     font-size: 14px;
-    color: #07C05F;
+    color: var(--td-brand-color);
   }
   
   .model-name {
@@ -642,7 +666,7 @@ const handleAllowedToolsChange = async (value: string[]) => {
   
   &.add {
     .model-name {
-      color: #07C05F;
+      color: var(--td-brand-color);
       font-weight: 500;
     }
   }

@@ -67,17 +67,27 @@
         </t-form-item>
       </t-form>
     </t-dialog>
+
+    <!-- 知识库设置模态框 -->
+    <KnowledgeBaseSettingsModal />
+    
+    <!-- 全局设置模态框 -->
+    <Settings />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, computed } from 'vue'
+import { onMounted, reactive, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { MessagePlugin } from 'tdesign-vue-next'
 import { listKnowledgeBases, createKnowledgeBase, deleteKnowledgeBase } from '@/api/knowledge-base'
 import { formatStringDate } from '@/utils/index'
+import { useUIStore } from '@/stores/ui'
+import KnowledgeBaseSettingsModal from './KnowledgeBaseSettingsModal.vue'
+import Settings from '@/views/settings/Settings.vue'
 
 const router = useRouter()
+const uiStore = useUIStore()
 
 interface KB { 
   id: string; 
@@ -167,14 +177,23 @@ const goDetail = (id: string) => {
   router.push(`/platform/knowledge-bases/${id}`)
 }
 const goSettings = (id: string) => {
-  router.push(`/platform/knowledge-bases/${id}/settings`)
+  // 使用模态框打开设置，而不是路由导航
+  uiStore.openKBSettings(id)
 }
+
+// 监听知识库设置模态框关闭，刷新列表
+watch(() => uiStore.showKBSettingsModal, (newVal, oldVal) => {
+  // 当模态框从打开变为关闭时，刷新列表
+  if (oldVal && !newVal) {
+    fetchList()
+  }
+})
 </script>
 
 <style scoped lang="less">
 .kb-list-container {
   padding: 20px;
-  background: #fff;
+  background: var(--td-bg-color-container);
   margin: 0 20px 0 20px;
   height: calc(100vh);
   overflow-y: auto;
@@ -186,7 +205,7 @@ const goSettings = (id: string) => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
-  h2 { margin: 0; font-size: 20px; font-weight: 600; }
+  h2 { margin: 0; font-size: 20px; font-weight: 600; color: var(--td-text-color-primary); }
 }
 
 .warning-banner {
@@ -195,14 +214,14 @@ const goSettings = (id: string) => {
   gap: 8px;
   padding: 12px 16px;
   margin-bottom: 16px;
-  background: #fff7e6;
-  border: 1px solid #ffd591;
+  background: var(--td-warning-color-light);
+  border: 1px solid var(--td-warning-color-3);
   border-radius: 6px;
-  color: #d46b08;
+  color: var(--td-warning-color);
   font-size: 14px;
   
   .t-icon {
-    color: #d46b08;
+    color: var(--td-warning-color);
     flex-shrink: 0;
   }
 }
@@ -213,21 +232,21 @@ const goSettings = (id: string) => {
   gap: 8px;
   
   .warning-icon {
-    color: #ff8800;
+    color: var(--td-warning-color);
     cursor: pointer;
     font-size: 16px;
     font-weight: bold;
     transition: color 0.2s;
     
     &:hover {
-      color: #d46b08;
+      color: var(--td-warning-color-hover);
     }
   }
 }
 
 .description-cell {
   .description-text {
-    color: #000000e6;
+    color: var(--td-text-color-primary);
     font-size: 14px;
   }
 }

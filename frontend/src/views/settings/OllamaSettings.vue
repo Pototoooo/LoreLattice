@@ -355,23 +355,30 @@ const initOllamaBaseUrl = async () => {
       // 如果接口没返回且 store 中也没有，使用默认值
       localBaseUrl.value = 'http://localhost:11434'
     }
+    
+    // 如果启用了，直接使用初始化时获取的状态，避免重复调用
+    if (localEnabled.value) {
+      connectionStatus.value = result.available
+      if (result.available) {
+        refreshModels()
+      }
+    }
+    
+    return result
   } catch (error) {
     console.error('初始化 Ollama 地址失败:', error)
     // 如果获取失败，使用默认值或 store 中的值
     if (!localBaseUrl.value) {
       localBaseUrl.value = 'http://localhost:11434'
     }
+    return null
   }
 }
 
 // 组件挂载时自动检查连接
 onMounted(async () => {
-  // 先初始化服务地址
+  // 初始化服务地址，如果启用则直接使用返回的状态，避免重复调用
   await initOllamaBaseUrl()
-  
-  if (localEnabled.value) {
-    testConnection()
-  }
 })
 </script>
 
@@ -386,13 +393,13 @@ onMounted(async () => {
   h2 {
     font-size: 20px;
     font-weight: 600;
-    color: #333333;
+    color: var(--td-text-color-primary);
     margin: 0 0 8px 0;
   }
 
   .section-description {
     font-size: 14px;
-    color: #666666;
+    color: var(--td-text-color-secondary);
     margin: 0;
     line-height: 1.5;
   }
@@ -409,7 +416,7 @@ onMounted(async () => {
   align-items: flex-start;
   justify-content: space-between;
   padding: 20px 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--td-component-border);
 
   &:last-child {
     border-bottom: none;
@@ -424,14 +431,14 @@ onMounted(async () => {
   label {
     font-size: 15px;
     font-weight: 500;
-    color: #333333;
+    color: var(--td-text-color-primary);
     display: block;
     margin-bottom: 4px;
   }
 
   .desc {
     font-size: 13px;
-    color: #666666;
+    color: var(--td-text-color-secondary);
     margin: 0;
     line-height: 1.5;
   }
@@ -460,11 +467,11 @@ onMounted(async () => {
       font-size: 18px;
 
       &.success {
-        color: #07C05F;
+        color: var(--td-success-color);
       }
 
       &.error {
-        color: #e34d59;
+        color: var(--td-error-color);
       }
 
       &.spinning {
@@ -476,10 +483,10 @@ onMounted(async () => {
 
 .model-category-section {
   margin-bottom: 24px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--td-component-border);
   border-radius: 8px;
   padding: 24px;
-  background: #ffffff;
+  background: var(--td-bg-color-container);
 
   &:last-child {
     margin-bottom: 0;
@@ -498,13 +505,13 @@ onMounted(async () => {
     h3 {
       font-size: 16px;
       font-weight: 600;
-      color: #333333;
+      color: var(--td-text-color-primary);
       margin: 0 0 4px 0;
     }
 
     p {
       font-size: 14px;
-      color: #666666;
+      color: var(--td-text-color-secondary);
       margin: 0;
       line-height: 1.5;
     }
@@ -517,7 +524,7 @@ onMounted(async () => {
   justify-content: center;
   gap: 8px;
   padding: 60px;
-  color: #666666;
+  color: var(--td-text-color-secondary);
   font-size: 14px;
 }
 
@@ -536,14 +543,14 @@ onMounted(async () => {
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--td-component-border);
   border-radius: 6px;
-  background: #fafafa;
+  background: var(--td-bg-color-secondarycontainer);
   transition: all 0.2s;
 
   &:hover {
-    border-color: #07C05F;
-    background: #ffffff;
+    border-color: var(--td-brand-color);
+    background: var(--td-bg-color-container);
   }
 }
 
@@ -554,7 +561,7 @@ onMounted(async () => {
   .model-name {
     font-size: 14px;
     font-weight: 500;
-    color: #333333;
+    color: var(--td-text-color-primary);
     margin-bottom: 4px;
     font-family: monospace;
   }
@@ -563,7 +570,7 @@ onMounted(async () => {
     display: flex;
     gap: 12px;
     font-size: 12px;
-    color: #666666;
+    color: var(--td-text-color-secondary);
   }
 }
 
@@ -579,7 +586,7 @@ onMounted(async () => {
 
   .download-progress {
     padding: 12px;
-    background: #f5f7fa;
+    background: var(--td-bg-color-component);
     border-radius: 6px;
 
     .progress-info {
@@ -587,14 +594,14 @@ onMounted(async () => {
       justify-content: space-between;
       margin-bottom: 8px;
       font-size: 13px;
-      color: #333333;
+      color: var(--td-text-color-primary);
     }
   }
 
   .recommended-models {
     .recommended-label {
       font-size: 13px;
-      color: #666666;
+      color: var(--td-text-color-secondary);
       margin: 0 0 10px 0;
       font-weight: 500;
     }
@@ -610,9 +617,9 @@ onMounted(async () => {
         font-size: 12px;
 
         &:hover {
-          background: #07C05F;
-          color: #ffffff;
-          border-color: #07C05F;
+          background: var(--td-brand-color);
+          color: var(--td-text-color-anti);
+          border-color: var(--td-brand-color);
         }
       }
     }
@@ -625,7 +632,7 @@ onMounted(async () => {
 
   .empty-text {
     font-size: 14px;
-    color: #999999;
+    color: var(--td-text-color-placeholder);
     margin: 0;
   }
 }

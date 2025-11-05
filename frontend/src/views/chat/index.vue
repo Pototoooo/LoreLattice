@@ -12,7 +12,7 @@
                     </div>
                 </div>
                 <div v-if="loading"
-                    style="height: 41px;display: flex;align-items: center;background: #fff;width: 58px;">
+                    style="height: 41px;display: flex;align-items: center;background: var(--td-bg-color-container);width: 58px;">
                     <img class="botanswer_laoding_gif" src="@/assets/img/botanswer_loading.gif" alt="正在等待答案……">
                 </div>
             </div>
@@ -561,8 +561,8 @@ onBeforeRouteUpdate((to, from, next) => {
     align-items: center;
     gap: 8px;
     padding: 8px 16px;
-    background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
-    border: 1px solid #91d5ff;
+    background: var(--td-brand-color-light);
+    border: 1px solid var(--td-brand-color-3);
     border-radius: 6px;
     margin-bottom: 12px;
     max-width: 800px;
@@ -575,7 +575,7 @@ onBeforeRouteUpdate((to, from, next) => {
     .agent-text {
         font-size: 14px;
         font-weight: 500;
-        color: #0050b3;
+        color: var(--td-brand-color);
         flex: 1;
     }
 }

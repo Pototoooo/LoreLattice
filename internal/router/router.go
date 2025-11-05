@@ -264,6 +264,7 @@ func RegisterInitializationRoutes(r *gin.RouterGroup, handler *handler.Initializ
 	// 初始化接口
 	r.GET("/initialization/config/:kbId", handler.GetCurrentConfigByKB)
 	r.POST("/initialization/initialize/:kbId", handler.InitializeByKB)
+	r.PUT("/initialization/config/:kbId", handler.UpdateKBConfig) // 新的简化版接口，只传模型ID
 
 	// Ollama相关接口
 	r.GET("/initialization/ollama/status", handler.CheckOllamaStatus)

@@ -59,32 +59,32 @@
             <div class="settings-content">
               <div class="content-wrapper">
                 <!-- 常规设置 -->
-                <div v-show="currentSection === 'general'" class="section">
+                <div v-if="currentSection === 'general'" class="section">
                   <GeneralSettings />
                 </div>
 
                 <!-- 模型配置 -->
-                <div v-show="currentSection === 'models'" class="section">
+                <div v-if="currentSection === 'models'" class="section">
                   <ModelSettings />
                 </div>
 
                 <!-- Ollama 设置 -->
-                <div v-show="currentSection === 'ollama'" class="section">
+                <div v-if="currentSection === 'ollama'" class="section">
                   <OllamaSettings />
                 </div>
 
                 <!-- 知识库设置 -->
-                <div v-show="currentSection === 'knowledge'" class="section">
+                <div v-if="currentSection === 'knowledge'" class="section">
                   <KnowledgeBaseSettings />
                 </div>
 
                 <!-- Agent 配置 -->
-                <div v-show="currentSection === 'agent'" class="section">
+                <div v-if="currentSection === 'agent'" class="section">
                   <AgentSettings />
                 </div>
 
                 <!-- 系统信息 -->
-                <div v-show="currentSection === 'system'" class="section">
+                <div v-if="currentSection === 'system'" class="section">
                   <SystemInfo />
                 </div>
               </div>
@@ -179,6 +179,27 @@ const handleClose = () => {
   }
 }
 
+// 监听初始导航设置
+watch(() => uiStore.settingsInitialSection, (section) => {
+  if (section && visible.value) {
+    currentSection.value = section
+    if (uiStore.settingsInitialSubSection) {
+      currentSubSection.value = uiStore.settingsInitialSubSection
+      // 展开对应的父菜单
+      if (!expandedMenus.value.includes(section)) {
+        expandedMenus.value.push(section)
+      }
+      // 滚动到对应区域
+      setTimeout(() => {
+        const element = document.querySelector(`[data-model-type="${uiStore.settingsInitialSubSection}"]`)
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 300)
+    }
+  }
+}, { immediate: true })
+
 // ESC 键关闭
 const handleEscape = (e: KeyboardEvent) => {
   if (e.key === 'Escape' && visible.value) {
@@ -221,7 +242,7 @@ onUnmounted(() => {
 .settings-overlay {
   position: fixed;
   inset: 0;
-  z-index: 999;
+  z-index: 1000;
   background: transparent;
   display: flex;
   align-items: center;
@@ -235,9 +256,9 @@ onUnmounted(() => {
   width: 100%;
   max-width: 900px;
   height: 700px;
-  background: #ffffff;
+  background: var(--td-bg-color-container);
   border-radius: 12px;
-  box-shadow: 0 6px 28px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--td-shadow-3);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -252,7 +273,7 @@ onUnmounted(() => {
   height: 32px;
   border: none;
   background: transparent;
-  color: #666666;
+  color: var(--td-text-color-secondary);
   cursor: pointer;
   border-radius: 6px;
   display: flex;
@@ -262,8 +283,8 @@ onUnmounted(() => {
   z-index: 10;
 
   &:hover {
-    background: #f5f5f5;
-    color: #333333;
+    background: var(--td-bg-color-container-hover);
+    color: var(--td-text-color-primary);
   }
 }
 
@@ -277,8 +298,8 @@ onUnmounted(() => {
 /* 左侧导航栏 */
 .settings-sidebar {
   width: 220px;
-  background-color: #f8f9fa;
-  border-right: 1px solid #e5e7eb;
+  background-color: var(--td-bg-color-secondarycontainer);
+  border-right: 1px solid var(--td-component-border);
   flex-shrink: 0;
   overflow-y: auto;
   display: flex;
@@ -287,13 +308,13 @@ onUnmounted(() => {
 
 .sidebar-header {
   padding: 24px 16px 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--td-component-border);
 }
 
 .sidebar-title {
   font-size: 18px;
   font-weight: 600;
-  color: #333333;
+  color: var(--td-text-color-primary);
   margin: 0;
 }
 
@@ -309,19 +330,19 @@ onUnmounted(() => {
   margin-bottom: 4px;
   border-radius: 6px;
   cursor: pointer;
-  color: #666666;
+  color: var(--td-text-color-secondary);
   font-size: 14px;
   transition: all 0.2s ease;
   user-select: none;
 
   &:hover {
-    background-color: #e8f5ed;
-    color: #333333;
+    background-color: var(--td-bg-color-container-hover);
+    color: var(--td-text-color-primary);
   }
 
   &.active {
-    background-color: rgba(7, 192, 95, 0.1);
-    color: #07C05F;
+    background-color: var(--td-brand-color-light);
+    color: var(--td-brand-color);
     font-weight: 500;
   }
 }
@@ -358,19 +379,19 @@ onUnmounted(() => {
   margin-bottom: 2px;
   border-radius: 4px;
   cursor: pointer;
-  color: #666666;
+  color: var(--td-text-color-secondary);
   font-size: 13px;
   transition: all 0.2s ease;
   user-select: none;
 
   &:hover {
-    background-color: #f5f7fa;
-    color: #333333;
+    background-color: var(--td-bg-color-component-hover);
+    color: var(--td-text-color-primary);
   }
 
   &.active {
-    background-color: rgba(7, 192, 95, 0.08);
-    color: #07C05F;
+    background-color: var(--td-brand-color-light);
+    color: var(--td-brand-color);
     font-weight: 500;
   }
 }
@@ -409,7 +430,7 @@ onUnmounted(() => {
 .settings-content {
   flex: 1;
   overflow-y: auto;
-  background-color: #ffffff;
+  background-color: var(--td-bg-color-container);
 }
 
 .content-wrapper {
@@ -461,29 +482,29 @@ onUnmounted(() => {
 }
 
 .settings-sidebar::-webkit-scrollbar-track {
-  background: #f8f9fa;
+  background: var(--td-bg-color-secondarycontainer);
 }
 
 .settings-sidebar::-webkit-scrollbar-thumb {
-  background: #d0d0d0;
+  background: var(--td-bg-color-component);
   border-radius: 3px;
 }
 
 .settings-sidebar::-webkit-scrollbar-thumb:hover {
-  background: #b0b0b0;
+  background: var(--td-bg-color-component-hover);
 }
 
 .settings-content::-webkit-scrollbar-track {
-  background: #ffffff;
+  background: var(--td-bg-color-container);
 }
 
 .settings-content::-webkit-scrollbar-thumb {
-  background: #d0d0d0;
+  background: var(--td-bg-color-component);
   border-radius: 3px;
 }
 
 .settings-content::-webkit-scrollbar-thumb:hover {
-  background: #b0b0b0;
+  background: var(--td-bg-color-component-hover);
 }
 </style>
 

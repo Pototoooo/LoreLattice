@@ -229,10 +229,10 @@ onMounted(async () => {
 }
 
 .img_loading {
-    background: #3032360f;
+    background: var(--td-bg-color-component);
     height: 230px;
     width: 230px;
-    color: #00000042;
+    color: var(--td-text-color-placeholder);
     display: flex;
     align-items: center;
     justify-content: center;

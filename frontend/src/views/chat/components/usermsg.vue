@@ -26,9 +26,9 @@ const props = defineProps({
     gap: 4px;
     flex: 1 0 0;
     border-radius: 4px;
-    background: #8CE97F;
+    background: var(--td-brand-color-light);
     margin-left: auto;
-    color: #000000e6;
+    color: var(--td-text-color-primary);
     font-size: 16px;
     text-align: justify;
     word-break: break-all;

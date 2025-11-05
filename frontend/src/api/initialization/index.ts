@@ -1,4 +1,4 @@
-import { get, post } from '../../utils/request';
+import { get, post, put } from '../../utils/request';
 
 // 初始化配置数据类型
 export interface InitializationConfig {
@@ -70,7 +70,59 @@ export interface DownloadTask {
     endTime?: string;
 }
 
-// 根据知识库ID执行配置更新
+// 简化版知识库配置更新接口（只传模型ID）
+export interface KBModelConfigRequest {
+    llmModelId: string
+    embeddingModelId: string
+    rerankModelId?: string
+    vllmModelId?: string
+    documentSplitting: {
+        chunkSize: number
+        chunkOverlap: number
+        separators: string[]
+    }
+    multimodal: {
+        enabled: boolean
+        storageType?: 'cos' | 'minio'
+        cos?: {
+            secretId: string
+            secretKey: string
+            region: string
+            bucketName: string
+            appId: string
+            pathPrefix: string
+        }
+        minio?: {
+            bucketName: string
+            useSSL: boolean
+            pathPrefix: string
+        }
+    }
+    nodeExtract: {
+        enabled: boolean
+        text: string
+        tags: string[]
+        nodes: Node[]
+        relations: Relation[]
+    }
+}
+
+export function updateKBConfig(kbId: string, config: KBModelConfigRequest): Promise<any> {
+    return new Promise((resolve, reject) => {
+        console.log('开始知识库配置更新（简化版）...', kbId, config);
+        put(`/api/v1/initialization/config/${kbId}`, config)
+            .then((response: any) => {
+                console.log('知识库配置更新完成', response);
+                resolve(response);
+            })
+            .catch((error: any) => {
+                console.error('知识库配置更新失败:', error);
+                reject(error.error || error);
+            });
+    });
+}
+
+// 根据知识库ID执行配置更新（旧版，保留兼容性）
 export function initializeSystemByKB(kbId: string, config: InitializationConfig): Promise<any> {
     return new Promise((resolve, reject) => {
         console.log('开始知识库配置更新...', kbId, config);
