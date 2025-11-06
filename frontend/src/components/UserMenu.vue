@@ -47,11 +47,13 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
 import { MessagePlugin } from 'tdesign-vue-next'
-import { getCurrentUser } from '@/api/auth'
+import { getCurrentUser, logout as logoutApi } from '@/api/auth'
 
 const router = useRouter()
 const uiStore = useUIStore()
+const authStore = useAuthStore()
 
 const menuRef = ref<HTMLElement>()
 const menuVisible = ref(false)
@@ -99,11 +101,19 @@ const handleSettings = () => {
 }
 
 // 注销
-const handleLogout = () => {
+const handleLogout = async () => {
   menuVisible.value = false
   
-  // 清理本地存储
-  localStorage.removeItem('WeKnora_token')
+  try {
+    // 调用后端API注销
+    await logoutApi()
+  } catch (error) {
+    // 即使API调用失败，也继续执行本地清理
+    console.error('注销API调用失败:', error)
+  }
+  
+  // 清理所有状态和本地存储
+  authStore.logout()
   
   MessagePlugin.success('已退出登录')
   

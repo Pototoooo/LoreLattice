@@ -57,7 +57,7 @@
                                 @click="gotopage(subitem.path)">
                                 <i v-if="currentSecondpath == subitem.path" class="dot"></i>
                                 <span class="submenu_title"
-                                    :style="currentSecondpath == subitem.path ? 'margin-left:14px;max-width:160px;' : 'margin-left:18px;max-width:173px;'">
+                                    :style="currentSecondpath == subitem.path ? 'margin-left:14px;max-width:160px;' : 'margin-left:18px;max-width:185px;'">
                                     {{ subitem.title }}
                                 </span>
                                 <t-dropdown 
@@ -93,6 +93,7 @@ import { onMounted, watch, computed, ref, reactive, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getSessionsList, delSession } from "@/api/chat/index";
 import { getKnowledgeBaseById, listKnowledgeBases, uploadKnowledgeFile } from '@/api/knowledge-base';
+import { logout as logoutApi } from '@/api/auth';
 import { kbFileTypeVerification } from '@/utils/index';
 import { useMenuStore } from '@/stores/menu';
 import { useAuthStore } from '@/stores/auth';
@@ -550,7 +551,16 @@ const gotopage = async (path: string) => {
     pathPrefix.value = path;
     // 处理退出登录
     if (path === 'logout') {
+        try {
+            // 调用后端API注销
+            await logoutApi();
+        } catch (error) {
+            // 即使API调用失败，也继续执行本地清理
+            console.error('注销API调用失败:', error);
+        }
+        // 清理所有状态和本地存储
         authStore.logout();
+        MessagePlugin.success('已退出登录');
         router.push('/login');
         return;
     } else {
@@ -830,7 +840,7 @@ watch(() => route.params.kbId, () => {
 
     .submenu_item_p {
         height: 44px;
-        padding: 4px 8px 4px 0px;
+        padding: 4px 0px 4px 0px;
         box-sizing: border-box;
     }
 
