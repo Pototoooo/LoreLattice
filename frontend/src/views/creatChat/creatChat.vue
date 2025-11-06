@@ -50,7 +50,7 @@ async function createNewSession(value: string) {
     try {
         const res = await createSessions(sessionData);
         if (res.data && res.data.id) {
-            await navigateToSession(res.data.id, value, selectedKbs[0]);
+            await navigateToSession(res.data.id, value);
         } else {
             console.error("创建会话失败");
             MessagePlugin.error("创建会话失败");
@@ -61,18 +61,21 @@ async function createNewSession(value: string) {
     }
 }
 
-const navigateToSession = async (sessionId: string, value: string, kbId: string) => {
+const navigateToSession = async (sessionId: string, value: string) => {
+    const now = new Date().toISOString();
     let obj = { 
         title: '新会话', 
-        path: `chat/${kbId}/${sessionId}`, 
+        path: `chat/${sessionId}`, 
         id: sessionId, 
         isMore: false, 
-        isNoTitle: true 
+        isNoTitle: true,
+        created_at: now,
+        updated_at: now
     };
     usemenuStore.updataMenuChildren(obj);
     usemenuStore.changeIsFirstSession(true);
     usemenuStore.changeFirstQuery(value);
-    router.push(`/platform/chat/${kbId}/${sessionId}`);
+    router.push(`/platform/chat/${sessionId}`);
 }
 
 </script>

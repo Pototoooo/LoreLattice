@@ -75,21 +75,20 @@ type SessionStrategy struct {
 }
 
 // CreateSessionRequest represents a request to create a new session
+// Sessions are now knowledge-base-independent and serve as conversation containers.
+// Knowledge bases can be specified dynamically in each query request (AgentQA/KnowledgeQA).
 type CreateSessionRequest struct {
-	// ID of the associated knowledge base (optional in agent mode)
+	// ID of the associated knowledge base (optional, can be set/changed during queries)
 	KnowledgeBaseID string `json:"knowledge_base_id"`
 	// Session strategy configuration
 	SessionStrategy *SessionStrategy `json:"session_strategy"`
-	// Agent configuration (optional, for agent mode)
-	AgentConfig *types.AgentConfig `json:"agent_config"`
+	// Agent configuration (optional, session-level config only: enabled and knowledge_bases)
+	AgentConfig *types.SessionAgentConfig `json:"agent_config"`
 }
 
 // CreateSession handles the creation of a new conversation session
 func (h *SessionHandler) CreateSession(c *gin.Context) {
 	ctx := c.Request.Context()
-
-	// logger.Infof(ctx, "Start creating session, config: %+v", h.config.Conversation)
-
 	// Parse and validate the request body
 	var request CreateSessionRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -107,21 +106,13 @@ func (h *SessionHandler) CreateSession(c *gin.Context) {
 	}
 
 	// Validate session creation request
-	// - Traditional RAG mode: requires KnowledgeBaseID
-	// - Agent mode: KnowledgeBaseID is optional
-	//   - If AgentConfig.KnowledgeBases is specified, use those
-	//   - If session.KnowledgeBaseID is specified, use that
-	//   - Otherwise, default to all knowledge bases under the tenant
+	// Sessions are now knowledge-base-independent:
+	// - KnowledgeBaseID is optional during session creation
+	// - Knowledge base can be specified in each query request (AgentQA/KnowledgeQA)
+	// - Agent mode can access multiple knowledge bases via AgentConfig.KnowledgeBases
+	// - Knowledge base can be switched during conversation
 	isAgentMode := request.AgentConfig != nil && request.AgentConfig.Enabled
-	hasKnowledgeBase := request.KnowledgeBaseID != ""
 	hasAgentKnowledgeBases := request.AgentConfig != nil && len(request.AgentConfig.KnowledgeBases) > 0
-
-	// In traditional RAG mode, knowledge base ID is required
-	if !isAgentMode && !hasKnowledgeBase {
-		logger.Error(ctx, "Traditional RAG mode requires knowledge_base_id")
-		c.Error(errors.NewBadRequestError("knowledge_base_id is required for non-agent sessions"))
-		return
-	}
 
 	logger.Infof(
 		ctx,
@@ -208,8 +199,8 @@ func (h *SessionHandler) CreateSession(c *gin.Context) {
 		logger.Debug(ctx, "Using default session strategy")
 	}
 
-	// Only fetch knowledge base if KnowledgeBaseID is provided
-	// In agent mode, knowledge bases may be configured in AgentConfig instead
+	// Fetch knowledge base if KnowledgeBaseID is provided to inherit its model configurations
+	// If no KB is provided, models will be determined at query time or use tenant/system defaults
 	if request.KnowledgeBaseID != "" {
 		kb, err := h.knowledgebaseService.GetKnowledgeBaseByID(ctx, request.KnowledgeBaseID)
 		if err != nil {
@@ -229,7 +220,7 @@ func (h *SessionHandler) CreateSession(c *gin.Context) {
 		logger.Debugf(ctx, "Knowledge base fetched: %s, rerank model: %s, summary model: %s",
 			kb.ID, kb.RerankModelID, kb.SummaryModelID)
 	} else {
-		logger.Debug(ctx, "No knowledge base ID provided, skipping knowledge base fetch (agent mode)")
+		logger.Debug(ctx, "No knowledge base ID provided, models will use session strategy or be determined at query time")
 	}
 
 	// Call service to create session
@@ -437,9 +428,17 @@ func (h *SessionHandler) GenerateTitle(c *gin.Context) {
 		return
 	}
 
+	// Get session from database
+	session, err := h.sessionService.GetSession(ctx, sessionID)
+	if err != nil {
+		logger.ErrorWithFields(ctx, err, nil)
+		c.Error(errors.NewInternalServerError(err.Error()))
+		return
+	}
+
 	// Call service to generate title
 	logger.Infof(ctx, "Generating session title, session ID: %s, message count: %d", sessionID, len(request.Messages))
-	title, err := h.sessionService.GenerateTitle(ctx, sessionID, request.Messages)
+	title, err := h.sessionService.GenerateTitle(ctx, session, request.Messages)
 	if err != nil {
 		logger.ErrorWithFields(ctx, err, nil)
 		c.Error(errors.NewInternalServerError(err.Error()))
@@ -456,7 +455,9 @@ func (h *SessionHandler) GenerateTitle(c *gin.Context) {
 
 // CreateKnowledgeQARequest defines the request structure for knowledge QA
 type CreateKnowledgeQARequest struct {
-	Query string `json:"query" binding:"required"` // Query text for knowledge base search
+	Query            string   `json:"query" binding:"required"` // Query text for knowledge base search
+	KnowledgeBaseIDs []string `json:"knowledge_base_ids"`       // Selected knowledge base ID for this request
+	AgentEnabled     bool     `json:"agent_enabled"`            // Whether agent mode is enabled for this request
 }
 
 // SearchKnowledgeRequest defines the request structure for searching knowledge without LLM summarization
@@ -760,6 +761,44 @@ func (h *SessionHandler) KnowledgeQA(c *gin.Context) {
 
 	logger.Infof(ctx, "Knowledge QA request, session ID: %s, query: %s", sessionID, request.Query)
 
+	// Get request ID for title generation
+	requestID := c.GetString(types.RequestIDContextKey.String())
+
+	// Get session to check if title needs to be generated
+	session, err := h.sessionService.GetSession(ctx, sessionID)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to get session, session ID: %s, error: %v", sessionID, err)
+		// Continue anyway - this is not critical
+	} else {
+		// Start async title generation if session has no title
+		if session.Title == "" {
+			logger.Infof(ctx, "Session has no title, starting async title generation, session ID: %s", sessionID)
+			// Use a simple event bus for title generation
+			titleEventBus := event.NewEventBus()
+			// Subscribe to title events and push to SSE
+			titleEventBus.On(event.EventSessionTitle, func(ctx context.Context, evt event.Event) error {
+				data, ok := evt.Data.(event.SessionTitleData)
+				if !ok {
+					return nil
+				}
+				// Send title update via SSE
+				c.SSEvent("message", &types.StreamResponse{
+					ID:           requestID,
+					ResponseType: types.ResponseTypeSessionTitle,
+					Content:      data.Title,
+					Done:         true,
+					Data: map[string]interface{}{
+						"session_id": data.SessionID,
+						"title":      data.Title,
+					},
+				})
+				c.Writer.Flush()
+				return nil
+			})
+			h.sessionService.GenerateTitleAsync(ctx, session, request.Query, titleEventBus)
+		}
+	}
+
 	// Create user message
 	if _, err := h.messageService.CreateMessage(ctx, &types.Message{
 		SessionID:   sessionID,
@@ -781,8 +820,24 @@ func (h *SessionHandler) KnowledgeQA(c *gin.Context) {
 	}
 	logger.Infof(ctx, "Calling knowledge QA service, session ID: %s", sessionID)
 
+	// Prepare knowledge base IDs
+	knowledgeBaseIDs := request.KnowledgeBaseIDs
+	if len(knowledgeBaseIDs) == 0 && session.KnowledgeBaseID != "" {
+		knowledgeBaseIDs = []string{session.KnowledgeBaseID}
+		logger.Infof(ctx, "No knowledge base IDs in request, using session default: %s", session.KnowledgeBaseID)
+	}
+
+	// Validate knowledge bases
+	if len(knowledgeBaseIDs) == 0 {
+		logger.Error(ctx, "No knowledge base ID available")
+		c.Error(errors.NewBadRequestError("At least one knowledge base ID is required"))
+		return
+	}
+
+	logger.Infof(ctx, "Using knowledge bases: %v", knowledgeBaseIDs)
+
 	// Call service to perform knowledge QA
-	searchResults, respCh, err := h.sessionService.KnowledgeQA(ctx, sessionID, request.Query)
+	searchResults, respCh, err := h.sessionService.KnowledgeQA(ctx, session, request.Query, knowledgeBaseIDs)
 	if err != nil {
 		logger.ErrorWithFields(ctx, err, nil)
 		c.Error(errors.NewInternalServerError(err.Error()))
@@ -791,10 +846,15 @@ func (h *SessionHandler) KnowledgeQA(c *gin.Context) {
 	assistantMessage.KnowledgeReferences = searchResults
 
 	// Register new stream with stream manager
-	requestID := c.GetString(types.RequestIDContextKey.String())
 	if err := h.streamManager.RegisterStream(ctx, sessionID, assistantMessage.ID, request.Query); err != nil {
 		logger.GetLogger(ctx).Error("Register stream failed", "error", err)
 	}
+
+	// Set headers for SSE
+	c.Header("Content-Type", "text/event-stream")
+	c.Header("Cache-Control", "no-cache")
+	c.Header("Connection", "keep-alive")
+	c.Header("X-Accel-Buffering", "no")
 
 	// Send knowledge references if available
 	if len(searchResults) > 0 {
@@ -903,6 +963,177 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 		return
 	}
 
+	// Initialize AgentConfig if it doesn't exist
+	if session.AgentConfig == nil {
+		session.AgentConfig = &types.SessionAgentConfig{}
+	}
+
+	// Detect if knowledge bases or agent mode has changed
+	knowledgeBasesChanged := false
+	configChanged := false
+
+	// Check if knowledge bases array has changed
+	if len(request.KnowledgeBaseIDs) > 0 {
+		// Compare arrays to detect changes
+		currentKBs := session.AgentConfig.KnowledgeBases
+		if len(currentKBs) != len(request.KnowledgeBaseIDs) {
+			knowledgeBasesChanged = true
+			configChanged = true
+		} else {
+			// Check if contents are different
+			kbMap := make(map[string]bool)
+			for _, kb := range currentKBs {
+				kbMap[kb] = true
+			}
+			for _, kb := range request.KnowledgeBaseIDs {
+				if !kbMap[kb] {
+					knowledgeBasesChanged = true
+					configChanged = true
+					break
+				}
+			}
+		}
+		if knowledgeBasesChanged {
+			logger.Infof(ctx, "Knowledge bases changed from %v to %v", session.AgentConfig.KnowledgeBases, request.KnowledgeBaseIDs)
+		}
+	}
+
+	// Check if agent mode has changed
+	currentAgentEnabled := session.AgentConfig.Enabled
+	if request.AgentEnabled != currentAgentEnabled {
+		logger.Infof(ctx, "Agent mode changed from %v to %v", currentAgentEnabled, request.AgentEnabled)
+		configChanged = true
+	}
+
+	// If configuration changed, clear context and update session
+	if configChanged {
+		logger.Infof(ctx, "Configuration changed, clearing context for session: %s", sessionID)
+		if knowledgeBasesChanged {
+			// Clear the LLM context to prevent contamination
+			if err := h.sessionService.ClearContext(ctx, sessionID); err != nil {
+				logger.Errorf(ctx, "Failed to clear context for session %s: %v", sessionID, err)
+				// Continue anyway - this is not a fatal error
+			}
+		}
+		session.AgentConfig.KnowledgeBases = request.KnowledgeBaseIDs
+		session.AgentConfig.Enabled = request.AgentEnabled
+		// Persist the session changes
+		if err := h.sessionService.UpdateSession(ctx, session); err != nil {
+			logger.Errorf(ctx, "Failed to update session %s: %v", sessionID, err)
+			c.Error(errors.NewInternalServerError("Failed to update session configuration"))
+			return
+		}
+		logger.Infof(ctx, "Session configuration updated successfully for session: %s", sessionID)
+	}
+
+	// If Agent mode is disabled, delegate to KnowledgeQA
+	if !request.AgentEnabled {
+		logger.Infof(ctx, "Agent mode disabled, delegating to KnowledgeQA for session: %s", sessionID)
+
+		// Use knowledge bases from request or session config
+		knowledgeBaseIDs := request.KnowledgeBaseIDs
+		if len(knowledgeBaseIDs) == 0 {
+			knowledgeBaseIDs = session.AgentConfig.KnowledgeBases
+		}
+
+		// If still empty, use session default knowledge base
+		if len(knowledgeBaseIDs) == 0 && session.KnowledgeBaseID != "" {
+			knowledgeBaseIDs = []string{session.KnowledgeBaseID}
+			logger.Infof(ctx, "Using session default knowledge base: %s", session.KnowledgeBaseID)
+		}
+
+		// Validate at least one knowledge base is available
+		if len(knowledgeBaseIDs) == 0 {
+			logger.Error(ctx, "No knowledge base available for delegation")
+			c.Error(errors.NewBadRequestError("No knowledge base available. Please configure at least one knowledge base."))
+			return
+		}
+
+		logger.Infof(ctx, "Delegating to KnowledgeQA with knowledge bases: %v", knowledgeBaseIDs)
+
+		// Create user message
+		requestID := c.GetString(types.RequestIDContextKey.String())
+		if _, err := h.messageService.CreateMessage(ctx, &types.Message{
+			SessionID:   sessionID,
+			Role:        "user",
+			Content:     request.Query,
+			RequestID:   requestID,
+			CreatedAt:   time.Now(),
+			IsCompleted: true,
+		}); err != nil {
+			c.Error(errors.NewInternalServerError(err.Error()))
+			return
+		}
+
+		// Create assistant message (response)
+		assistantMessage.CreatedAt = time.Now()
+		if _, err := h.messageService.CreateMessage(ctx, assistantMessage); err != nil {
+			c.Error(errors.NewInternalServerError(err.Error()))
+			return
+		}
+
+		// Call KnowledgeQA service
+		searchResults, respCh, err := h.sessionService.KnowledgeQA(ctx, session, request.Query, knowledgeBaseIDs)
+		if err != nil {
+			logger.ErrorWithFields(ctx, err, nil)
+			c.Error(errors.NewInternalServerError(err.Error()))
+			return
+		}
+		assistantMessage.KnowledgeReferences = searchResults
+
+		// Register new stream with stream manager
+		if err := h.streamManager.RegisterStream(ctx, sessionID, assistantMessage.ID, request.Query); err != nil {
+			logger.GetLogger(ctx).Error("Register stream failed", "error", err)
+		}
+
+		// Set headers for SSE
+		c.Header("Content-Type", "text/event-stream")
+		c.Header("Cache-Control", "no-cache")
+		c.Header("Connection", "keep-alive")
+		c.Header("X-Accel-Buffering", "no")
+
+		// Send knowledge references if available
+		if len(searchResults) > 0 {
+			logger.Debugf(ctx, "Sending reference content, total %d", len(searchResults))
+			c.SSEvent("message", &types.StreamResponse{
+				ID:                  requestID,
+				ResponseType:        types.ResponseTypeReferences,
+				KnowledgeReferences: searchResults,
+			})
+			c.Writer.Flush()
+		} else {
+			logger.Debug(ctx, "No reference content to send")
+		}
+
+		// Process streamed response
+		func() {
+			defer func() {
+				// Mark stream as completed when done
+				if err := h.streamManager.CompleteStream(ctx, sessionID, assistantMessage.ID); err != nil {
+					logger.GetLogger(ctx).Error("Complete stream failed", "error", err)
+				}
+			}()
+			for response := range respCh {
+				response.ID = requestID
+				c.SSEvent("message", response)
+				c.Writer.Flush()
+				if response.ResponseType == types.ResponseTypeAnswer {
+					assistantMessage.Content += response.Content
+				}
+			}
+			assistantMessage.IsCompleted = true
+		}()
+
+		// Update message with final content and references
+		assistantMessage.UpdatedAt = time.Now()
+		if err := h.messageService.UpdateMessage(ctx, assistantMessage); err != nil {
+			logger.Errorf(ctx, "Failed to update assistant message: %v", err)
+		}
+
+		logger.Infof(ctx, "KnowledgeQA delegation completed for session: %s", sessionID)
+		return
+	}
+
 	// Emit agent query event to create user message
 	requestID := c.GetString(types.RequestIDContextKey.String())
 	if err := event.Emit(ctx, event.Event{
@@ -916,6 +1147,38 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 		},
 	}); err != nil {
 		logger.Errorf(ctx, "Failed to emit agent query event: %v", err)
+		return
+	}
+
+	// Set headers for SSE immediately
+	c.Header("Content-Type", "text/event-stream")
+	c.Header("Cache-Control", "no-cache")
+	c.Header("Connection", "keep-alive")
+	c.Header("X-Accel-Buffering", "no")
+
+	// Send agent query event to frontend via SSE to trigger loading state immediately
+	c.SSEvent("message", &types.StreamResponse{
+		ID:           requestID,
+		ResponseType: types.ResponseTypeAgentQuery,
+		Content:      "Agent query processing started",
+		Done:         false,
+		Data: map[string]interface{}{
+			"session_id": sessionID,
+			"query":      request.Query,
+			"request_id": requestID,
+		},
+	})
+	c.Writer.Flush()
+
+	// Create user message
+	if _, err := h.messageService.CreateMessage(ctx, &types.Message{
+		SessionID:   sessionID,
+		Role:        "user",
+		Content:     request.Query,
+		RequestID:   requestID,
+		CreatedAt:   time.Now(),
+		IsCompleted: true,
+	}); err != nil {
 		c.Error(errors.NewInternalServerError(err.Error()))
 		return
 	}
@@ -936,11 +1199,7 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 		logger.GetLogger(ctx).Error("Register stream failed", "error", err)
 	}
 
-	// Set headers for SSE
-	c.Header("Content-Type", "text/event-stream")
-	c.Header("Cache-Control", "no-cache")
-	c.Header("Connection", "keep-alive")
-	c.Header("X-Accel-Buffering", "no")
+	// SSE headers already set earlier when sending agent_query event
 
 	eventBus := event.NewEventBus()
 	// Create stream handler with dedicated EventBus BEFORE calling AgentQA
@@ -951,6 +1210,32 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 
 	// Subscribe to events on the dedicated EventBus
 	streamHandler.Subscribe()
+
+	// Start async title generation if session has no title
+	if session.Title == "" {
+		logger.Infof(ctx, "Session has no title, starting async title generation, session ID: %s", sessionID)
+		// Subscribe to title events on the dedicated EventBus
+		eventBus.On(event.EventSessionTitle, func(ctx context.Context, evt event.Event) error {
+			data, ok := evt.Data.(event.SessionTitleData)
+			if !ok {
+				return nil
+			}
+			// Send title update via SSE
+			c.SSEvent("message", &types.StreamResponse{
+				ID:           requestID,
+				ResponseType: types.ResponseTypeSessionTitle,
+				Content:      data.Title,
+				Done:         true,
+				Data: map[string]interface{}{
+					"session_id": data.SessionID,
+					"title":      data.Title,
+				},
+			})
+			c.Writer.Flush()
+			return nil
+		})
+		h.sessionService.GenerateTitleAsync(ctx, session, request.Query, eventBus)
+	}
 
 	// Call service to perform agent QA
 	go func() {

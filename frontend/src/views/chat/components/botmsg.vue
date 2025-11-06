@@ -5,7 +5,7 @@
             <AgentStreamDisplay :session="session" v-if="session.isAgentMode"></AgentStreamDisplay>
             <deepThink :deepSession="session" v-if="session.showThink && !session.isAgentMode"></deepThink>
         </div>
-        <div ref="parentMd">
+        <div ref="parentMd" v-if="!session.hideContent">
             <!-- 消息正在总结中则渲染加载gif  -->
             <img v-if="session.thinking" class="botanswer_laoding_gif" src="@/assets/img/botanswer_loading.gif"
                 alt="正在总结答案……">
@@ -212,11 +212,11 @@ onMounted(async () => {
 }
 
 .bot_msg {
-    background: #fff;
+    // background: #fff;
     border-radius: 4px;
     color: rgba(0, 0, 0, 0.9);
     font-size: 16px;
-    padding: 10px 12px;
+    // padding: 10px 12px;
     margin-right: auto;
     max-width: 100%;
     box-sizing: border-box;

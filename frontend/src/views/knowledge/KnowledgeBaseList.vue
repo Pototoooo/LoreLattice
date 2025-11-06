@@ -1,8 +1,9 @@
 <template>
   <div class="kb-list-container">
+    <!-- 头部 -->
     <div class="header">
       <h2>知识库</h2>
-      <t-button theme="primary" @click="openCreate">新建知识库</t-button>
+      <button class="create-btn" @click="openCreateModal">新建知识库</button>
     </div>
     
     <!-- 未初始化知识库提示 -->
@@ -10,66 +11,107 @@
       <t-icon name="info-circle" size="16px" />
       <span>部分知识库尚未初始化，需要先在设置中配置模型信息才能添加知识文档</span>
     </div>
-    <t-table :data="kbs" :columns="columns" row-key="id" size="medium" hover>
-      <template #status="{ row }">
-        <div class="status-cell">
-          <t-tag 
-            :theme="isInitialized(row) ? 'success' : 'warning'"
-            size="small"
-          >
-            {{ isInitialized(row) ? '已初始化' : '未初始化' }}
-          </t-tag>
-          <t-tooltip 
-            v-if="!isInitialized(row)" 
-            content="需要先在设置中配置模型信息才能添加知识"
-            placement="top"
-          >
-            <span class="warning-icon">⚠</span>
-          </t-tooltip>
-        </div>
-      </template>
-      <template #description="{ row }">
-        <div class="description-text">{{ row.description || '暂无描述' }}</div>
-      </template>
-      <template #op="{ row }">
-        <t-space size="small">
-          <t-button 
-            size="small" 
-            @click="goDetail(row.id)"
-            :disabled="!isInitialized(row)"
-            :theme="isInitialized(row) ? 'primary' : 'default'"
-            :variant="isInitialized(row) ? 'base' : 'outline'"
-            :title="!isInitialized(row) ? '请先在设置中配置模型信息' : ''"
-          >
-            文档
-          </t-button>
-          <t-button size="small" variant="outline" @click="goSettings(row.id)">设置</t-button>
-          <t-popconfirm content="确认删除该知识库？" @confirm="remove(row.id)">
-            <t-button size="small" theme="danger" variant="text">删除</t-button>
-          </t-popconfirm>
-        </t-space>
-      </template>
-    </t-table>
 
-    <t-dialog v-model:visible="createVisible" header="新建知识库" :footer="false">
-      <t-form :data="createForm" @submit="create">
-        <t-form-item label="名称" name="name" :rules="[{ required: true, message: '请输入名称' }]">
-          <t-input v-model="createForm.name" />
-        </t-form-item>
-        <t-form-item label="描述" name="description">
-          <t-textarea v-model="createForm.description" />
-        </t-form-item>
-        <t-form-item>
-          <t-space>
-            <t-button theme="primary" type="submit" :loading="creating">创建</t-button>
-            <t-button variant="outline" @click="createVisible = false">取消</t-button>
-          </t-space>
-        </t-form-item>
-      </t-form>
+    <!-- 卡片网格 -->
+    <div v-if="kbs.length > 0" class="kb-card-wrap">
+      <div 
+        v-for="(kb, index) in kbs" 
+        :key="kb.id" 
+        class="kb-card"
+        :class="{ 'uninitialized': !isInitialized(kb) }"
+        @click="handleCardClick(kb)"
+      >
+        <!-- 卡片头部 -->
+        <div class="card-header">
+          <span class="card-title" :title="kb.name">{{ kb.name }}</span>
+          <t-popup 
+            v-model="kb.showMore" 
+            overlayClassName="card-more-popup"
+            :on-visible-change="onVisibleChange"
+            trigger="click" 
+            destroy-on-close 
+            placement="bottom-right"
+          >
+            <div 
+              variant="outline" 
+              class="more-wrap" 
+              @click.stop="openMore(index)"
+              :class="{ 'active-more': currentMoreIndex === index }"
+            >
+              <img class="more-icon" src="@/assets/img/more.png" alt="" />
+            </div>
+            <template #content>
+              <div class="popup-menu" @click.stop>
+                <div class="popup-menu-item" @click.stop="handleSettings(kb)">
+                  <t-icon class="menu-icon" name="setting" />
+                  <span>设置</span>
+                </div>
+                <div class="popup-menu-item delete" @click.stop="handleDelete(kb)">
+                  <t-icon class="menu-icon" name="delete" />
+                  <span>删除</span>
+                </div>
+              </div>
+            </template>
+          </t-popup>
+        </div>
+
+        <!-- 卡片内容 -->
+        <div class="card-content">
+          <div class="card-description">
+            {{ kb.description || '暂无描述' }}
+          </div>
+        </div>
+
+        <!-- 卡片底部 -->
+        <div class="card-bottom">
+          <div class="status-badge" :class="{ 'initialized': isInitialized(kb), 'uninitialized': !isInitialized(kb) }">
+            <span v-if="!isInitialized(kb)" class="warning-icon">⚠</span>
+            <span>{{ isInitialized(kb) ? '已初始化' : '未初始化' }}</span>
+          </div>
+          <span class="card-time">{{ kb.updated_at }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 空状态 -->
+    <div v-else-if="!loading" class="empty-state">
+      <img class="empty-img" src="@/assets/img/upload.svg" alt="">
+      <span class="empty-txt">暂无知识库</span>
+      <span class="empty-desc">点击右上角"新建知识库"按钮创建第一个知识库</span>
+    </div>
+
+
+    <!-- 删除确认对话框 -->
+    <t-dialog 
+      v-model:visible="deleteVisible" 
+      dialogClassName="del-knowledge-dialog" 
+      :closeBtn="false" 
+      :cancelBtn="null"
+      :confirmBtn="null"
+    >
+      <div class="circle-wrap">
+        <div class="dialog-header">
+          <img class="circle-img" src="@/assets/img/circle.png" alt="">
+          <span class="circle-title">删除确认</span>
+        </div>
+        <span class="del-circle-txt">
+          {{ `确认要删除知识库"${deletingKb?.name}"？删除后不可恢复` }}
+        </span>
+        <div class="circle-btn">
+          <span class="circle-btn-txt" @click="deleteVisible = false">取消</span>
+          <span class="circle-btn-txt confirm" @click="confirmDelete">确认删除</span>
+        </div>
+      </div>
     </t-dialog>
 
-    <!-- 知识库设置模态框 -->
-    <KnowledgeBaseSettingsModal />
+    <!-- 知识库编辑器（创建/编辑统一组件） -->
+    <KnowledgeBaseEditorModal 
+      :visible="uiStore.showKBEditorModal"
+      :mode="uiStore.kbEditorMode"
+      :kb-id="uiStore.currentKBId || undefined"
+      @update:visible="(val) => val ? null : uiStore.closeKBEditor()"
+      @success="handleKBEditorSuccess"
+    />
     
     <!-- 全局设置模态框 -->
     <Settings />
@@ -77,13 +119,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, computed, watch } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { MessagePlugin } from 'tdesign-vue-next'
-import { listKnowledgeBases, createKnowledgeBase, deleteKnowledgeBase } from '@/api/knowledge-base'
+import { listKnowledgeBases, deleteKnowledgeBase } from '@/api/knowledge-base'
 import { formatStringDate } from '@/utils/index'
 import { useUIStore } from '@/stores/ui'
-import KnowledgeBaseSettingsModal from './KnowledgeBaseSettingsModal.vue'
+import KnowledgeBaseEditorModal from './KnowledgeBaseEditorModal.vue'
 import Settings from '@/views/settings/Settings.vue'
 
 const router = useRouter()
@@ -96,71 +138,78 @@ interface KB {
   updated_at?: string;
   embedding_model_id?: string;
   summary_model_id?: string;
+  showMore?: boolean;
 }
+
 const kbs = ref<KB[]>([])
 const loading = ref(false)
-
-const columns = [
-  { colKey: 'name', title: '名称' },
-  { colKey: 'description', title: '描述', cell: 'description', width: 300 },
-  { colKey: 'status', title: '状态', cell: 'status', width: 100 },
-  { colKey: 'updated_at', title: '更新时间' },
-  { colKey: 'op', title: '操作', cell: 'op', width: 220 },
-]
+const deleteVisible = ref(false)
+const deletingKb = ref<KB | null>(null)
+const currentMoreIndex = ref<number>(-1)
 
 const fetchList = () => {
   loading.value = true
   listKnowledgeBases().then((res: any) => {
     const data = res.data || []
-    // 格式化时间
+    // 格式化时间，并初始化 showMore 状态
     kbs.value = data.map((kb: KB) => ({
       ...kb,
-      updated_at: kb.updated_at ? formatStringDate(new Date(kb.updated_at)) : ''
+      updated_at: kb.updated_at ? formatStringDate(new Date(kb.updated_at)) : '',
+      showMore: false
     }))
   }).finally(() => loading.value = false)
 }
 
-onMounted(fetchList)
+onMounted(() => {
+  fetchList()
+})
 
-const createVisible = ref(false)
-const creating = ref(false)
-const createForm = reactive({ name: '', description: '' })
-const openCreate = () => {
-  createForm.name = ''
-  createForm.description = ''
-  createVisible.value = true
+// 打开创建知识库弹窗
+const openCreateModal = () => {
+  uiStore.openCreateKB()
 }
-const create = () => {
-  if (!createForm.name) return
-  creating.value = true
-  const chunking_config = {
-    chunk_size: 512,
-    chunk_overlap: 100,
-    separators: ['.', '?', '!', '。', '？', '！'],
-    enable_multimodal: false
+
+const openMore = (index: number) => {
+  // 只记录当前打开的索引，用于显示激活样式
+  // 弹窗的开关由 v-model 自动管理
+  currentMoreIndex.value = index
+}
+
+const onVisibleChange = (visible: boolean) => {
+  // 弹窗关闭时重置索引
+  if (!visible) {
+    currentMoreIndex.value = -1
   }
-  createKnowledgeBase({ name: createForm.name, description: createForm.description, chunking_config }).then((res: any) => {
-    if (res.success) {
-      MessagePlugin.success('创建成功')
-      createVisible.value = false
-      fetchList()
-    } else {
-      MessagePlugin.error(res.message || '创建失败')
-    }
-  }).catch((e: any) => {
-    MessagePlugin.error(e?.message || '创建失败')
-  }).finally(() => creating.value = false)
 }
 
-const remove = (id: string) => {
-  deleteKnowledgeBase(id).then((res: any) => {
+const handleSettings = (kb: KB) => {
+  // 手动关闭弹窗
+  kb.showMore = false
+  goSettings(kb.id)
+}
+
+const handleDelete = (kb: KB) => {
+  // 手动关闭弹窗
+  kb.showMore = false
+  deletingKb.value = kb
+  deleteVisible.value = true
+}
+
+const confirmDelete = () => {
+  if (!deletingKb.value) return
+  
+  deleteKnowledgeBase(deletingKb.value.id).then((res: any) => {
     if (res.success) {
       MessagePlugin.success('已删除')
+      deleteVisible.value = false
+      deletingKb.value = null
       fetchList()
     } else {
       MessagePlugin.error(res.message || '删除失败')
     }
-  }).catch((e: any) => MessagePlugin.error(e?.message || '删除失败'))
+  }).catch((e: any) => {
+    MessagePlugin.error(e?.message || '删除失败')
+  })
 }
 
 const isInitialized = (kb: KB) => {
@@ -173,39 +222,77 @@ const hasUninitializedKbs = computed(() => {
   return kbs.value.some(kb => !isInitialized(kb))
 })
 
+const handleCardClick = (kb: KB) => {
+  if (isInitialized(kb)) {
+    goDetail(kb.id)
+  } else {
+    goSettings(kb.id)
+  }
+}
+
 const goDetail = (id: string) => {
   router.push(`/platform/knowledge-bases/${id}`)
 }
+
 const goSettings = (id: string) => {
-  // 使用模态框打开设置，而不是路由导航
+  // 使用模态框打开设置
   uiStore.openKBSettings(id)
 }
 
-// 监听知识库设置模态框关闭，刷新列表
-watch(() => uiStore.showKBSettingsModal, (newVal, oldVal) => {
-  // 当模态框从打开变为关闭时，刷新列表
-  if (oldVal && !newVal) {
-    fetchList()
-  }
-})
+// 知识库编辑器成功回调（创建或编辑成功）
+const handleKBEditorSuccess = (kbId: string) => {
+  console.log('知识库操作成功:', kbId)
+  fetchList()
+}
 </script>
 
 <style scoped lang="less">
 .kb-list-container {
-  padding: 20px;
-  background: #fff;
-  margin: 0 20px 0 20px;
+  padding: 24px 44px;
+  // background: #fff;
+  margin: 0 20px;
   height: calc(100vh);
   overflow-y: auto;
   box-sizing: border-box;
   flex: 1;
 }
+
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
-  h2 { margin: 0; font-size: 20px; font-weight: 600; }
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    color: #000000e6;
+    font-family: "PingFang SC";
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 32px;
+  }
+}
+
+.create-btn {
+  padding: 8px 20px;
+  height: 36px;
+  background: #07c05f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-family: "PingFang SC";
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #05a04f;
+  }
+
+  &:active {
+    background: #048f45;
+  }
 }
 
 .warning-banner {
@@ -213,11 +300,12 @@ watch(() => uiStore.showKBSettingsModal, (newVal, oldVal) => {
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   background: #fff7e6;
   border: 1px solid #ffd591;
   border-radius: 6px;
   color: #d46b08;
+  font-family: "PingFang SC";
   font-size: 14px;
   
   .t-icon {
@@ -226,28 +314,349 @@ watch(() => uiStore.showKBSettingsModal, (newVal, oldVal) => {
   }
 }
 
-.status-cell {
+.kb-card-wrap {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+}
+
+.kb-card {
+  border: 2px solid #fbfbfb;
+  border-radius: 6px;
+  overflow: hidden;
+  box-sizing: border-box;
+  box-shadow: 0 0 8px 0 #00000005;
+  background: #fff;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 12px 16px 14px;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  
-  .warning-icon {
-    color: #ff8800;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    transition: color 0.2s;
-    
-    &:hover {
-      color: #d46b08;
-    }
+  flex-direction: column;
+  min-height: 150px;
+
+  &:hover {
+    border-color: #07c05f;
+  }
+
+  &.uninitialized {
+    opacity: 0.9;
   }
 }
 
-.description-cell {
-  .description-text {
-    color: #000000e6;
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.card-title {
+  color: #000000e6;
+  font-family: "PingFang SC";
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  margin-right: 8px;
+}
+
+.more-wrap {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #e7e7e7;
+  }
+
+  &.active-more {
+    background: #e7e7e7;
+  }
+
+  .more-icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.card-content {
+  flex: 1;
+  margin-bottom: 10px;
+}
+
+.card-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  color: #00000066;
+  font-family: "PingFang SC";
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
+  min-height: 40px;
+}
+
+.card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 0;
+  border-top: 1px solid #f0f0f0;
+  margin-top: auto;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-family: "PingFang SC";
+  font-size: 12px;
+  font-weight: 500;
+
+  &.initialized {
+    background: #07c05f1a;
+    color: #07c05f;
+  }
+
+  &.uninitialized {
+    background: #fff7e6;
+    color: #d46b08;
+  }
+  
+  .warning-icon {
+    font-size: 12px;
+  }
+}
+
+.card-time {
+  color: #00000066;
+  font-family: "PingFang SC";
+  font-size: 12px;
+  font-weight: 400;
+}
+
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+
+  .empty-img {
+    width: 162px;
+    height: 162px;
+    margin-bottom: 20px;
+  }
+
+  .empty-txt {
+    color: #00000099;
+    font-family: "PingFang SC";
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 26px;
+    margin-bottom: 8px;
+  }
+
+  .empty-desc {
+    color: #00000066;
+    font-family: "PingFang SC";
     font-size: 14px;
+    font-weight: 400;
+    line-height: 22px;
+  }
+}
+
+// 响应式布局
+@media (min-width: 900px) {
+  .kb-card-wrap {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1250px) {
+  .kb-card-wrap {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1600px) {
+  .kb-card-wrap {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+// 删除确认对话框样式
+:deep(.del-knowledge-dialog) {
+  padding: 0px !important;
+  border-radius: 6px !important;
+
+  .t-dialog__header {
+    display: none;
+  }
+
+  .t-dialog__body {
+    padding: 16px;
+  }
+
+  .t-dialog__footer {
+    padding: 0;
+  }
+}
+
+:deep(.t-dialog__position.t-dialog--top) {
+  padding-top: 40vh !important;
+}
+
+.circle-wrap {
+  .dialog-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .circle-img {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+  }
+
+  .circle-title {
+    color: #000000e6;
+    font-family: "PingFang SC";
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+
+  .del-circle-txt {
+    color: #00000099;
+    font-family: "PingFang SC";
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 22px;
+    display: inline-block;
+    margin-left: 29px;
+    margin-bottom: 21px;
+  }
+
+  .circle-btn {
+    height: 22px;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .circle-btn-txt {
+    color: #000000e6;
+    font-family: "PingFang SC";
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 22px;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  .confirm {
+    color: #FA5151;
+    margin-left: 40px;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+</style>
+
+<style lang="less">
+// 更多操作弹窗样式
+.card-more-popup {
+  z-index: 99 !important;
+
+  .t-popup__content {
+    padding: 4px 0 !important;
+    margin-top: 4px !important;
+    min-width: 120px;
+  }
+}
+
+.popup-menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #000000e6;
+  font-family: "PingFang SC";
+  font-size: 14px;
+  font-weight: 400;
+
+  .menu-icon {
+    margin-right: 8px;
+    font-size: 16px;
+  }
+
+  &:hover {
+    background: #f5f5f5;
+  }
+
+  &.delete {
+    color: #000000e6;
+    
+    &:hover {
+      background: #fff1f0;
+      color: #FA5151;
+
+      .menu-icon {
+        color: #FA5151;
+    }
+  }
+}
+}
+
+// 创建对话框样式优化
+.create-kb-dialog {
+  .t-form-item__label {
+    font-family: "PingFang SC";
+    font-size: 14px;
+    font-weight: 500;
+    color: #000000e6;
+  }
+
+  .t-input,
+  .t-textarea {
+    font-family: "PingFang SC";
+  }
+
+  .t-button--theme-primary {
+    background-color: #07c05f;
+    border-color: #07c05f;
+
+    &:hover {
+      background-color: #05a04f;
+      border-color: #05a04f;
+    }
   }
 }
 </style>

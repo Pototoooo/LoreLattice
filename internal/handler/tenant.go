@@ -372,7 +372,6 @@ func (h *TenantHandler) UpdateTenantAgentConfig(c *gin.Context) {
 		Temperature:       req.Temperature,
 		ThinkingModelID:   req.ThinkingModelID,
 		RerankModelID:     req.RerankModelID,
-		KnowledgeBases:    []string{}, // Will be set per session
 	}
 
 	updatedTenant, err := h.service.UpdateTenant(ctx, tenant)

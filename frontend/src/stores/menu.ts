@@ -25,7 +25,11 @@ export const useMenuStore = defineStore('menuStore', {
             this.menuArr[1].children = reactive<object[]>([]);
         },
         updatemenuArr(obj: any) {
-            this.menuArr[1].children?.push(obj);
+            // 检查是否已存在相同 ID 的 session，避免重复添加
+            const exists = this.menuArr[1].children?.some((item: any) => item.id === obj.id);
+            if (!exists) {
+                this.menuArr[1].children?.push(obj);
+            }
         },
         updataMenuChildren(item: object) {
             this.menuArr[1].children?.unshift(item)

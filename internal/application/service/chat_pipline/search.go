@@ -3,6 +3,7 @@ package chatpipline
 import (
 	"context"
 	"strings"
+	"sync"
 
 	"github.com/Tencent/WeKnora/internal/config"
 	"github.com/Tencent/WeKnora/internal/logger"
@@ -40,6 +41,21 @@ func (p *PluginSearch) ActivationEvents() []types.EventType {
 func (p *PluginSearch) OnEvent(ctx context.Context,
 	eventType types.EventType, chatManage *types.ChatManage, next func() *PluginError,
 ) *PluginError {
+	// Get knowledge base IDs list
+	knowledgeBaseIDs := chatManage.KnowledgeBaseIDs
+	if len(knowledgeBaseIDs) == 0 && chatManage.KnowledgeBaseID != "" {
+		// Fall back to single knowledge base
+		knowledgeBaseIDs = []string{chatManage.KnowledgeBaseID}
+		logger.Infof(ctx, "No KnowledgeBaseIDs provided, falling back to single KB: %s", chatManage.KnowledgeBaseID)
+	}
+
+	if len(knowledgeBaseIDs) == 0 {
+		logger.Errorf(ctx, "No knowledge base IDs available for search")
+		return ErrSearch.WithError(nil)
+	}
+
+	logger.Infof(ctx, "Searching across %d knowledge base(s): %v", len(knowledgeBaseIDs), knowledgeBaseIDs)
+
 	// Prepare search parameters
 	searchParams := types.SearchParams{
 		QueryText:        strings.TrimSpace(chatManage.RewriteQuery),
@@ -49,14 +65,34 @@ func (p *PluginSearch) OnEvent(ctx context.Context,
 	}
 	logger.Infof(ctx, "Search parameters: %v", searchParams)
 
-	// Perform initial hybrid search
-	searchResults, err := p.knowledgeBaseService.HybridSearch(ctx, chatManage.KnowledgeBaseID, searchParams)
-	logger.Infof(ctx, "Search results count: %d, error: %v", len(searchResults), err)
-	if err != nil {
-		return ErrSearch.WithError(err)
+	// Parallel search across multiple knowledge bases
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var allResults []*types.SearchResult
+
+	for _, kbID := range knowledgeBaseIDs {
+		wg.Add(1)
+		go func(knowledgeBaseID string) {
+			defer wg.Done()
+
+			results, err := p.knowledgeBaseService.HybridSearch(ctx, knowledgeBaseID, searchParams)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to search KB %s: %v", knowledgeBaseID, err)
+				return
+			}
+
+			logger.Infof(ctx, "KB %s search results count: %d", knowledgeBaseID, len(results))
+
+			mu.Lock()
+			allResults = append(allResults, results...)
+			mu.Unlock()
+		}(kbID)
 	}
-	chatManage.SearchResult = searchResults
-	logger.Infof(ctx, "Search result count: %d", len(chatManage.SearchResult))
+
+	wg.Wait()
+
+	logger.Infof(ctx, "Total search results from all KBs: %d", len(allResults))
+	chatManage.SearchResult = allResults
 
 	// Add relevant results from chat history
 	historyResult := p.getSearchResultFromHistory(chatManage)
@@ -68,17 +104,38 @@ func (p *PluginSearch) OnEvent(ctx context.Context,
 	// Try search with processed query if different from rewrite query
 	if chatManage.RewriteQuery != chatManage.ProcessedQuery {
 		searchParams.QueryText = strings.TrimSpace(chatManage.ProcessedQuery)
-		searchResults, err = p.knowledgeBaseService.HybridSearch(ctx, chatManage.KnowledgeBaseID, searchParams)
-		logger.Infof(ctx, "Search by processed query: %s, results count: %d, error: %v",
-			searchParams.QueryText, len(searchResults), err,
-		)
-		if err != nil {
-			return ErrSearch.WithError(err)
+		logger.Infof(ctx, "Searching with processed query: %s", searchParams.QueryText)
+
+		var wg2 sync.WaitGroup
+		var mu2 sync.Mutex
+		var processedResults []*types.SearchResult
+
+		for _, kbID := range knowledgeBaseIDs {
+			wg2.Add(1)
+			go func(knowledgeBaseID string) {
+				defer wg2.Done()
+
+				results, err := p.knowledgeBaseService.HybridSearch(ctx, knowledgeBaseID, searchParams)
+				if err != nil {
+					logger.Errorf(ctx, "Failed to search KB %s with processed query: %v", knowledgeBaseID, err)
+					return
+				}
+
+				logger.Infof(ctx, "KB %s processed query results count: %d", knowledgeBaseID, len(results))
+
+				mu2.Lock()
+				processedResults = append(processedResults, results...)
+				mu2.Unlock()
+			}(kbID)
 		}
-		chatManage.SearchResult = append(chatManage.SearchResult, searchResults...)
+
+		wg2.Wait()
+
+		logger.Infof(ctx, "Total processed query results from all KBs: %d", len(processedResults))
+		chatManage.SearchResult = append(chatManage.SearchResult, processedResults...)
 	}
 
-	// remove duplicate results
+	// Remove duplicate results
 	chatManage.SearchResult = removeDuplicateResults(chatManage.SearchResult)
 
 	// Return if we have results

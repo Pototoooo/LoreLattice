@@ -17,7 +17,10 @@
         <div v-if="event.type === 'thinking'" class="thinking-event">
           <div 
             class="thinking-phase" 
-            :class="{ 'thinking-active': event.thinking }"
+            :class="{ 
+              'thinking-active': event.thinking,
+              'thinking-last': isLastThinking(event.event_id)
+            }"
           >
             <div v-if="event.content" 
                  class="thinking-content markdown-content" 
@@ -135,6 +138,26 @@ const expandedEvents = ref<Set<string>>(new Set());
 
 // State for intermediate steps collapse
 const showIntermediateSteps = ref(false);
+
+// Find the last thinking event in the current message's event stream
+// Only the last thinking should have the green border-left
+const lastThinkingEventId = computed(() => {
+  const stream = eventStream.value;
+  if (!stream || stream.length === 0) return null;
+  
+  // Find all thinking events
+  const thinkingEvents = stream.filter((e: any) => e.type === 'thinking');
+  if (thinkingEvents.length === 0) return null;
+  
+  // Return the event_id of the last thinking event
+  const lastThinking = thinkingEvents[thinkingEvents.length - 1];
+  return lastThinking.event_id;
+});
+
+// Check if a thinking event is the last one (should have green border)
+const isLastThinking = (eventId: string): boolean => {
+  return eventId === lastThinkingEventId.value;
+};
 
 // Check if conversation is done (based on answer event with done=true)
 const isConversationDone = computed(() => {
@@ -498,10 +521,18 @@ const formatJSON = (obj: any): string => {
     background: #ffffff;
     border-radius: 8px;
     padding: 1px 14px;
-    border-left: 3px solid #d1d5db;
+    // 默认不显示 border-left
+    border-left: 3px solid transparent;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     
+    // 只有最后一个 thinking 显示绿色 border-left
+    &.thinking-last {
+      border-left-color: #07c05f;
+      box-shadow: 0 2px 4px rgba(7, 192, 95, 0.08);
+    }
+    
+    // 进行中的 thinking（实时对话）显示绿色 border-left 和动画
     &.thinking-active {
       border-left-color: #07c05f;
       box-shadow: 0 2px 4px rgba(7, 192, 95, 0.08);

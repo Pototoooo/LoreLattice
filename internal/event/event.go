@@ -56,6 +56,9 @@ const (
 
 	// Error events
 	EventError EventType = "error" // 错误事件
+
+	// Session events
+	EventSessionTitle EventType = "session_title" // 会话标题更新
 )
 
 // Event represents an event in the system

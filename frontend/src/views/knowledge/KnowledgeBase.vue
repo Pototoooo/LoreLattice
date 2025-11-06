@@ -176,7 +176,16 @@ const sendMsg = (value: string) => {
 };
 
 const getTitle = (session_id: string, value: string) => {
-  let obj = { title: '新会话', path: `chat/${kbId.value}/${session_id}`, id: session_id, isMore: false, isNoTitle: true };
+  const now = new Date().toISOString();
+  let obj = { 
+    title: '新会话', 
+    path: `chat/${kbId.value}/${session_id}`, 
+    id: session_id, 
+    isMore: false, 
+    isNoTitle: true,
+    created_at: now,
+    updated_at: now
+  };
   usemenuStore.updataMenuChildren(obj);
   usemenuStore.changeIsFirstSession(true);
   usemenuStore.changeFirstQuery(value);

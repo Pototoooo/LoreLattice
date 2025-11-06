@@ -3,7 +3,8 @@ import { defineStore } from 'pinia'
 export const useUIStore = defineStore('ui', {
   state: () => ({
     showSettingsModal: false,
-    showKBSettingsModal: false,
+    showKBEditorModal: false,
+    kbEditorMode: 'create' as 'create' | 'edit',
     currentKBId: null as string | null,
     settingsInitialSection: null as string | null,
     settingsInitialSubSection: null as string | null
@@ -28,11 +29,18 @@ export const useUIStore = defineStore('ui', {
 
     openKBSettings(kbId: string) {
       this.currentKBId = kbId
-      this.showKBSettingsModal = true
+      this.kbEditorMode = 'edit'
+      this.showKBEditorModal = true
     },
 
-    closeKBSettings() {
-      this.showKBSettingsModal = false
+    openCreateKB() {
+      this.currentKBId = null
+      this.kbEditorMode = 'create'
+      this.showKBEditorModal = true
+    },
+
+    closeKBEditor() {
+      this.showKBEditorModal = false
       this.currentKBId = null
     }
   }

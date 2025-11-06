@@ -195,3 +195,9 @@ type AgentReflectionData struct {
 	Iteration  int    `json:"iteration"`
 	Done       bool   `json:"done"` // Whether streaming is complete
 }
+
+// SessionTitleData represents session title update data
+type SessionTitleData struct {
+	SessionID string `json:"session_id"`
+	Title     string `json:"title"`
+}

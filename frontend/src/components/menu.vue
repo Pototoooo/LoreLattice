@@ -49,31 +49,33 @@
                     </t-popup>
                 </div>
                 <div ref="submenuscrollContainer" @scroll="handleScroll" class="submenu" v-if="item.children">
-                    <div class="submenu_item_p" v-for="(subitem, subindex) in item.children" :key="subindex"
-                        @click="gotopage(subitem.path)">
-                        <div :class="['submenu_item', currentSecondpath == subitem.path ? 'submenu_item_active' : '']"
-                            @mouseenter="mouseenteBotDownr(subindex)" @mouseleave="mouseleaveBotDown">
-                            <i v-if="currentSecondpath == subitem.path" class="dot"></i>
-                            <span class="submenu_title"
-                                :style="currentSecondpath == subitem.path ? 'margin-left:14px;max-width:160px;' : 'margin-left:18px;max-width:173px;'">
-                                {{ subitem.title }}
-                            </span>
-                            <t-popup v-model:visible="subitem.isMore" @overlay-click="delCard(subindex, subitem)"
-                                @visible-change="onVisibleChange" overlayClassName="del-menu-popup" trigger="click"
-                                destroy-on-close placement="top-left">
-                                <div v-if="(activeSubmenu == subindex) || (currentSecondpath == subitem.path) || subitem.isMore"
-                                    @click.stop="openMore(subindex)" variant="outline" class="menu-more-wrap">
-                                    <t-icon name="ellipsis" class="menu-more" />
-                                </div>
-                                <template #content>
-                                    <span class="del_submenu">删除记录</span>
-                                </template>
-                            </t-popup>
+                    <template v-for="(group, groupIndex) in groupedSessions" :key="groupIndex">
+                        <div class="timeline_header">{{ group.label }}</div>
+                        <div class="submenu_item_p" v-for="(subitem, subindex) in group.items" :key="subitem.id">
+                            <div :class="['submenu_item', currentSecondpath == subitem.path ? 'submenu_item_active' : '']"
+                                @mouseenter="mouseenteBotDownr(subitem.id)" @mouseleave="mouseleaveBotDown"
+                                @click="gotopage(subitem.path)">
+                                <i v-if="currentSecondpath == subitem.path" class="dot"></i>
+                                <span class="submenu_title"
+                                    :style="currentSecondpath == subitem.path ? 'margin-left:14px;max-width:160px;' : 'margin-left:18px;max-width:173px;'">
+                                    {{ subitem.title }}
+                                </span>
+                                <t-dropdown 
+                                    :options="[{ content: '删除记录', value: 'delete' }]"
+                                    @click="(data) => data.value === 'delete' && delCard(subitem.originalIndex, subitem)"
+                                    placement="bottom-right"
+                                    trigger="click">
+                                    <div @click.stop class="menu-more-wrap">
+                                        <t-icon name="ellipsis" class="menu-more" />
+                                    </div>
+                                </t-dropdown>
+                            </div>
                         </div>
-                    </div>
+                    </template>
                 </div>
             </div>
         </div>
+        
         
         <!-- 下半部分：用户菜单 -->
         <div class="menu_bottom">
@@ -114,13 +116,12 @@ const totalPages = computed(() => Math.ceil(total.value / page_size.value));
 const hasMore = computed(() => currentPage.value < totalPages.value);
 type MenuItem = { title: string; icon: string; path: string; childrenPath?: string; children?: any[] };
 const { menuArr } = storeToRefs(usemenuStore);
-let activeSubmenu = ref<number>(-1);
+let activeSubmenu = ref<string>('');
 
-// 是否处于知识库详情页
+// 是否处于知识库详情页（不包括全局聊天）
 const isInKnowledgeBase = computed<boolean>(() => {
     return route.name === 'knowledgeBaseDetail' || 
            route.name === 'kbCreatChat' || 
-           route.name === 'chat' || 
            route.name === 'knowledgeBaseSettings';
 });
 
@@ -186,6 +187,70 @@ const initializedKnowledgeBases = computed(() => {
         kb.summary_model_id && kb.summary_model_id !== ''
     )
 })
+
+// 时间分组函数
+const getTimeCategory = (dateStr: string): string => {
+    if (!dateStr) return '更早';
+    
+    const date = new Date(dateStr);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+    const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const oneYearAgo = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000);
+    
+    const sessionDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    
+    if (sessionDate.getTime() >= today.getTime()) {
+        return '今天';
+    } else if (sessionDate.getTime() >= yesterday.getTime()) {
+        return '昨天';
+    } else if (date.getTime() >= sevenDaysAgo.getTime()) {
+        return '近7天';
+    } else if (date.getTime() >= thirtyDaysAgo.getTime()) {
+        return '近30天';
+    } else if (date.getTime() >= oneYearAgo.getTime()) {
+        return '近1年';
+    } else {
+        return '更早';
+    }
+};
+
+// 按时间分组Session列表
+const groupedSessions = computed(() => {
+    const chatMenu = (menuArr.value as unknown as MenuItem[]).find((item: MenuItem) => item.path === 'creatChat');
+    if (!chatMenu || !chatMenu.children || chatMenu.children.length === 0) {
+        return [];
+    }
+    
+    const groups: { [key: string]: any[] } = {
+        '今天': [],
+        '昨天': [],
+        '近7天': [],
+        '近30天': [],
+        '近1年': [],
+        '更早': []
+    };
+    
+    // 将sessions按时间分组
+    (chatMenu.children as any[]).forEach((session: any, index: number) => {
+        const category = getTimeCategory(session.updated_at || session.created_at);
+        groups[category].push({
+            ...session,
+            originalIndex: index
+        });
+    });
+    
+    // 按顺序返回非空分组
+    const orderedLabels = ['今天', '昨天', '近7天', '近30天', '近1年', '更早'];
+    return orderedLabels
+        .filter(label => groups[label].length > 0)
+        .map(label => ({
+            label,
+            items: groups[label]
+        }));
+});
 
 // 动态更新知识库菜单项标题
 const kbMenuItem = computed(() => {
@@ -282,27 +347,27 @@ const upload = async (e: any) => {
         uploadInput.value.value = "";
     }
 }
-const mouseenteBotDownr = (val: number) => {
+const mouseenteBotDownr = (val: string) => {
     activeSubmenu.value = val;
 }
 const mouseleaveBotDown = () => {
-    activeSubmenu.value = -1;
-}
-const onVisibleChange = (_e: any) => {
+    activeSubmenu.value = '';
 }
 
 const delCard = (index: number, item: any) => {
     delSession(item.id).then((res: any) => {
         if (res && (res as any).success) {
-            (menuArr.value as any[])[1]?.children?.splice(index, 1);
+            // 使用 originalIndex 找到正确的位置进行删除
+            const actualIndex = index !== undefined ? index : 
+                (menuArr.value as any[])[1]?.children?.findIndex((s: any) => s.id === item.id);
+            
+            if (actualIndex !== -1) {
+                (menuArr.value as any[])[1]?.children?.splice(actualIndex, 1);
+            }
+            
             if (item.id == route.params.chatid) {
-                // 删除当前会话后，跳转到当前知识库的创建聊天页面
-                const kbId = route.params.kbId;
-                if (kbId) {
-                    router.push(`/platform/knowledge-bases/${kbId}/creatChat`);
-                } else {
-                    router.push('/platform/knowledge-bases');
-                }
+                // 删除当前会话后，跳转到全局创建聊天页面
+                router.push('/platform/creatChat');
             }
         } else {
             MessagePlugin.error("删除失败，请稍后再试!");
@@ -319,70 +384,89 @@ const debounce = (fn: (...args: any[]) => void, delay: number) => {
 // 滚动处理
 const checkScrollBottom = () => {
     const container = submenuscrollContainer.value
-    if (!container) return
+    if (!container || !container[0]) return
 
     const { scrollTop, scrollHeight, clientHeight } = container[0]
     const isBottom = scrollHeight - (scrollTop + clientHeight) < 100 // 触底阈值
-    if (isBottom && hasMore.value) {
+    
+    if (isBottom && hasMore.value && !loading.value) {
         currentPage.value++;
-        getMessageList();
+        getMessageList(true);
     }
 }
 const handleScroll = debounce(checkScrollBottom, 200)
-const getMessageList = async () => {
-    // 仅在知识库内部显示对话列表
-    if (!isInKnowledgeBase.value) {
-        usemenuStore.clearMenuArr();
-        currentKbName.value = '';
-        return;
-    }
+const getMessageList = async (isLoadMore = false) => {
+    // 全局显示对话列表（所有有"对话"入口的地方都显示）
     let kbId = (route.params as any)?.kbId as string
-    // 新的路由格式：/platform/chat/:kbId/:chatid，直接从路由参数获取知识库ID
-    if (!kbId) {
-        usemenuStore.clearMenuArr();
+    
+    // 如果在知识库内部，获取知识库名称和所有知识库列表
+    if (kbId && isInKnowledgeBase.value) {
+        try {
+            const [kbRes, allKbRes]: any[] = await Promise.all([
+                getKnowledgeBaseById(kbId),
+                listKnowledgeBases()
+            ])
+            if (kbRes?.data?.name) {
+                currentKbName.value = kbRes.data.name
+            }
+            if (allKbRes?.data) {
+                allKnowledgeBases.value = allKbRes.data
+            }
+        } catch {}
+    } else {
+        // 不在知识库内部时，清空知识库名称
         currentKbName.value = '';
-        return;
+        // 不在知识库列表页时才调用API（避免与页面组件KnowledgeBaseList.vue重复调用）
+        // 知识库列表页会自己调用listKnowledgeBases来显示列表
+        if (route.name !== 'knowledgeBaseList') {
+            try {
+                const allKbRes: any = await listKnowledgeBases()
+                if (allKbRes?.data) {
+                    allKnowledgeBases.value = allKbRes.data
+                }
+            } catch {}
+        }
     }
     
-    // 获取知识库名称和所有知识库列表
-    try {
-        const [kbRes, allKbRes]: any[] = await Promise.all([
-            getKnowledgeBaseById(kbId),
-            listKnowledgeBases()
-        ])
-        if (kbRes?.data?.name) {
-            currentKbName.value = kbRes.data.name
-        }
-        if (allKbRes?.data) {
-            allKnowledgeBases.value = allKbRes.data
-        }
-    } catch {}
-    
-    if (loading.value) return;
+    if (loading.value) return Promise.resolve();
     loading.value = true;
-    usemenuStore.clearMenuArr();
-    getSessionsList(currentPage.value, page_size.value).then((res: any) => {
+    
+    // 只有在首次加载或路由变化时才清空数组，滚动加载时不清空
+    if (!isLoadMore) {
+        currentPage.value = 1; // 重置页码
+        usemenuStore.clearMenuArr();
+    }
+    
+    return getSessionsList(currentPage.value, page_size.value).then((res: any) => {
         if (res.data && res.data.length) {
-            // 过滤出当前知识库的会话
-            const filtered = res.data.filter((s: any) => s.knowledge_base_id === kbId)
-            filtered.forEach((item: any) => {
-                let obj = { title: item.title ? item.title : "新会话", path: `chat/${kbId}/${item.id}`, id: item.id, isMore: false, isNoTitle: item.title ? false : true }
+            // Display all sessions globally without filtering
+            res.data.forEach((item: any) => {
+                let obj = { 
+                    title: item.title ? item.title : "新会话", 
+                    path: `chat/${item.id}`, 
+                    id: item.id, 
+                    isMore: false, 
+                    isNoTitle: item.title ? false : true,
+                    created_at: item.created_at,
+                    updated_at: item.updated_at
+                }
                 usemenuStore.updatemenuArr(obj)
             });
-            loading.value = false;
         }
         if ((res as any).total) {
             total.value = (res as any).total;
         }
+        loading.value = false;
+    }).catch(() => {
+        loading.value = false;
     })
 }
 
-const openMore = (_e: any) => { }
 onMounted(() => {
     const routeName = typeof route.name === 'string' ? route.name : (route.name ? String(route.name) : '')
     currentpath.value = routeName;
-    if (route.params.chatid && route.params.kbId) {
-        currentSecondpath.value = `chat/${route.params.kbId}/${route.params.chatid}`;
+    if (route.params.chatid) {
+        currentSecondpath.value = `chat/${route.params.chatid}`;
     }
     getMessageList();
 });
@@ -390,12 +474,12 @@ onMounted(() => {
 watch([() => route.name, () => route.params], (newvalue) => {
     const nameStr = typeof newvalue[0] === 'string' ? (newvalue[0] as string) : (newvalue[0] ? String(newvalue[0]) : '')
     currentpath.value = nameStr;
-    if (newvalue[1].chatid && newvalue[1].kbId) {
-        currentSecondpath.value = `chat/${newvalue[1].kbId}/${newvalue[1].chatid}`;
+    if (newvalue[1].chatid) {
+        currentSecondpath.value = `chat/${newvalue[1].chatid}`;
     } else {
         currentSecondpath.value = "";
     }
-    // 路由变化时刷新对话列表（仅在知识库内部）
+    // 路由变化时刷新对话列表
     getMessageList();
     // 路由变化时更新图标状态
     getIcon(nameStr);
@@ -553,11 +637,6 @@ watch(() => route.params.kbId, () => {
 
 </script>
 <style lang="less" scoped>
-.del_submenu {
-    color: #fa5151;
-    cursor: pointer;
-}
-
 .aside_box {
     min-width: 260px;
     padding: 8px;
@@ -733,10 +812,25 @@ watch(() => route.params.kbId, () => {
         min-height: 0;
         margin-left: 4px;
     }
+    
+    .timeline_header {
+        font-family: "PingFang SC";
+        font-size: 12px;
+        font-weight: 600;
+        color: #00000066;
+        padding: 12px 18px 6px 18px;
+        margin-top: 8px;
+        line-height: 20px;
+        user-select: none;
+        
+        &:first-child {
+            margin-top: 4px;
+        }
+    }
 
     .submenu_item_p {
         height: 44px;
-        padding: 4px 8px 4px 12px;
+        padding: 4px 8px 4px 0px;
         box-sizing: border-box;
     }
 
@@ -749,7 +843,7 @@ watch(() => route.params.kbId, () => {
         font-weight: 400;
         line-height: 22px;
         height: 36px;
-        padding-left: 18px;
+        padding-left: 0px;
         padding-right: 14px;
         position: relative;
 
@@ -761,6 +855,8 @@ watch(() => route.params.kbId, () => {
 
         .menu-more-wrap {
             margin-left: auto;
+            opacity: 0;
+            transition: opacity 0.2s ease;
         }
 
         .menu-more {
@@ -789,6 +885,10 @@ watch(() => route.params.kbId, () => {
                 color: #00000099;
             }
 
+            .menu-more-wrap {
+                opacity: 1;
+            }
+
             .submenu_title {
                 max-width: 160px !important;
 
@@ -803,6 +903,14 @@ watch(() => route.params.kbId, () => {
 
         .menu-more {
             color: #07c05f !important;
+        }
+
+        .menu-more-wrap {
+            opacity: 1;
+        }
+
+        .submenu_title {
+            max-width: 160px !important;
         }
     }
 }
@@ -908,19 +1016,6 @@ watch(() => route.params.kbId, () => {
     }
 }
 
-.del-menu-popup {
-    z-index: 99 !important;
-
-    .t-popup__content {
-        width: 100px;
-        height: 40px;
-        line-height: 30px;
-        padding-left: 14px;
-        cursor: pointer;
-        margin-top: 4px !important;
-
-    }
-}
 
 // 退出登录确认框样式
 :deep(.t-popconfirm) {

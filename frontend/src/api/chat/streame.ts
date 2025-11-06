@@ -28,7 +28,7 @@ export function useStream() {
   let renderTimer: number | null = null
 
   // 启动流式请求
-  const startStream = async (params: { session_id: any; query: any; method: string; url: string }) => {
+  const startStream = async (params: { session_id: any; query: any; knowledge_base_ids?: string[]; agent_enabled?: boolean; method: string; url: string }) => {
     // 重置状态
     output.value = '';
     error.value = null;
@@ -46,11 +46,33 @@ export function useStream() {
       return;
     }
 
+    // Validate knowledge_base_ids for agent-chat requests
+    const isAgentChat = params.url === '/api/v1/agent-chat';
+    if (isAgentChat && params.method === 'POST') {
+      if (!params.knowledge_base_ids || params.knowledge_base_ids.length === 0) {
+        error.value = "请至少选择一个知识库";
+        stopStream();
+        return;
+      }
+    }
+
     try {
       let url =
         params.method == "POST"
           ? `${apiUrl}${params.url}/${params.session_id}`
           : `${apiUrl}${params.url}/${params.session_id}?message_id=${params.query}`;
+      
+      // Prepare POST body with required fields for agent-chat
+      // knowledge_base_ids array and agent_enabled can update Session's SessionAgentConfig
+      const postBody: any = { 
+        query: params.query,
+        agent_enabled: params.agent_enabled !== undefined ? params.agent_enabled : true
+      };
+      // Always include knowledge_base_ids for agent-chat (already validated above)
+      if (params.knowledge_base_ids !== undefined && params.knowledge_base_ids.length > 0) {
+        postBody.knowledge_base_ids = params.knowledge_base_ids;
+      }
+      
       await fetchEventSource(url, {
         method: params.method,
         headers: {
@@ -60,7 +82,7 @@ export function useStream() {
         },
         body:
           params.method == "POST"
-            ? JSON.stringify({ query: params.query })
+            ? JSON.stringify(postBody)
             : null,
         signal: controller.signal,
         openWhenHidden: true,

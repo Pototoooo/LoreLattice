@@ -29,10 +29,11 @@ import { useRoute, useRouter, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vu
 import InputField from '../../components/Input-field.vue';
 import botmsg from './components/botmsg.vue';
 import usermsg from './components/usermsg.vue';
-import { getMessageList, generateSessionsTitle } from "@/api/chat/index";
+import { getMessageList, generateSessionsTitle, getSession } from "@/api/chat/index";
 import { useStream } from '../../api/chat/streame'
 import { useMenuStore } from '@/stores/menu';
 import { useSettingsStore } from '@/stores/settings';
+import { MessagePlugin } from 'tdesign-vue-next';
 const usemenuStore = useMenuStore();
 const useSettingsStoreInstance = useSettingsStore();
 const { menuArr, isFirstSession, firstQuery } = storeToRefs(usemenuStore);
@@ -40,7 +41,7 @@ const { output, onChunk, isStreaming, isLoading, error, startStream, stopStream 
 const route = useRoute();
 const router = useRouter();
 const session_id = ref(route.params.chatid);
-const knowledge_base_id = ref(route.params.kbId);
+const sessionData = ref(null);
 const created_at = ref('');
 const limit = ref(20);
 const messagesList = reactive([]);
@@ -60,7 +61,6 @@ watch([() => route.params], (newvalue) => {
         }
         messagesList.splice(0);
         session_id.value = newvalue[0].chatid;
-        knowledge_base_id.value = newvalue[0].kbId;
         checkmenuTitle(session_id.value)
         let data = {
             session_id: session_id.value,
@@ -107,6 +107,59 @@ const getmsgList = (data, isScrollType = false, scrollHeight) => {
         }
     })
 }
+
+// Reconstruct agentEventStream from agent_steps stored in database
+// This allows the frontend to restore the exact conversation state including all agent reasoning steps
+const reconstructEventStreamFromSteps = (agentSteps) => {
+    if (!agentSteps || !Array.isArray(agentSteps) || agentSteps.length === 0) {
+        return [];
+    }
+    
+    const events = [];
+    
+    agentSteps.forEach((step) => {
+        // Add thinking event if thought content exists
+        if (step.thought && step.thought.trim()) {
+            events.push({
+                type: 'thinking',
+                event_id: `step-${step.iteration}-thought`,
+                content: step.thought,
+                done: true,
+                thinking: false,
+            });
+        }
+        
+        // Add tool call and result events
+        if (step.tool_calls && Array.isArray(step.tool_calls)) {
+            step.tool_calls.forEach((toolCall) => {
+                events.push({
+                    type: 'tool_call',
+                    tool_call_id: toolCall.id,
+                    tool_name: toolCall.name,
+                    arguments: toolCall.args,
+                    pending: false,
+                    success: toolCall.result?.success !== false,
+                    output: toolCall.result?.output || '',
+                    error: toolCall.result?.error || undefined,
+                    duration: toolCall.duration,
+                    display_type: toolCall.result?.data?.display_type,
+                    tool_data: toolCall.result?.data,
+                });
+            });
+        }
+    });
+    
+    // 添加一个完成标记的 answer 事件，触发折叠逻辑
+    if (events.length > 0) {
+        events.push({
+            type: 'answer',
+            content: '',  // 空内容，因为最终答案会在 message.content 中
+            done: true
+        });
+    }
+    
+    return events;
+};
 const handleMsgList = async (data, isScrollType = false, newScrollHeight) => {
     let chatlist = data.reverse()
     for (let i = 0, len = chatlist.length; i < len; i++) {
@@ -115,6 +168,17 @@ const handleMsgList = async (data, isScrollType = false, newScrollHeight) => {
         item.agentEventStream = item.agentEventStream || [];
         item._eventMap = new Map();
         item._pendingToolCalls = new Map();
+        
+        // Check if this message has agent_steps from database (historical agent conversation)
+        // If so, reconstruct the agentEventStream to restore the exact conversation state
+        if (item.agent_steps && Array.isArray(item.agent_steps) && item.agent_steps.length > 0) {
+            console.log('[Message Load] Reconstructing agent steps for message:', item.id, 'steps:', item.agent_steps.length);
+            item.isAgentMode = true;
+            item.agentEventStream = reconstructEventStreamFromSteps(item.agent_steps);
+            // 隐藏最终答案内容，用户可以通过展开步骤查看完整过程
+            item.hideContent = true;
+            console.log('[Message Load] Reconstructed', item.agentEventStream.length, 'events from agent steps');
+        }
         
         if (item.content) {
             if (!item.content.includes('<think>') && !item.content.includes('<\/think>')) {
@@ -163,18 +227,41 @@ const sendMsg = async (value) => {
     messagesList.push({ content: value, role: 'user' });
     scrollToBottom();
     
-    // 判断是否使用 Agent 模式
-    const isAgentMode = useSettingsStoreInstance.isAgentEnabled;
-    const chatUrl = isAgentMode ? '/api/v1/agent-chat' : '/api/v1/knowledge-chat';
+    // Always use agent mode with unified architecture
+    // Get knowledge_base_ids from session's agent_config.knowledge_bases to update SessionAgentConfig
+    let kbIds = [];
+    if (sessionData.value?.agent_config?.knowledge_bases?.length > 0) {
+        kbIds = sessionData.value.agent_config.knowledge_bases;
+    }
+    
+    // Validate knowledge_base_ids before sending
+    if (kbIds.length === 0) {
+        MessagePlugin.warning('请至少选择一个知识库');
+        isReplying.value = false;
+        loading.value = false;
+        // Remove the user message that was just added
+        messagesList.pop();
+        return;
+    }
     
     await startStream({ 
         session_id: session_id.value, 
-        knowledge_base_id: knowledge_base_id.value,
+        knowledge_base_ids: kbIds,
+        agent_enabled: true,
         query: value, 
         method: 'POST', 
-        url: chatUrl
+        url: '/api/v1/agent-chat'
     });
 }
+
+// Watch for stream errors and show message
+watch(error, (newError) => {
+    if (newError) {
+        MessagePlugin.error(newError);
+        isReplying.value = false;
+        loading.value = false;
+    }
+});
 
 // 处理流式数据
 onChunk((data) => {
@@ -189,6 +276,33 @@ onChunk((data) => {
         content_preview: data.content ? data.content.substring(0, 50) : '',
         data: data.data
     });
+    
+    // 处理 agent query 事件 - 确保显示 loading 状态
+    if (data.response_type === 'agent_query') {
+        console.log('[Agent Query Event]', {
+            session_id: data.data?.session_id,
+            query: data.data?.query,
+            request_id: data.data?.request_id
+        });
+        // Loading state is already set in sendMsg, but ensure it's true
+        loading.value = true;
+        return;
+    }
+    
+    // 处理会话标题更新事件
+    if (data.response_type === 'session_title') {
+        const title = data.content || data.data?.title;
+        if (title && data.data?.session_id) {
+            console.log('[Session Title Update]', {
+                session_id: data.data.session_id,
+                title: title
+            });
+            usemenuStore.updatasessionTitle(data.data.session_id, title);
+            usemenuStore.changeIsFirstSession(false);
+            isNeedTitle.value = false;
+        }
+        return;
+    }
     
     // 判断是否是 Agent 模式的响应
     const isAgentResponse = data.response_type === 'thinking' || 
@@ -220,17 +334,8 @@ onChunk((data) => {
         obj.content = fullContent.value;
     }
     if (data.done) {
-        if (isFirstSession.value || isNeedTitle.value) {
-            generateSessionsTitle(session_id.value, {
-                messages: [{ role: "user", content: userquery.value }]
-            }).then(res => {
-                if (res.data) {
-                    usemenuStore.changeIsFirstSession(false);
-                    usemenuStore.updatasessionTitle(session_id.value, res.data);
-                    isNeedTitle.value = false;
-                }
-            })
-        }
+        // 标题生成已改为异步事件推送，不再需要在这里手动调用
+        // 如果标题还未生成，前端会通过 SSE 事件接收
         isReplying.value = false;
         fullContent.value = "";
     }
@@ -444,18 +549,8 @@ const handleAgentChunk = (data) => {
                 isReplying.value = false;
                 fullContent.value = '';
                 
-                // 生成标题
-                if (isFirstSession.value || isNeedTitle.value) {
-                    generateSessionsTitle(session_id.value, {
-                        messages: [{ role: "user", content: userquery.value }]
-                    }).then(res => {
-                        if (res.data) {
-                            usemenuStore.changeIsFirstSession(false);
-                            usemenuStore.updatasessionTitle(session_id.value, res.data);
-                            isNeedTitle.value = false;
-                        }
-                    });
-                }
+                // 标题生成已改为异步事件推送，不再需要在这里手动调用
+                // 如果标题还未生成，前端会通过 SSE 事件接收
             }
             break;
     }
@@ -481,13 +576,19 @@ const updateAssistantSession = (payload) => {
     }
     scrollToBottom();
 }
-onMounted(() => {
+onMounted(async () => {
     messagesList.splice(0);
-    // scrollContainer.value.addEventListener("scroll", () => {
-    //     if (scrollContainer.value.scrollTop == 0) {
-    //         onChatScrollTop();
-    //     }
-    // });
+    
+    // Load session data to get agent_config
+    try {
+        const sessionRes = await getSession(session_id.value);
+        if (sessionRes?.data) {
+            sessionData.value = sessionRes.data;
+        }
+    } catch (error) {
+        console.error('Failed to load session data:', error);
+    }
+    
     checkmenuTitle(session_id.value)
     if (firstQuery.value) {
         scrollLock.value = true;
@@ -546,7 +647,6 @@ onBeforeRouteUpdate((to, from, next) => {
     flex: 1;
     width: 100%;
     overflow-y: auto;
-    max-width: 800px;
 
     &::-webkit-scrollbar {
         width: 0;
@@ -586,6 +686,8 @@ onBeforeRouteUpdate((to, from, next) => {
     gap: 16px;
     max-width: 800px;
     flex: 1;
+    margin: 0 auto;
+    width: 100%;
 
     .botanswer_laoding_gif {
         width: 24px;

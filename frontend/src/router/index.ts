@@ -71,7 +71,7 @@ const router = createRouter({
           meta: { requiresInit: true, requiresAuth: true }
         },
         {
-          path: "chat/:kbId/:chatid",
+          path: "chat/:chatid",
           name: "chat",
           component: () => import("../views/chat/index.vue"),
           meta: { requiresInit: true, requiresAuth: true }

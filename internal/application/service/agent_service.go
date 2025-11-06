@@ -53,6 +53,8 @@ func (s *agentService) CreateAgentEngine(
 	ctx context.Context,
 	config *types.AgentConfig,
 	eventBus *event.EventBus,
+	contextManager interfaces.ContextManager,
+	sessionID string,
 ) (interfaces.AgentEngine, error) {
 	logger.Infof(ctx, "Creating agent engine with custom EventBus")
 
@@ -103,7 +105,7 @@ func (s *agentService) CreateAgentEngine(
 		}
 	}
 
-	// Create engine with provided EventBus
+	// Create engine with provided EventBus and contextManager
 	engine := agent.NewAgentEngine(
 		config,
 		chatModel,
@@ -111,6 +113,8 @@ func (s *agentService) CreateAgentEngine(
 		s.knowledgeBaseService,
 		eventBus,
 		kbInfos,
+		contextManager,
+		sessionID,
 	)
 
 	return engine, nil

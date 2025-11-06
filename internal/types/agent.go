@@ -7,7 +7,8 @@ import (
 	"time"
 )
 
-// AgentConfig represents the configuration for an agent session
+// AgentConfig represents the full agent configuration (used at tenant level and runtime)
+// This includes all configuration parameters for agent execution
 type AgentConfig struct {
 	Enabled           bool     `json:"enabled"`            // Whether agent mode is enabled
 	MaxIterations     int      `json:"max_iterations"`     // Maximum number of ReAct iterations
@@ -19,6 +20,13 @@ type AgentConfig struct {
 	KnowledgeBases    []string `json:"knowledge_bases"`    // Accessible knowledge base IDs
 }
 
+// SessionAgentConfig represents session-level agent configuration
+// Sessions only store Enabled and KnowledgeBases; other configs are read from Tenant at runtime
+type SessionAgentConfig struct {
+	Enabled        bool     `json:"enabled"`         // Whether agent mode is enabled for this session
+	KnowledgeBases []string `json:"knowledge_bases"` // Accessible knowledge base IDs for this session
+}
+
 // Value implements driver.Valuer interface for AgentConfig
 func (c AgentConfig) Value() (driver.Value, error) {
 	return json.Marshal(c)
@@ -26,6 +34,23 @@ func (c AgentConfig) Value() (driver.Value, error) {
 
 // Scan implements sql.Scanner interface for AgentConfig
 func (c *AgentConfig) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+	b, ok := value.([]byte)
+	if !ok {
+		return nil
+	}
+	return json.Unmarshal(b, c)
+}
+
+// Value implements driver.Valuer interface for SessionAgentConfig
+func (c SessionAgentConfig) Value() (driver.Value, error) {
+	return json.Marshal(c)
+}
+
+// Scan implements sql.Scanner interface for SessionAgentConfig
+func (c *SessionAgentConfig) Scan(value interface{}) error {
 	if value == nil {
 		return nil
 	}

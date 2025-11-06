@@ -9,11 +9,12 @@ type ChatManage struct {
 	RewriteQuery   string     `json:"rewrite_query,omitempty"`   // Query after rewriting for better retrieval
 	History        []*History `json:"history,omitempty"`         // Chat history for context
 
-	KnowledgeBaseID  string  `json:"knowledge_base_id"` // ID of the knowledge base to search against
-	VectorThreshold  float64 `json:"vector_threshold"`  // Minimum score threshold for vector search results
-	KeywordThreshold float64 `json:"keyword_threshold"` // Minimum score threshold for keyword search results
-	EmbeddingTopK    int     `json:"embedding_top_k"`   // Number of top results to retrieve from embedding search
-	VectorDatabase   string  `json:"vector_database"`   // Vector database type/name to use
+	KnowledgeBaseID  string   `json:"knowledge_base_id"`  // ID of the knowledge base to search against (deprecated, use KnowledgeBaseIDs)
+	KnowledgeBaseIDs []string `json:"knowledge_base_ids"` // IDs of knowledge bases to search (multi-KB support)
+	VectorThreshold  float64  `json:"vector_threshold"`   // Minimum score threshold for vector search results
+	KeywordThreshold float64  `json:"keyword_threshold"`  // Minimum score threshold for keyword search results
+	EmbeddingTopK    int      `json:"embedding_top_k"`    // Number of top results to retrieve from embedding search
+	VectorDatabase   string   `json:"vector_database"`    // Vector database type/name to use
 
 	RerankModelID   string  `json:"rerank_model_id"`  // Model ID for reranking search results
 	RerankTopK      int     `json:"rerank_top_k"`     // Number of top results after reranking
@@ -37,12 +38,17 @@ type ChatManage struct {
 
 // Clone creates a deep copy of the ChatManage object
 func (c *ChatManage) Clone() *ChatManage {
+	// Deep copy knowledge base IDs slice
+	knowledgeBaseIDs := make([]string, len(c.KnowledgeBaseIDs))
+	copy(knowledgeBaseIDs, c.KnowledgeBaseIDs)
+
 	return &ChatManage{
 		Query:            c.Query,
 		ProcessedQuery:   c.ProcessedQuery,
 		RewriteQuery:     c.RewriteQuery,
 		SessionID:        c.SessionID,
 		KnowledgeBaseID:  c.KnowledgeBaseID,
+		KnowledgeBaseIDs: knowledgeBaseIDs,
 		VectorThreshold:  c.VectorThreshold,
 		KeywordThreshold: c.KeywordThreshold,
 		EmbeddingTopK:    c.EmbeddingTopK,

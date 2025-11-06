@@ -2,6 +2,7 @@ package chatpipline
 
 import (
 	"context"
+	"sync"
 
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/types"
@@ -45,17 +46,56 @@ func (p *PluginSearchEntity) OnEvent(ctx context.Context,
 		return next()
 	}
 
-	graph, err := p.graphRepo.SearchNode(ctx, types.NameSpace{KnowledgeBase: chatManage.KnowledgeBaseID}, entity)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to search node, session_id: %s, error: %v", chatManage.SessionID, err)
+	// Get knowledge base IDs list
+	knowledgeBaseIDs := chatManage.KnowledgeBaseIDs
+	if len(knowledgeBaseIDs) == 0 && chatManage.KnowledgeBaseID != "" {
+		knowledgeBaseIDs = []string{chatManage.KnowledgeBaseID}
+		logger.Infof(ctx, "No KnowledgeBaseIDs provided, falling back to single KB: %s", chatManage.KnowledgeBaseID)
+	}
+
+	if len(knowledgeBaseIDs) == 0 {
+		logger.Warnf(ctx, "No knowledge base IDs available for entity search")
 		return next()
 	}
-	chatManage.GraphResult = graph
-	logger.Infof(ctx, "search entity result count: %d", len(graph.Node))
-	// graphStr, _ := json.Marshal(graph)
-	// logger.Debugf(ctx, "search entity result: %s", string(graphStr))
 
-	chunkIDs := filterSeenChunk(ctx, graph, chatManage.SearchResult)
+	logger.Infof(ctx, "Searching entities across %d knowledge base(s): %v", len(knowledgeBaseIDs), knowledgeBaseIDs)
+
+	// Parallel search across multiple knowledge bases
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var allNodes []*types.GraphNode
+	var allRelations []*types.GraphRelation
+
+	for _, kbID := range knowledgeBaseIDs {
+		wg.Add(1)
+		go func(knowledgeBaseID string) {
+			defer wg.Done()
+
+			graph, err := p.graphRepo.SearchNode(ctx, types.NameSpace{KnowledgeBase: knowledgeBaseID}, entity)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to search entity in KB %s: %v", knowledgeBaseID, err)
+				return
+			}
+
+			logger.Infof(ctx, "KB %s entity search result count: %d nodes, %d relations", knowledgeBaseID, len(graph.Node), len(graph.Relation))
+
+			mu.Lock()
+			allNodes = append(allNodes, graph.Node...)
+			allRelations = append(allRelations, graph.Relation...)
+			mu.Unlock()
+		}(kbID)
+	}
+
+	wg.Wait()
+
+	// Merge graph data
+	chatManage.GraphResult = &types.GraphData{
+		Node:     allNodes,
+		Relation: allRelations,
+	}
+	logger.Infof(ctx, "Total entity search result: %d nodes, %d relations", len(allNodes), len(allRelations))
+
+	chunkIDs := filterSeenChunk(ctx, chatManage.GraphResult, chatManage.SearchResult)
 	if len(chunkIDs) == 0 {
 		logger.Infof(ctx, "No new chunk found")
 		return next()

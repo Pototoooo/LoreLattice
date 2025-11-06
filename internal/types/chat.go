@@ -54,6 +54,10 @@ const (
 	ResponseTypeError ResponseType = "error"
 	// Reflection response type (for agent reflection)
 	ResponseTypeReflection ResponseType = "reflection"
+	// Session title response type
+	ResponseTypeSessionTitle ResponseType = "session_title"
+	// Agent query response type (query received and processing started)
+	ResponseTypeAgentQuery ResponseType = "agent_query"
 )
 
 // StreamResponse stream response

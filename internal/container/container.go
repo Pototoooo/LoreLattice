@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/neo4j/neo4j-go-driver/v6/neo4j"
 	"github.com/panjf2000/ants/v2"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/dig"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -28,6 +29,7 @@ import (
 	"github.com/Tencent/WeKnora/internal/application/service"
 	chatpipline "github.com/Tencent/WeKnora/internal/application/service/chat_pipline"
 	"github.com/Tencent/WeKnora/internal/application/service/file"
+	"github.com/Tencent/WeKnora/internal/application/service/llmcontext"
 	"github.com/Tencent/WeKnora/internal/application/service/retriever"
 	"github.com/Tencent/WeKnora/internal/config"
 	"github.com/Tencent/WeKnora/internal/event"
@@ -60,7 +62,9 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(initTracer))
 	must(container.Provide(initDatabase))
 	must(container.Provide(initFileService))
+	must(container.Provide(initRedisClient))
 	must(container.Provide(initAntsPool))
+	must(container.Provide(initContextStorage))
 
 	// Register goroutine pool cleanup handler
 	must(container.Invoke(registerPoolCleanup))
@@ -164,6 +168,35 @@ func must(err error) {
 //   - Error if initialization fails
 func initTracer() (*tracing.Tracer, error) {
 	return tracing.InitTracer()
+}
+
+func initRedisClient() (*redis.Client, error) {
+	db, err := strconv.Atoi(os.Getenv("REDIS_DB"))
+	if err != nil {
+		return nil, err
+	}
+
+	client := redis.NewClient(&redis.Options{
+		Addr:     os.Getenv("REDIS_ADDR"),
+		Password: os.Getenv("REDIS_PASSWORD"),
+		DB:       db,
+	})
+
+	// 验证连接
+	_, err = client.Ping(context.Background()).Result()
+	if err != nil {
+		return nil, fmt.Errorf("连接Redis失败: %w", err)
+	}
+
+	return client, nil
+}
+
+func initContextStorage(redisClient *redis.Client) (llmcontext.ContextStorage, error) {
+	storage, err := llmcontext.NewRedisStorage(redisClient, 24*time.Hour, "context:")
+	if err != nil {
+		return nil, err
+	}
+	return storage, nil
 }
 
 // initDatabase initializes database connection

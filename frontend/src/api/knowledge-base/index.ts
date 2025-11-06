@@ -5,7 +5,18 @@ export function listKnowledgeBases() {
   return get(`/api/v1/knowledge-bases`);
 }
 
-export function createKnowledgeBase(data: { name: string; description?: string; chunking_config?: any }) {
+export function createKnowledgeBase(data: { 
+  name: string; 
+  description?: string; 
+  chunking_config?: any;
+  embedding_model_id?: string;
+  summary_model_id?: string;
+  rerank_model_id?: string;
+  vlm_model_id?: string;
+  vlm_config?: any;
+  cos_config?: any;
+  extract_config?: any;
+}) {
   return post(`/api/v1/knowledge-bases`, data);
 }
 

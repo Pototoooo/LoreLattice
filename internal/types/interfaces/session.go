@@ -22,10 +22,14 @@ type SessionService interface {
 	// DeleteSession deletes a session
 	DeleteSession(ctx context.Context, id string) error
 	// GenerateTitle generates a title for the current conversation
-	GenerateTitle(ctx context.Context, sessionID string, messages []types.Message) (string, error)
+	GenerateTitle(ctx context.Context, session *types.Session, messages []types.Message) (string, error)
+	// GenerateTitleAsync generates a title for the session asynchronously
+	// It emits an event when the title is generated
+	GenerateTitleAsync(ctx context.Context, session *types.Session, userQuery string, eventBus *event.EventBus)
 	// KnowledgeQA performs knowledge-based question answering
+	// knowledgeBaseIDs: list of knowledge base IDs to search (supports multi-KB)
 	KnowledgeQA(ctx context.Context,
-		sessionID, query string,
+		session *types.Session, query string, knowledgeBaseIDs []string,
 	) ([]*types.SearchResult, <-chan types.StreamResponse, error)
 	// KnowledgeQAByEvent performs knowledge-based question answering by event
 	KnowledgeQAByEvent(ctx context.Context, chatManage *types.ChatManage, eventList []types.EventType) error
@@ -34,6 +38,8 @@ type SessionService interface {
 	// AgentQA performs agent-based question answering with conversation history and streaming support
 	// eventBus is optional - if nil, uses service's default EventBus
 	AgentQA(ctx context.Context, session *types.Session, query string, assistantMessageID string, eventBus *event.EventBus) ([]*types.SearchResult, error)
+	// ClearContext clears the LLM context for a session
+	ClearContext(ctx context.Context, sessionID string) error
 }
 
 // SessionRepository defines the session repository interface

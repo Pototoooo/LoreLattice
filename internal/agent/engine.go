@@ -28,7 +28,9 @@ type AgentEngine struct {
 	chatModel          chat.Chat
 	knowledgeService   interfaces.KnowledgeBaseService
 	eventBus           *event.EventBus
-	knowledgeBasesInfo []*KnowledgeBaseInfo // Detailed knowledge base information for prompt
+	knowledgeBasesInfo []*KnowledgeBaseInfo      // Detailed knowledge base information for prompt
+	contextManager     interfaces.ContextManager // Context manager for writing agent conversation to LLM context
+	sessionID          string                    // Session ID for context management
 }
 
 // listToolNames returns tool.function names for logging
@@ -48,6 +50,8 @@ func NewAgentEngine(
 	knowledgeService interfaces.KnowledgeBaseService,
 	eventBus *event.EventBus,
 	knowledgeBasesInfo []*KnowledgeBaseInfo,
+	contextManager interfaces.ContextManager,
+	sessionID string,
 ) *AgentEngine {
 	if eventBus == nil {
 		eventBus = event.NewEventBus()
@@ -59,14 +63,16 @@ func NewAgentEngine(
 		knowledgeService:   knowledgeService,
 		eventBus:           eventBus,
 		knowledgeBasesInfo: knowledgeBasesInfo,
+		contextManager:     contextManager,
+		sessionID:          sessionID,
 	}
 }
 
 // Execute executes the agent with conversation history and streaming output
 // All events are emitted to EventBus and handled by subscribers (like Handler layer)
-func (e *AgentEngine) Execute(ctx context.Context, sessionID, query string, llmContext []chat.Message) (*types.AgentState, error) {
+func (e *AgentEngine) Execute(ctx context.Context, sessionID, messageID, query string, llmContext []chat.Message) (*types.AgentState, error) {
 	logger.Infof(ctx, "========== Agent Execution Started ==========")
-	logger.Infof(ctx, "[Agent] SessionID: %s", sessionID)
+	logger.Infof(ctx, "[Agent] SessionID: %s, MessageID: %s", sessionID, messageID)
 	logger.Infof(ctx, "[Agent] User Query: %s", query)
 	logger.Infof(ctx, "[Agent] LLM Context Messages: %d", len(llmContext))
 
@@ -92,7 +98,7 @@ func (e *AgentEngine) Execute(ctx context.Context, sessionID, query string, llmC
 	tools := e.buildToolsForLLM()
 	logger.Infof(ctx, "[Agent] Tools enabled (%d): %s", len(tools), strings.Join(listToolNames(tools), ", "))
 
-	_, err := e.executeLoop(ctx, state, query, messages, tools, sessionID)
+	_, err := e.executeLoop(ctx, state, query, messages, tools, sessionID, messageID)
 	if err != nil {
 		logger.Errorf(ctx, "[Agent] Execution failed: %v", err)
 		e.eventBus.Emit(ctx, event.Event{
@@ -123,6 +129,7 @@ func (e *AgentEngine) executeLoop(
 	messages []chat.Message,
 	tools []chat.Tool,
 	sessionID string,
+	messageID string,
 ) (*types.AgentState, error) {
 	startTime := time.Now()
 	for state.CurrentRound < e.config.MaxIterations {
@@ -336,8 +343,8 @@ func (e *AgentEngine) executeLoop(
 		}
 
 		state.RoundSteps = append(state.RoundSteps, step)
-		// 4. Observe: Add tool results to messages
-		messages = e.appendToolResults(messages, step)
+		// 4. Observe: Add tool results to messages and write to context
+		messages = e.appendToolResults(ctx, messages, step)
 		// 5. Check if we should continue
 		state.CurrentRound++
 	}
@@ -371,6 +378,7 @@ func (e *AgentEngine) executeLoop(
 			AgentSteps:    state.RoundSteps, // Include detailed execution steps for message storage
 			TotalSteps:    len(state.RoundSteps),
 			TotalDuration: time.Since(startTime).Milliseconds(),
+			MessageID:     messageID, // Include message ID for proper message update
 		},
 	})
 
@@ -397,7 +405,8 @@ func (e *AgentEngine) buildToolsForLLM() []chat.Tool {
 }
 
 // appendToolResults adds tool results to the message history following OpenAI's tool calling format
-func (e *AgentEngine) appendToolResults(messages []chat.Message, step types.AgentStep) []chat.Message {
+// Also writes these messages to the context manager for persistence
+func (e *AgentEngine) appendToolResults(ctx context.Context, messages []chat.Message, step types.AgentStep) []chat.Message {
 	// Add assistant message with tool calls (if any)
 	if step.Thought != "" || len(step.ToolCalls) > 0 {
 		assistantMsg := chat.Message{
@@ -424,6 +433,15 @@ func (e *AgentEngine) appendToolResults(messages []chat.Message, step types.Agen
 		}
 
 		messages = append(messages, assistantMsg)
+
+		// Write assistant message to context
+		if e.contextManager != nil {
+			if err := e.contextManager.AddMessage(ctx, e.sessionID, assistantMsg); err != nil {
+				logger.Warnf(ctx, "[Agent] Failed to add assistant message to context: %v", err)
+			} else {
+				logger.Debugf(ctx, "[Agent] Added assistant message to context (session: %s)", e.sessionID)
+			}
+		}
 	}
 
 	// Add tool result messages (role: "tool", following OpenAI format)
@@ -433,12 +451,23 @@ func (e *AgentEngine) appendToolResults(messages []chat.Message, step types.Agen
 			resultContent = fmt.Sprintf("Error: %s", toolCall.Result.Error)
 		}
 
-		messages = append(messages, chat.Message{
+		toolMsg := chat.Message{
 			Role:       "tool",
 			Content:    resultContent,
 			ToolCallID: toolCall.ID,
 			Name:       toolCall.Name,
-		})
+		}
+
+		messages = append(messages, toolMsg)
+
+		// Write tool message to context
+		if e.contextManager != nil {
+			if err := e.contextManager.AddMessage(ctx, e.sessionID, toolMsg); err != nil {
+				logger.Warnf(ctx, "[Agent] Failed to add tool message to context: %v", err)
+			} else {
+				logger.Debugf(ctx, "[Agent] Added tool message to context (session: %s, tool: %s)", e.sessionID, toolCall.Name)
+			}
+		}
 	}
 
 	return messages
