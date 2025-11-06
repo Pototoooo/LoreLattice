@@ -29,9 +29,9 @@ type Tenant struct {
 	// Storage used (Bytes)
 	StorageUsed int64 `yaml:"storage_used" json:"storage_used" gorm:"default:0"`
 	// Global Agent configuration for this tenant (default for all sessions)
-	AgentConfig *AgentConfig `yaml:"agent_config" json:"agent_config" gorm:"type:json"`
+	AgentConfig *AgentConfig `yaml:"agent_config" json:"agent_config" gorm:"type:jsonb"`
 	// Global Context configuration for this tenant (default for all sessions)
-	ContextConfig *ContextConfig `yaml:"context_config" json:"context_config" gorm:"type:json"`
+	ContextConfig *ContextConfig `yaml:"context_config" json:"context_config" gorm:"type:jsonb"`
 	// Creation time
 	CreatedAt time.Time `yaml:"created_at" json:"created_at"`
 	// Last updated time

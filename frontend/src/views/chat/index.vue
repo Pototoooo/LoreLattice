@@ -227,12 +227,14 @@ const sendMsg = async (value) => {
     messagesList.push({ content: value, role: 'user' });
     scrollToBottom();
     
-    // Always use agent mode with unified architecture
+    // Get agent mode status from settings store
+    const agentEnabled = useSettingsStoreInstance.isAgentEnabled;
+    
     // Get knowledge_base_ids from settings store (selected by user via KnowledgeBaseSelector)
     const kbIds = useSettingsStoreInstance.settings.selectedKnowledgeBases || [];
     
-    // Validate knowledge_base_ids before sending
-    if (kbIds.length === 0) {
+    // Validate knowledge_base_ids before sending (only when agent mode is enabled)
+    if (agentEnabled && kbIds.length === 0) {
         MessagePlugin.warning('请至少选择一个知识库');
         isReplying.value = false;
         loading.value = false;
@@ -241,13 +243,16 @@ const sendMsg = async (value) => {
         return;
     }
     
+    // Use agent-chat endpoint when agent is enabled, otherwise use knowledge-chat
+    const endpoint = agentEnabled ? '/api/v1/agent-chat' : '/api/v1/knowledge-chat';
+    
     await startStream({ 
         session_id: session_id.value, 
         knowledge_base_ids: kbIds,
-        agent_enabled: true,
+        agent_enabled: agentEnabled,
         query: value, 
         method: 'POST', 
-        url: '/api/v1/agent-chat'
+        url: endpoint
     });
 }
 

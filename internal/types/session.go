@@ -93,8 +93,8 @@ type Session struct {
 	RerankThreshold   float64             `json:"rerank_threshold"`                    // 排序阈值
 	SummaryModelID    string              `json:"summary_model_id"`                    // 总结模型ID
 	SummaryParameters *SummaryConfig      `json:"summary_parameters" gorm:"type:json"` // 总结模型参数
-	AgentConfig       *SessionAgentConfig `json:"agent_config" gorm:"type:json"`       // Agent 配置（会话级别，仅存储enabled和knowledge_bases）
-	ContextConfig     *ContextConfig      `json:"context_config" gorm:"type:json"`     // 上下文管理配置（可选）
+	AgentConfig       *SessionAgentConfig `json:"agent_config" gorm:"type:jsonb"`       // Agent 配置（会话级别，仅存储enabled和knowledge_bases）
+	ContextConfig     *ContextConfig      `json:"context_config" gorm:"type:jsonb"`     // 上下文管理配置（可选）
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
