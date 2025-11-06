@@ -26,7 +26,7 @@
                     }]"
                     @click="handleNavClick(item)"
                   >
-                    <span class="nav-icon">{{ item.icon }}</span>
+                    <t-icon :name="item.icon" class="nav-icon" />
                     <span class="nav-label">{{ item.label }}</span>
                     <t-icon 
                       v-if="item.children && item.children.length > 0"
@@ -116,10 +116,10 @@ const currentSubSection = ref<string>('')
 const expandedMenus = ref<string[]>([])
 
 const navItems = [
-  { key: 'general', icon: '⚙️', label: '常规' },
+  { key: 'general', icon: 'setting', label: '常规' },
   { 
     key: 'models', 
-    icon: '🤖', 
+    icon: 'control-platform', 
     label: '模型配置',
     children: [
       { key: 'chat', label: '对话模型' },
@@ -128,10 +128,10 @@ const navItems = [
       { key: 'vllm', label: 'VLLM' }
     ]
   },
-  { key: 'ollama', icon: '🦙', label: 'Ollama' },
-  { key: 'knowledge', icon: '📚', label: '知识库' },
-  { key: 'agent', icon: '🧠', label: 'Agent 配置' },
-  { key: 'system', icon: 'ℹ️', label: '系统信息' }
+  { key: 'ollama', icon: 'server', label: 'Ollama' },
+  { key: 'knowledge', icon: 'folder-open', label: '知识库' },
+  { key: 'agent', icon: 'chat', label: 'Agent 配置' },
+  { key: 'system', icon: 'info-circle', label: '系统信息' }
 ]
 
 // 导航项点击处理
@@ -350,12 +350,12 @@ onUnmounted(() => {
 
 .nav-icon {
   margin-right: 12px;
-  font-size: 16px;
+  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  flex-shrink: 0;
+  color: inherit;
 }
 
 .nav-label {

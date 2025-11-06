@@ -17,15 +17,15 @@
     <Transition name="dropdown">
       <div v-if="menuVisible" class="user-dropdown" @click.stop>
         <div class="menu-item" @click="handleQuickNav('models')">
-          <t-icon name="component" class="menu-icon" />
+          <t-icon name="control-platform" class="menu-icon" />
           <span>模型配置</span>
         </div>
         <div class="menu-item" @click="handleQuickNav('ollama')">
-          <span class="menu-icon emoji-icon">🦙</span>
+          <t-icon name="server" class="menu-icon" />
           <span>Ollama</span>
         </div>
         <div class="menu-item" @click="handleQuickNav('knowledge')">
-          <t-icon name="layers" class="menu-icon" />
+          <t-icon name="folder-open" class="menu-icon" />
           <span>知识库</span>
         </div>
         <div class="menu-divider"></div>
@@ -39,7 +39,7 @@
           <span>API 文档</span>
         </div>
         <div class="menu-item" @click="openWebsite">
-          <t-icon name="internet" class="menu-icon" />
+          <t-icon name="home" class="menu-icon" />
           <span>官网</span>
         </div>
         <div class="menu-item" @click="openGithub">
@@ -314,11 +314,6 @@ onUnmounted(() => {
   height: 1px;
   background: #e5e7eb;
   margin: 4px 0;
-}
-
-.emoji-icon {
-  font-size: 16px;
-  line-height: 1;
 }
 
 // 下拉动画
