@@ -34,6 +34,19 @@
           <span>全部设置</span>
         </div>
         <div class="menu-divider"></div>
+        <div class="menu-item" @click="openApiDoc">
+          <t-icon name="book" class="menu-icon" />
+          <span>API 文档</span>
+        </div>
+        <div class="menu-item" @click="openWebsite">
+          <t-icon name="internet" class="menu-icon" />
+          <span>官网</span>
+        </div>
+        <div class="menu-item" @click="openGithub">
+          <t-icon name="logo-github" class="menu-icon" />
+          <span>GitHub</span>
+        </div>
+        <div class="menu-divider"></div>
         <div class="menu-item danger" @click="handleLogout">
           <t-icon name="logout" class="menu-icon" />
           <span>注销</span>
@@ -98,6 +111,24 @@ const handleSettings = () => {
   menuVisible.value = false
   uiStore.openSettings()
   router.push('/platform/settings')
+}
+
+// 打开 API 文档
+const openApiDoc = () => {
+  menuVisible.value = false
+  window.open('https://github.com/Tencent/WeKnora/blob/main/docs/API.md', '_blank')
+}
+
+// 打开官网
+const openWebsite = () => {
+  menuVisible.value = false
+  window.open('https://weknora.weixin.qq.com/', '_blank')
+}
+
+// 打开 GitHub
+const openGithub = () => {
+  menuVisible.value = false
+  window.open('https://github.com/Tencent/WeKnora', '_blank')
 }
 
 // 注销

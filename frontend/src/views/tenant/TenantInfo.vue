@@ -140,28 +140,6 @@
           </t-descriptions>
         </div>
       </t-card>
-
-      <!-- API 开发文档卡片 -->
-      <t-card class="info-card" :bordered="false">
-        <template #header>
-          <div class="card-title">API 开发文档</div>
-        </template>
-        <div class="doc-content">
-          <p class="doc-description">使用您的 API Key 开始开发，查看完整的 API 文档和示例代码。</p>
-          <t-space class="doc-actions">
-            <t-button 
-              theme="primary" 
-              @click="openApiDoc"
-            >
-              <template #icon>
-                <t-icon name="link" />
-              </template>
-              查看 API 文档
-            </t-button>
-          </t-space>
-          
-        </div>
-      </t-card>
     </div>
 
     <!-- 加载状态 -->
@@ -265,10 +243,6 @@ const copyApiKey = async () => {
       MessagePlugin.success('API Key 已复制到剪贴板')
     })
   }
-}
-
-const openApiDoc = () => {
-  window.open('https://github.com/Tencent/WeKnora/blob/main/docs/API.md', '_blank')
 }
 
 const getStatusText = (status: string | undefined) => {
@@ -420,39 +394,6 @@ onMounted(() => {
   }
 }
 
-.doc-description {
-  margin-bottom: 16px;
-  color: #666666;
-  font-size: 14px;
-}
-
-.doc-actions {
-  margin-bottom: 20px;
-}
-
-.api-example {
-  margin-top: 20px;
-  padding: 16px;
-  background-color: #f8f9fa;
-  border-radius: 6px;
-
-  .example-header h4 {
-    margin: 0 0 16px 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: #000000;
-  }
-
-  .code-textarea {
-    margin-bottom: 16px;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  }
-
-  .example-note {
-    margin-top: 16px;
-  }
-}
-
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -495,17 +436,6 @@ onMounted(() => {
     color: #666;
     font-size: 12px;
     margin-left: 8px;
-  }
-
-  .doc-actions {
-    :deep(.t-space) {
-      flex-direction: column;
-      width: 100%;
-      
-      .t-button {
-        width: 100%;
-      }
-    }
   }
 }
 
