@@ -36,4 +36,5 @@ data/files/
 ### macOS
 # General
 .DS_Store
-/scripts/scale_dev_jobs.shserver
+/scripts/scale_dev_jobs.sh
+server
