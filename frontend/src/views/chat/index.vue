@@ -228,11 +228,8 @@ const sendMsg = async (value) => {
     scrollToBottom();
     
     // Always use agent mode with unified architecture
-    // Get knowledge_base_ids from session's agent_config.knowledge_bases to update SessionAgentConfig
-    let kbIds = [];
-    if (sessionData.value?.agent_config?.knowledge_bases?.length > 0) {
-        kbIds = sessionData.value.agent_config.knowledge_bases;
-    }
+    // Get knowledge_base_ids from settings store (selected by user via KnowledgeBaseSelector)
+    const kbIds = useSettingsStoreInstance.settings.selectedKnowledgeBases || [];
     
     // Validate knowledge_base_ids before sending
     if (kbIds.length === 0) {

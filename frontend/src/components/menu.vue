@@ -538,12 +538,13 @@ const handleLogout = () => {
 }
 
 const getCurrentKbId = async (): Promise<string | null> => {
+    // Session 不再和知识库绑定，从当前路由获取知识库ID（仅用于知识库详情页）
     let kbId = (route.params as any)?.kbId as string
-    // 新的路由格式：/platform/chat/:kbId/:chatid，直接从路由参数获取
-    if (!kbId && route.name === 'chat' && (route.params as any)?.kbId) {
-        kbId = (route.params as any).kbId
+    // 如果当前在知识库详情页，返回知识库ID
+    if (route.name === 'knowledgeBaseDetail' && kbId) {
+        return kbId
     }
-    return kbId || null
+    return null
 }
 
 const gotopage = async (path: string) => {

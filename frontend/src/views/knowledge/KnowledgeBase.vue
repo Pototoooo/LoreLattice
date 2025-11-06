@@ -179,7 +179,7 @@ const getTitle = (session_id: string, value: string) => {
   const now = new Date().toISOString();
   let obj = { 
     title: '新会话', 
-    path: `chat/${kbId.value}/${session_id}`, 
+    path: `chat/${session_id}`, 
     id: session_id, 
     isMore: false, 
     isNoTitle: true,
@@ -189,32 +189,12 @@ const getTitle = (session_id: string, value: string) => {
   usemenuStore.updataMenuChildren(obj);
   usemenuStore.changeIsFirstSession(true);
   usemenuStore.changeFirstQuery(value);
-  router.push(`/platform/chat/${kbId.value}/${session_id}`);
+  router.push(`/platform/chat/${session_id}`);
 };
 
 async function createNewSession(value: string): Promise<void> {
-  // 优先使用当前页面的知识库ID
-  let sessionKbId = kbId.value;
-  
-  // 如果当前页面没有知识库ID，尝试从localStorage获取设置中的知识库ID
-  if (!sessionKbId) {
-    const settingsStr = localStorage.getItem("WeKnora_settings");
-    if (settingsStr) {
-      try {
-        const settings = JSON.parse(settingsStr);
-        sessionKbId = settings.knowledgeBaseId;
-      } catch (e) {
-        console.error("解析设置失败:", e);
-      }
-    }
-  }
-  
-  if (!sessionKbId) {
-    MessagePlugin.warning("请先选择一个知识库");
-    return;
-  }
-  
-  createSessions({ knowledge_base_id: sessionKbId }).then(res => {
+  // Session 不再和知识库绑定，直接创建 Session
+  createSessions({}).then(res => {
     if (res.data && res.data.id) {
       getTitle(res.data.id, value);
     } else {

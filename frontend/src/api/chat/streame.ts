@@ -47,14 +47,11 @@ export function useStream() {
     }
 
     // Validate knowledge_base_ids for agent-chat requests
+    // Note: knowledge_base_ids can be empty if user hasn't selected any, but we allow it
+    // The backend will handle the case when no knowledge bases are selected
     const isAgentChat = params.url === '/api/v1/agent-chat';
-    if (isAgentChat && params.method === 'POST') {
-      if (!params.knowledge_base_ids || params.knowledge_base_ids.length === 0) {
-        error.value = "请至少选择一个知识库";
-        stopStream();
-        return;
-      }
-    }
+    // Removed validation - allow empty knowledge_base_ids array
+    // The backend should handle this case appropriately
 
     try {
       let url =
