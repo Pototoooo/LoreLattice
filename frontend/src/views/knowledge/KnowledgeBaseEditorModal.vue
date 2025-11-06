@@ -23,7 +23,7 @@
                   :class="['nav-item', { 'active': currentSection === item.key }]"
                   @click="currentSection = item.key"
                 >
-                  <span class="nav-icon">{{ item.icon }}</span>
+                  <t-icon :name="item.icon" class="nav-icon" />
                   <span class="nav-label">{{ item.label }}</span>
                 </div>
               </div>
@@ -143,10 +143,10 @@ const allModels = ref<any[]>([])
 const hasFiles = ref(false)
 
 const navItems = [
-  { key: 'basic', icon: 'ℹ️', label: '基本信息' },
-  { key: 'models', icon: '🤖', label: '模型配置' },
-  { key: 'chunking', icon: '📄', label: '分块设置' },
-  { key: 'advanced', icon: '⚙️', label: '高级设置' }
+  { key: 'basic', icon: 'info-circle', label: '基本信息' },
+  { key: 'models', icon: 'control-platform', label: '模型配置' },
+  { key: 'chunking', icon: 'file-copy', label: '分块设置' },
+  { key: 'advanced', icon: 'setting', label: '高级设置' }
 ]
 
 // 模型配置引用
@@ -638,7 +638,11 @@ watch(() => props.visible, async (newVal) => {
 
 .nav-icon {
   margin-right: 8px;
-  font-size: 16px;
+  font-size: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-label {

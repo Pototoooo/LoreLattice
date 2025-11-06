@@ -3,7 +3,10 @@
     <!-- 头部 -->
     <div class="header">
       <h2>知识库</h2>
-      <button class="create-btn" @click="openCreateModal">新建知识库</button>
+      <button class="create-btn" @click="openCreateModal">
+        <t-icon name="add" size="16px" class="btn-icon" />
+        <span>新建知识库</span>
+      </button>
     </div>
     
     <!-- 未初始化知识库提示 -->
@@ -274,12 +277,15 @@ const handleKBEditorSuccess = (kbId: string) => {
 }
 
 .create-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 20px;
   height: 36px;
   background: #07c05f;
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-family: "PingFang SC";
   font-size: 14px;
   font-weight: 500;
@@ -292,6 +298,10 @@ const handleKBEditorSuccess = (kbId: string) => {
 
   &:active {
     background: #048f45;
+  }
+
+  .btn-icon {
+    flex-shrink: 0;
   }
 }
 

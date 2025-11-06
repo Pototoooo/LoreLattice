@@ -87,6 +87,16 @@
                 <div v-if="currentSection === 'system'" class="section">
                   <SystemInfo />
                 </div>
+
+                <!-- 租户信息 -->
+                <div v-if="currentSection === 'tenant'" class="section">
+                  <TenantInfo />
+                </div>
+
+                <!-- API 信息 -->
+                <div v-if="currentSection === 'api'" class="section">
+                  <ApiInfo />
+                </div>
               </div>
             </div>
           </div>
@@ -102,6 +112,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import AgentSettings from './AgentSettings.vue'
 import SystemInfo from './SystemInfo.vue'
+import TenantInfo from './TenantInfo.vue'
+import ApiInfo from './ApiInfo.vue'
 import GeneralSettings from './GeneralSettings.vue'
 import ModelSettings from './ModelSettings.vue'
 import KnowledgeBaseSettings from './KnowledgeBaseSettings.vue'
@@ -131,7 +143,9 @@ const navItems = [
   { key: 'ollama', icon: 'server', label: 'Ollama' },
   { key: 'knowledge', icon: 'folder-open', label: '知识库' },
   { key: 'agent', icon: 'chat', label: 'Agent 配置' },
-  { key: 'system', icon: 'info-circle', label: '系统信息' }
+  { key: 'system', icon: 'info-circle', label: '系统信息' },
+  { key: 'tenant', icon: 'user-circle', label: '租户信息' },
+  { key: 'api', icon: 'secured', label: 'API 信息' }
 ]
 
 // 导航项点击处理
