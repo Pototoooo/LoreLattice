@@ -265,8 +265,6 @@ watch(error, (newError) => {
 
 // 处理流式数据
 onChunk((data) => {
-    loading.value = false;
-    
     // 日志：打印接收到的事件
     console.log('[Agent Event Received]', {
         response_type: data.response_type,
@@ -277,19 +275,19 @@ onChunk((data) => {
         data: data.data
     });
     
-    // 处理 agent query 事件 - 确保显示 loading 状态
+    // 处理 agent query 事件 - 保持 loading 状态
     if (data.response_type === 'agent_query') {
         console.log('[Agent Query Event]', {
             session_id: data.data?.session_id,
             query: data.data?.query,
             request_id: data.data?.request_id
         });
-        // Loading state is already set in sendMsg, but ensure it's true
+        // 保持 loading 状态，等待实际内容
         loading.value = true;
         return;
     }
     
-    // 处理会话标题更新事件
+    // 处理会话标题更新事件 - 不关闭 loading
     if (data.response_type === 'session_title') {
         const title = data.content || data.data?.title;
         if (title && data.data?.session_id) {
@@ -301,6 +299,7 @@ onChunk((data) => {
             usemenuStore.changeIsFirstSession(false);
             isNeedTitle.value = false;
         }
+        // 不关闭 loading，等待实际内容
         return;
     }
     
@@ -311,6 +310,7 @@ onChunk((data) => {
     
     // Agent 模式处理
     if (isAgentResponse || messagesList[messagesList.length - 1]?.isAgentMode) {
+        // 在 handleAgentChunk 中处理 loading 状态
         handleAgentChunk(data);
         return;
     }
@@ -333,6 +333,18 @@ onChunk((data) => {
     } else {
         obj.content = fullContent.value;
     }
+    
+    // 检查是否已有消息，如果没有则说明这是第一次，关闭 loading
+    const existingMessage = messagesList.findLast((item) => {
+        if (item.request_id === obj.id) {
+            return true
+        }
+        return item.id === obj.id;
+    });
+    if (!existingMessage) {
+        loading.value = false; // 消息即将创建，关闭 loading
+    }
+    
     if (data.done) {
         // 标题生成已改为异步事件推送，不再需要在这里手动调用
         // 如果标题还未生成，前端会通过 SSE 事件接收
@@ -346,7 +358,7 @@ const handleAgentChunk = (data) => {
     const message = messagesList.findLast((item) => item.request_id === data.id || item.id === data.id);
     
     if (!message) {
-        // 创建新的 Assistant 消息
+        // 创建新的 Assistant 消息 - 此时开始显示内容，关闭 loading
         const newMsg = {
             id: data.id,
             request_id: data.id,
@@ -360,6 +372,7 @@ const handleAgentChunk = (data) => {
             knowledge_references: []
         };
         messagesList.push(newMsg);
+        loading.value = false; // 消息已创建，关闭 loading
         scrollToBottom();
         return;
     }

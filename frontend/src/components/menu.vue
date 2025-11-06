@@ -55,9 +55,8 @@
                             <div :class="['submenu_item', currentSecondpath == subitem.path ? 'submenu_item_active' : '']"
                                 @mouseenter="mouseenteBotDownr(subitem.id)" @mouseleave="mouseleaveBotDown"
                                 @click="gotopage(subitem.path)">
-                                <i v-if="currentSecondpath == subitem.path" class="dot"></i>
                                 <span class="submenu_title"
-                                    :style="currentSecondpath == subitem.path ? 'margin-left:14px;max-width:160px;' : 'margin-left:18px;max-width:185px;'">
+                                    :style="currentSecondpath == subitem.path ? 'margin-left:18px;max-width:160px;' : 'margin-left:18px;max-width:185px;'">
                                     {{ subitem.title }}
                                 </span>
                                 <t-dropdown 
@@ -873,13 +872,6 @@ watch(() => route.params.kbId, () => {
             display: inline-block;
             font-weight: bold;
             color: #07C05F;
-        }
-
-        .dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: #07C05F;
         }
 
         .sub_title {

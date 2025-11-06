@@ -22,7 +22,21 @@ BEGIN
         
         RAISE NOTICE 'Added agent_config column to tenants table';
     ELSE
-        RAISE NOTICE 'agent_config column already exists in tenants table';
+        -- 如果字段已存在但类型是 JSON，转换为 JSONB
+        IF EXISTS (
+            SELECT 1 
+            FROM information_schema.columns 
+            WHERE table_name = 'tenants' 
+            AND column_name = 'agent_config'
+            AND data_type = 'json'
+        ) THEN
+            ALTER TABLE tenants 
+            ALTER COLUMN agent_config TYPE JSONB USING agent_config::jsonb;
+            
+            RAISE NOTICE 'Converted tenants.agent_config from JSON to JSONB';
+        ELSE
+            RAISE NOTICE 'agent_config column already exists in tenants table';
+        END IF;
     END IF;
 END $$;
 
@@ -101,14 +115,25 @@ END $$;
 
 DO $$
 BEGIN
-    -- 为 tenants.agent_config 添加索引
+    -- 为 tenants.agent_config 添加索引（仅当字段类型为 JSONB 时）
     IF NOT EXISTS (
         SELECT 1 FROM pg_indexes 
         WHERE tablename = 'tenants' 
         AND indexname = 'idx_tenants_agent_config'
     ) THEN
-        CREATE INDEX idx_tenants_agent_config ON tenants USING GIN (agent_config);
-        RAISE NOTICE 'Created index idx_tenants_agent_config';
+        -- 检查字段类型是否为 JSONB
+        IF EXISTS (
+            SELECT 1 
+            FROM information_schema.columns 
+            WHERE table_name = 'tenants' 
+            AND column_name = 'agent_config'
+            AND data_type = 'jsonb'
+        ) THEN
+            CREATE INDEX idx_tenants_agent_config ON tenants USING GIN (agent_config);
+            RAISE NOTICE 'Created index idx_tenants_agent_config';
+        ELSE
+            RAISE NOTICE 'Skipped index creation for tenants.agent_config (not JSONB type)';
+        END IF;
     ELSE
         RAISE NOTICE 'Index idx_tenants_agent_config already exists';
     END IF;
