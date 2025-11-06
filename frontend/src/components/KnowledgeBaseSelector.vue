@@ -1,6 +1,6 @@
 <template>
   <div v-if="visible" class="kb-overlay" @click="close">
-    <div class="kb-dropdown" @click.stop :style="dropdownStyle">
+    <div class="kb-dropdown" @click.stop @wheel.stop :style="dropdownStyle">
       <!-- 搜索 -->
       <div class="kb-search">
         <input
@@ -17,7 +17,7 @@
       </div>
 
       <!-- 列表 -->
-      <div class="kb-list" ref="kbList">
+      <div class="kb-list" ref="kbList" @wheel.stop>
         <div
           v-for="(kb, index) in filteredKnowledgeBases"
           :key="kb.id"
@@ -196,31 +196,50 @@ const updateDropdownPosition = () => {
   const vw = window.innerWidth
   const vh = window.innerHeight
   
-  // 左对齐到触发元素（也可以改为居中：rect.left + rect.width / 2 - dropdownWidth / 2）
+  // 左对齐到触发元素
   let left = Math.round(rect.left)
   
-  // 边界处理：不超出视口左右（留 8px margin）
-  const minLeft = 8
-  const maxLeft = Math.max(8, vw - dropdownWidth - 8)
+  // 边界处理：不超出视口左右（留 16px margin）
+  const minLeft = 16
+  const maxLeft = Math.max(16, vw - dropdownWidth - 16)
   left = Math.max(minLeft, Math.min(maxLeft, left))
 
-  // 垂直：优先下方，若不够则上方
-  let top = Math.round(rect.bottom + offsetY)
-  const estimatedHeight = 320 // 估算高度，用于判断是否溢出
+  // 垂直定位：智能判断向上还是向下
+  const dropdownHeight = 360 // 弹窗高度估算
+  const spaceBelow = vh - rect.bottom // 下方剩余空间
+  const spaceAbove = rect.top // 上方剩余空间
   
-  if (top + estimatedHeight > vh) {
-    // 往上弹出
-    top = Math.round(rect.top - estimatedHeight - offsetY)
-    if (top < 8) {
-      top = 8
+  let top: number
+  
+  // 判断应该向上还是向下弹出
+  if (spaceBelow >= dropdownHeight + offsetY + 16) {
+    // 下方空间充足，向下弹出
+    top = Math.round(rect.bottom + offsetY)
+  } else if (spaceAbove >= dropdownHeight + offsetY + 16) {
+    // 下方不够但上方充足，向上弹出
+    top = Math.round(rect.top - dropdownHeight - offsetY)
+  } else {
+    // 上下都不够，选择空间较大的一侧
+    if (spaceAbove > spaceBelow) {
+      // 上方空间更大，贴着顶部
+      top = Math.max(16, Math.round(rect.top - dropdownHeight - offsetY))
+    } else {
+      // 下方空间更大，贴着底部或按钮下方
+      top = Math.round(rect.bottom + offsetY)
+      // 确保不超出视口底部
+      if (top + dropdownHeight > vh - 16) {
+        top = Math.max(16, vh - dropdownHeight - 16)
+      }
     }
   }
 
-  // 使用 fixed 定位，不需要加 scroll offset
+  // 使用 fixed 定位
   dropdownStyle.value = {
+    position: 'fixed',
     width: `${dropdownWidth}px`,
     left: `${left}px`,
-    top: `${top}px`
+    top: `${top}px`,
+    maxHeight: `${Math.min(dropdownHeight, vh - 32)}px` // 添加最大高度限制
   }
 }
 
@@ -230,7 +249,14 @@ watch(() => props.visible, async (v) => {
     await loadKnowledgeBases()
     // 等 DOM 渲染完再计算位置，防止 rect 读取到不准值
     await nextTick()
-    updateDropdownPosition()
+    // 延迟一帧再计算位置，确保所有样式都已应用
+    requestAnimationFrame(() => {
+      updateDropdownPosition()
+      // 再次确保位置正确（应对动画或其他延迟渲染）
+      setTimeout(() => {
+        updateDropdownPosition()
+      }, 50)
+    })
     // 确保 focus
     nextTick(() => searchInput.value?.focus())
     // 监听 resize/scroll 做微调
@@ -259,18 +285,25 @@ watch(() => props.visible, async (v) => {
   inset: 0;
   z-index: 9999;
   background: transparent;
+  /* 不阻止点击穿透，但防止触摸滚动 */
+  touch-action: none;
 }
 
 /* 下拉面板使用 fixed 定位，相对于视口 */
 .kb-dropdown {
-  position: fixed;
+  position: fixed !important;
   background: #fff;
   border: 1px solid #e7e9eb;
   border-radius: 10px;
   box-shadow: 0 6px 28px rgba(15, 23, 42, 0.08);
   overflow: hidden;
-  animation: fadeIn 0.12s ease-out;
+  animation: fadeIn 0.15s ease-out;
   z-index: 10000;
+  margin: 0;
+  /* 确保定位准确，动画使用 scale 而不是 translate */
+  transform-origin: top left;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 宽度由 JS 控制（dropdownWidth），这里只做内部样式 */
@@ -294,9 +327,14 @@ watch(() => props.visible, async (v) => {
 }
 
 .kb-list {
+  flex: 1;
+  min-height: 0; /* 允许 flex 子元素缩小 */
   max-height: 260px;
   overflow-y: auto;
   padding: 8px;
+  /* 确保滚动限制在此容器内 */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .kb-item {
@@ -365,7 +403,7 @@ watch(() => props.visible, async (v) => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
 }
 </style>
