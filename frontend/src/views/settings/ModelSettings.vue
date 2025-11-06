@@ -13,7 +13,10 @@
           <p>配置用于对话的大语言模型</p>
         </div>
         <t-button size="small" theme="primary" @click="openAddDialog('chat')">
-          <t-icon name="add" />添加模型
+          <template #icon>
+            <t-icon name="add" />
+          </template>
+          添加模型
         </t-button>
       </div>
       
@@ -59,7 +62,10 @@
           <p>配置用于文本向量化的嵌入模型</p>
         </div>
         <t-button size="small" theme="primary" @click="openAddDialog('embedding')">
-          <t-icon name="add" />添加模型
+          <template #icon>
+            <t-icon name="add" />
+          </template>
+          添加模型
         </t-button>
       </div>
       
@@ -106,7 +112,10 @@
           <p>配置用于结果重排序的模型</p>
         </div>
         <t-button size="small" theme="primary" @click="openAddDialog('rerank')">
-          <t-icon name="add" />添加模型
+          <template #icon>
+            <t-icon name="add" />
+          </template>
+          添加模型
         </t-button>
       </div>
       
@@ -152,7 +161,10 @@
           <p>配置用于视觉理解和多模态的视觉语言模型</p>
         </div>
         <t-button size="small" theme="primary" @click="openAddDialog('vllm')">
-          <t-icon name="add" />添加模型
+          <template #icon>
+            <t-icon name="add" />
+          </template>
+          添加模型
         </t-button>
       </div>
       
@@ -164,9 +176,7 @@
               <t-tag v-if="model.isDefault" theme="success" size="small">默认</t-tag>
             </div>
             <div class="model-meta">
-              <span class="source-tag">
-                {{ model.interfaceType === 'ollama' ? 'Ollama' : 'OpenAI兼容' }}
-              </span>
+              <span class="source-tag">{{ model.source === 'local' ? 'Ollama' : 'OpenAI兼容' }}</span>
               <!-- <span class="model-id">{{ model.modelName }}</span> -->
             </div>
           </div>
@@ -259,7 +269,6 @@ function convertToLegacyFormat(model: ModelConfig) {
     baseUrl: model.parameters.base_url || '',
     apiKey: model.parameters.api_key || '',
     dimension: model.parameters.embedding_parameters?.dimension,
-    interfaceType: model.parameters.interface_type,
     isDefault: model.is_default || false
   }
 }
@@ -276,8 +285,7 @@ function deduplicateModels(models: any[]) {
       modelName: model.modelName,
       baseUrl: model.baseUrl,
       apiKey: model.apiKey,
-      dimension: model.dimension,
-      interfaceType: model.interfaceType
+      dimension: model.dimension
     })
     
     if (seen.has(signature)) {
@@ -327,23 +335,55 @@ const editModel = (type: 'chat' | 'embedding' | 'rerank' | 'vllm', model: any) =
 // 保存模型
 const handleModelSave = async (modelData: any) => {
   try {
+    // 字段校验
+    if (!modelData.modelName || !modelData.modelName.trim()) {
+      MessagePlugin.warning('模型名称不能为空')
+      return
+    }
+    
+    if (modelData.modelName.trim().length > 100) {
+      MessagePlugin.warning('模型名称不能超过100个字符')
+      return
+    }
+    
+    // Remote 类型必须填写 baseUrl
+    if (modelData.source === 'remote') {
+      if (!modelData.baseUrl || !modelData.baseUrl.trim()) {
+        MessagePlugin.warning('Remote API 类型必须填写 Base URL')
+        return
+      }
+      
+      // 校验 Base URL 格式
+      try {
+        new URL(modelData.baseUrl.trim())
+      } catch {
+        MessagePlugin.warning('Base URL 格式不正确，请输入有效的 URL')
+        return
+      }
+    }
+    
+    // Embedding 模型必须填写维度
+    if (currentModelType.value === 'embedding') {
+      if (!modelData.dimension || modelData.dimension < 128 || modelData.dimension > 4096) {
+        MessagePlugin.warning('Embedding 模型必须填写有效的向量维度（128-4096）')
+        return
+      }
+    }
+    
     // 将前端格式转换为后端格式
     const apiModelData: ModelConfig = {
-      name: modelData.modelName || modelData.name,
+      name: modelData.modelName.trim(), // 使用 modelName 作为 name，并去除首尾空格
       type: getModelType(currentModelType.value),
       source: modelData.source,
       description: '',
       parameters: {
-        base_url: modelData.baseUrl,
-        api_key: modelData.apiKey,
+        base_url: modelData.baseUrl?.trim() || '',
+        api_key: modelData.apiKey?.trim() || '',
         ...(currentModelType.value === 'embedding' && modelData.dimension ? {
           embedding_parameters: {
             dimension: modelData.dimension,
             truncate_prompt_tokens: 0
           }
-        } : {}),
-        ...(currentModelType.value === 'vllm' && modelData.interfaceType ? {
-          interface_type: modelData.interfaceType
         } : {})
       },
       is_default: modelData.isDefault || false
@@ -514,18 +554,6 @@ onMounted(() => {
     }
   }
 
-  // 确保按钮内的图标垂直居中
-  :deep(.t-button) {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    
-    .t-icon {
-      display: inline-flex;
-      align-items: center;
-      vertical-align: middle;
-    }
-  }
 }
 
 .model-list-container {

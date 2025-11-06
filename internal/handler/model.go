@@ -163,6 +163,8 @@ type UpdateModelRequest struct {
 	Description string                `json:"description"`
 	Parameters  types.ModelParameters `json:"parameters"`
 	IsDefault   bool                  `json:"is_default"`
+	Source      types.ModelSource     `json:"source"`
+	Type        types.ModelType       `json:"type"`
 }
 
 // UpdateModel handles the HTTP request to update an existing model
@@ -206,13 +208,13 @@ func (h *ModelHandler) UpdateModel(c *gin.Context) {
 	if req.Name != "" {
 		model.Name = req.Name
 	}
-	if req.Description != "" {
-		model.Description = req.Description
-	}
+	model.Description = req.Description
 	if req.Parameters != (types.ModelParameters{}) {
 		model.Parameters = req.Parameters
 	}
 	model.IsDefault = req.IsDefault
+	model.Source = req.Source
+	model.Type = req.Type
 
 	logger.Infof(ctx, "Updating model, ID: %s, Name: %s", id, model.Name)
 	if err := h.service.UpdateModel(ctx, model); err != nil {

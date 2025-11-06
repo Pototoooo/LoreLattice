@@ -1,39 +1,36 @@
 <template>
-  <t-dialog
-    v-model:visible="dialogVisible"
-    :header="isEdit ? '编辑模型' : '添加模型'"
-    :width="600"
-    :on-confirm="handleConfirm"
-    :on-cancel="handleCancel"
-    :confirm-btn="{ content: '保存', loading: saving }"
-  >
-    <div class="model-editor-form">
-      <t-form ref="formRef" :data="formData" :rules="rules" layout="vertical">
-        <!-- 模型名称 -->
-        <t-form-item label="模型名称" name="name">
-          <t-input v-model="formData.name" placeholder="为模型取个名字，如：GPT-4" />
-        </t-form-item>
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="dialogVisible" class="model-editor-overlay" @click.self="handleCancel">
+        <div class="model-editor-modal">
+          <!-- 关闭按钮 -->
+          <button class="close-btn" @click="handleCancel" aria-label="关闭">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
 
+          <!-- 标题区域 -->
+          <div class="modal-header">
+            <h2 class="modal-title">{{ isEdit ? '编辑模型' : '添加模型' }}</h2>
+            <p class="modal-desc">{{ getModalDescription() }}</p>
+          </div>
+
+          <!-- 表单内容区域 -->
+          <div class="modal-body">
+            <t-form ref="formRef" :data="formData" :rules="rules" layout="vertical">
         <!-- 模型来源 -->
-        <t-form-item label="模型来源" name="source">
+        <div class="form-item">
+          <label class="form-label required">模型来源</label>
           <t-radio-group v-model="formData.source">
             <t-radio value="local">Ollama (本地)</t-radio>
             <t-radio value="remote">Remote API (远程)</t-radio>
           </t-radio-group>
-        </t-form-item>
-
-        <!-- VLLM 专用：接口类型（在来源选择之后） -->
-        <template v-if="modelType === 'vllm' && formData.source === 'local'">
-          <t-form-item label="接口类型" name="interfaceType">
-            <t-radio-group v-model="formData.interfaceType">
-              <t-radio value="ollama">Ollama</t-radio>
-              <t-radio value="openai">OpenAI 兼容接口</t-radio>
-            </t-radio-group>
-          </t-form-item>
-        </template>
+        </div>
 
         <!-- Ollama 本地模型选择器 -->
-        <t-form-item v-if="formData.source === 'local' && modelType !== 'vllm'" label="模型标识" name="modelName">
+        <div v-if="formData.source === 'local'" class="form-item">
+          <label class="form-label required">模型名称</label>
           <t-select
             v-model="formData.modelName"
             :loading="loadingOllamaModels"
@@ -92,35 +89,39 @@
             <t-icon name="refresh" />
             刷新列表
           </t-button>
-        </t-form-item>
+        </div>
 
         <!-- Remote API 和 VLLM 保持原有的 input -->
-        <t-form-item v-else label="模型标识" name="modelName">
+        <div v-else class="form-item">
+          <label class="form-label required">模型名称</label>
           <t-input 
             v-model="formData.modelName" 
-            :placeholder="formData.source === 'local' ? '如：llava:latest' : '如：gpt-4, claude-3-opus'"
+            :placeholder="getModelNamePlaceholder()"
           />
-        </t-form-item>
+        </div>
 
-        <!-- Remote API 配置或 VLLM OpenAI 兼容接口 -->
-        <template v-if="formData.source === 'remote' || (modelType === 'vllm' && formData.interfaceType === 'openai')">
-          <t-form-item label="Base URL" name="baseUrl">
+        <!-- Remote API 配置 -->
+        <template v-if="formData.source === 'remote'">
+          <div class="form-item">
+            <label class="form-label required">Base URL</label>
             <t-input 
               v-model="formData.baseUrl" 
               :placeholder="modelType === 'vllm' ? '如：http://localhost:11434/v1' : '如：https://api.openai.com/v1'"
             />
-          </t-form-item>
+          </div>
 
-          <t-form-item label="API Key (可选)" name="apiKey">
+          <div class="form-item">
+            <label class="form-label">API Key (可选)</label>
             <t-input 
               v-model="formData.apiKey" 
               type="password"
               placeholder="输入 API Key"
             />
-          </t-form-item>
+          </div>
 
           <!-- Remote API 校验 -->
-          <t-form-item label="连接测试">
+          <div class="form-item">
+            <label class="form-label">连接测试</label>
             <div class="api-test-section">
               <t-button 
                 variant="outline" 
@@ -146,26 +147,40 @@
                 {{ remoteMessage }}
               </span>
             </div>
-          </t-form-item>
+          </div>
         </template>
 
         <!-- Embedding 专用：维度 -->
-        <t-form-item v-if="modelType === 'embedding'" label="向量维度" name="dimension">
+        <div v-if="modelType === 'embedding'" class="form-item">
+          <label class="form-label">向量维度</label>
           <t-input-number 
             v-model="formData.dimension" 
             :min="128"
             :max="4096"
             placeholder="如：1536"
           />
-        </t-form-item>
+        </div>
 
         <!-- 设为默认 -->
-        <t-form-item label=" " name="isDefault">
+        <div class="form-item">
           <t-checkbox v-model="formData.isDefault">设为默认模型</t-checkbox>
-        </t-form-item>
+        </div>
       </t-form>
-    </div>
-  </t-dialog>
+          </div>
+
+          <!-- 底部按钮区域 -->
+          <div class="modal-footer">
+            <t-button theme="default" variant="outline" @click="handleCancel">
+              取消
+            </t-button>
+            <t-button theme="primary" @click="handleConfirm" :loading="saving">
+              保存
+            </t-button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -239,25 +254,78 @@ const formData = ref<ModelFormData>({
 })
 
 const rules = {
-  name: [{ required: true, message: '请输入模型名称' }],
-  modelName: [{ required: true, message: '请输入模型标识' }],
+  modelName: [
+    { required: true, message: '请输入模型名称' },
+    { 
+      validator: (val: string) => {
+        if (!val || !val.trim()) {
+          return { result: false, message: '模型名称不能为空' }
+        }
+        if (val.trim().length > 100) {
+          return { result: false, message: '模型名称不能超过100个字符' }
+        }
+        return { result: true }
+      },
+      trigger: 'blur'
+    }
+  ],
   baseUrl: [
     { 
       required: true, 
       message: '请输入 Base URL',
       trigger: 'blur'
+    },
+    {
+      validator: (val: string) => {
+        if (!val || !val.trim()) {
+          return { result: false, message: 'Base URL 不能为空' }
+        }
+        // 简单的 URL 格式校验
+        try {
+          new URL(val.trim())
+          return { result: true }
+        } catch {
+          return { result: false, message: 'Base URL 格式不正确，请输入有效的 URL' }
+        }
+      },
+      trigger: 'blur'
     }
   ]
+}
+
+// 获取弹窗描述文字
+const getModalDescription = () => {
+  const typeDesc = {
+    chat: '配置用于对话的大语言模型',
+    embedding: '配置用于文本向量化的嵌入模型',
+    rerank: '配置用于结果重排序的模型',
+    vllm: '配置用于视觉理解和多模态的视觉语言模型'
+  }
+  return typeDesc[props.modelType] || '配置模型信息'
+}
+
+// 获取模型名称占位符
+const getModelNamePlaceholder = () => {
+  if (props.modelType === 'vllm') {
+    return formData.value.source === 'local' ? '如：llava:latest' : '如：gpt-4-vision-preview'
+  }
+  return formData.value.source === 'local' ? '如：llama2:latest' : '如：gpt-4, claude-3-opus'
 }
 
 // 监听 visible 变化，初始化表单
 watch(() => props.visible, (val) => {
   if (val) {
+    // 锁定背景滚动
+    document.body.style.overflow = 'hidden'
+    
     if (props.modelData) {
       formData.value = { ...props.modelData }
     } else {
       resetForm()
     }
+  } else {
+    // 恢复背景滚动
+    document.body.style.overflow = ''
   }
 })
 
@@ -265,13 +333,13 @@ watch(() => props.visible, (val) => {
 const resetForm = () => {
   formData.value = {
     id: generateId(),
-    name: '',
+    name: '', // 保留字段但不使用，保存时用 modelName
     source: 'local',
     modelName: '',
     baseUrl: '',
     apiKey: '',
     dimension: props.modelType === 'embedding' ? 1536 : undefined,
-    interfaceType: props.modelType === 'vllm' ? 'ollama' : undefined,
+    interfaceType: undefined,
     isDefault: false
   }
   modelChecked.value = false
@@ -314,6 +382,7 @@ const handleModelFilter = (filterWords: string) => {
 
 // 加载 Ollama 模型列表
 const loadOllamaModels = async () => {
+  // 只在选择 local 来源时加载
   if (formData.value.source !== 'local') return
   
   loadingOllamaModels.value = true
@@ -455,6 +524,34 @@ const checkRemoteAPI = async () => {
 // 确认保存
 const handleConfirm = async () => {
   try {
+    // 手动校验必填字段
+    if (!formData.value.modelName || !formData.value.modelName.trim()) {
+      MessagePlugin.warning('请输入模型名称')
+      return
+    }
+    
+    if (formData.value.modelName.trim().length > 100) {
+      MessagePlugin.warning('模型名称不能超过100个字符')
+      return
+    }
+    
+    // 如果是 remote 类型，必须填写 baseUrl
+    if (formData.value.source === 'remote') {
+      if (!formData.value.baseUrl || !formData.value.baseUrl.trim()) {
+        MessagePlugin.warning('Remote API 类型必须填写 Base URL')
+        return
+      }
+      
+      // 校验 Base URL 格式
+      try {
+        new URL(formData.value.baseUrl.trim())
+      } catch {
+        MessagePlugin.warning('Base URL 格式不正确，请输入有效的 URL')
+        return
+      }
+    }
+    
+    // 执行表单验证
     await formRef.value?.validate()
     saving.value = true
     
@@ -465,7 +562,7 @@ const handleConfirm = async () => {
     
     emit('confirm', { ...formData.value })
     dialogVisible.value = false
-    MessagePlugin.success(isEdit.value ? '模型已更新' : '模型已添加')
+    // 移除此处的成功提示，由父组件统一处理
   } catch (error) {
     console.error('表单验证失败:', error)
   } finally {
@@ -580,10 +677,88 @@ const handleCancel = () => {
 </script>
 
 <style lang="less" scoped>
-.model-editor-form {
-  padding: 8px 0;
-  max-height: 60vh;
+// 遮罩层
+.model-editor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  overflow: hidden; // 防止背景滚动
+}
+
+// 弹窗主体
+.model-editor-modal {
+  position: relative;
+  width: 90vw;
+  max-width: 600px;
+  max-height: 85vh;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// 关闭按钮
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f5f5f5;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: all 0.2s ease;
+  z-index: 10;
+
+  &:hover {
+    background: #e5e5e5;
+    color: #000;
+  }
+}
+
+// 标题区域
+.modal-header {
+  padding: 24px 32px 20px;
+  border-bottom: 1px solid #e5e5e5;
+  flex-shrink: 0;
+}
+
+.modal-title {
+  margin: 0 0 8px 0;
+  font-family: "PingFang SC";
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000e6;
+}
+
+.modal-desc {
+  margin: 0;
+  font-family: "PingFang SC";
+  font-size: 14px;
+  color: #00000066;
+  line-height: 22px;
+}
+
+// 内容区域
+.modal-body {
+  flex: 1;
   overflow-y: auto;
+  padding: 24px 32px;
 
   // 自定义滚动条
   &::-webkit-scrollbar {
@@ -604,118 +779,110 @@ const handleCancel = () => {
     }
   }
 
-  :deep(.t-form-item) {
-    margin-bottom: 18px;
-
-    &:last-child {
-      margin-bottom: 0;
+  :deep(.t-form) {
+    .t-form-item {
+      display: none; // 隐藏 t-form-item，使用自定义的 form-item
     }
   }
+}
 
-  :deep(.t-form-item__label) {
-    font-size: 13px;
-    font-weight: 500;
-    color: #333333;
-    padding-bottom: 6px;
+// 表单项样式
+.form-item {
+  margin-bottom: 20px;
+
+  &:last-child {
     margin-bottom: 0;
   }
-
-  :deep(.t-input),
-  :deep(.t-select),
-  :deep(.t-textarea),
-  :deep(.t-input-number) {
-    font-size: 13px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-
-    &:hover {
-      border-color: #07C05F;
-      background: #fafafa;
-    }
-
-    &:focus,
-    &.t-is-focused {
-      background: #ffffff;
-      border-color: #07C05F;
-      box-shadow: 0 0 0 2px rgba(7, 192, 95, 0.1);
-    }
-  }
-
-  :deep(.t-input__inner) {
-    font-size: 13px;
-  }
-
-  :deep(.t-radio-group) {
-    .t-radio {
-      margin-right: 16px;
-      font-size: 13px;
-
-      &:last-child {
-        margin-right: 0;
-      }
-    }
-
-    .t-radio__label {
-      font-size: 13px;
-      color: #333333;
-    }
-  }
-
-  :deep(.t-checkbox) {
-    font-size: 13px;
-
-    .t-checkbox__label {
-      font-size: 13px;
-      color: #333333;
-    }
-  }
 }
 
-.model-input-with-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  :deep(.t-input) {
-    flex: 1;
-  }
-
-  .status-icon {
-    font-size: 16px;
-    flex-shrink: 0;
-
-    &.available {
-      color: #07C05F;
-    }
-
-    &.unavailable {
-      color: #e34d59;
-    }
-  }
-}
-
-.download-hint {
-  margin-top: -10px;
+.form-label {
+  display: block;
   margin-bottom: 8px;
+  font-family: "PingFang SC";
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000e6;
 
-  :deep(.t-alert) {
-    padding: 8px 12px;
-    font-size: 12px;
-    border-radius: 6px;
-    background: #fff7e6;
-    border-color: #ffa940;
+  &.required::after {
+    content: '*';
+    color: #FA5151;
+    margin-left: 4px;
   }
 }
 
+// 输入框样式
+:deep(.t-input),
+:deep(.t-select),
+:deep(.t-textarea),
+:deep(.t-input-number) {
+  width: 100%;
+  font-size: 14px;
+  
+  .t-input__inner,
+  input {
+    font-size: 14px;
+  }
+}
+
+// 单选按钮组
+:deep(.t-radio-group) {
+  display: flex;
+  gap: 16px;
+  
+  .t-radio {
+    margin-right: 0;
+    font-size: 14px;
+  }
+
+  .t-radio__label {
+    font-size: 14px;
+    color: #000000e6;
+  }
+}
+
+// 复选框
+:deep(.t-checkbox) {
+  font-size: 14px;
+
+  .t-checkbox__label {
+    font-size: 14px;
+    color: #000000e6;
+  }
+}
+
+// 底部按钮区域
+.modal-footer {
+  padding: 16px 32px;
+  border-top: 1px solid #e5e5e5;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+// 过渡动画
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+
+  .model-editor-modal {
+    transform: scale(0.95);
+  }
+}
+
+// API 测试区域
 .api-test-section {
   display: flex;
   align-items: center;
   gap: 12px;
 
   .test-message {
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.5;
     
     &.success {
@@ -730,52 +897,17 @@ const handleCancel = () => {
   :deep(.t-button) {
     min-width: 100px;
   }
-}
-
-// 优化对话框样式
-:deep(.t-dialog) {
-  border-radius: 12px;
   
-  .t-dialog__header {
-    padding: 20px 24px 16px;
-    border-bottom: 1px solid #e5e7eb;
-    
-    .t-dialog__header-content {
-      font-size: 16px;
-      font-weight: 600;
-      color: #333333;
+  .status-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+
+    &.available {
+      color: #07C05F;
     }
-  }
 
-  .t-dialog__body {
-    padding: 20px 24px;
-  }
-
-  .t-dialog__footer {
-    padding: 12px 24px 20px;
-    border-top: 1px solid #e5e7eb;
-    
-    .t-button {
-      font-size: 13px;
-      padding: 6px 16px;
-      border-radius: 6px;
-      
-      &.t-button--theme-primary {
-        background: #07C05F;
-        border-color: #07C05F;
-        
-        &:hover {
-          background: #05a34e;
-          border-color: #05a34e;
-        }
-      }
-      
-      &.t-button--variant-outline {
-        &:hover {
-          border-color: #07C05F;
-          color: #07C05F;
-        }
-      }
+    &.unavailable {
+      color: #e34d59;
     }
   }
 }
