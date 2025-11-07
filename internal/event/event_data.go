@@ -201,3 +201,10 @@ type SessionTitleData struct {
 	SessionID string `json:"session_id"`
 	Title     string `json:"title"`
 }
+
+// StopData represents stop generation request data
+type StopData struct {
+	SessionID string `json:"session_id"`
+	MessageID string `json:"message_id"`
+	Reason    string `json:"reason,omitempty"` // Optional reason for stopping
+}

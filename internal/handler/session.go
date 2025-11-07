@@ -820,9 +820,39 @@ func (h *SessionHandler) handleKnowledgeQARequest(
 	c.Header("Connection", "keep-alive")
 	c.Header("X-Accel-Buffering", "no")
 
+	// Write initial agent_query event to StreamManager
+	agentQueryEvent := interfaces.StreamEvent{
+		ID:        fmt.Sprintf("query-%d", time.Now().UnixNano()),
+		Type:      types.ResponseTypeAgentQuery,
+		Content:   "",
+		Done:      true,
+		Timestamp: time.Now(),
+		Data: map[string]interface{}{
+			"session_id":           sessionID,
+			"assistant_message_id": assistantMessage.ID,
+		},
+	}
+	if err := h.streamManager.AppendEvent(ctx, sessionID, assistantMessage.ID, agentQueryEvent); err != nil {
+		logger.ErrorWithFields(ctx, err, map[string]interface{}{
+			"session_id": sessionID,
+			"message_id": assistantMessage.ID,
+		})
+		// Non-fatal error, continue
+	}
+
 	// Create dedicated EventBus for this request
 	eventBus := event.NewEventBus()
-	asyncCtx := logger.CloneContext(ctx)
+	// Create cancellable context for async operations
+	asyncCtx, cancel := context.WithCancel(logger.CloneContext(ctx))
+
+	// Register stop event handler to cancel the context
+	eventBus.On(event.EventStop, func(ctx context.Context, evt event.Event) error {
+		logger.Infof(ctx, "Received stop event, cancelling async operations for session: %s", sessionID)
+		cancel()
+		assistantMessage.Content = "用户停止了本次对话"
+		h.completeAssistantMessage(ctx, assistantMessage)
+		return nil
+	})
 
 	// Create stream handler with dedicated EventBus
 	streamHandler := NewAgentStreamHandler(
@@ -848,6 +878,7 @@ func (h *SessionHandler) handleKnowledgeQARequest(
 		if data.Done {
 			logger.Infof(asyncCtx, "Knowledge QA service completed for session: %s", sessionID)
 			h.completeAssistantMessage(asyncCtx, assistantMessage)
+			cancel() // Clean up context
 			return nil
 		}
 		return nil
@@ -878,7 +909,7 @@ func (h *SessionHandler) handleKnowledgeQARequest(
 	}()
 
 	// Handle events for SSE (blocking until connection is done)
-	h.handleAgentEventsForSSEWithHandler(ctx, c, sessionID, assistantMessage.ID, requestID)
+	h.handleAgentEventsForSSEWithHandler(ctx, c, sessionID, assistantMessage.ID, requestID, eventBus)
 }
 
 // AgentQA handles agent-based question answering with conversation history and streaming
@@ -1067,11 +1098,32 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 	logger.Infof(ctx, "Calling agent QA service, session ID: %s", sessionID)
 
 	// SSE headers already set earlier when sending agent_query event
+	// Write initial agent_query event to StreamManager
+	agentQueryEvent := interfaces.StreamEvent{
+		ID:        fmt.Sprintf("query-%d", time.Now().UnixNano()),
+		Type:      types.ResponseTypeAgentQuery,
+		Content:   "",
+		Done:      true,
+		Timestamp: time.Now(),
+		Data: map[string]interface{}{
+			"session_id":           sessionID,
+			"assistant_message_id": assistantMessage.ID,
+		},
+	}
+	if err := h.streamManager.AppendEvent(ctx, sessionID, assistantMessage.ID, agentQueryEvent); err != nil {
+		logger.ErrorWithFields(ctx, err, map[string]interface{}{
+			"session_id": sessionID,
+			"message_id": assistantMessage.ID,
+		})
+		// Non-fatal error, continue
+	}
 
 	eventBus := event.NewEventBus()
+	// Create cancellable context for async operations
+	asyncCtx, cancel := context.WithCancel(logger.CloneContext(ctx))
 	// Create stream handler with dedicated EventBus BEFORE calling AgentQA
 	streamHandler := NewAgentStreamHandler(
-		ctx, sessionID, assistantMessage.ID, requestID,
+		asyncCtx, sessionID, assistantMessage.ID, requestID,
 		assistantMessage, h.streamManager, eventBus,
 	)
 
@@ -1081,10 +1133,18 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 	// Start async title generation if session has no title
 	if session.Title == "" {
 		logger.Infof(ctx, "Session has no title, starting async title generation, session ID: %s", sessionID)
-		h.sessionService.GenerateTitleAsync(ctx, session, request.Query, eventBus)
+		h.sessionService.GenerateTitleAsync(asyncCtx, session, request.Query, eventBus)
 	}
 
-	asyncCtx := logger.CloneContext(ctx)
+	// Register stop event handler to cancel the context
+	eventBus.On(event.EventStop, func(ctx context.Context, evt event.Event) error {
+		logger.Warnf(asyncCtx, "Received stop event, cancelling async operations for session: %s", sessionID)
+		cancel()
+		assistantMessage.Content = "用户停止了本次对话"
+		h.completeAssistantMessage(ctx, assistantMessage)
+		return nil
+	})
+
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -1111,7 +1171,7 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 	}()
 
 	// Handle events for SSE (blocking until connection is done)
-	h.handleAgentEventsForSSEWithHandler(ctx, c, sessionID, assistantMessage.ID, requestID)
+	h.handleAgentEventsForSSEWithHandler(ctx, c, sessionID, assistantMessage.ID, requestID, eventBus)
 }
 
 // handleAgentEventsForSSEWithHandler handles agent events for SSE streaming using an existing handler
@@ -1121,6 +1181,7 @@ func (h *SessionHandler) handleAgentEventsForSSEWithHandler(
 	ctx context.Context,
 	c *gin.Context,
 	sessionID, assistantMessageID, requestID string,
+	eventBus *event.EventBus,
 ) {
 	ticker := time.NewTicker(100 * time.Millisecond)
 	defer ticker.Stop()
@@ -1148,13 +1209,53 @@ func (h *SessionHandler) handleAgentEventsForSSEWithHandler(
 			// Send any new events
 			streamCompleted := false
 			for _, evt := range events {
+				// Check for stop event
+				if evt.Type == types.ResponseType(event.EventStop) {
+					log.Infof("Detected stop event, triggering stop via EventBus for session=%s", sessionID)
+
+					// Emit stop event to the EventBus to trigger context cancellation
+					if eventBus != nil {
+						eventBus.Emit(ctx, event.Event{
+							Type:      event.EventStop,
+							SessionID: sessionID,
+							Data: event.StopData{
+								SessionID: sessionID,
+								MessageID: assistantMessageID,
+								Reason:    "user_requested",
+							},
+						})
+					}
+
+					// Send stop notification to frontend
+					c.SSEvent("message", &types.StreamResponse{
+						ID:           requestID,
+						ResponseType: "stop",
+						Content:      "Generation stopped by user",
+						Done:         true,
+					})
+					c.Writer.Flush()
+					return
+				}
+
 				// Build StreamResponse from StreamEvent
+				// For agent_query event, extract session_id and assistant_message_id from Data
+				var sessionIDFromEvent, assistantMessageIDFromEvent string
+				if evt.Type == types.ResponseTypeAgentQuery {
+					if sid, ok := evt.Data["session_id"].(string); ok {
+						sessionIDFromEvent = sid
+					}
+					if amid, ok := evt.Data["assistant_message_id"].(string); ok {
+						assistantMessageIDFromEvent = amid
+					}
+				}
 				response := &types.StreamResponse{
-					ID:           requestID,
-					ResponseType: evt.Type,
-					Content:      evt.Content,
-					Done:         evt.Done,
-					Data:         evt.Data,
+					ID:                 requestID,
+					ResponseType:       evt.Type,
+					Content:            evt.Content,
+					Done:               evt.Done,
+					Data:               evt.Data,
+					SessionID:          sessionIDFromEvent,
+					AssistantMessageID: assistantMessageIDFromEvent,
 				}
 
 				// Special handling for references event
@@ -1198,4 +1299,115 @@ func (h *SessionHandler) handleAgentEventsForSSEWithHandler(
 			}
 		}
 	}
+}
+
+// StopSessionRequest represents the stop session request
+type StopSessionRequest struct {
+	MessageID string `json:"message_id" binding:"required"`
+}
+
+// StopSession handles the stop generation request
+func (h *SessionHandler) StopSession(c *gin.Context) {
+	ctx := logger.CloneContext(c.Request.Context())
+	sessionID := c.Param("session_id")
+
+	if sessionID == "" {
+		c.JSON(400, gin.H{"error": "Session ID is required"})
+		return
+	}
+
+	// Parse request body to get message_id
+	var req StopSessionRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.ErrorWithFields(ctx, err, map[string]interface{}{
+			"session_id": sessionID,
+		})
+		c.JSON(400, gin.H{"error": "message_id is required"})
+		return
+	}
+
+	assistantMessageID := req.MessageID
+	logger.Infof(ctx, "Stop generation request for session: %s, message: %s", sessionID, assistantMessageID)
+
+	// Get tenant ID from context
+	tenantID, exists := c.Get(types.TenantIDContextKey.String())
+	if !exists {
+		logger.Error(ctx, "Failed to get tenant ID")
+		c.JSON(401, gin.H{"error": "Unauthorized"})
+		return
+	}
+	tenantIDUint := tenantID.(uint)
+
+	// Verify message ownership and status
+	message, err := h.messageService.GetMessage(ctx, sessionID, assistantMessageID)
+	if err != nil {
+		logger.ErrorWithFields(ctx, err, map[string]interface{}{
+			"session_id": sessionID,
+			"message_id": assistantMessageID,
+		})
+		c.JSON(404, gin.H{"error": "Message not found"})
+		return
+	}
+
+	// Verify message belongs to this session (double check)
+	if message.SessionID != sessionID {
+		logger.Warnf(ctx, "Message %s does not belong to session %s", assistantMessageID, sessionID)
+		c.JSON(403, gin.H{"error": "Message does not belong to this session"})
+		return
+	}
+
+	// Verify message belongs to the current tenant
+	session, err := h.sessionService.GetSession(ctx, sessionID)
+	if err != nil {
+		logger.ErrorWithFields(ctx, err, map[string]interface{}{
+			"session_id": sessionID,
+		})
+		c.JSON(404, gin.H{"error": "Session not found"})
+		return
+	}
+
+	if session.TenantID != tenantIDUint {
+		logger.Warnf(ctx, "Session %s does not belong to tenant %d", sessionID, tenantIDUint)
+		c.JSON(403, gin.H{"error": "Access denied"})
+		return
+	}
+
+	// Check if message is already completed (stopped)
+	if message.IsCompleted {
+		logger.Infof(ctx, "Message %s is already completed, no need to stop", assistantMessageID)
+		c.JSON(200, gin.H{
+			"success": true,
+			"message": "Message already completed",
+		})
+		return
+	}
+
+	// Write stop event to StreamManager for distributed support
+	stopEvent := interfaces.StreamEvent{
+		ID:        fmt.Sprintf("stop-%d", time.Now().UnixNano()),
+		Type:      types.ResponseType(event.EventStop),
+		Content:   "",
+		Done:      true,
+		Timestamp: time.Now(),
+		Data: map[string]interface{}{
+			"session_id": sessionID,
+			"message_id": assistantMessageID,
+			"reason":     "user_requested",
+		},
+	}
+
+	if err := h.streamManager.AppendEvent(ctx, sessionID, assistantMessageID, stopEvent); err != nil {
+		logger.ErrorWithFields(ctx, err, map[string]interface{}{
+			"session_id": sessionID,
+			"message_id": assistantMessageID,
+		})
+		c.JSON(500, gin.H{"error": "Failed to write stop event"})
+		return
+	}
+
+	logger.Infof(ctx, "Stop event written successfully for session: %s, message: %s", sessionID, assistantMessageID)
+	c.JSON(200, gin.H{
+		"success": true,
+		"message": "Generation stopped",
+	})
 }

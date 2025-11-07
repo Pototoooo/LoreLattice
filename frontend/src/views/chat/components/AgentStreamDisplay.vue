@@ -175,7 +175,7 @@ const isLastThinking = (eventId: string): boolean => {
   return eventId === lastThinkingEventId.value;
 };
 
-// Check if conversation is done (based on answer event with done=true)
+// Check if conversation is done (based on answer event with done=true or stop event)
 const isConversationDone = computed(() => {
   const stream = eventStream.value;
   if (!stream || stream.length === 0) {
@@ -183,7 +183,14 @@ const isConversationDone = computed(() => {
     return false;
   }
   
-  // Only check for answer event with done=true
+  // Check for stop event (user cancelled)
+  const stopEvent = stream.find((e: any) => e.type === 'stop');
+  if (stopEvent) {
+    console.log('[Collapse] Found stop event, conversation done');
+    return true;
+  }
+  
+  // Check for answer event with done=true
   const answerEvents = stream.filter((e: any) => e.type === 'answer');
   const doneAnswer = answerEvents.find((e: any) => e.done === true);
   

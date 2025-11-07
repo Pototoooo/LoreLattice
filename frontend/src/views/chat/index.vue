@@ -18,7 +18,13 @@
             </div>
         </div>
         <div style="min-height: 115px; margin: 16px auto 4px;width: 100%;max-width: 800px;">
-            <InputField @send-msg="sendMsg" :isReplying="isReplying"></InputField>
+            <InputField 
+                @send-msg="sendMsg" 
+                @stop-generation="handleStopGeneration"
+                :isReplying="isReplying" 
+                :sessionId="session_id"
+                :assistantMessageId="currentAssistantMessageId"
+            ></InputField>
         </div>
     </div>
 </template>
@@ -46,6 +52,7 @@ const created_at = ref('');
 const limit = ref(20);
 const messagesList = reactive([]);
 const isReplying = ref(false);
+const currentAssistantMessageId = ref(''); // 当前正在生成的 assistant message ID
 const scrollLock = ref(false);
 const isNeedTitle = ref(false);
 const isFirstEnter = ref(true);
@@ -208,7 +215,13 @@ const handleMsgList = async (data, isScrollType = false, newScrollHeight) => {
     }
     if (messagesList[messagesList.length - 1] && !messagesList[messagesList.length - 1].is_completed) {
         isReplying.value = true;
-        await startStream({ session_id: session_id.value, query: messagesList[messagesList.length - 1].id, method: 'GET', url: '/api/v1/sessions/continue-stream' });
+        // 保存正在 stream 的消息 ID，以便停止时使用
+        const lastMessage = messagesList[messagesList.length - 1];
+        if (lastMessage.role === 'assistant') {
+            currentAssistantMessageId.value = lastMessage.id;
+            console.log('[Continue Stream] Set assistant message ID:', lastMessage.id);
+        }
+        await startStream({ session_id: session_id.value, query: lastMessage.id, method: 'GET', url: '/api/v1/sessions/continue-stream' });
     }
 
 }
@@ -220,6 +233,15 @@ const checkmenuTitle = (session_id) => {
     });
 }
 // 发送消息
+// 处理停止生成事件 - 立即清除 loading 状态
+const handleStopGeneration = () => {
+    console.log('[Stop Generation] Immediately clearing loading state');
+    loading.value = false;
+    isReplying.value = false;
+    // 注意：不在这里清空 currentAssistantMessageId，因为需要它来调用 API
+    // API 调用成功后，后端的 stop 事件会清空它
+};
+
 const sendMsg = async (value) => {
     userquery.value = value;
     isReplying.value = true;
@@ -238,6 +260,8 @@ const sendMsg = async (value) => {
         MessagePlugin.warning('请至少选择一个知识库');
         isReplying.value = false;
         loading.value = false;
+        // 清空当前 assistant message ID
+        currentAssistantMessageId.value = '';
         // Remove the user message that was just added
         messagesList.pop();
         return;
@@ -262,6 +286,8 @@ watch(error, (newError) => {
         MessagePlugin.error(newError);
         isReplying.value = false;
         loading.value = false;
+        // 清空当前 assistant message ID
+        currentAssistantMessageId.value = '';
     }
 });
 
@@ -274,13 +300,20 @@ onChunk((data) => {
         done: data.done,
         content_length: data.content?.length || 0,
         content_preview: data.content ? data.content.substring(0, 50) : '',
-        data: data.data
+        data: data.data,
+        session_id: data.session_id,
+        assistant_message_id: data.assistant_message_id
     });
     
-    // 处理 agent query 事件 - 保持 loading 状态
+    // 处理 agent query 事件 - 保存 assistant message ID 并保持 loading 状态
     if (data.response_type === 'agent_query') {
+        if (data.assistant_message_id) {
+            currentAssistantMessageId.value = data.assistant_message_id;
+            console.log('[Agent Query] Saved assistant message ID:', data.assistant_message_id);
+        }
         console.log('[Agent Query Event]', {
-            session_id: data.data?.session_id,
+            session_id: data.session_id || data.data?.session_id,
+            assistant_message_id: data.assistant_message_id,
             query: data.data?.query,
             request_id: data.data?.request_id
         });
@@ -308,12 +341,22 @@ onChunk((data) => {
     // 判断是否是 Agent 模式的响应
     const isAgentResponse = data.response_type === 'thinking' || 
                            data.response_type === 'tool_call' || 
-                           data.response_type === 'references';
+                           data.response_type === 'references' ||
+                           data.response_type === 'stop';
     
-    // Agent 模式处理
+    // Agent 模式处理（包括 stop 事件）
     if (isAgentResponse || messagesList[messagesList.length - 1]?.isAgentMode) {
         // 在 handleAgentChunk 中处理 loading 状态
         handleAgentChunk(data);
+        
+        // 对于 stop 事件，额外处理全局状态
+        if (data.response_type === 'stop') {
+            console.log('[Stop Event] Generation stopped');
+            loading.value = false;
+            isReplying.value = false;
+            // 清空当前 assistant message ID
+            currentAssistantMessageId.value = '';
+        }
         return;
     }
     
@@ -352,6 +395,8 @@ onChunk((data) => {
         // 如果标题还未生成，前端会通过 SSE 事件接收
         isReplying.value = false;
         fullContent.value = "";
+        // 清空当前 assistant message ID
+        currentAssistantMessageId.value = '';
     }
     updateAssistantSession(obj);
 })
@@ -566,10 +611,29 @@ const handleAgentChunk = (data) => {
                 // 完成
                 isReplying.value = false;
                 fullContent.value = '';
+                // 清空当前 assistant message ID
+                currentAssistantMessageId.value = '';
                 
                 // 标题生成已改为异步事件推送，不再需要在这里手动调用
                 // 如果标题还未生成，前端会通过 SSE 事件接收
             }
+            break;
+            
+        case 'stop':
+            // 停止事件 - 添加到事件流并标记对话完成
+            console.log('[Agent] Stop event received');
+            if (!message.agentEventStream) message.agentEventStream = [];
+            
+            // Add stop event to stream
+            message.agentEventStream.push({
+                type: 'stop',
+                timestamp: Date.now(),
+                reason: data.data?.reason || 'user_requested'
+            });
+            
+            // Mark conversation as stopped
+            isReplying.value = false;
+            fullContent.value = '';
             break;
     }
     

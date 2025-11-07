@@ -6,6 +6,7 @@ import { MessagePlugin } from "tdesign-vue-next";
 import { useSettingsStore } from '@/stores/settings';
 import { useUIStore } from '@/stores/ui';
 import { listKnowledgeBases } from '@/api/knowledge-base';
+import { stopSession } from '@/api/chat';
 import KnowledgeBaseSelector from './KnowledgeBaseSelector.vue';
 
 const route = useRoute();
@@ -19,6 +20,14 @@ const atButtonRef = ref<HTMLElement>();
 const props = defineProps({
   isReplying: {
     type: Boolean,
+    required: false
+  },
+  sessionId: {
+    type: String,
+    required: false
+  },
+  assistantMessageId: {
+    type: String,
     required: false
   }
 });
@@ -68,7 +77,7 @@ watch(() => route.params.kbId, (newKbId) => {
   }
 });
 
-const emit = defineEmits(['send-msg']);
+const emit = defineEmits(['send-msg', 'stop-generation']);
 
 const createSession = (val: string) => {
   if (!val.trim()) {
@@ -155,6 +164,32 @@ const toggleKbSelector = () => {
 
 const removeKb = (kbId: string) => {
   settingsStore.removeKnowledgeBase(kbId);
+}
+
+const handleStop = async () => {
+  if (!props.sessionId) {
+    MessagePlugin.warning('会话 ID 不存在');
+    return;
+  }
+  
+  if (!props.assistantMessageId) {
+    console.error('[Stop] Assistant message ID is empty');
+    MessagePlugin.warning('无法获取消息 ID，请刷新页面后重试');
+    return;
+  }
+  
+  console.log('[Stop] Stopping generation for message:', props.assistantMessageId);
+  
+  // 发送 stop 事件，通知父组件立即清除 loading 状态
+  emit('stop-generation');
+  
+  try {
+    await stopSession(props.sessionId, props.assistantMessageId);
+    MessagePlugin.success('已停止生成');
+  } catch (error) {
+    console.error('Failed to stop session:', error);
+    MessagePlugin.error('停止失败，请重试');
+  }
 }
 
 onBeforeRouteUpdate((to, from, next) => {
@@ -248,13 +283,33 @@ onBeforeRouteUpdate((to, from, next) => {
         </div>
       </div>
 
-      <!-- 右侧发送按钮 -->
+      <!-- 右侧控制按钮组 -->
+      <div class="control-right">
+        <!-- 停止按钮（仅在回复中时显示） -->
+        <t-tooltip 
+          v-if="isReplying"
+          content="停止生成"
+          placement="top"
+        >
+          <div 
+            @click="handleStop" 
+            class="control-btn stop-btn"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <rect x="5" y="5" width="6" height="6" rx="1" />
+            </svg>
+          </div>
+        </t-tooltip>
+
+        <!-- 发送按钮 -->
       <div 
+          v-if="!isReplying"
         @click="createSession(query)" 
         class="control-btn send-btn"
         :class="{ 'disabled': !query.length || selectedKbIds.length === 0 }"
       >
         <img src="../assets/img/sending-aircraft.svg" alt="发送" />
+        </div>
       </div>
     </div>
 
@@ -489,6 +544,104 @@ const getImgSrc = (url: string) => {
   
   &:hover {
     background: rgba(0, 0, 0, 0.08);
+  }
+}
+
+.control-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stop-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: rgba(7, 192, 95, 0.08);
+  color: #07C05F;
+  border: 1.5px solid rgba(7, 192, 95, 0.2);
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: stopBtnPulse 2s ease-in-out infinite;
+  
+  &:hover {
+    background: rgba(7, 192, 95, 0.12);
+    border-color: #07C05F;
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(7, 192, 95, 0.2);
+    animation: none;
+  }
+  
+  &:active {
+    transform: scale(0.95);
+    background: rgba(7, 192, 95, 0.15);
+  }
+  
+  svg {
+    display: none;
+  }
+  
+  &::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: #07C05F;
+    border-radius: 50%;
+    display: block;
+    animation: stopDotPulse 2s ease-in-out infinite;
+  }
+  
+  &:hover::before {
+    animation: none;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #07C05F;
+    animation: stopRipple 2s ease-out infinite;
+  }
+  
+  &:hover::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+@keyframes stopBtnPulse {
+  0%, 100% {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  50% {
+    box-shadow: 0 2px 4px rgba(7, 192, 95, 0.1);
+  }
+}
+
+@keyframes stopDotPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.92);
+    opacity: 0.9;
+  }
+}
+
+@keyframes stopRipple {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
   }
 }
 

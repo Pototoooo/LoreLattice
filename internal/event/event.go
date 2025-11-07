@@ -59,6 +59,9 @@ const (
 
 	// Session events
 	EventSessionTitle EventType = "session_title" // 会话标题更新
+
+	// Control events
+	EventStop EventType = "stop" // 停止对话生成
 )
 
 // Event represents an event in the system

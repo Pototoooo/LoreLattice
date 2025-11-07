@@ -72,6 +72,10 @@ type StreamResponse struct {
 	Done bool `json:"done"`
 	// Knowledge references
 	KnowledgeReferences References `json:"knowledge_references,omitempty"`
+	// Session ID (for agent_query event)
+	SessionID string `json:"session_id,omitempty"`
+	// Assistant Message ID (for agent_query event)
+	AssistantMessageID string `json:"assistant_message_id,omitempty"`
 	// Tool calls for streaming (partial)
 	ToolCalls []LLMToolCall `json:"tool_calls,omitempty"`
 	// Additional metadata for enhanced display
