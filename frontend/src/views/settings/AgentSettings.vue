@@ -3,23 +3,40 @@
     <div class="section-header">
       <h2>Agent 配置</h2>
       <p class="section-description">配置 AI Agent 的默认行为和参数，这些设置将应用于所有启用 Agent 模式的对话</p>
+      
+      <!-- Agent 状态显示 -->
+      <div class="agent-status-row">
+        <div class="status-label">
+          <label>Agent 状态</label>
+        </div>
+        <div class="status-control">
+          <div class="status-badge" :class="{ ready: isAgentReady }">
+            <t-icon 
+              v-if="isAgentReady" 
+              name="check-circle-filled" 
+              class="status-icon"
+            />
+            <t-icon 
+              v-else 
+              name="error-circle-filled" 
+              class="status-icon"
+            />
+            <span class="status-text">
+              {{ isAgentReady ? '可用' : '未就绪' }}
+            </span>
+          </div>
+          <span v-if="!isAgentReady" class="status-hint">
+            {{ agentStatusMessage }}
+          </span>
+          <p v-if="!isAgentReady" class="status-tip">
+            <t-icon name="info-circle" class="tip-icon" />
+            配置完成后，Agent 状态将自动变为"可用"，此时可在对话界面开启 Agent 模式
+          </p>
+        </div>
+      </div>
     </div>
 
     <div class="settings-group">
-      <!-- 启用 Agent 模式 -->
-      <div class="setting-row">
-        <div class="setting-info">
-          <label>启用 Agent 模式</label>
-          <p class="desc">启用后，AI 将能够使用工具进行多步推理和跨知识库搜索</p>
-        </div>
-        <div class="setting-control">
-        <t-switch 
-          v-model="localAgentEnabled" 
-          @change="handleAgentToggle"
-          size="large"
-        />
-      </div>
-      </div>
 
       <!-- 最大迭代次数 -->
       <div class="setting-row">
@@ -35,8 +52,7 @@
             :max="30" 
             :step="1"
             :marks="{ 1: '1', 5: '5', 10: '10', 15: '15', 20: '20', 25: '25', 30: '30' }"
-            @change="handleMaxIterationsChange"
-            :disabled="!localAgentEnabled"
+            @change="handleMaxIterationsChangeDebounced"
               style="width: 200px;"
           />
             <span class="value-display">{{ localMaxIterations }}</span>
@@ -141,7 +157,6 @@
             :step="0.1"
             :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
             @change="handleTemperatureChange"
-            :disabled="!localAgentEnabled"
               style="width: 200px;"
           />
             <span class="value-display">{{ localTemperature.toFixed(1) }}</span>
@@ -161,7 +176,6 @@
             multiple
             placeholder="请选择工具..."
             @change="handleAllowedToolsChange"
-            :disabled="!localAgentEnabled"
             style="width: 400px;"
           >
             <t-option
@@ -181,7 +195,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSettingsStore } from '@/stores/settings'
 import { MessagePlugin } from 'tdesign-vue-next'
@@ -192,12 +206,40 @@ const settingsStore = useSettingsStore()
 const router = useRouter()
 
 // 本地状态
-const localAgentEnabled = ref(false)
 const localMaxIterations = ref(5)
 const localTemperature = ref(0.7)
 const localThinkingModelId = ref('')
 const localRerankModelId = ref('')
 const localAllowedTools = ref<string[]>([])
+
+// 计算 Agent 是否就绪
+const isAgentReady = computed(() => {
+  // 必须有思考模型、Rerank 模型 且 至少选择一个工具
+  return localThinkingModelId.value !== '' && 
+         localRerankModelId.value !== '' && 
+         localAllowedTools.value.length > 0
+})
+
+// Agent 状态提示消息
+const agentStatusMessage = computed(() => {
+  const missing: string[] = []
+  
+  if (!localThinkingModelId.value) {
+    missing.push('思考模型')
+  }
+  if (!localRerankModelId.value) {
+    missing.push('Rerank 模型')
+  }
+  if (localAllowedTools.value.length === 0) {
+    missing.push('允许的工具')
+  }
+  
+  if (missing.length === 0) {
+    return ''
+  }
+  
+  return `请配置${missing.join('、')}`
+})
 
 // 模型列表状态
 const chatModels = ref<ModelConfig[]>([])
@@ -227,8 +269,8 @@ onMounted(async () => {
     const config = res.data
     
     // 更新本地状态（在初始化期间，不会触发保存）
-    localAgentEnabled.value = config.enabled
     localMaxIterations.value = config.max_iterations
+    lastSavedValue = config.max_iterations // 初始化时记录已保存的值
     localTemperature.value = config.temperature
     localThinkingModelId.value = config.thinking_model_id
     localRerankModelId.value = config.rerank_model_id
@@ -241,23 +283,29 @@ onMounted(async () => {
     }
     
     // 同步到store（只更新本地存储，不触发API保存）
-    settingsStore.toggleAgent(config.enabled)
+    // 注意：不自动设置 isAgentEnabled，保持用户之前的选择
+    // enabled 状态应该由用户手动控制，而不是根据配置自动设置
     settingsStore.updateAgentConfig({
       maxIterations: config.max_iterations,
       temperature: config.temperature,
       thinkingModelId: config.thinking_model_id,
-      rerankModelId: config.rerank_model_id
+      rerankModelId: config.rerank_model_id,
+      allowedTools: config.allowed_tools || []
     })
     
-    // 初始化完成
-    isInitializing.value = false
+    // 等待下一个 tick，确保所有响应式更新完成
+    await nextTick()
+    // 再等待一帧，确保所有事件监听器都已设置好
+    requestAnimationFrame(() => {
+      // 初始化完成，现在可以允许保存操作
+      isInitializing.value = false
+    })
   } catch (error) {
     console.error('加载Agent配置失败:', error)
     MessagePlugin.error('加载Agent配置失败')
     configLoaded.value = false // 加载失败时重置标记，允许重试
     
     // 失败时从store加载
-    localAgentEnabled.value = settingsStore.isAgentEnabled
     localMaxIterations.value = settingsStore.agentConfig.maxIterations
     localTemperature.value = settingsStore.agentConfig.temperature
     localThinkingModelId.value = settingsStore.agentConfig.thinkingModelId
@@ -289,59 +337,63 @@ const getErrorMessage = (error: any): string => {
   }
 }
 
-// 处理 Agent 开关
-const handleAgentToggle = async (value: boolean) => {
-  // 如果正在初始化，不触发保存（但用户手动切换开关应该允许）
-  // 注意：这个可能不需要检查，因为用户手动切换开关应该保存
-  // 但为了安全，如果初始化时开关状态变化，也不保存
-  if (isInitializing.value) return
-  
-  try {
-    // 构建完整配置
-    const config: AgentConfig = {
-      enabled: value,
-      max_iterations: localMaxIterations.value,
-      reflection_enabled: false,
-      allowed_tools: localAllowedTools.value,
-      temperature: localTemperature.value,
-      thinking_model_id: localThinkingModelId.value,
-      rerank_model_id: localRerankModelId.value
-    }
-    
-    await updateAgentConfig(config)
-    settingsStore.toggleAgent(value)
-    MessagePlugin.success(value ? 'Agent 模式已启用' : 'Agent 模式已禁用')
-  } catch (error) {
-    console.error('保存Agent配置失败:', error)
-    MessagePlugin.error(getErrorMessage(error))
-    // 回滚
-    localAgentEnabled.value = !value
-  }
-}
+// 防抖定时器
+let maxIterationsDebounceTimer: any = null
+// 上次保存的值，用于避免重复保存相同值
+let lastSavedValue: number | null = null
 
-// 处理最大迭代次数变化
-const handleMaxIterationsChange = async (value: number) => {
+// 处理最大迭代次数变化（防抖版本，点击和拖动都使用这个）
+const handleMaxIterationsChangeDebounced = (value: number) => {
   // 如果正在初始化，不触发保存
   if (isInitializing.value) return
   
-  try {
-    const config: AgentConfig = {
-      enabled: localAgentEnabled.value,
-      max_iterations: value,
-      reflection_enabled: false,
-      allowed_tools: localAllowedTools.value,
-      temperature: localTemperature.value,
-      thinking_model_id: localThinkingModelId.value,
-      rerank_model_id: localRerankModelId.value
+  // 确保 value 是数字类型
+  const numValue = typeof value === 'number' ? value : Number(value)
+  if (isNaN(numValue)) {
+    console.error('Invalid max_iterations value:', value)
+    return
+  }
+  
+  // 如果值没有变化，不保存
+  if (lastSavedValue === numValue) {
+    return
+  }
+  
+  // 清除之前的定时器
+  if (maxIterationsDebounceTimer) {
+    clearTimeout(maxIterationsDebounceTimer)
+  }
+  
+  // 设置新的定时器，300ms 后保存（减少延迟，提升响应速度）
+  maxIterationsDebounceTimer = setTimeout(async () => {
+    // 再次检查值是否变化（可能在等待期间值又变了）
+    if (lastSavedValue === numValue) {
+      maxIterationsDebounceTimer = null
+      return
     }
     
-    await updateAgentConfig(config)
-    settingsStore.updateAgentConfig({ maxIterations: value })
-    MessagePlugin.success('最大迭代次数已保存')
-  } catch (error) {
-    console.error('保存失败:', error)
-    MessagePlugin.error(getErrorMessage(error))
-  }
+    try {
+      const config: AgentConfig = {
+        enabled: isAgentReady.value, // 自动根据配置状态设置
+        max_iterations: numValue, // 确保是数字类型
+        reflection_enabled: false,
+        allowed_tools: localAllowedTools.value,
+        temperature: localTemperature.value,
+        thinking_model_id: localThinkingModelId.value,
+        rerank_model_id: localRerankModelId.value
+      }
+      
+      await updateAgentConfig(config)
+      settingsStore.updateAgentConfig({ maxIterations: numValue })
+      lastSavedValue = numValue // 记录已保存的值
+      MessagePlugin.success('最大迭代次数已保存')
+    } catch (error) {
+      console.error('保存失败:', error)
+      MessagePlugin.error(getErrorMessage(error))
+    } finally {
+      maxIterationsDebounceTimer = null
+    }
+  }, 300)
 }
 
 // 统一加载所有模型（只调用一次API）
@@ -385,7 +437,7 @@ const handleThinkingModelChange = async (value: string) => {
   
   try {
     const config: AgentConfig = {
-      enabled: localAgentEnabled.value,
+      enabled: isAgentReady.value, // 自动根据配置状态设置
       max_iterations: localMaxIterations.value,
       reflection_enabled: false,
       allowed_tools: localAllowedTools.value,
@@ -395,7 +447,8 @@ const handleThinkingModelChange = async (value: string) => {
     }
     
     await updateAgentConfig(config)
-    settingsStore.updateAgentConfig({ thinkingModelId: localThinkingModelId.value })
+    // 更新 store，确保 isAgentReady 能正确计算
+    settingsStore.updateAgentConfig({ thinkingModelId: value })
     MessagePlugin.success('思考模型已保存')
   } catch (error) {
     console.error('保存失败:', error)
@@ -417,7 +470,7 @@ const handleRerankModelChange = async (value: string) => {
   
   try {
     const config: AgentConfig = {
-      enabled: localAgentEnabled.value,
+      enabled: isAgentReady.value, // 自动根据配置状态设置
       max_iterations: localMaxIterations.value,
       reflection_enabled: false,
       allowed_tools: localAllowedTools.value,
@@ -497,7 +550,7 @@ const handleTemperatureChange = async (value: number) => {
   
   try {
     const config: AgentConfig = {
-      enabled: localAgentEnabled.value,
+      enabled: isAgentReady.value, // 自动根据配置状态设置
       max_iterations: localMaxIterations.value,
       reflection_enabled: false,
       allowed_tools: localAllowedTools.value,
@@ -522,7 +575,7 @@ const handleAllowedToolsChange = async (value: string[]) => {
   
   try {
     const config: AgentConfig = {
-      enabled: localAgentEnabled.value,
+      enabled: isAgentReady.value, // 自动根据配置状态设置
       max_iterations: localMaxIterations.value,
       reflection_enabled: false,
       allowed_tools: value,
@@ -541,6 +594,18 @@ const handleAllowedToolsChange = async (value: string[]) => {
     localAllowedTools.value = settingsStore.agentConfig.allowedTools
   }
 }
+
+// 监听 Agent 就绪状态变化，同步到 store
+watch(isAgentReady, (newValue, oldValue) => {
+  if (!isInitializing.value) {
+    // 如果配置从"就绪"变为"未就绪"，且 Agent 当前是启用状态，自动关闭
+    if (!newValue && oldValue && settingsStore.isAgentEnabled) {
+      settingsStore.toggleAgent(false)
+      MessagePlugin.warning('Agent 配置不完整，已自动关闭 Agent 模式')
+    }
+    // 注意：配置从"未就绪"变为"就绪"时，不自动启用（让用户自己决定是否启用）
+  }
+})
 </script>
 
 <style lang="less" scoped>
@@ -561,8 +626,102 @@ const handleAllowedToolsChange = async (value: string[]) => {
   .section-description {
     font-size: 14px;
     color: #666666;
-    margin: 0;
+    margin: 0 0 20px 0;
     line-height: 1.5;
+  }
+
+  .agent-status-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin-top: 8px;
+
+    .status-label {
+      flex: 1;
+      max-width: 65%;
+      padding-right: 24px;
+
+      label {
+        font-size: 15px;
+        font-weight: 500;
+        color: #333333;
+        display: block;
+        margin-bottom: 4px;
+      }
+    }
+
+    .status-control {
+      flex-shrink: 0;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+
+        &.ready {
+          background: #f0fdf4;
+          color: #16a34a;
+          
+          .status-icon {
+            color: #16a34a;
+            font-size: 16px;
+          }
+        }
+
+        &:not(.ready) {
+          background: #fff7ed;
+          color: #ea580c;
+          
+          .status-icon {
+            color: #ea580c;
+            font-size: 16px;
+          }
+        }
+
+        .status-text {
+          line-height: 1.4;
+        }
+      }
+
+      .status-hint {
+        font-size: 13px;
+        color: #666666;
+        text-align: right;
+        line-height: 1.5;
+        max-width: 280px;
+      }
+
+      .status-tip {
+        margin: 8px 0 0 0;
+        font-size: 12px;
+        color: #999999;
+        text-align: right;
+        line-height: 1.5;
+        max-width: 280px;
+        display: flex;
+        align-items: flex-start;
+        gap: 4px;
+        justify-content: flex-end;
+
+        .tip-icon {
+          font-size: 14px;
+          color: #999999;
+          flex-shrink: 0;
+          margin-top: 2px;
+        }
+      }
+    }
   }
 }
 

@@ -164,6 +164,7 @@ const updateDropdownPosition = () => {
     const vw = window.innerWidth
     const topFallback = Math.max(80, window.innerHeight / 2 - 160)
     dropdownStyle.value = {
+      position: 'fixed',
       width: `${dropdownWidth}px`,
       left: `${Math.round((vw - dropdownWidth) / 2)}px`,
       top: `${Math.round(topFallback)}px`
@@ -175,12 +176,13 @@ const updateDropdownPosition = () => {
     return
   }
 
-  // 获取 anchor 的 bounding rect
+  // 获取 anchor 的 bounding rect（相对于视口）
   let rect: DOMRect | null = null
   try {
     if (typeof anchor.getBoundingClientRect === 'function') {
+      // 强制重新计算布局，确保获取最新位置
       rect = anchor.getBoundingClientRect()
-    } else if (anchor.width && anchor.left) {
+    } else if (anchor.width !== undefined && anchor.left !== undefined) {
       // 已经是 DOMRect
       rect = anchor as DOMRect
     }
@@ -188,7 +190,7 @@ const updateDropdownPosition = () => {
     console.error('[KnowledgeBaseSelector] Error getting bounding rect:', e)
   }
   
-  if (!rect) {
+  if (!rect || rect.width === 0 || rect.height === 0) {
     applyFallback()
     return
   }
@@ -196,8 +198,9 @@ const updateDropdownPosition = () => {
   const vw = window.innerWidth
   const vh = window.innerHeight
   
-  // 左对齐到触发元素
-  let left = Math.round(rect.left)
+  // 左对齐到触发元素的左边缘
+  // 使用 Math.floor 而不是 Math.round，避免像素对齐问题
+  let left = Math.floor(rect.left)
   
   // 边界处理：不超出视口左右（留 16px margin）
   const minLeft = 16
@@ -214,34 +217,41 @@ const updateDropdownPosition = () => {
   // 判断应该向上还是向下弹出
   if (spaceBelow >= dropdownHeight + offsetY + 16) {
     // 下方空间充足，向下弹出
-    top = Math.round(rect.bottom + offsetY)
+    top = Math.floor(rect.bottom + offsetY)
   } else if (spaceAbove >= dropdownHeight + offsetY + 16) {
     // 下方不够但上方充足，向上弹出
-    top = Math.round(rect.top - dropdownHeight - offsetY)
+    top = Math.floor(rect.top - dropdownHeight - offsetY)
   } else {
     // 上下都不够，选择空间较大的一侧
     if (spaceAbove > spaceBelow) {
       // 上方空间更大，贴着顶部
-      top = Math.max(16, Math.round(rect.top - dropdownHeight - offsetY))
+      top = Math.max(16, Math.floor(rect.top - dropdownHeight - offsetY))
     } else {
       // 下方空间更大，贴着底部或按钮下方
-      top = Math.round(rect.bottom + offsetY)
+      top = Math.floor(rect.bottom + offsetY)
       // 确保不超出视口底部
       if (top + dropdownHeight > vh - 16) {
-        top = Math.max(16, vh - dropdownHeight - 16)
+        top = Math.max(16, Math.floor(vh - dropdownHeight - 16))
       }
     }
   }
 
-  // 使用 fixed 定位
+  // 使用 fixed 定位，确保没有 transform 或其他样式影响
   dropdownStyle.value = {
     position: 'fixed',
     width: `${dropdownWidth}px`,
     left: `${left}px`,
     top: `${top}px`,
-    maxHeight: `${Math.min(dropdownHeight, vh - 32)}px` // 添加最大高度限制
+    maxHeight: `${Math.min(dropdownHeight, vh - 32)}px`, // 添加最大高度限制
+    transform: 'none', // 确保没有 transform 影响定位
+    margin: '0', // 确保没有 margin 影响定位
+    padding: '0' // 确保没有 padding 影响定位
   }
 }
+
+// 事件监听器引用，用于清理
+let resizeHandler: (() => void) | null = null
+let scrollHandler: (() => void) | null = null
 
 // 当 visible 变化时处理
 watch(() => props.visible, async (v) => {
@@ -253,20 +263,33 @@ watch(() => props.visible, async (v) => {
     requestAnimationFrame(() => {
       updateDropdownPosition()
       // 再次确保位置正确（应对动画或其他延迟渲染）
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         updateDropdownPosition()
-      }, 50)
+        // 最后一次确保位置正确
+        setTimeout(() => {
+          updateDropdownPosition()
+        }, 100)
+      })
     })
     // 确保 focus
     nextTick(() => searchInput.value?.focus())
-    // 监听 resize/scroll 做微调
-    window.addEventListener('resize', updateDropdownPosition)
-    window.addEventListener('scroll', updateDropdownPosition, true)
+    // 监听 resize/scroll 做微调（使用 passive 提高性能）
+    resizeHandler = () => updateDropdownPosition()
+    scrollHandler = () => updateDropdownPosition()
+    window.addEventListener('resize', resizeHandler, { passive: true })
+    window.addEventListener('scroll', scrollHandler, { passive: true, capture: true })
   } else {
     searchQuery.value = ''
     highlightedIndex.value = 0
-    window.removeEventListener('resize', updateDropdownPosition)
-    window.removeEventListener('scroll', updateDropdownPosition, true)
+    // 清理事件监听器
+    if (resizeHandler) {
+      window.removeEventListener('resize', resizeHandler)
+      resizeHandler = null
+    }
+    if (scrollHandler) {
+      window.removeEventListener('scroll', scrollHandler, { capture: true })
+      scrollHandler = null
+    }
   }
 })
 </script>

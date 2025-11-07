@@ -33,7 +33,7 @@
             <t-input 
               v-model="displayApiKey" 
               readonly 
-              :type="showApiKey ? 'text' : 'password'"
+              type="text"
               style="width: 100%; font-family: monospace; font-size: 12px;"
             />
             <t-button 
@@ -59,17 +59,13 @@
       <div class="setting-row">
         <div class="setting-info">
           <label>API 文档</label>
-          <p class="desc">查看完整的 API 调用文档和示例</p>
-        </div>
-        <div class="setting-control">
-          <t-button 
-            size="small" 
-            theme="default" 
-            variant="outline"
-            @click="openApiDoc"
-          >
-            查看文档
-          </t-button>
+          <p class="desc">
+            查看完整的 API 调用文档和示例，
+            <a @click="openApiDoc" class="doc-link">
+              打开文档
+              <t-icon name="link" class="link-icon" />
+            </a>
+          </p>
         </div>
       </div>
 
@@ -139,7 +135,14 @@ const showApiKey = ref(false)
 // 计算属性
 const displayApiKey = computed(() => {
   if (!tenantInfo.value?.api_key) return ''
-  return tenantInfo.value.api_key
+  if (showApiKey.value) {
+    return tenantInfo.value.api_key
+  }
+  let masked = ''
+  for (let i = 0; i < tenantInfo.value.api_key.length; i++) {
+    masked += '•'
+  }
+  return masked
 })
 
 // 方法
@@ -168,13 +171,13 @@ const openApiDoc = () => {
 }
 
 const copyApiKey = async () => {
-  if (!displayApiKey.value) {
+  if (!tenantInfo.value?.api_key) {
     MessagePlugin.warning('暂无 API Key')
     return
   }
   
   try {
-    await navigator.clipboard.writeText(displayApiKey.value)
+    await navigator.clipboard.writeText(tenantInfo.value.api_key)
     MessagePlugin.success('API Key 已复制到剪贴板')
   } catch (err) {
     MessagePlugin.error('复制失败，请手动复制')
@@ -277,6 +280,26 @@ onMounted(() => {
     color: #666666;
     margin: 0;
     line-height: 1.5;
+  }
+
+  .doc-link {
+    color: #07C05F;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: #05a04f;
+      text-decoration: underline;
+    }
+
+    .link-icon {
+      font-size: 12px;
+    }
   }
 }
 

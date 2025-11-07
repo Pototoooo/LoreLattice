@@ -6,59 +6,78 @@
     </div>
 
     <div class="settings-group">
-      <!-- 启用 Ollama -->
+      <!-- Ollama 服务状态 -->
       <div class="setting-row">
         <div class="setting-info">
-          <label>启用 Ollama</label>
-          <p class="desc">启用后可以使用本地 Ollama 模型</p>
+          <label>Ollama 服务状态</label>
+          <p class="desc">自动检测本地 Ollama 服务是否可用。如果服务未运行或地址配置错误，将显示"不可用"状态</p>
         </div>
         <div class="setting-control">
-          <t-switch 
-            v-model="localEnabled" 
-            @change="handleEnableToggle"
-            size="large"
-          />
+          <div class="status-display">
+            <t-tag 
+              v-if="testing"
+              theme="default"
+              variant="light"
+            >
+              <t-icon name="loading" class="status-icon spinning" />
+              检测中
+            </t-tag>
+            <t-tag 
+              v-else-if="connectionStatus === true"
+              theme="success"
+              variant="light"
+            >
+              <t-icon name="check-circle-filled" />
+              可用
+            </t-tag>
+            <t-tag 
+              v-else-if="connectionStatus === false"
+              theme="danger"
+              variant="light"
+            >
+              <t-icon name="close-circle-filled" />
+              不可用
+            </t-tag>
+            <t-tag 
+              v-else
+              theme="default"
+              variant="light"
+            >
+              <t-icon name="help-circle" />
+              未检测
+            </t-tag>
+            <t-button 
+              size="small" 
+              variant="outline"
+              :loading="testing"
+              @click="testConnection"
+            >
+              <t-icon name="refresh" />
+              重新检测
+            </t-button>
+          </div>
         </div>
       </div>
 
       <!-- Ollama 服务地址 -->
       <div class="setting-row">
         <div class="setting-info">
-          <label>Ollama 服务地址</label>
-          <p class="desc">本地 Ollama 服务的 API 地址</p>
+          <label>服务地址</label>
+          <p class="desc">本地 Ollama 服务的 API 地址，由系统自动检测。如需修改，请在 .env 配置文件中设置</p>
         </div>
         <div class="setting-control">
           <div class="url-control-group">
             <t-input 
               v-model="localBaseUrl" 
               placeholder="http://localhost:11434"
-              :disabled="!localEnabled"
+              disabled
               style="flex: 1;"
             />
-            <div v-if="localEnabled" class="status-indicator">
-              <t-icon 
-                v-if="testing"
-                name="loading" 
-                class="status-icon spinning"
-              />
-              <t-icon 
-                v-else-if="connectionStatus === true"
-                name="check-circle-filled" 
-                class="status-icon success"
-                title="连接成功"
-              />
-              <t-icon 
-                v-else-if="connectionStatus === false"
-                name="close-circle-filled" 
-                class="status-icon error"
-                title="连接失败"
-              />
-            </div>
           </div>
           <t-alert 
-            v-if="connectionStatus === false && localEnabled"
-            theme="error"
-            message="连接失败，请检查 Ollama 是否运行"
+            v-if="connectionStatus === false"
+            theme="warning"
+            message="连接失败，请检查 Ollama 是否运行或服务地址是否正确"
             style="margin-top: 8px;"
           />
         </div>
@@ -66,8 +85,51 @@
 
     </div>
 
+    <!-- 下载新模型 -->
+    <div v-if="connectionStatus === true" class="model-category-section">
+      <div class="category-header">
+        <div class="header-info">
+          <h3>下载新模型</h3>
+          <p>
+            输入模型名称下载，
+            <a href="https://ollama.com/search" target="_blank" rel="noopener noreferrer" class="model-link">
+              浏览 Ollama 模型库
+              <t-icon name="link" class="link-icon" />
+            </a>
+          </p>
+        </div>
+      </div>
+      
+      <div class="download-content">
+        <div class="input-group">
+          <t-input 
+            v-model="downloadModelName" 
+            placeholder="如：qwen2.5:0.5b"
+            style="flex: 1;"
+          />
+          <t-button 
+            theme="primary"
+            size="small"
+            :loading="downloading"
+            :disabled="!downloadModelName.trim()"
+            @click="downloadModel"
+          >
+            下载
+          </t-button>
+        </div>
+        
+        <div v-if="downloadProgress > 0" class="download-progress">
+          <div class="progress-info">
+            <span>正在下载: {{ downloadModelName }}</span>
+            <span>{{ downloadProgress.toFixed(2) }}%</span>
+          </div>
+          <t-progress :percentage="downloadProgress" size="small" />
+        </div>
+      </div>
+    </div>
+
     <!-- 已下载的模型 -->
-    <div v-if="localEnabled && connectionStatus" class="model-category-section">
+    <div v-if="connectionStatus === true" class="model-category-section">
       <div class="category-header">
         <div class="header-info">
           <h3>已下载的模型</h3>
@@ -102,59 +164,6 @@
         <p class="empty-text">暂无已下载的模型</p>
       </div>
     </div>
-
-    <!-- 下载新模型 -->
-    <div v-if="localEnabled && connectionStatus" class="model-category-section">
-      <div class="category-header">
-        <div class="header-info">
-          <h3>下载新模型</h3>
-          <p>输入模型名称下载，或点击推荐模型快速下载</p>
-        </div>
-      </div>
-      
-      <div class="download-content">
-        <div class="input-group">
-          <t-input 
-            v-model="downloadModelName" 
-            placeholder="如：qwen2.5:0.5b"
-            style="flex: 1;"
-          />
-          <t-button 
-            theme="primary"
-            size="small"
-            :loading="downloading"
-            :disabled="!downloadModelName.trim()"
-            @click="downloadModel"
-          >
-            下载
-          </t-button>
-        </div>
-        
-        <div v-if="downloadProgress > 0" class="download-progress">
-          <div class="progress-info">
-            <span>正在下载: {{ downloadModelName }}</span>
-            <span>{{ downloadProgress.toFixed(2) }}%</span>
-          </div>
-          <t-progress :percentage="downloadProgress" size="small" />
-        </div>
-
-        <div class="recommended-models">
-          <div class="recommended-label">推荐模型：</div>
-          <div class="model-tags">
-            <t-tag 
-              v-for="model in popularModels" 
-              :key="model"
-              theme="default"
-              variant="outline"
-              class="model-tag"
-              @click="quickDownload(model)"
-            >
-              {{ model }}
-            </t-tag>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -166,7 +175,6 @@ import { checkOllamaStatus, listOllamaModels, downloadOllamaModel, getDownloadPr
 
 const settingsStore = useSettingsStore()
 
-const localEnabled = ref(settingsStore.settings.ollamaConfig?.enabled ?? true)
 const localBaseUrl = ref(settingsStore.settings.ollamaConfig?.baseUrl ?? '')
 
 const testing = ref(false)
@@ -177,32 +185,8 @@ const downloading = ref(false)
 const downloadModelName = ref('')
 const downloadProgress = ref(0)
 
-// 推荐的流行模型
-const popularModels = [
-  'qwen2.5:0.5b',
-  'qwen2.5:1.5b',
-  'llama3.2:1b',
-  'llama3.2:3b',
-  'gemma2:2b',
-  'phi3:mini'
-]
-
-// 处理启用/禁用
-const handleEnableToggle = (value: boolean) => {
-  settingsStore.updateOllamaConfig({ enabled: value })
-  MessagePlugin.success(value ? 'Ollama 已启用' : 'Ollama 已禁用')
-  
-  if (value) {
-    testConnection()
-  } else {
-    connectionStatus.value = null
-  }
-}
-
 // 测试连接
 const testConnection = async () => {
-  if (!localEnabled.value) return
-  
   testing.value = true
   connectionStatus.value = null
   
@@ -334,12 +318,6 @@ const downloadModel = async () => {
   }
 }
 
-// 快速下载推荐模型
-const quickDownload = (modelName: string) => {
-  downloadModelName.value = modelName
-  downloadModel()
-}
-
 // 初始化 Ollama 服务地址
 const initOllamaBaseUrl = async () => {
   try {
@@ -356,12 +334,10 @@ const initOllamaBaseUrl = async () => {
       localBaseUrl.value = 'http://localhost:11434'
     }
     
-    // 如果启用了，直接使用初始化时获取的状态，避免重复调用
-    if (localEnabled.value) {
+    // 直接使用初始化时获取的状态，避免重复调用
       connectionStatus.value = result.available
       if (result.available) {
         refreshModels()
-      }
     }
     
     return result
@@ -425,8 +401,7 @@ onMounted(async () => {
 
 .setting-info {
   flex: 1;
-  max-width: 65%;
-  padding-right: 24px;
+  padding-right: 32px;
 
   label {
     font-size: 15px;
@@ -440,16 +415,27 @@ onMounted(async () => {
     font-size: 13px;
     color: #666666;
     margin: 0;
-    line-height: 1.5;
+    line-height: 1.6;
   }
 }
 
 .setting-control {
   flex-shrink: 0;
-  min-width: 420px;
+  min-width: 360px;
+  max-width: 360px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+}
+
+.status-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .status-icon.spinning {
+    animation: spin 1s linear infinite;
+  }
 }
 
 .url-control-group {
@@ -457,36 +443,18 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 8px;
-
-  .status-indicator {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-
-    .status-icon {
-      font-size: 18px;
-
-      &.success {
-        color: #07C05F;
-      }
-
-      &.error {
-        color: #e34d59;
-      }
-
-      &.spinning {
-        animation: spin 1s linear infinite;
-      }
-    }
-  }
 }
 
 .model-category-section {
-  margin-bottom: 24px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 24px;
-  background: #ffffff;
+  margin-top: 32px;
+  margin-bottom: 32px;
+  padding-top: 32px;
+  border-top: 1px solid #e5e7eb;
+
+  &:first-of-type {
+    margin-top: 24px;
+    padding-top: 24px;
+  }
 
   &:last-child {
     margin-bottom: 0;
@@ -497,23 +465,42 @@ onMounted(async () => {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 
   .header-info {
     flex: 1;
 
     h3 {
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 600;
       color: #333333;
-      margin: 0 0 4px 0;
+      margin: 0 0 6px 0;
     }
 
     p {
-      font-size: 14px;
-      color: #666666;
+      font-size: 13px;
+      color: #999999;
       margin: 0;
       line-height: 1.5;
+    }
+
+    .model-link {
+      color: #07C05F;
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: #05a04f;
+        text-decoration: underline;
+      }
+
+      .link-icon {
+        font-size: 12px;
+      }
     }
   }
 }
@@ -523,8 +510,8 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 60px;
-  color: #666666;
+  padding: 48px 0;
+  color: #999999;
   font-size: 14px;
 }
 
@@ -582,52 +569,28 @@ onMounted(async () => {
   .input-group {
     display: flex;
     gap: 8px;
+    align-items: center;
   }
 
   .download-progress {
-    padding: 12px;
-    background: #f5f7fa;
-    border-radius: 6px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
 
     .progress-info {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       font-size: 13px;
       color: #333333;
-    }
-  }
-
-  .recommended-models {
-    .recommended-label {
-      font-size: 13px;
-      color: #666666;
-      margin: 0 0 10px 0;
       font-weight: 500;
-    }
-
-    .model-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-
-      .model-tag {
-        cursor: pointer;
-        transition: all 0.2s;
-        font-size: 12px;
-
-        &:hover {
-          background: #07C05F;
-          color: #ffffff;
-          border-color: #07C05F;
-        }
-      }
     }
   }
 }
 
 .empty-state {
-  padding: 80px 0;
+  padding: 48px 0;
   text-align: center;
 
   .empty-text {

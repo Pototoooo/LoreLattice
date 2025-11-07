@@ -23,6 +23,8 @@ node_modules/
 # 临时文件
 tmp/
 temp/
+logs/
+*.pid
 
 WeKnora
 /models/

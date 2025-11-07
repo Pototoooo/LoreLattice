@@ -73,11 +73,6 @@
                   <OllamaSettings />
                 </div>
 
-                <!-- 知识库设置 -->
-                <div v-if="currentSection === 'knowledge'" class="section">
-                  <KnowledgeBaseSettings />
-                </div>
-
                 <!-- Agent 配置 -->
                 <div v-if="currentSection === 'agent'" class="section">
                   <AgentSettings />
@@ -116,7 +111,6 @@ import TenantInfo from './TenantInfo.vue'
 import ApiInfo from './ApiInfo.vue'
 import GeneralSettings from './GeneralSettings.vue'
 import ModelSettings from './ModelSettings.vue'
-import KnowledgeBaseSettings from './KnowledgeBaseSettings.vue'
 import OllamaSettings from './OllamaSettings.vue'
 
 const route = useRoute()
@@ -141,7 +135,6 @@ const navItems = [
     ]
   },
   { key: 'ollama', icon: 'server', label: 'Ollama' },
-  { key: 'knowledge', icon: 'folder-open', label: '知识库' },
   { key: 'agent', icon: 'chat', label: 'Agent 配置' },
   { key: 'system', icon: 'info-circle', label: '系统信息' },
   { key: 'tenant', icon: 'user-circle', label: '租户信息' },

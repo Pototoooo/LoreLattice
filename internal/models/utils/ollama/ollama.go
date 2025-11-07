@@ -2,6 +2,7 @@ package ollama
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -273,6 +274,11 @@ func (s *OllamaService) ListModelsDetailed(ctx context.Context) ([]OllamaModelIn
 	if err != nil {
 		return nil, fmt.Errorf("failed to get model list: %w", err)
 	}
+	jsonData, err := json.Marshal(listResp.Models)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal model list: %w", err)
+	}
+	logger.GetLogger(ctx).Infof("List models detailed: %s", string(jsonData))
 
 	models := make([]OllamaModelInfo, len(listResp.Models))
 	for i, model := range listResp.Models {

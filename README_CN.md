@@ -260,6 +260,33 @@ WeKnora 支持将文档转化为知识图谱，展示文档中不同段落之间
 
 ## 🧭 开发指南
 
+### ⚡ 快速开发模式（推荐）
+
+如果你需要频繁修改代码，**不需要每次重新构建 Docker 镜像**！使用快速开发模式：
+
+```bash
+# 方式 1：使用 Make 命令（推荐）
+make dev-start      # 启动基础设施
+make dev-app        # 启动后端（新终端）
+make dev-frontend   # 启动前端（新终端）
+
+# 方式 2：一键启动
+./scripts/quick-dev.sh
+
+# 方式 3：使用脚本
+./scripts/dev.sh start     # 启动基础设施
+./scripts/dev.sh app       # 启动后端（新终端）
+./scripts/dev.sh frontend  # 启动前端（新终端）
+```
+
+**开发优势：**
+- ✅ 前端修改自动热重载（无需重启）
+- ✅ 后端修改快速重启（5-10秒，支持 Air 热重载）
+- ✅ 无需重新构建 Docker 镜像
+- ✅ 支持 IDE 断点调试
+
+**详细文档：** [开发环境快速入门](./DEVELOPMENT.md) | [完整开发指南](./docs/开发指南.md)
+
 ### 📁 项目目录结构
 
 ```
@@ -277,8 +304,19 @@ WeKnora/
 ### 🔧 常用命令
 
 ```bash
-# 清空数据库（慎用！）
-make clean-db
+# 开发模式
+make dev-start      # 启动开发环境基础设施
+make dev-stop       # 停止开发环境
+make dev-app        # 启动后端应用（本地）
+make dev-frontend   # 启动前端（本地）
+
+# 生产部署
+make build-images   # 构建所有镜像
+make start-all      # 启动所有服务
+make stop-all       # 停止所有服务
+
+# 数据库
+make clean-db       # 清空数据库（慎用！）
 ```
 
 ## 🤝 贡献指南

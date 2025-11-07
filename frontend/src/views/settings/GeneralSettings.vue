@@ -24,25 +24,6 @@
           </t-select>
         </div>
       </div>
-
-      <!-- 外观主题 -->
-      <div class="setting-row">
-        <div class="setting-info">
-          <label>外观</label>
-          <p class="desc">选择界面主题样式</p>
-        </div>
-        <div class="setting-control">
-          <t-select
-            v-model="localTheme"
-            placeholder="选择主题"
-            @change="handleThemeChange"
-            style="width: 280px;"
-          >
-            <t-option value="light" label="明亮">明亮</t-option>
-            <t-option value="dark" label="暗色">暗色</t-option>
-          </t-select>
-        </div>
-      </div>
     </div>
   </div>
 </template>

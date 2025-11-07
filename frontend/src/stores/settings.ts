@@ -84,6 +84,14 @@ export const useSettingsStore = defineStore("settings", {
     // Agent 是否启用
     isAgentEnabled: (state) => state.settings.isAgentEnabled || false,
     
+    // Agent 是否就绪（配置完整）
+    isAgentReady: (state) => {
+      const config = state.settings.agentConfig || defaultSettings.agentConfig
+      return config.thinkingModelId !== '' && 
+             config.rerankModelId !== '' && 
+             config.allowedTools.length > 0
+    },
+    
     // 获取 Agent 配置
     agentConfig: (state) => state.settings.agentConfig || defaultSettings.agentConfig,
     

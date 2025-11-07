@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { ref, defineEmits, onMounted, defineProps, computed, watch, nextTick } from "vue";
-import { useRoute } from 'vue-router';
+import { ref, defineEmits, onMounted, defineProps, computed, watch, nextTick, h } from "vue";
+import { useRoute, useRouter } from 'vue-router';
 import { onBeforeRouteUpdate } from 'vue-router';
 import { MessagePlugin } from "tdesign-vue-next";
 import { useSettingsStore } from '@/stores/settings';
+import { useUIStore } from '@/stores/ui';
 import { listKnowledgeBases } from '@/api/knowledge-base';
 import KnowledgeBaseSelector from './KnowledgeBaseSelector.vue';
 
 const route = useRoute();
+const router = useRouter();
 const settingsStore = useSettingsStore();
+const uiStore = useUIStore();
 let query = ref("");
 const showKbSelector = ref(false);
 const atButtonRef = ref<HTMLElement>();
@@ -98,6 +101,45 @@ const onKeydown = (val: string, event: { e: { preventDefault(): unknown; keyCode
 }
 
 const toggleAgentMode = () => {
+  // 如果要启用 Agent，先检查是否就绪
+  // 注意：isAgentReady 是从 store 中计算的，需要确保 store 中的配置是最新的
+  if (!isAgentEnabled.value) {
+    // 尝试启用 Agent，先检查是否就绪
+    const agentReady = settingsStore.isAgentReady
+    if (!agentReady) {
+      // 创建带跳转链接的自定义消息
+      const messageContent = h('div', { style: 'display: flex; align-items: center; gap: 8px; flex-wrap: wrap;' }, [
+        h('span', { style: 'flex: 1; min-width: 0;' }, 'Agent 未就绪，请先在设置中完成 Agent 配置（思考模型、Rerank 模型和允许的工具）'),
+        h('a', {
+          href: '#',
+          onClick: (e: Event) => {
+            e.preventDefault();
+            // 使用 uiStore 打开设置并跳转到 agent 部分
+            uiStore.openSettings('agent');
+            // 如果当前不在设置页面，导航到设置页面
+            if (route.path !== '/platform/settings') {
+              router.push('/platform/settings');
+            }
+          },
+          style: 'color: #07C05F; text-decoration: none; font-weight: 500; cursor: pointer; white-space: nowrap; flex-shrink: 0;',
+          onMouseenter: (e: Event) => {
+            (e.target as HTMLElement).style.textDecoration = 'underline';
+          },
+          onMouseleave: (e: Event) => {
+            (e.target as HTMLElement).style.textDecoration = 'none';
+          }
+        }, '去设置 →')
+      ]);
+      
+      MessagePlugin.warning({
+        content: messageContent,
+        duration: 5000
+      });
+      return
+    }
+  }
+  
+  // 正常切换 Agent 状态
   settingsStore.toggleAgent(!isAgentEnabled.value);
   const message = isAgentEnabled.value ? 'Agent 模式已启用' : 'Agent 模式已禁用';
   MessagePlugin.success(message);
@@ -126,10 +168,16 @@ onBeforeRouteUpdate((to, from, next) => {
       <!-- 左侧控制按钮 -->
       <div class="control-left">
         <!-- Agent 模式按钮 -->
-        <t-tooltip :content="isAgentEnabled ? 'Agent 模式（已启用）' : 'Agent 模式（已禁用）'" placement="top">
+        <t-tooltip 
+          :content="isAgentEnabled ? 'Agent 模式（已启用）' : (settingsStore.isAgentReady ? 'Agent 模式（已禁用，点击启用）' : 'Agent 未就绪，请先完成配置')" 
+          placement="top"
+        >
           <div 
             class="control-btn agent-btn"
-            :class="{ 'active': isAgentEnabled }"
+            :class="{ 
+              'active': isAgentEnabled,
+              'disabled': !isAgentEnabled && !settingsStore.isAgentReady
+            }"
             @click="toggleAgentMode"
           >
             <img 
@@ -307,6 +355,16 @@ const getImgSrc = (url: string) => {
     
     &:hover {
       background: rgba(7, 192, 95, 0.15);
+    }
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    
+    &:hover {
+      background: #f5f5f5;
+      transform: none;
     }
   }
 }

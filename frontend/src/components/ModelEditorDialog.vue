@@ -31,64 +31,66 @@
         <!-- Ollama 本地模型选择器 -->
         <div v-if="formData.source === 'local'" class="form-item">
           <label class="form-label required">模型名称</label>
-          <t-select
-            v-model="formData.modelName"
-            :loading="loadingOllamaModels"
-            :class="{ 'downloading': downloading }"
-            :style="downloading ? `--progress: ${downloadProgress}%` : ''"
-            filterable
-            :filter="handleModelFilter"
-            placeholder="搜索模型..."
-            @focus="loadOllamaModels"
-            @visible-change="handleDropdownVisibleChange"
-          >
-            <!-- 已下载的模型 -->
-            <t-option
-              v-for="model in filteredOllamaModels"
-              :key="model.name"
-              :value="model.name"
-              :label="model.name"
+          <div class="model-select-row">
+            <t-select
+              v-model="formData.modelName"
+              :loading="loadingOllamaModels"
+              :class="{ 'downloading': downloading }"
+              :style="downloading ? `--progress: ${downloadProgress}%` : ''"
+              filterable
+              :filter="handleModelFilter"
+              placeholder="搜索模型..."
+              @focus="loadOllamaModels"
+              @visible-change="handleDropdownVisibleChange"
             >
-              <div class="model-option">
-                <t-icon name="check-circle-filled" class="downloaded-icon" />
-                <span class="model-name">{{ model.name }}</span>
-                <span class="model-size">{{ formatModelSize(model.size) }}</span>
-              </div>
-            </t-option>
+              <!-- 已下载的模型 -->
+              <t-option
+                v-for="model in filteredOllamaModels"
+                :key="model.name"
+                :value="model.name"
+                :label="model.name"
+              >
+                <div class="model-option">
+                  <t-icon name="check-circle-filled" class="downloaded-icon" />
+                  <span class="model-name">{{ model.name }}</span>
+                  <span class="model-size">{{ formatModelSize(model.size) }}</span>
+                </div>
+              </t-option>
+              
+              <!-- 下载新模型选项（仅当搜索词不在列表中时显示） -->
+              <t-option
+                v-if="showDownloadOption"
+                :value="`__download__${searchKeyword}`"
+                :label="`下载: ${searchKeyword}`"
+                class="download-option"
+              >
+                <div class="model-option download">
+                  <t-icon name="download" class="download-icon" />
+                  <span class="model-name">下载: {{ searchKeyword }}</span>
+                </div>
+              </t-option>
+              
+              <!-- 下载进度后缀 -->
+              <template v-if="downloading" #suffix>
+                <div class="download-suffix">
+                  <t-icon name="loading" class="spinning" />
+                  <span class="progress-text">{{ downloadProgress.toFixed(1) }}%</span>
+                </div>
+              </template>
+            </t-select>
             
-            <!-- 下载新模型选项（仅当搜索词不在列表中时显示） -->
-            <t-option
-              v-if="showDownloadOption"
-              :value="`__download__${searchKeyword}`"
-              :label="`下载: ${searchKeyword}`"
-              class="download-option"
+            <!-- 刷新按钮 -->
+            <t-button
+              variant="text"
+              size="small"
+              :loading="loadingOllamaModels"
+              @click="refreshOllamaModels"
+              class="refresh-btn"
             >
-              <div class="model-option download">
-                <t-icon name="download" class="download-icon" />
-                <span class="model-name">下载: {{ searchKeyword }}</span>
-              </div>
-            </t-option>
-            
-            <!-- 下载进度后缀 -->
-            <template v-if="downloading" #suffix>
-              <div class="download-suffix">
-                <t-icon name="loading" class="spinning" />
-                <span class="progress-text">{{ downloadProgress.toFixed(1) }}%</span>
-              </div>
-            </template>
-          </t-select>
-          
-          <!-- 刷新按钮 -->
-          <t-button
-            variant="text"
-            size="small"
-            :loading="loadingOllamaModels"
-            @click="refreshOllamaModels"
-            class="refresh-btn"
-          >
-            <t-icon name="refresh" />
-            刷新列表
-          </t-button>
+              <t-icon name="refresh" />
+              刷新列表
+            </t-button>
+          </div>
         </div>
 
         <!-- Remote API 和 VLLM 保持原有的 input -->
@@ -153,12 +155,31 @@
         <!-- Embedding 专用：维度 -->
         <div v-if="modelType === 'embedding'" class="form-item">
           <label class="form-label">向量维度</label>
-          <t-input-number 
-            v-model="formData.dimension" 
-            :min="128"
-            :max="4096"
-            placeholder="如：1536"
-          />
+          <div class="dimension-control">
+            <t-input 
+              v-model.number="formData.dimension" 
+              type="number"
+              :min="128"
+              :max="4096"
+              placeholder="如：1536"
+              :disabled="formData.source === 'local' && checking"
+            />
+            <!-- Ollama 本地模型：自动检测维度按钮 -->
+            <t-button 
+              v-if="formData.source === 'local' && formData.modelName"
+              variant="outline"
+              size="small"
+              :loading="checking"
+              @click="checkOllamaDimension"
+              class="dimension-check-btn"
+            >
+              <t-icon name="refresh" />
+              检测维度
+            </t-button>
+          </div>
+          <p v-if="dimensionChecked && dimensionMessage" class="dimension-hint" :class="{ success: dimensionSuccess }">
+            {{ dimensionMessage }}
+          </p>
         </div>
 
         <!-- 设为默认 -->
@@ -231,6 +252,9 @@ const checking = ref(false)
 const remoteChecked = ref(false)
 const remoteAvailable = ref(false)
 const remoteMessage = ref('')
+const dimensionChecked = ref(false)
+const dimensionSuccess = ref(false)
+const dimensionMessage = ref('')
 
 // Ollama 模型状态
 const ollamaModelList = ref<OllamaModelInfo[]>([])
@@ -248,7 +272,7 @@ const formData = ref<ModelFormData>({
   modelName: '',
   baseUrl: '',
   apiKey: '',
-  dimension: 1536,
+  dimension: undefined,
   interfaceType: 'ollama',
   isDefault: false
 })
@@ -338,7 +362,7 @@ const resetForm = () => {
     modelName: '',
     baseUrl: '',
     apiKey: '',
-    dimension: props.modelType === 'embedding' ? 1536 : undefined,
+    dimension: undefined, // 默认不填，让用户手动输入或通过检测按钮获取
     interfaceType: undefined,
     isDefault: false
   }
@@ -347,6 +371,9 @@ const resetForm = () => {
   remoteChecked.value = false
   remoteAvailable.value = false
   remoteMessage.value = ''
+  dimensionChecked.value = false
+  dimensionSuccess.value = false
+  dimensionMessage.value = ''
 }
 
 // 监听来源变化，重置校验状态（已合并到下面的 watch）
@@ -433,6 +460,45 @@ const checkModelStatus = async () => {
     console.error('检查模型状态失败:', error)
     modelChecked.value = false
     modelAvailable.value = false
+  }
+}
+
+// 检查 Ollama 本地 Embedding 模型维度
+const checkOllamaDimension = async () => {
+  if (!formData.value.modelName || formData.value.source !== 'local' || props.modelType !== 'embedding') {
+    return
+  }
+  
+  checking.value = true
+  dimensionChecked.value = false
+  dimensionMessage.value = ''
+  
+  try {
+    const result = await testEmbeddingModel({
+      source: 'local',
+      modelName: formData.value.modelName,
+      dimension: formData.value.dimension
+    })
+    
+    dimensionChecked.value = true
+    dimensionSuccess.value = result.available || false
+    
+    if (result.available && result.dimension) {
+      formData.value.dimension = result.dimension
+      dimensionMessage.value = `检测成功，向量维度：${result.dimension}`
+      MessagePlugin.success(dimensionMessage.value)
+    } else {
+      dimensionMessage.value = result.message || '检测失败，请手动输入维度'
+      MessagePlugin.warning(dimensionMessage.value)
+    }
+  } catch (error: any) {
+    console.error('检测 Ollama 模型维度失败:', error)
+    dimensionChecked.value = true
+    dimensionSuccess.value = false
+    dimensionMessage.value = error.message || '检测失败，请手动输入维度'
+    MessagePlugin.error(dimensionMessage.value)
+  } finally {
+    checking.value = false
   }
 }
 
@@ -570,18 +636,31 @@ const handleConfirm = async () => {
   }
 }
 
-// 监听模型选择变化（处理下载逻辑）
-watch(() => formData.value.modelName, async (newValue) => {
-  if (!newValue || !newValue.startsWith('__download__')) return
+// 监听模型选择变化（处理下载逻辑和自动维度检测提示）
+watch(() => formData.value.modelName, async (newValue, oldValue) => {
+  if (!newValue) return
   
-  // 提取模型名称
-  const modelName = newValue.replace('__download__', '')
+  // 处理下载逻辑
+  if (newValue.startsWith('__download__')) {
+    // 提取模型名称
+    const modelName = newValue.replace('__download__', '')
+    
+    // 重置选择（避免显示 __download__ 前缀）
+    formData.value.modelName = ''
+    
+    // 开始下载
+    await startDownload(modelName)
+    return
+  }
   
-  // 重置选择（避免显示 __download__ 前缀）
-  formData.value.modelName = ''
-  
-  // 开始下载
-  await startDownload(modelName)
+  // 如果是 embedding 模型且选择的是 Ollama 本地模型，且模型名称发生了实际变化
+  if (props.modelType === 'embedding' && 
+      formData.value.source === 'local' && 
+      newValue !== oldValue && 
+      oldValue !== '') {
+    // 提示用户可以检测维度
+    MessagePlugin.info('模型已选择，点击"检测维度"按钮自动获取向量维度')
+  }
 })
 
 // 开始下载模型
@@ -658,6 +737,9 @@ watch(() => formData.value.source, () => {
   remoteChecked.value = false
   remoteAvailable.value = false
   remoteMessage.value = ''
+  dimensionChecked.value = false
+  dimensionSuccess.value = false
+  dimensionMessage.value = ''
   
   // 清理下载状态
   searchKeyword.value = ''
@@ -668,6 +750,13 @@ watch(() => formData.value.source, () => {
   downloading.value = false
   downloadProgress.value = 0
   currentDownloadModel.value = ''
+})
+
+// 监听模型名称变化，清理维度检测状态
+watch(() => formData.value.modelName, () => {
+  dimensionChecked.value = false
+  dimensionSuccess.value = false
+  dimensionMessage.value = ''
 })
 
 // 取消
@@ -1000,10 +1089,21 @@ const handleCancel = () => {
   }
 }
 
+.model-select-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .t-select {
+    flex: 1;
+  }
+}
+
 .refresh-btn {
-  margin-top: 4px;
+  margin-top: 0;
   font-size: 12px;
   color: #666666;
+  flex-shrink: 0;
   
   &:hover {
     color: #07C05F;
@@ -1013,6 +1113,33 @@ const handleCancel = () => {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+// 维度控制样式
+.dimension-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  :deep(.t-input) {
+    flex: 1;
+  }
+}
+
+.dimension-check-btn {
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+.dimension-hint {
+  margin: 8px 0 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #e34d59;
+
+  &.success {
+    color: #07C05F;
+  }
 }
 </style>
 
