@@ -15,9 +15,15 @@ import (
 	"github.com/Tencent/WeKnora/internal/tracing"
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/google/uuid"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 )
+
+// generateEventID generates a unique event ID with type suffix for better traceability
+func generateEventID(suffix string) string {
+	return fmt.Sprintf("%s-%s", uuid.New().String()[:8], suffix)
+}
 
 // sessionService implements the SessionService interface for managing conversation sessions
 type sessionService struct {
@@ -393,9 +399,8 @@ func (s *sessionService) GenerateTitleAsync(ctx context.Context, session *types.
 }
 
 // KnowledgeQA performs knowledge base question answering with LLM summarization
-func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session, query string, knowledgeBaseIDs []string) (
-	[]*types.SearchResult, <-chan types.StreamResponse, error,
-) {
+// Events are emitted through eventBus (references, answer chunks, completion)
+func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session, query string, knowledgeBaseIDs []string, assistantMessageID string, eventBus *event.EventBus) error {
 	logger.Infof(ctx, "Knowledge base question answering parameters, session ID: %s, query: %s", session.ID, query)
 
 	// If no knowledge base IDs provided, fall back to session's default
@@ -405,7 +410,7 @@ func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session
 			logger.Infof(ctx, "No knowledge base IDs provided, using session default: %s", session.KnowledgeBaseID)
 		} else {
 			logger.Warnf(ctx, "Session has no associated knowledge base, session ID: %s", session.ID)
-			return nil, nil, errors.New("session has no knowledge base")
+			return errors.New("session has no knowledge base")
 		}
 	}
 
@@ -414,7 +419,7 @@ func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session
 	// Determine chat model ID: prioritize Remote models
 	chatModelID, err := s.selectChatModelID(ctx, session, knowledgeBaseIDs)
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 
 	// Create chat management object with session settings
@@ -423,6 +428,7 @@ func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session
 		Query:            query,
 		RewriteQuery:     query,
 		SessionID:        session.ID,
+		MessageID:        assistantMessageID,  // NEW: For event emission in pipeline
 		KnowledgeBaseID:  knowledgeBaseIDs[0], // For backward compatibility, use first KB ID
 		KnowledgeBaseIDs: knowledgeBaseIDs,    // Multi-KB support
 		VectorThreshold:  session.VectorThreshold,
@@ -447,6 +453,7 @@ func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session
 			MaxCompletionTokens: session.SummaryParameters.MaxCompletionTokens,
 		},
 		FallbackResponse: session.FallbackResponse,
+		EventBus:         eventBus.AsEventBusInterface(), // NEW: For pipeline to emit events directly
 	}
 
 	// Start knowledge QA event processing
@@ -457,11 +464,31 @@ func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session
 			"session_id":        session.ID,
 			"knowledge_base_id": session.KnowledgeBaseID,
 		})
-		return nil, nil, err
+		return err
 	}
 
-	logger.Info(ctx, "Knowledge base question answering completed")
-	return chatManage.MergeResult, chatManage.ResponseChan, nil
+	// Emit references event if we have search results
+	if len(chatManage.MergeResult) > 0 {
+		logger.Infof(ctx, "Emitting references event with %d results", len(chatManage.MergeResult))
+		if err := eventBus.Emit(ctx, event.Event{
+			ID:        generateEventID("references"),
+			Type:      event.EventAgentReferences,
+			SessionID: session.ID,
+			Data: event.AgentReferencesData{
+				References: chatManage.MergeResult,
+			},
+		}); err != nil {
+			logger.Errorf(ctx, "Failed to emit references event: %v", err)
+		}
+	}
+
+	// Note: Answer events are now emitted directly by chat_completion_stream plugin
+	// Completion event will be emitted when the last answer event has Done=true
+	// We can optionally add a completion watcher here if needed, but for now
+	// the frontend can detect completion from the Done flag
+
+	logger.Info(ctx, "Knowledge base question answering initiated")
+	return nil
 }
 
 // selectChatModelID selects the appropriate chat model ID with priority for Remote models
@@ -564,28 +591,43 @@ func (s *sessionService) KnowledgeQAByEvent(ctx context.Context,
 	)
 
 	// Process each event in sequence
-	for _, event := range eventList {
-		logger.Infof(ctx, "Starting to trigger event: %v", event)
-		err := s.eventManager.Trigger(ctx, event, chatManage)
+	for _, eventType := range eventList {
+		logger.Infof(ctx, "Starting to trigger event: %v", eventType)
+		err := s.eventManager.Trigger(ctx, eventType, chatManage)
 
 		// Handle case where search returns no results
 		if err == chatpipline.ErrSearchNothing {
-			logger.Warnf(ctx, "Event %v triggered, search result is empty, using fallback response", event)
-			chatManage.ResponseChan = chatpipline.NewFallbackChan(ctx, chatManage.FallbackResponse)
+			logger.Warnf(ctx, "Event %v triggered, search result is empty, using fallback response", eventType)
 			chatManage.ChatResponse = &types.ChatResponse{Content: chatManage.FallbackResponse}
+
+			// Emit fallback response as answer event
+			if chatManage.EventBus != nil {
+				fallbackID := generateEventID("fallback")
+				if err := chatManage.EventBus.Emit(ctx, types.Event{
+					ID:        fallbackID,
+					Type:      types.EventType(event.EventAgentThought),
+					SessionID: chatManage.SessionID,
+					Data: event.AgentThoughtData{
+						Content: chatManage.FallbackResponse,
+						Done:    true,
+					},
+				}); err != nil {
+					logger.Errorf(ctx, "Failed to emit fallback answer event: %v", err)
+				}
+			}
 			return nil
 		}
 
 		// Handle other errors
 		if err != nil {
 			logger.Errorf(ctx, "Event triggering failed, event: %v, error type: %s, description: %s, error: %v",
-				event, err.ErrorType, err.Description, err.Err)
+				eventType, err.ErrorType, err.Description, err.Err)
 			span.RecordError(err.Err)
 			span.SetStatus(codes.Error, err.Description)
 			span.SetAttributes(attribute.String("error_type", err.ErrorType))
 			return err.Err
 		}
-		logger.Infof(ctx, "Event %v triggered successfully", event)
+		logger.Infof(ctx, "Event %v triggered successfully", eventType)
 	}
 
 	logger.Info(ctx, "All events triggered successfully")
@@ -680,9 +722,7 @@ func (s *sessionService) SearchKnowledge(ctx context.Context,
 }
 
 // AgentQA performs agent-based question answering with conversation history and streaming support
-func (s *sessionService) AgentQA(ctx context.Context, session *types.Session, query string, assistantMessageID string, eventBus *event.EventBus) (
-	[]*types.SearchResult, error,
-) {
+func (s *sessionService) AgentQA(ctx context.Context, session *types.Session, query string, assistantMessageID string, eventBus *event.EventBus) error {
 	sessionID := session.ID
 	tenantID := ctx.Value(types.TenantIDContextKey).(uint)
 	logger.Infof(ctx, "Start agent-based question answering, session ID: %s, tenant ID: %d, query: %s", sessionID, tenantID, query)
@@ -696,13 +736,13 @@ func (s *sessionService) AgentQA(ctx context.Context, session *types.Session, qu
 	// Check if agent is enabled at session level
 	if session.AgentConfig == nil || !session.AgentConfig.Enabled {
 		logger.Warnf(ctx, "Agent not enabled for session: %s", sessionID)
-		return nil, errors.New("agent not enabled for this session")
+		return errors.New("agent not enabled for this session")
 	}
 
 	// Check if tenant has agent configuration
 	if tenantInfo.AgentConfig == nil {
 		logger.Warnf(ctx, "Tenant %d has no agent configuration", tenantInfo.ID)
-		return nil, errors.New("tenant has no agent configuration")
+		return errors.New("tenant has no agent configuration")
 	}
 
 	// Create runtime AgentConfig by merging session and tenant configs
@@ -734,12 +774,12 @@ func (s *sessionService) AgentQA(ctx context.Context, session *types.Session, qu
 			allKBs, err := s.knowledgeBaseService.ListKnowledgeBases(ctx)
 			if err != nil {
 				logger.Errorf(ctx, "Failed to list knowledge bases for tenant: %v", err)
-				return nil, fmt.Errorf("failed to list knowledge bases: %w", err)
+				return fmt.Errorf("failed to list knowledge bases: %w", err)
 			}
 
 			if len(allKBs) == 0 {
 				logger.Warnf(ctx, "No knowledge bases available for agent session: %s", sessionID)
-				return nil, errors.New("no knowledge bases available for agent")
+				return errors.New("no knowledge bases available for agent")
 			}
 
 			// Extract knowledge base IDs
@@ -764,7 +804,7 @@ func (s *sessionService) AgentQA(ctx context.Context, session *types.Session, qu
 	summaryModel, err := s.modelService.GetChatModel(ctx, agentConfig.ThinkingModelID)
 	if err != nil {
 		logger.Warnf(ctx, "Failed to get chat model: %v", err)
-		return nil, fmt.Errorf("failed to get chat model: %w", err)
+		return fmt.Errorf("failed to get chat model: %w", err)
 	}
 
 	// Get or create contextManager for this session
@@ -782,30 +822,27 @@ func (s *sessionService) AgentQA(ctx context.Context, session *types.Session, qu
 	engine, err := s.agentService.CreateAgentEngine(ctx, agentConfig, eventBus, contextManager, session.ID)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create agent engine: %v", err)
-		return nil, err
+		return err
 	}
 
 	// Execute agent with streaming (asynchronously)
 	// Events will be emitted to EventBus and handled by the Handler layer
 	logger.Info(ctx, "Executing agent with streaming")
-	go func() {
-		if _, err := engine.Execute(ctx, sessionID, assistantMessageID, query, llmContext); err != nil {
-			logger.Errorf(ctx, "Agent execution failed: %v", err)
-			// Emit error event to the EventBus used by this agent
-			eventBus.Emit(ctx, event.Event{
-				Type:      event.EventError,
+	if _, err := engine.Execute(ctx, sessionID, assistantMessageID, query, llmContext); err != nil {
+		logger.Errorf(ctx, "Agent execution failed: %v", err)
+		// Emit error event to the EventBus used by this agent
+		eventBus.Emit(ctx, event.Event{
+			Type:      event.EventError,
+			SessionID: sessionID,
+			Data: event.ErrorData{
+				Error:     err.Error(),
+				Stage:     "agent_execution",
 				SessionID: sessionID,
-				Data: event.ErrorData{
-					Error:     err.Error(),
-					Stage:     "agent_execution",
-					SessionID: sessionID,
-				},
-			})
-		}
-	}()
-
+			},
+		})
+	}
 	// Return empty - events will be handled by Handler via EventBus subscription
-	return nil, nil
+	return nil
 }
 
 // getContextManagerForSession creates a context manager for the session based on configuration

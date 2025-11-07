@@ -110,13 +110,11 @@ const getmsgList = (data, isScrollType = false, scrollHeight) => {
 
 // Reconstruct agentEventStream from agent_steps stored in database
 // This allows the frontend to restore the exact conversation state including all agent reasoning steps
-const reconstructEventStreamFromSteps = (agentSteps) => {
-    if (!agentSteps || !Array.isArray(agentSteps) || agentSteps.length === 0) {
-        return [];
-    }
-    
+const reconstructEventStreamFromSteps = (agentSteps, messageContent) => {
     const events = [];
     
+    // Process agent steps if they exist
+    if (agentSteps && Array.isArray(agentSteps) && agentSteps.length > 0) {
     agentSteps.forEach((step) => {
         // Add thinking event if thought content exists
         if (step.thought && step.thought.trim()) {
@@ -148,12 +146,14 @@ const reconstructEventStreamFromSteps = (agentSteps) => {
             });
         }
     });
+    }
     
-    // 添加一个完成标记的 answer 事件，触发折叠逻辑
-    if (events.length > 0) {
+    // 总是添加 answer 事件如果有内容（无论是否有 agent_steps）
+    // 这样可以确保最终答案始终被渲染
+    if (messageContent && messageContent.trim()) {
         events.push({
             type: 'answer',
-            content: '',  // 空内容，因为最终答案会在 message.content 中
+            content: messageContent,
             done: true
         });
     }
@@ -174,8 +174,8 @@ const handleMsgList = async (data, isScrollType = false, newScrollHeight) => {
         if (item.agent_steps && Array.isArray(item.agent_steps) && item.agent_steps.length > 0) {
             console.log('[Message Load] Reconstructing agent steps for message:', item.id, 'steps:', item.agent_steps.length);
             item.isAgentMode = true;
-            item.agentEventStream = reconstructEventStreamFromSteps(item.agent_steps);
-            // 隐藏最终答案内容，用户可以通过展开步骤查看完整过程
+            item.agentEventStream = reconstructEventStreamFromSteps(item.agent_steps, item.content);
+            // 隐藏最终答案内容，因为它已经包含在 agentEventStream 的 answer 事件中
             item.hideContent = true;
             console.log('[Message Load] Reconstructed', item.agentEventStream.length, 'events from agent steps');
         }
@@ -530,7 +530,10 @@ const handleAgentChunk = (data) => {
 
         case 'references':
             // 知识引用
-            if (data.knowledge_references) {
+            if (data.data?.references) {
+                message.knowledge_references = data.data.references;
+            } else if (data.knowledge_references) {
+                // 兼容旧格式
                 message.knowledge_references = data.knowledge_references;
             }
             break;

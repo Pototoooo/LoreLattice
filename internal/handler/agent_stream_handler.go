@@ -10,14 +10,13 @@ import (
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
-	"github.com/gin-gonic/gin"
 )
 
 // AgentStreamHandler handles agent events for SSE streaming
 // It uses a dedicated EventBus per request to avoid SessionID filtering
+// Events are appended to StreamManager without accumulation
 type AgentStreamHandler struct {
 	ctx                context.Context
-	ginContext         *gin.Context
 	sessionID          string
 	assistantMessageID string
 	requestID          string
@@ -27,17 +26,15 @@ type AgentStreamHandler struct {
 	eventBus *event.EventBus
 
 	// State tracking
-	knowledgeRefs      []*types.SearchResult
-	finalAnswer        string
-	accumulatedContent map[string]string    // Accumulate content per event ID (thought, answer, reflection)
-	eventStartTimes    map[string]time.Time // Track start time for duration calculation
-	mu                 sync.Mutex
+	knowledgeRefs   []*types.SearchResult
+	finalAnswer     string
+	eventStartTimes map[string]time.Time // Track start time for duration calculation
+	mu              sync.Mutex
 }
 
 // NewAgentStreamHandler creates a new handler for agent SSE streaming
 func NewAgentStreamHandler(
 	ctx context.Context,
-	c *gin.Context,
 	sessionID, assistantMessageID, requestID string,
 	assistantMessage *types.Message,
 	streamManager interfaces.StreamManager,
@@ -45,7 +42,6 @@ func NewAgentStreamHandler(
 ) *AgentStreamHandler {
 	return &AgentStreamHandler{
 		ctx:                ctx,
-		ginContext:         c,
 		sessionID:          sessionID,
 		assistantMessageID: assistantMessageID,
 		requestID:          requestID,
@@ -53,7 +49,6 @@ func NewAgentStreamHandler(
 		streamManager:      streamManager,
 		eventBus:           eventBus,
 		knowledgeRefs:      make([]*types.SearchResult, 0),
-		accumulatedContent: make(map[string]string),
 		eventStartTimes:    make(map[string]time.Time),
 	}
 }
@@ -69,7 +64,7 @@ func (h *AgentStreamHandler) Subscribe() {
 	h.eventBus.On(event.EventAgentFinalAnswer, h.handleFinalAnswer)
 	h.eventBus.On(event.EventAgentReflection, h.handleReflection)
 	h.eventBus.On(event.EventError, h.handleError)
-	h.eventBus.On(event.EventAgentComplete, h.handleComplete)
+	h.eventBus.On(event.EventSessionTitle, h.handleSessionTitle)
 }
 
 // handleThought handles agent thought events
@@ -105,22 +100,17 @@ func (h *AgentStreamHandler) handleThought(ctx context.Context, evt event.Event)
 
 	h.mu.Unlock()
 
-	// Send SSE response (real-time incremental)
-	response := types.StreamResponse{
-		ID:           h.requestID,
-		ResponseType: types.ResponseTypeThinking,
-		Content:      data.Content,
-		Done:         data.Done,
-		Data:         metadata,
+	// Append this chunk to stream (no accumulation - frontend will accumulate)
+	if err := h.streamManager.AppendEvent(h.ctx, h.sessionID, h.assistantMessageID, interfaces.StreamEvent{
+		ID:        evt.ID,
+		Type:      types.ResponseTypeThinking,
+		Content:   data.Content, // Just this chunk
+		Done:      data.Done,
+		Timestamp: time.Now(),
+		Data:      metadata,
+	}); err != nil {
+		logger.GetLogger(h.ctx).Error("Append thought event to stream failed", "error", err)
 	}
-
-	h.ginContext.SSEvent("message", response)
-	h.ginContext.Writer.Flush()
-
-	// Accumulate content and replace event in stream (so refresh can see progress)
-	h.mu.Lock()
-	h.accumulateAndReplaceEventWithData(evt.ID, types.ResponseTypeThinking, data.Content, data.Done, metadata)
-	h.mu.Unlock()
 
 	return nil
 }
@@ -137,20 +127,8 @@ func (h *AgentStreamHandler) handleToolCall(ctx context.Context, evt event.Event
 		"arguments": data.Arguments,
 	}
 
-	// Send SSE response
-	response := types.StreamResponse{
-		ID:           h.requestID,
-		ResponseType: types.ResponseTypeToolCall,
-		Content:      fmt.Sprintf("Calling tool: %s", data.ToolName),
-		Done:         false,
-		Data:         metadata,
-	}
-
-	h.ginContext.SSEvent("message", response)
-	h.ginContext.Writer.Flush()
-
-	// Push event to stream for replay on refresh
-	if err := h.streamManager.PushEvent(h.ctx, h.sessionID, h.assistantMessageID, interfaces.StreamEvent{
+	// Append event to stream
+	if err := h.streamManager.AppendEvent(h.ctx, h.sessionID, h.assistantMessageID, interfaces.StreamEvent{
 		ID:        evt.ID,
 		Type:      types.ResponseTypeToolCall,
 		Content:   fmt.Sprintf("Calling tool: %s", data.ToolName),
@@ -158,7 +136,7 @@ func (h *AgentStreamHandler) handleToolCall(ctx context.Context, evt event.Event
 		Timestamp: time.Now(),
 		Data:      metadata,
 	}); err != nil {
-		logger.GetLogger(h.ctx).Error("Push tool call event to stream failed", "error", err)
+		logger.GetLogger(h.ctx).Error("Append tool call event to stream failed", "error", err)
 	}
 
 	return nil
@@ -197,19 +175,8 @@ func (h *AgentStreamHandler) handleToolResult(ctx context.Context, evt event.Eve
 		}
 	}
 
-	response := types.StreamResponse{
-		ID:           h.requestID,
-		ResponseType: responseType,
-		Content:      content,
-		Done:         false,
-		Data:         metadata,
-	}
-
-	h.ginContext.SSEvent("message", response)
-	h.ginContext.Writer.Flush()
-
-	// Push event to stream for replay on refresh
-	if err := h.streamManager.PushEvent(h.ctx, h.sessionID, h.assistantMessageID, interfaces.StreamEvent{
+	// Append event to stream
+	if err := h.streamManager.AppendEvent(h.ctx, h.sessionID, h.assistantMessageID, interfaces.StreamEvent{
 		ID:        evt.ID,
 		Type:      responseType,
 		Content:   content,
@@ -217,7 +184,7 @@ func (h *AgentStreamHandler) handleToolResult(ctx context.Context, evt event.Eve
 		Timestamp: time.Now(),
 		Data:      metadata,
 	}); err != nil {
-		logger.GetLogger(h.ctx).Error("Push tool result event to stream failed", "error", err)
+		logger.GetLogger(h.ctx).Error("Append tool result event to stream failed", "error", err)
 	}
 
 	return nil
@@ -271,26 +238,8 @@ func (h *AgentStreamHandler) handleReferences(ctx context.Context, evt event.Eve
 	// Update assistant message references
 	h.assistantMessage.KnowledgeReferences = h.knowledgeRefs
 
-	// Send SSE response
-	response := types.StreamResponse{
-		ID:                  h.requestID,
-		ResponseType:        types.ResponseTypeReferences,
-		KnowledgeReferences: h.knowledgeRefs,
-		Done:                false,
-	}
-
-	h.ginContext.SSEvent("message", response)
-	h.ginContext.Writer.Flush()
-
-	// Update stream references
-	if err := h.streamManager.UpdateReferences(
-		h.ctx, h.sessionID, h.assistantMessageID, h.knowledgeRefs,
-	); err != nil {
-		logger.GetLogger(h.ctx).Error("Update stream references failed", "error", err)
-	}
-
-	// Push event to stream for replay on refresh
-	if err := h.streamManager.PushEvent(h.ctx, h.sessionID, h.assistantMessageID, interfaces.StreamEvent{
+	// Append references event to stream
+	if err := h.streamManager.AppendEvent(h.ctx, h.sessionID, h.assistantMessageID, interfaces.StreamEvent{
 		ID:        evt.ID,
 		Type:      types.ResponseTypeReferences,
 		Content:   "",
@@ -300,7 +249,7 @@ func (h *AgentStreamHandler) handleReferences(ctx context.Context, evt event.Eve
 			"references": h.knowledgeRefs,
 		},
 	}); err != nil {
-		logger.GetLogger(h.ctx).Error("Push references event to stream failed", "error", err)
+		logger.GetLogger(h.ctx).Error("Append references event to stream failed", "error", err)
 	}
 
 	return nil
@@ -314,25 +263,20 @@ func (h *AgentStreamHandler) handleFinalAnswer(ctx context.Context, evt event.Ev
 	}
 
 	h.mu.Lock()
-
-	// Accumulate final answer (this persists and won't be reset)
+	// Accumulate final answer locally for assistant message (database)
 	h.finalAnswer += data.Content
-	h.assistantMessage.Content = h.finalAnswer
-
-	// Send SSE response (real-time incremental)
-	response := types.StreamResponse{
-		ID:           h.requestID,
-		ResponseType: types.ResponseTypeAnswer,
-		Content:      data.Content,
-		Done:         data.Done,
-	}
-
-	h.ginContext.SSEvent("message", response)
-	h.ginContext.Writer.Flush()
-
-	// Replace answer event in stream (so refresh can see progress)
-	h.accumulateAndReplaceEvent(evt.ID, types.ResponseTypeAnswer, data.Content, data.Done)
 	h.mu.Unlock()
+
+	// Append this chunk to stream (frontend will accumulate by event ID)
+	if err := h.streamManager.AppendEvent(h.ctx, h.sessionID, h.assistantMessageID, interfaces.StreamEvent{
+		ID:        evt.ID,
+		Type:      types.ResponseTypeAnswer,
+		Content:   data.Content, // Just this chunk
+		Done:      data.Done,
+		Timestamp: time.Now(),
+	}); err != nil {
+		logger.GetLogger(h.ctx).Error("Append answer event to stream failed", "error", err)
+	}
 
 	return nil
 }
@@ -344,21 +288,16 @@ func (h *AgentStreamHandler) handleReflection(ctx context.Context, evt event.Eve
 		return nil
 	}
 
-	// Send reflection as SSE (real-time incremental)
-	response := types.StreamResponse{
-		ID:           h.requestID,
-		ResponseType: "reflection", // Special type for reflection
-		Content:      data.Content,
-		Done:         data.Done,
+	// Append this chunk to stream (frontend will accumulate by event ID)
+	if err := h.streamManager.AppendEvent(h.ctx, h.sessionID, h.assistantMessageID, interfaces.StreamEvent{
+		ID:        evt.ID,
+		Type:      types.ResponseTypeReflection,
+		Content:   data.Content, // Just this chunk
+		Done:      data.Done,
+		Timestamp: time.Now(),
+	}); err != nil {
+		logger.GetLogger(h.ctx).Error("Append reflection event to stream failed", "error", err)
 	}
-
-	h.ginContext.SSEvent("message", response)
-	h.ginContext.Writer.Flush()
-
-	// Accumulate reflection per tool call and replace event in stream
-	h.mu.Lock()
-	h.accumulateAndReplaceEvent(evt.ID, types.ResponseTypeReflection, data.Content, data.Done)
-	h.mu.Unlock()
 
 	return nil
 }
@@ -370,95 +309,50 @@ func (h *AgentStreamHandler) handleError(ctx context.Context, evt event.Event) e
 		return nil
 	}
 
-	response := types.StreamResponse{
-		ID:           h.requestID,
-		ResponseType: types.ResponseTypeError,
-		Content:      data.Error,
-		Done:         true,
+	// Build error metadata
+	metadata := map[string]interface{}{
+		"stage": data.Stage,
+		"error": data.Error,
 	}
 
-	h.ginContext.SSEvent("message", response)
-	h.ginContext.Writer.Flush()
+	// Append error event to stream
+	if err := h.streamManager.AppendEvent(h.ctx, h.sessionID, h.assistantMessageID, interfaces.StreamEvent{
+		ID:        evt.ID,
+		Type:      types.ResponseTypeError,
+		Content:   data.Error,
+		Done:      true,
+		Timestamp: time.Now(),
+		Data:      metadata,
+	}); err != nil {
+		logger.GetLogger(h.ctx).Error("Append error event to stream failed", "error", err)
+	}
 
 	return nil
 }
 
-// handleComplete handles agent complete events
-func (h *AgentStreamHandler) handleComplete(ctx context.Context, evt event.Event) error {
-	data, ok := evt.Data.(event.AgentCompleteData)
+// handleSessionTitle handles session title update events
+func (h *AgentStreamHandler) handleSessionTitle(ctx context.Context, evt event.Event) error {
+	data, ok := evt.Data.(event.SessionTitleData)
 	if !ok {
 		return nil
 	}
 
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	// Update assistant message with final data
-	if data.MessageID == h.assistantMessageID {
-		h.assistantMessage.Content = data.FinalAnswer
-		h.assistantMessage.IsCompleted = true
-
-		// Update knowledge references if provided
-		if len(data.KnowledgeRefs) > 0 {
-			knowledgeRefs := make([]*types.SearchResult, 0, len(data.KnowledgeRefs))
-			for _, ref := range data.KnowledgeRefs {
-				if sr, ok := ref.(*types.SearchResult); ok {
-					knowledgeRefs = append(knowledgeRefs, sr)
-				}
-			}
-			h.assistantMessage.KnowledgeReferences = knowledgeRefs
-		}
-
-		// Update agent steps if provided
-		if data.AgentSteps != nil {
-			if steps, ok := data.AgentSteps.([]types.AgentStep); ok {
-				h.assistantMessage.AgentSteps = steps
-			}
-		}
-	}
-
-	// Complete stream
-	if err := h.streamManager.CompleteStream(h.ctx, h.sessionID, h.assistantMessageID); err != nil {
-		logger.GetLogger(h.ctx).Error("Complete stream failed", "error", err)
+	// Append title event to stream
+	if err := h.streamManager.AppendEvent(h.ctx, h.sessionID, h.assistantMessageID, interfaces.StreamEvent{
+		ID:        evt.ID,
+		Type:      types.ResponseTypeSessionTitle,
+		Content:   data.Title,
+		Done:      true,
+		Timestamp: time.Now(),
+		Data: map[string]interface{}{
+			"session_id": data.SessionID,
+			"title":      data.Title,
+		},
+	}); err != nil {
+		logger.GetLogger(h.ctx).Error("Append session title event to stream failed", "error", err)
 	}
 
 	return nil
-}
-
-// accumulateAndReplaceEvent accumulates content per event ID and replaces the event in stream
-// This is a common pattern for thought, answer, and reflection events
-func (h *AgentStreamHandler) accumulateAndReplaceEvent(
-	evtID string,
-	evtType types.ResponseType,
-	content string,
-	done bool,
-) {
-	h.accumulateAndReplaceEventWithData(evtID, evtType, content, done, nil)
-}
-
-// accumulateAndReplaceEventWithData accumulates content and replaces event with metadata
-func (h *AgentStreamHandler) accumulateAndReplaceEventWithData(
-	evtID string,
-	evtType types.ResponseType,
-	content string,
-	done bool,
-	data map[string]interface{},
-) {
-	h.accumulatedContent[evtID] += content
-	if err := h.streamManager.ReplaceEvent(h.ctx, h.sessionID, h.assistantMessageID, interfaces.StreamEvent{
-		ID:        evtID,
-		Type:      evtType,
-		Content:   h.accumulatedContent[evtID],
-		Done:      done,
-		Timestamp: time.Now(),
-		Data:      data,
-	}); err != nil {
-		logger.GetLogger(h.ctx).Error(fmt.Sprintf("Replace %s event in stream failed", evtType), "error", err)
-	}
-	// Clean up when done
-	if done {
-		delete(h.accumulatedContent, evtID)
-	}
 }
 
 // Helper functions

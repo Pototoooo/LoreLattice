@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"time"
 
@@ -14,7 +13,6 @@ import (
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // SessionHandler handles all HTTP requests related to conversation sessions
@@ -571,154 +569,141 @@ func (h *SessionHandler) ContinueStream(c *gin.Context) {
 		return
 	}
 
-	// Get stream information
-	streamInfo, err := h.streamManager.GetStream(ctx, sessionID, messageID)
+	// Get initial events from stream (offset 0)
+	events, currentOffset, err := h.streamManager.GetEvents(ctx, sessionID, messageID, 0)
 	if err != nil {
 		logger.ErrorWithFields(ctx, err, nil)
 		c.Error(errors.NewInternalServerError(fmt.Sprintf("Failed to get stream data: %s", err.Error())))
 		return
 	}
 
-	if streamInfo == nil {
-		logger.Warnf(ctx, "Active stream not found, session ID: %s, message ID: %s", sessionID, messageID)
+	if len(events) == 0 {
+		logger.Warnf(ctx, "No events found in stream, session ID: %s, message ID: %s", sessionID, messageID)
 		c.JSON(http.StatusNotFound, gin.H{
 			"success": false,
-			"error":   "Active stream not found",
-		})
-		return
-	}
-
-	// If stream is already completed, return the full message
-	if streamInfo.IsCompleted {
-		logger.Infof(
-			ctx, "Stream already completed, returning directly, session ID: %s, message ID: %s", sessionID, messageID,
-		)
-		c.JSON(http.StatusOK, gin.H{
-			"id":         message.ID,
-			"role":       message.Role,
-			"content":    message.Content,
-			"created_at": message.CreatedAt,
-			"done":       true,
+			"error":   "No stream events found",
 		})
 		return
 	}
 
 	logger.Infof(
-		ctx, "Preparing to set SSE headers and send stream data, session ID: %s, message ID: %s", sessionID, messageID,
+		ctx, "Preparing to replay %d events and continue streaming, session ID: %s, message ID: %s",
+		len(events), sessionID, messageID,
 	)
 
-	// Send knowledge references first if available
-	if len(streamInfo.KnowledgeReferences) > 0 {
-		logger.Debug(ctx, "Sending knowledge references")
-		c.SSEvent("message", &types.StreamResponse{
-			ID:                  message.RequestID,
-			ResponseType:        types.ResponseTypeReferences,
-			Done:                false,
-			KnowledgeReferences: streamInfo.KnowledgeReferences,
-		})
+	// Set headers for SSE
+	c.Header("Content-Type", "text/event-stream")
+	c.Header("Cache-Control", "no-cache")
+	c.Header("Connection", "keep-alive")
+	c.Header("X-Accel-Buffering", "no")
+
+	// Check if stream is already completed
+	streamCompleted := false
+	for _, evt := range events {
+		if evt.Type == "complete" {
+			streamCompleted = true
+			break
+		}
 	}
 
 	// Replay existing events
-	if len(streamInfo.Events) > 0 {
-		logger.Debugf(ctx, "Replaying %d existing events", len(streamInfo.Events))
-		for _, evt := range streamInfo.Events {
-			c.SSEvent("message", &types.StreamResponse{
-				ID:           message.RequestID,
-				ResponseType: evt.Type,
-				Content:      evt.Content,
-				Done:         evt.Done,
-				Data:         evt.Data,
-			})
+	logger.Debugf(ctx, "Replaying %d existing events", len(events))
+	for _, evt := range events {
+		response := &types.StreamResponse{
+			ID:           message.RequestID,
+			ResponseType: evt.Type,
+			Content:      evt.Content,
+			Done:         evt.Done,
+			Data:         evt.Data,
 		}
-	}
 
-	// Create channels to monitor event updates
-	eventIndexCh := make(chan int, 10)
-	doneCh := make(chan bool, 1)
-
-	logger.Debug(ctx, "Starting event update monitoring")
-
-	// Start a goroutine to monitor for new events
-	go func() {
-		ticker := time.NewTicker(100 * time.Millisecond)
-		defer ticker.Stop()
-
-		currentEventCount := len(streamInfo.Events)
-
-		for {
-			select {
-			case <-ticker.C:
-				latestStreamInfo, err := h.streamManager.GetStream(ctx, sessionID, messageID)
-				if err != nil {
-					logger.Errorf(ctx, "Failed to get stream data: %v", err)
-					doneCh <- true
-					return
-				}
-
-				if latestStreamInfo == nil {
-					logger.Debug(ctx, "Stream no longer exists")
-					doneCh <- true
-					return
-				}
-
-				if latestStreamInfo.IsCompleted {
-					logger.Debug(ctx, "Stream completed")
-					doneCh <- true
-					return
-				}
-
-				// Check for new events
-				if len(latestStreamInfo.Events) > currentEventCount {
-					eventIndexCh <- currentEventCount
-					currentEventCount = len(latestStreamInfo.Events)
-					logger.Debugf(ctx, "Detected %d new events", len(latestStreamInfo.Events)-currentEventCount)
-				}
-
-			case <-c.Request.Context().Done():
-				logger.Debug(ctx, "Client connection closed")
-				return
+		// Special handling for references event
+		if evt.Type == types.ResponseTypeReferences {
+			if refs, ok := evt.Data["references"].(types.References); ok {
+				response.KnowledgeReferences = refs
 			}
 		}
-	}()
 
-	logger.Info(ctx, "Starting stream response")
+		c.SSEvent("message", response)
+		c.Writer.Flush()
+	}
 
-	// Stream new events to client
-	c.Stream(func(w io.Writer) bool {
+	// If stream is already completed, send final event and return
+	if streamCompleted {
+		logger.Infof(ctx, "Stream already completed, session ID: %s, message ID: %s", sessionID, messageID)
+		c.SSEvent("message", &types.StreamResponse{
+			ID:           message.RequestID,
+			ResponseType: types.ResponseTypeAnswer,
+			Content:      "",
+			Done:         true,
+		})
+		c.Writer.Flush()
+		return
+	}
+
+	// Continue polling for new events
+	logger.Debug(ctx, "Starting event update monitoring")
+	ticker := time.NewTicker(100 * time.Millisecond)
+	defer ticker.Stop()
+
+	for {
 		select {
 		case <-c.Request.Context().Done():
 			logger.Debug(ctx, "Client connection closed")
-			return false
+			return
 
-		case <-doneCh:
-			logger.Debug(ctx, "Stream completed, sending completion notification")
-			c.SSEvent("message", &types.StreamResponse{
-				ID:           message.RequestID,
-				ResponseType: types.ResponseTypeAnswer,
-				Content:      "",
-				Done:         true,
-			})
-			return false
-
-		case startIdx := <-eventIndexCh:
-			// Send new events
-			latestStreamInfo, err := h.streamManager.GetStream(ctx, sessionID, messageID)
-			if err == nil && latestStreamInfo != nil {
-				for i := startIdx; i < len(latestStreamInfo.Events); i++ {
-					evt := latestStreamInfo.Events[i]
-					logger.Debugf(ctx, "Sending new event: %s", evt.Type)
-					c.SSEvent("message", &types.StreamResponse{
-						ID:           message.RequestID,
-						ResponseType: evt.Type,
-						Content:      evt.Content,
-						Done:         evt.Done,
-						Data:         evt.Data,
-					})
-				}
+		case <-ticker.C:
+			// Get new events from current offset
+			newEvents, newOffset, err := h.streamManager.GetEvents(ctx, sessionID, messageID, currentOffset)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to get new events: %v", err)
+				return
 			}
-			return true
+
+			// Send new events
+			streamCompletedNow := false
+			for _, evt := range newEvents {
+				response := &types.StreamResponse{
+					ID:           message.RequestID,
+					ResponseType: evt.Type,
+					Content:      evt.Content,
+					Done:         evt.Done,
+					Data:         evt.Data,
+				}
+
+				// Special handling for references event
+				if evt.Type == types.ResponseTypeReferences {
+					if refs, ok := evt.Data["references"].(types.References); ok {
+						response.KnowledgeReferences = refs
+					}
+				}
+
+				// Check for completion event
+				if evt.Type == "complete" {
+					streamCompletedNow = true
+				}
+
+				c.SSEvent("message", response)
+				c.Writer.Flush()
+			}
+
+			// Update offset
+			currentOffset = newOffset
+
+			// If stream completed, send final event and exit
+			if streamCompletedNow {
+				logger.Infof(ctx, "Stream completed, session ID: %s, message ID: %s", sessionID, messageID)
+				c.SSEvent("message", &types.StreamResponse{
+					ID:           message.RequestID,
+					ResponseType: types.ResponseTypeAnswer,
+					Content:      "",
+					Done:         true,
+				})
+				c.Writer.Flush()
+				return
+			}
 		}
-	})
+	}
 }
 
 // KnowledgeQA handles knowledge base question answering requests with LLM summarization
@@ -750,7 +735,6 @@ func (h *SessionHandler) KnowledgeQA(c *gin.Context) {
 		RequestID:   c.GetString(types.RequestIDContextKey.String()),
 		IsCompleted: false,
 	}
-	defer h.completeAssistantMessage(ctx, assistantMessage)
 
 	// Validate query content
 	if request.Query == "" {
@@ -761,50 +745,52 @@ func (h *SessionHandler) KnowledgeQA(c *gin.Context) {
 
 	logger.Infof(ctx, "Knowledge QA request, session ID: %s, query: %s", sessionID, request.Query)
 
-	// Get request ID for title generation
-	requestID := c.GetString(types.RequestIDContextKey.String())
-
-	// Get session to check if title needs to be generated
+	// Get session to prepare knowledge base IDs
 	session, err := h.sessionService.GetSession(ctx, sessionID)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get session, session ID: %s, error: %v", sessionID, err)
-		// Continue anyway - this is not critical
-	} else {
-		// Start async title generation if session has no title
-		if session.Title == "" {
-			logger.Infof(ctx, "Session has no title, starting async title generation, session ID: %s", sessionID)
-			// Use a simple event bus for title generation
-			titleEventBus := event.NewEventBus()
-			// Subscribe to title events and push to SSE
-			titleEventBus.On(event.EventSessionTitle, func(ctx context.Context, evt event.Event) error {
-				data, ok := evt.Data.(event.SessionTitleData)
-				if !ok {
-					return nil
-				}
-				// Send title update via SSE
-				c.SSEvent("message", &types.StreamResponse{
-					ID:           requestID,
-					ResponseType: types.ResponseTypeSessionTitle,
-					Content:      data.Title,
-					Done:         true,
-					Data: map[string]interface{}{
-						"session_id": data.SessionID,
-						"title":      data.Title,
-					},
-				})
-				c.Writer.Flush()
-				return nil
-			})
-			h.sessionService.GenerateTitleAsync(ctx, session, request.Query, titleEventBus)
-		}
+		c.Error(errors.NewInternalServerError(err.Error()))
+		return
 	}
+
+	// Prepare knowledge base IDs
+	knowledgeBaseIDs := request.KnowledgeBaseIDs
+	if len(knowledgeBaseIDs) == 0 && session.KnowledgeBaseID != "" {
+		knowledgeBaseIDs = []string{session.KnowledgeBaseID}
+		logger.Infof(ctx, "No knowledge base IDs in request, using session default: %s", session.KnowledgeBaseID)
+	}
+
+	// Use shared function to handle KnowledgeQA request
+	h.handleKnowledgeQARequest(ctx, c, session, request.Query, knowledgeBaseIDs, assistantMessage, true)
+}
+
+// completeAssistantMessage marks an assistant message as complete and updates it
+func (h *SessionHandler) completeAssistantMessage(ctx context.Context, assistantMessage *types.Message) {
+	assistantMessage.UpdatedAt = time.Now()
+	assistantMessage.IsCompleted = true
+	_ = h.messageService.UpdateMessage(ctx, assistantMessage)
+}
+
+// handleKnowledgeQARequest handles a KnowledgeQA request with the given parameters
+// This is a shared function used by both KnowledgeQA endpoint and AgentQA fallback
+func (h *SessionHandler) handleKnowledgeQARequest(
+	ctx context.Context,
+	c *gin.Context,
+	session *types.Session,
+	query string,
+	knowledgeBaseIDs []string,
+	assistantMessage *types.Message,
+	generateTitle bool, // Whether to generate title if session has no title
+) {
+	sessionID := session.ID
+	requestID := c.GetString(types.RequestIDContextKey.String())
 
 	// Create user message
 	if _, err := h.messageService.CreateMessage(ctx, &types.Message{
 		SessionID:   sessionID,
 		Role:        "user",
-		Content:     request.Query,
-		RequestID:   c.GetString(types.RequestIDContextKey.String()),
+		Content:     query,
+		RequestID:   requestID,
 		CreatedAt:   time.Now(),
 		IsCompleted: true,
 	}); err != nil {
@@ -818,14 +804,6 @@ func (h *SessionHandler) KnowledgeQA(c *gin.Context) {
 		c.Error(errors.NewInternalServerError(err.Error()))
 		return
 	}
-	logger.Infof(ctx, "Calling knowledge QA service, session ID: %s", sessionID)
-
-	// Prepare knowledge base IDs
-	knowledgeBaseIDs := request.KnowledgeBaseIDs
-	if len(knowledgeBaseIDs) == 0 && session.KnowledgeBaseID != "" {
-		knowledgeBaseIDs = []string{session.KnowledgeBaseID}
-		logger.Infof(ctx, "No knowledge base IDs in request, using session default: %s", session.KnowledgeBaseID)
-	}
 
 	// Validate knowledge bases
 	if len(knowledgeBaseIDs) == 0 {
@@ -836,89 +814,76 @@ func (h *SessionHandler) KnowledgeQA(c *gin.Context) {
 
 	logger.Infof(ctx, "Using knowledge bases: %v", knowledgeBaseIDs)
 
-	// Call service to perform knowledge QA
-	searchResults, respCh, err := h.sessionService.KnowledgeQA(ctx, session, request.Query, knowledgeBaseIDs)
-	if err != nil {
-		logger.ErrorWithFields(ctx, err, nil)
-		c.Error(errors.NewInternalServerError(err.Error()))
-		return
-	}
-	assistantMessage.KnowledgeReferences = searchResults
-
-	// Register new stream with stream manager
-	if err := h.streamManager.RegisterStream(ctx, sessionID, assistantMessage.ID, request.Query); err != nil {
-		logger.GetLogger(ctx).Error("Register stream failed", "error", err)
-	}
-
 	// Set headers for SSE
 	c.Header("Content-Type", "text/event-stream")
 	c.Header("Cache-Control", "no-cache")
 	c.Header("Connection", "keep-alive")
 	c.Header("X-Accel-Buffering", "no")
 
-	// Send knowledge references if available
-	if len(searchResults) > 0 {
-		logger.Debugf(ctx, "Sending reference content, total %d", len(searchResults))
-		c.SSEvent("message", &types.StreamResponse{
-			ID:                  requestID,
-			ResponseType:        types.ResponseTypeReferences,
-			KnowledgeReferences: searchResults,
-		})
-		c.Writer.Flush()
-	} else {
-		logger.Debug(ctx, "No reference content to send")
+	// Create dedicated EventBus for this request
+	eventBus := event.NewEventBus()
+	asyncCtx := logger.CloneContext(ctx)
+
+	// Create stream handler with dedicated EventBus
+	streamHandler := NewAgentStreamHandler(
+		asyncCtx, sessionID, assistantMessage.ID, requestID,
+		assistantMessage, h.streamManager, eventBus,
+	)
+
+	// Subscribe to events on the dedicated EventBus
+	streamHandler.Subscribe()
+
+	// Generate title if needed
+	if generateTitle && session.Title == "" {
+		logger.Infof(ctx, "Session has no title, starting async title generation, session ID: %s", sessionID)
+		h.sessionService.GenerateTitleAsync(asyncCtx, session, query, eventBus)
 	}
 
-	// Process streamed response
-	func() {
+	eventBus.On(event.EventAgentFinalAnswer, func(ctx context.Context, evt event.Event) error {
+		data, ok := evt.Data.(event.AgentFinalAnswerData)
+		if !ok {
+			return nil
+		}
+		assistantMessage.Content += data.Content
+		if data.Done {
+			logger.Infof(asyncCtx, "Knowledge QA service completed for session: %s", sessionID)
+			h.completeAssistantMessage(asyncCtx, assistantMessage)
+			return nil
+		}
+		return nil
+	})
+
+	// Call service to perform knowledge QA (async, emits events)
+	go func() {
 		defer func() {
-			// Mark stream as completed when done
-			if err := h.streamManager.CompleteStream(ctx, sessionID, assistantMessage.ID); err != nil {
-				logger.GetLogger(ctx).Error("Complete stream failed", "error", err)
+			if r := recover(); r != nil {
+				logger.ErrorWithFields(asyncCtx, errors.NewInternalServerError("Knowledge QA service panicked"), nil)
 			}
 		}()
-		for response := range respCh {
-			response.ID = requestID
-			c.SSEvent("message", response)
-			c.Writer.Flush()
-			if response.ResponseType == types.ResponseTypeAnswer {
-				assistantMessage.Content += response.Content
-				// Push event to stream for replay on refresh
-				if err := h.streamManager.PushEvent(
-					ctx, sessionID, assistantMessage.ID, interfaces.StreamEvent{
-						ID:        uuid.New().String(),
-						Type:      response.ResponseType,
-						Content:   response.Content,
-						Done:      response.Done,
-						Timestamp: time.Now(),
-					},
-				); err != nil {
-					logger.GetLogger(ctx).Error("Push answer event to stream failed", "error", err)
-				}
-			}
-			if response.ResponseType == types.ResponseTypeReferences {
-				// Update references
-				if err := h.streamManager.UpdateReferences(
-					ctx, sessionID, assistantMessage.ID, searchResults,
-				); err != nil {
-					logger.GetLogger(ctx).Error("Update stream references failed", "error", err)
-				}
-			}
+		err := h.sessionService.KnowledgeQA(asyncCtx, session, query, knowledgeBaseIDs, assistantMessage.ID, eventBus)
+		if err != nil {
+			logger.ErrorWithFields(asyncCtx, err, nil)
+			// Emit error event to dedicated EventBus
+			eventBus.Emit(asyncCtx, event.Event{
+				Type:      event.EventError,
+				SessionID: sessionID,
+				Data: event.ErrorData{
+					Error:     err.Error(),
+					Stage:     "knowledge_qa_execution",
+					SessionID: sessionID,
+				},
+			})
+			return
 		}
 	}()
-}
 
-// completeAssistantMessage marks an assistant message as complete and updates it
-func (h *SessionHandler) completeAssistantMessage(ctx context.Context, assistantMessage *types.Message) {
-	assistantMessage.UpdatedAt = time.Now()
-	assistantMessage.IsCompleted = true
-	_ = h.messageService.UpdateMessage(ctx, assistantMessage)
+	// Handle events for SSE (blocking until connection is done)
+	h.handleAgentEventsForSSEWithHandler(ctx, c, sessionID, assistantMessage.ID, requestID)
 }
 
 // AgentQA handles agent-based question answering with conversation history and streaming
 func (h *SessionHandler) AgentQA(c *gin.Context) {
 	ctx := logger.CloneContext(c.Request.Context())
-
 	logger.Info(ctx, "Start processing agent QA request")
 
 	// Get session ID from URL parameter
@@ -937,15 +902,6 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 		return
 	}
 
-	// Create assistant message
-	assistantMessage := &types.Message{
-		SessionID:   sessionID,
-		Role:        "assistant",
-		RequestID:   c.GetString(types.RequestIDContextKey.String()),
-		IsCompleted: false,
-	}
-	defer h.completeAssistantMessage(ctx, assistantMessage)
-
 	// Validate query content
 	if request.Query == "" {
 		logger.Error(ctx, "Query content is empty")
@@ -961,6 +917,14 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 		logger.Errorf(ctx, "Failed to get session, session ID: %s, error: %v", sessionID, err)
 		c.Error(errors.NewNotFoundError("Session not found"))
 		return
+	}
+
+	// Create assistant message
+	assistantMessage := &types.Message{
+		SessionID:   sessionID,
+		Role:        "assistant",
+		RequestID:   c.GetString(types.RequestIDContextKey.String()),
+		IsCompleted: false,
 	}
 
 	// Initialize AgentConfig if it doesn't exist
@@ -1051,86 +1015,8 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 
 		logger.Infof(ctx, "Delegating to KnowledgeQA with knowledge bases: %v", knowledgeBaseIDs)
 
-		// Create user message
-		requestID := c.GetString(types.RequestIDContextKey.String())
-		if _, err := h.messageService.CreateMessage(ctx, &types.Message{
-			SessionID:   sessionID,
-			Role:        "user",
-			Content:     request.Query,
-			RequestID:   requestID,
-			CreatedAt:   time.Now(),
-			IsCompleted: true,
-		}); err != nil {
-			c.Error(errors.NewInternalServerError(err.Error()))
-			return
-		}
-
-		// Create assistant message (response)
-		assistantMessage.CreatedAt = time.Now()
-		if _, err := h.messageService.CreateMessage(ctx, assistantMessage); err != nil {
-			c.Error(errors.NewInternalServerError(err.Error()))
-			return
-		}
-
-		// Call KnowledgeQA service
-		searchResults, respCh, err := h.sessionService.KnowledgeQA(ctx, session, request.Query, knowledgeBaseIDs)
-		if err != nil {
-			logger.ErrorWithFields(ctx, err, nil)
-			c.Error(errors.NewInternalServerError(err.Error()))
-			return
-		}
-		assistantMessage.KnowledgeReferences = searchResults
-
-		// Register new stream with stream manager
-		if err := h.streamManager.RegisterStream(ctx, sessionID, assistantMessage.ID, request.Query); err != nil {
-			logger.GetLogger(ctx).Error("Register stream failed", "error", err)
-		}
-
-		// Set headers for SSE
-		c.Header("Content-Type", "text/event-stream")
-		c.Header("Cache-Control", "no-cache")
-		c.Header("Connection", "keep-alive")
-		c.Header("X-Accel-Buffering", "no")
-
-		// Send knowledge references if available
-		if len(searchResults) > 0 {
-			logger.Debugf(ctx, "Sending reference content, total %d", len(searchResults))
-			c.SSEvent("message", &types.StreamResponse{
-				ID:                  requestID,
-				ResponseType:        types.ResponseTypeReferences,
-				KnowledgeReferences: searchResults,
-			})
-			c.Writer.Flush()
-		} else {
-			logger.Debug(ctx, "No reference content to send")
-		}
-
-		// Process streamed response
-		func() {
-			defer func() {
-				// Mark stream as completed when done
-				if err := h.streamManager.CompleteStream(ctx, sessionID, assistantMessage.ID); err != nil {
-					logger.GetLogger(ctx).Error("Complete stream failed", "error", err)
-				}
-			}()
-			for response := range respCh {
-				response.ID = requestID
-				c.SSEvent("message", response)
-				c.Writer.Flush()
-				if response.ResponseType == types.ResponseTypeAnswer {
-					assistantMessage.Content += response.Content
-				}
-			}
-			assistantMessage.IsCompleted = true
-		}()
-
-		// Update message with final content and references
-		assistantMessage.UpdatedAt = time.Now()
-		if err := h.messageService.UpdateMessage(ctx, assistantMessage); err != nil {
-			logger.Errorf(ctx, "Failed to update assistant message: %v", err)
-		}
-
-		logger.Infof(ctx, "KnowledgeQA delegation completed for session: %s", sessionID)
+		// Use shared function to handle KnowledgeQA request (no title generation for AgentQA fallback)
+		h.handleKnowledgeQARequest(ctx, c, session, request.Query, knowledgeBaseIDs, assistantMessage, false)
 		return
 	}
 
@@ -1156,20 +1042,6 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 	c.Header("Connection", "keep-alive")
 	c.Header("X-Accel-Buffering", "no")
 
-	// Send agent query event to frontend via SSE to trigger loading state immediately
-	c.SSEvent("message", &types.StreamResponse{
-		ID:           requestID,
-		ResponseType: types.ResponseTypeAgentQuery,
-		Content:      "Agent query processing started",
-		Done:         false,
-		Data: map[string]interface{}{
-			"session_id": sessionID,
-			"query":      request.Query,
-			"request_id": requestID,
-		},
-	})
-	c.Writer.Flush()
-
 	// Create user message
 	if _, err := h.messageService.CreateMessage(ctx, &types.Message{
 		SessionID:   sessionID,
@@ -1194,17 +1066,12 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 
 	logger.Infof(ctx, "Calling agent QA service, session ID: %s", sessionID)
 
-	// Register new stream with stream manager
-	if err := h.streamManager.RegisterStream(ctx, sessionID, assistantMessage.ID, request.Query); err != nil {
-		logger.GetLogger(ctx).Error("Register stream failed", "error", err)
-	}
-
 	// SSE headers already set earlier when sending agent_query event
 
 	eventBus := event.NewEventBus()
 	// Create stream handler with dedicated EventBus BEFORE calling AgentQA
 	streamHandler := NewAgentStreamHandler(
-		ctx, c, sessionID, assistantMessage.ID, requestID,
+		ctx, sessionID, assistantMessage.ID, requestID,
 		assistantMessage, h.streamManager, eventBus,
 	)
 
@@ -1214,36 +1081,23 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 	// Start async title generation if session has no title
 	if session.Title == "" {
 		logger.Infof(ctx, "Session has no title, starting async title generation, session ID: %s", sessionID)
-		// Subscribe to title events on the dedicated EventBus
-		eventBus.On(event.EventSessionTitle, func(ctx context.Context, evt event.Event) error {
-			data, ok := evt.Data.(event.SessionTitleData)
-			if !ok {
-				return nil
-			}
-			// Send title update via SSE
-			c.SSEvent("message", &types.StreamResponse{
-				ID:           requestID,
-				ResponseType: types.ResponseTypeSessionTitle,
-				Content:      data.Title,
-				Done:         true,
-				Data: map[string]interface{}{
-					"session_id": data.SessionID,
-					"title":      data.Title,
-				},
-			})
-			c.Writer.Flush()
-			return nil
-		})
 		h.sessionService.GenerateTitleAsync(ctx, session, request.Query, eventBus)
 	}
 
-	// Call service to perform agent QA
+	asyncCtx := logger.CloneContext(ctx)
 	go func() {
-		searchResults, err := h.sessionService.AgentQA(ctx, session, request.Query, assistantMessage.ID, eventBus)
+		defer func() {
+			if r := recover(); r != nil {
+				logger.ErrorWithFields(asyncCtx, errors.NewInternalServerError("Agent QA service panicked"), nil)
+			}
+			h.completeAssistantMessage(asyncCtx, assistantMessage)
+			logger.Infof(asyncCtx, "Agent QA service completed for session: %s", sessionID)
+		}()
+		err := h.sessionService.AgentQA(asyncCtx, session, request.Query, assistantMessage.ID, eventBus)
 		if err != nil {
-			logger.ErrorWithFields(ctx, err, nil)
+			logger.ErrorWithFields(asyncCtx, err, nil)
 			// Emit error event to dedicated EventBus
-			eventBus.Emit(ctx, event.Event{
+			eventBus.Emit(asyncCtx, event.Event{
 				Type:      event.EventError,
 				SessionID: sessionID,
 				Data: event.ErrorData{
@@ -1254,26 +1108,94 @@ func (h *SessionHandler) AgentQA(c *gin.Context) {
 			})
 			return
 		}
-		assistantMessage.KnowledgeReferences = searchResults
 	}()
 
 	// Handle events for SSE (blocking until connection is done)
-	h.handleAgentEventsForSSEWithHandler(ctx, c, sessionID, assistantMessage.ID)
+	h.handleAgentEventsForSSEWithHandler(ctx, c, sessionID, assistantMessage.ID, requestID)
 }
 
 // handleAgentEventsForSSEWithHandler handles agent events for SSE streaming using an existing handler
 // The handler is already subscribed to events and AgentQA is already running
+// This function polls StreamManager and pushes events to SSE, allowing graceful handling of disconnections
 func (h *SessionHandler) handleAgentEventsForSSEWithHandler(
 	ctx context.Context,
 	c *gin.Context,
-	sessionID, assistantMessageID string,
+	sessionID, assistantMessageID, requestID string,
 ) {
-	// Wait for completion - events are already being handled by streamHandler
-	// The connection will be closed when the gin context is done
-	<-c.Request.Context().Done()
+	ticker := time.NewTicker(100 * time.Millisecond)
+	defer ticker.Stop()
 
-	// Complete stream when done
-	if err := h.streamManager.CompleteStream(ctx, sessionID, assistantMessageID); err != nil {
-		logger.GetLogger(ctx).Error("Complete stream failed", "error", err)
+	lastOffset := 0
+	log := logger.GetLogger(ctx)
+
+	log.Infof("Starting pull-based SSE streaming for session=%s, message=%s", sessionID, assistantMessageID)
+
+	for {
+		select {
+		case <-c.Request.Context().Done():
+			// Connection closed, exit gracefully without panic
+			log.Infof("Client disconnected, stopping SSE streaming for session=%s, message=%s", sessionID, assistantMessageID)
+			return
+
+		case <-ticker.C:
+			// Get new events from StreamManager using offset
+			events, newOffset, err := h.streamManager.GetEvents(ctx, sessionID, assistantMessageID, lastOffset)
+			if err != nil {
+				log.Warnf("Failed to get events from stream: %v", err)
+				continue
+			}
+
+			// Send any new events
+			streamCompleted := false
+			for _, evt := range events {
+				// Build StreamResponse from StreamEvent
+				response := &types.StreamResponse{
+					ID:           requestID,
+					ResponseType: evt.Type,
+					Content:      evt.Content,
+					Done:         evt.Done,
+					Data:         evt.Data,
+				}
+
+				// Special handling for references event
+				if evt.Type == types.ResponseTypeReferences {
+					if refs, ok := evt.Data["references"].(types.References); ok {
+						response.KnowledgeReferences = refs
+					}
+				}
+
+				// Check for completion event
+				if evt.Type == "complete" {
+					streamCompleted = true
+				}
+
+				// Check if connection is still alive before writing
+				if c.Request.Context().Err() != nil {
+					log.Info("Connection closed during event sending, stopping")
+					return
+				}
+
+				c.SSEvent("message", response)
+				c.Writer.Flush()
+			}
+
+			// Update offset
+			lastOffset = newOffset
+
+			// Check if stream is completed
+			if streamCompleted {
+				log.Infof("Stream completed for session=%s, message=%s", sessionID, assistantMessageID)
+
+				// Send final completion signal
+				c.SSEvent("message", &types.StreamResponse{
+					ID:           requestID,
+					ResponseType: types.ResponseTypeAnswer,
+					Content:      "",
+					Done:         true,
+				})
+				c.Writer.Flush()
+				return
+			}
+		}
 	}
 }

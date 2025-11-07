@@ -20,20 +20,23 @@ type ChatManage struct {
 	RerankTopK      int     `json:"rerank_top_k"`     // Number of top results after reranking
 	RerankThreshold float64 `json:"rerank_threshold"` // Minimum score threshold for reranked results
 
-	ChatModelID      string           `json:"chat_model_id"`     // Model ID for chat completion
+	ChatModelID      string           `json:"chat_model_id"`     // ID of the chat model to use
 	SummaryConfig    SummaryConfig    `json:"summary_config"`    // Configuration for summary generation
 	FallbackStrategy FallbackStrategy `json:"fallback_strategy"` // Strategy when no relevant results are found
 	FallbackResponse string           `json:"fallback_response"` // Default response when fallback occurs
 
 	// Internal fields for pipeline data processing
-	SearchResult []*SearchResult       `json:"-"` // Results from search phase
-	RerankResult []*SearchResult       `json:"-"` // Results after reranking
-	MergeResult  []*SearchResult       `json:"-"` // Final merged results after all processing
-	Entity       []string              `json:"-"` // List of identified entities
-	GraphResult  *GraphData            `json:"-"` // Graph data from search phase
-	UserContent  string                `json:"-"` // Processed user content
-	ChatResponse *ChatResponse         `json:"-"` // Final response from chat model
-	ResponseChan <-chan StreamResponse `json:"-"` // Channel for streaming responses
+	SearchResult []*SearchResult `json:"-"` // Results from search phase
+	RerankResult []*SearchResult `json:"-"` // Results after reranking
+	MergeResult  []*SearchResult `json:"-"` // Final merged results after all processing
+	Entity       []string        `json:"-"` // List of identified entities
+	GraphResult  *GraphData      `json:"-"` // Graph data from search phase
+	UserContent  string          `json:"-"` // Processed user content
+	ChatResponse *ChatResponse   `json:"-"` // Final response from chat model
+
+	// Event system for streaming responses
+	EventBus  EventBusInterface `json:"-"` // EventBus for emitting streaming events
+	MessageID string            `json:"-"` // Assistant message ID for event emission
 }
 
 // Clone creates a deep copy of the ChatManage object

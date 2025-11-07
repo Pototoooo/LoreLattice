@@ -5,13 +5,14 @@
             <AgentStreamDisplay :session="session" v-if="session.isAgentMode"></AgentStreamDisplay>
             <deepThink :deepSession="session" v-if="session.showThink && !session.isAgentMode"></deepThink>
         </div>
-        <div ref="parentMd" v-if="!session.hideContent">
+        <!-- 非 Agent 模式下才显示传统的 markdown 渲染 -->
+        <div ref="parentMd" v-if="!session.hideContent && !session.isAgentMode">
             <!-- 消息正在总结中则渲染加载gif  -->
             <img v-if="session.thinking" class="botanswer_laoding_gif" src="@/assets/img/botanswer_loading.gif"
                 alt="正在总结答案……">
-            <div v-for="(item, index) in processedMarkdown" :key="index">
-                <img class="ai-markdown-img" @click="preview(item)" v-if="isLink(item)" :src="item" alt="">
-                <div v-else class="ai-markdown-template" v-html="processMarkdown(item)"></div>
+            <!-- 直接渲染完整内容，避免切分导致的问题，样式与 thinking 一致 -->
+            <div class="content-wrapper">
+                <div class="ai-markdown-template markdown-content" v-html="processMarkdown(content || session.content)"></div>
             </div>
             <div v-if="isImgLoading" class="img_loading"><t-loading size="small"></t-loading><span>加载中...</span></div>
         </div>
@@ -61,6 +62,7 @@ const preview = (url) => {
 }
 const removeImg = () => {
     nextTick(() => {
+        if (!parentMd.value) return;
         const images = parentMd.value.querySelectorAll('img.ai-markdown-img');
         if (images) {
             images.forEach(async item => {
@@ -184,19 +186,113 @@ onMounted(async () => {
 <style lang="less" scoped>
 @import '../../../components/css/markdown.less';
 
-:deep(.ai-markdown-template) {
-    contain: content;
-    line-height: 28px;
-    letter-spacing: 1px;
+// 内容包装器 - 与 thinking 样式一致
+.content-wrapper {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 1px 14px;
+    border-left: 3px solid #07c05f;
+    box-shadow: 0 2px 4px rgba(7, 192, 95, 0.08);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInUp 0.3s ease-out;
+}
 
-    h1,
-    h2,
-    h3,
-    h4 {
-        line-height: 14px;
-        font-size: 16px;
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ai-markdown-template {
+    font-size: 14px;
+    color: #333333;
+    line-height: 1.6;
+}
+
+.markdown-content {
+    :deep(p) {
+        margin: 8px 0;
+        line-height: 1.6;
     }
 
+    :deep(code) {
+        background: #f0f0f0;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: 'Monaco', 'Courier New', monospace;
+        font-size: 12px;
+    }
+
+    :deep(pre) {
+        background: #f5f5f5;
+        padding: 12px;
+        border-radius: 4px;
+        overflow-x: auto;
+        margin: 8px 0;
+
+        code {
+            background: none;
+            padding: 0;
+        }
+    }
+
+    :deep(ul), :deep(ol) {
+        margin: 8px 0;
+        padding-left: 24px;
+    }
+
+    :deep(li) {
+        margin: 4px 0;
+    }
+
+    :deep(blockquote) {
+        border-left: 3px solid #07c05f;
+        padding-left: 12px;
+        margin: 8px 0;
+        color: #666;
+    }
+
+    :deep(h1), :deep(h2), :deep(h3), :deep(h4), :deep(h5), :deep(h6) {
+        margin: 12px 0 8px 0;
+        font-weight: 600;
+        color: #333;
+    }
+
+    :deep(a) {
+        color: #07c05f;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    :deep(table) {
+        border-collapse: collapse;
+        margin: 8px 0;
+        font-size: 12px;
+        width: 100%;
+
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 6px 10px;
+            text-align: left;
+    }
+
+        th {
+            background: #f5f5f5;
+            font-weight: 600;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+    }
 }
 
 .ai-markdown-img {

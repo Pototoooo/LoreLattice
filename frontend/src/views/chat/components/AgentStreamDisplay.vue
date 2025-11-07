@@ -29,6 +29,22 @@
           </div>
         </div>
         
+        <!-- Answer Event -->
+        <div v-else-if="event.type === 'answer'" class="answer-event">
+          <div 
+            class="answer-content-wrapper"
+            :class="{ 
+              'answer-active': !event.done,
+              'answer-done': event.done
+            }"
+          >
+            <div v-if="event.content" 
+                 class="answer-content markdown-content" 
+                 v-html="renderMarkdown(event.content)">
+            </div>
+          </div>
+        </div>
+        
         <!-- Tool Call Event -->
         <div v-else-if="event.type === 'tool_call'" class="tool-event">
         <div 
@@ -472,7 +488,7 @@ const formatJSON = (obj: any): string => {
   cursor: pointer;
   padding: 10px 14px;
   background: #ffffff;
-  border: 1px solid #e5e7eb;
+  border-left: 3px solid #07c05f;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -480,18 +496,16 @@ const formatJSON = (obj: any): string => {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
   margin-bottom: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 4px rgba(7, 192, 95, 0.08);
   animation: slideInDown 0.3s ease-out;
   
   &:hover {
-    background: #fafafa;
-    border-color: #07c05f;
+    background: rgba(7, 192, 95, 0.04);
     box-shadow: 0 2px 6px rgba(7, 192, 95, 0.12);
-    transform: translateY(-1px);
   }
   
   &:active {
-    transform: translateY(0);
+    background: rgba(7, 192, 95, 0.08);
   }
   
   .collapse-icon {
@@ -502,7 +516,7 @@ const formatJSON = (obj: any): string => {
   }
   
   .collapse-text {
-    font-size: 13px;
+    font-size: 14px;
     color: #333333;
     font-weight: 500;
     letter-spacing: -0.01em;
@@ -541,6 +555,111 @@ const formatJSON = (obj: any): string => {
   }
   
   .thinking-content {
+    font-size: 14px;
+    color: #333333;
+    line-height: 1.6;
+    
+    &.markdown-content {
+      :deep(p) {
+        margin: 8px 0;
+        line-height: 1.6;
+      }
+      
+      :deep(code) {
+        background: #f0f0f0;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: 'Monaco', 'Courier New', monospace;
+        font-size: 12px;
+      }
+      
+      :deep(pre) {
+        background: #f5f5f5;
+        padding: 12px;
+        border-radius: 4px;
+        overflow-x: auto;
+        margin: 8px 0;
+        
+        code {
+          background: none;
+          padding: 0;
+        }
+      }
+      
+      :deep(ul), :deep(ol) {
+        margin: 8px 0;
+        padding-left: 24px;
+      }
+      
+      :deep(li) {
+        margin: 4px 0;
+      }
+      
+      :deep(blockquote) {
+        border-left: 3px solid #07c05f;
+        padding-left: 12px;
+        margin: 8px 0;
+        color: #666;
+      }
+      
+      :deep(h1), :deep(h2), :deep(h3), :deep(h4), :deep(h5), :deep(h6) {
+        margin: 12px 0 8px 0;
+        font-weight: 600;
+        color: #333;
+      }
+      
+      :deep(a) {
+        color: #07c05f;
+        text-decoration: none;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+      
+      :deep(table) {
+        border-collapse: collapse;
+        margin: 8px 0;
+        font-size: 12px;
+        
+        th, td {
+          border: 1px solid #e5e7eb;
+          padding: 6px 10px;
+        }
+        
+        th {
+          background: #f5f5f5;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+// Answer Event - 类似 thinking 但有独特样式
+.answer-event {
+  animation: fadeInUp 0.3s ease-out;
+  
+  .answer-content-wrapper {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 1px 14px;
+    border-left: 3px solid #07c05f;
+    box-shadow: 0 2px 4px rgba(7, 192, 95, 0.08);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    // 进行中的 answer 显示动画
+    &.answer-active {
+      animation: pulseBorder 2s ease-in-out infinite;
+    }
+    
+    // 完成的 answer 保持绿色边框
+    &.answer-done {
+      border-left-color: #07c05f;
+    }
+  }
+  
+  .answer-content {
     font-size: 14px;
     color: #333333;
     line-height: 1.6;

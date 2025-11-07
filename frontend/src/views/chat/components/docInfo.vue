@@ -60,17 +60,22 @@ const safeProcessContent = (content) => {
     flex-direction: column;
     font-size: 14px;
     width: 100%;
-    border-radius: 2px;
-    background-color: #30323605;
+    border-radius: 8px;
+    background-color: #ffffff;
+    border-left: 3px solid #07c05f;
+    box-shadow: 0 2px 4px rgba(7, 192, 95, 0.08);
     overflow: hidden;
     box-sizing: border-box;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 8px;
 
     .refer_header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 4px;
-        color: #00000099;
+        padding: 10px 14px;
+        color: #333333;
+        font-weight: 500;
 
         .refer_title {
             display: flex;
@@ -81,29 +86,31 @@ const safeProcessContent = (content) => {
                 height: 16px;
                 color: #07c05f;
                 fill: currentColor;
-                margin-right: 6px;
+                margin-right: 8px;
             }
 
             span {
                 white-space: nowrap;
+                font-size: 14px;
             }
         }
 
         .refer_show_icon {
             font-size: 14px;
             padding: 0 2px 1px 2px;
+            color: #07c05f;
         }
     }
 
     .refer_header:hover {
-        border-radius: 2px;
-        background-color: #30323605;
+        background-color: rgba(7, 192, 95, 0.04);
         cursor: pointer;
     }
 
     .refer_box {
-        padding: 2px 4px 4px 4px;
+        padding: 4px 14px 10px 14px;
         flex-direction: column;
+        border-top: 1px solid #f0f0f0;
     }
 }
 
@@ -119,8 +126,8 @@ const safeProcessContent = (content) => {
 }
 
 .doc {
-    text-decoration: underline;
-    color: #366ef4;
+    text-decoration: none;
+    color: #07c05f;
     cursor: pointer;
     display: inline-block;
     white-space: nowrap;
@@ -128,6 +135,14 @@ const safeProcessContent = (content) => {
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 20px;
+    padding: 2px 0;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid transparent;
+    
+    &:hover {
+        border-bottom-color: #07c05f;
+    }
 }
 </style>
 

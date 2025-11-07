@@ -28,16 +28,17 @@ type SessionService interface {
 	GenerateTitleAsync(ctx context.Context, session *types.Session, userQuery string, eventBus *event.EventBus)
 	// KnowledgeQA performs knowledge-based question answering
 	// knowledgeBaseIDs: list of knowledge base IDs to search (supports multi-KB)
+	// Events are emitted through eventBus (references, answer chunks, completion)
 	KnowledgeQA(ctx context.Context,
-		session *types.Session, query string, knowledgeBaseIDs []string,
-	) ([]*types.SearchResult, <-chan types.StreamResponse, error)
+		session *types.Session, query string, knowledgeBaseIDs []string, assistantMessageID string, eventBus *event.EventBus,
+	) error
 	// KnowledgeQAByEvent performs knowledge-based question answering by event
 	KnowledgeQAByEvent(ctx context.Context, chatManage *types.ChatManage, eventList []types.EventType) error
 	// SearchKnowledge performs knowledge-based search, without summarization
 	SearchKnowledge(ctx context.Context, knowledgeBaseID, query string) ([]*types.SearchResult, error)
 	// AgentQA performs agent-based question answering with conversation history and streaming support
 	// eventBus is optional - if nil, uses service's default EventBus
-	AgentQA(ctx context.Context, session *types.Session, query string, assistantMessageID string, eventBus *event.EventBus) ([]*types.SearchResult, error)
+	AgentQA(ctx context.Context, session *types.Session, query string, assistantMessageID string, eventBus *event.EventBus) error
 	// ClearContext clears the LLM context for a session
 	ClearContext(ctx context.Context, sessionID string) error
 }
