@@ -58,6 +58,8 @@ const (
 	ResponseTypeSessionTitle ResponseType = "session_title"
 	// Agent query response type (query received and processing started)
 	ResponseTypeAgentQuery ResponseType = "agent_query"
+	// Complete response type (agent complete)
+	ResponseTypeComplete ResponseType = "complete"
 )
 
 // StreamResponse stream response

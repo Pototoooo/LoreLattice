@@ -65,6 +65,7 @@ func (h *AgentStreamHandler) Subscribe() {
 	h.eventBus.On(event.EventAgentReflection, h.handleReflection)
 	h.eventBus.On(event.EventError, h.handleError)
 	h.eventBus.On(event.EventSessionTitle, h.handleSessionTitle)
+	h.eventBus.On(event.EventAgentComplete, h.handleComplete)
 }
 
 // handleThought handles agent thought events
@@ -350,6 +351,58 @@ func (h *AgentStreamHandler) handleSessionTitle(ctx context.Context, evt event.E
 		},
 	}); err != nil {
 		logger.GetLogger(h.ctx).Error("Append session title event to stream failed", "error", err)
+	}
+
+	return nil
+}
+
+// handleComplete handles agent complete events
+func (h *AgentStreamHandler) handleComplete(ctx context.Context, evt event.Event) error {
+	data, ok := evt.Data.(event.AgentCompleteData)
+	if !ok {
+		return nil
+	}
+
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	// Update assistant message with final data
+	if data.MessageID == h.assistantMessageID {
+		// h.assistantMessage.Content = data.FinalAnswer
+		h.assistantMessage.IsCompleted = true
+
+		// Update knowledge references if provided
+		if len(data.KnowledgeRefs) > 0 {
+			knowledgeRefs := make([]*types.SearchResult, 0, len(data.KnowledgeRefs))
+			for _, ref := range data.KnowledgeRefs {
+				if sr, ok := ref.(*types.SearchResult); ok {
+					knowledgeRefs = append(knowledgeRefs, sr)
+				}
+			}
+			h.assistantMessage.KnowledgeReferences = knowledgeRefs
+		}
+
+		// Update agent steps if provided
+		if data.AgentSteps != nil {
+			if steps, ok := data.AgentSteps.([]types.AgentStep); ok {
+				h.assistantMessage.AgentSteps = steps
+			}
+		}
+	}
+
+	// Send completion event to stream manager so SSE can detect completion
+	if err := h.streamManager.AppendEvent(h.ctx, h.sessionID, h.assistantMessageID, interfaces.StreamEvent{
+		ID:        evt.ID,
+		Type:      types.ResponseTypeComplete,
+		Content:   "",
+		Done:      true,
+		Timestamp: time.Now(),
+		Data: map[string]interface{}{
+			"total_steps":    data.TotalSteps,
+			"total_duration": data.TotalDuration,
+		},
+	}); err != nil {
+		logger.GetLogger(h.ctx).Error("Append complete event to stream failed", "error", err)
 	}
 
 	return nil
