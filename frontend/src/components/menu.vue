@@ -425,38 +425,6 @@ const checkScrollBottom = () => {
 }
 const handleScroll = debounce(checkScrollBottom, 200)
 const getMessageList = async (isLoadMore = false) => {
-    // 全局显示对话列表（所有有"对话"入口的地方都显示）
-    let kbId = (route.params as any)?.kbId as string
-    
-    // 如果在知识库内部，获取知识库名称和所有知识库列表
-    if (kbId && isInKnowledgeBase.value) {
-        try {
-            const [kbRes, allKbRes]: any[] = await Promise.all([
-                getKnowledgeBaseById(kbId),
-                listKnowledgeBases()
-            ])
-            if (kbRes?.data?.name) {
-                currentKbName.value = kbRes.data.name
-            }
-            if (allKbRes?.data) {
-                allKnowledgeBases.value = allKbRes.data
-            }
-        } catch {}
-    } else {
-        // 不在知识库内部时，清空知识库名称
-        currentKbName.value = '';
-        // 不在知识库列表页时才调用API（避免与页面组件KnowledgeBaseList.vue重复调用）
-        // 知识库列表页会自己调用listKnowledgeBases来显示列表
-        if (route.name !== 'knowledgeBaseList') {
-            try {
-                const allKbRes: any = await listKnowledgeBases()
-                if (allKbRes?.data) {
-                    allKnowledgeBases.value = allKbRes.data
-                }
-            } catch {}
-        }
-    }
-    
     if (loading.value) return Promise.resolve();
     loading.value = true;
     
@@ -491,16 +459,46 @@ const getMessageList = async (isLoadMore = false) => {
     })
 }
 
-onMounted(() => {
+onMounted(async () => {
     const routeName = typeof route.name === 'string' ? route.name : (route.name ? String(route.name) : '')
     currentpath.value = routeName;
     if (route.params.chatid) {
         currentSecondpath.value = `chat/${route.params.chatid}`;
     }
+    
+    // 初始化知识库信息
+    const kbId = (route.params as any)?.kbId as string
+    if (kbId && isInKnowledgeBase.value) {
+        try {
+            const [kbRes, allKbRes]: any[] = await Promise.all([
+                getKnowledgeBaseById(kbId),
+                listKnowledgeBases()
+            ])
+            if (kbRes?.data?.name) {
+                currentKbName.value = kbRes.data.name
+            }
+            if (allKbRes?.data) {
+                allKnowledgeBases.value = allKbRes.data
+            }
+        } catch {}
+    } else if (route.name !== 'knowledgeBaseList') {
+        // 不在知识库内部时，尝试加载所有知识库列表（避免与页面组件重复调用）
+        try {
+            const allKbRes: any = await listKnowledgeBases()
+            if (allKbRes?.data) {
+                allKnowledgeBases.value = allKbRes.data
+            }
+        } catch {}
+    }
+    
+    // 加载对话列表
     getMessageList();
+    
+    // 注册点击外部关闭下拉菜单的事件
+    document.addEventListener('click', handleClickOutside)
 });
 
-watch([() => route.name, () => route.params], (newvalue) => {
+watch([() => route.name, () => route.params], (newvalue, oldvalue) => {
     const nameStr = typeof newvalue[0] === 'string' ? (newvalue[0] as string) : (newvalue[0] ? String(newvalue[0]) : '')
     currentpath.value = nameStr;
     if (newvalue[1].chatid) {
@@ -508,10 +506,42 @@ watch([() => route.name, () => route.params], (newvalue) => {
     } else {
         currentSecondpath.value = "";
     }
-    // 路由变化时刷新对话列表
-    getMessageList();
-    // 路由变化时更新图标状态
+    
+    // 只在必要时刷新对话列表，避免不必要的重新加载导致列表抖动
+    // 需要刷新的情况：
+    // 1. 创建新会话后（从 creatChat/kbCreatChat 跳转到 chat/:id）
+    // 2. 删除会话后已在 delCard 中处理，不需要在这里刷新
+    const oldRouteNameStr = typeof oldvalue?.[0] === 'string' ? (oldvalue[0] as string) : (oldvalue?.[0] ? String(oldvalue[0]) : '')
+    const isCreatingNewSession = (oldRouteNameStr === 'globalCreatChat' || oldRouteNameStr === 'kbCreatChat') && 
+                                 nameStr !== 'globalCreatChat' && nameStr !== 'kbCreatChat';
+    
+    // 只在创建新会话时才刷新列表
+    if (isCreatingNewSession) {
+        getMessageList();
+    }
+    
+    // 路由变化时更新图标状态和知识库信息（不涉及对话列表）
     getIcon(nameStr);
+    
+    // 如果切换了知识库，更新知识库名称但不重新加载对话列表
+    if (newvalue[1].kbId !== oldvalue?.[1]?.kbId) {
+        const kbId = (newvalue[1] as any)?.kbId as string;
+        if (kbId && isInKnowledgeBase.value) {
+            getKnowledgeBaseById(kbId).then((kbRes: any) => {
+                if (kbRes?.data?.name) {
+                    currentKbName.value = kbRes.data.name;
+                }
+            }).catch(() => {});
+            
+            listKnowledgeBases().then((allKbRes: any) => {
+                if (allKbRes?.data) {
+                    allKnowledgeBases.value = allKbRes.data;
+                }
+            }).catch(() => {});
+        } else if (!isInKnowledgeBase.value) {
+            currentKbName.value = '';
+        }
+    }
 });
 let fileAddIcon = ref('file-add-green.svg');
 let knowledgeIcon = ref('zhishiku-green.svg');
@@ -665,10 +695,6 @@ const switchKnowledgeBase = (kbId: string, event?: Event) => {
 const handleClickOutside = () => {
     showKbDropdown.value = false
 }
-
-onMounted(() => {
-    document.addEventListener('click', handleClickOutside)
-})
 
 watch(() => route.params.kbId, () => {
     showKbDropdown.value = false
