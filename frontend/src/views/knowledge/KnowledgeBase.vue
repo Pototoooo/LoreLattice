@@ -7,8 +7,11 @@ import { useRoute, useRouter } from 'vue-router';
 import EmptyKnowledge from '@/components/empty-knowledge.vue';
 import { getSessionsList, createSessions, generateSessionsTitle } from "@/api/chat/index";
 import { useMenuStore } from '@/stores/menu';
+import { useUIStore } from '@/stores/ui';
 import { MessagePlugin } from 'tdesign-vue-next';
+import KnowledgeBaseEditorModal from './KnowledgeBaseEditorModal.vue';
 const usemenuStore = useMenuStore();
+const uiStore = useUIStore();
 const router = useRouter();
 import {
   batchQueryKnowledge,
@@ -175,6 +178,14 @@ const sendMsg = (value: string) => {
   createNewSession(value);
 };
 
+// 处理知识库编辑成功后的回调
+const handleKBEditorSuccess = (kbIdValue: string) => {
+  // 如果编辑的是当前知识库，刷新文件列表
+  if (kbIdValue === kbId.value) {
+    loadKnowledgeFiles(kbIdValue);
+  }
+};
+
 const getTitle = (session_id: string, value: string) => {
   const now = new Date().toISOString();
   let obj = { 
@@ -265,6 +276,15 @@ async function createNewSession(value: string): Promise<void> {
     <DocContent :visible="isCardDetails" :details="details" @closeDoc="closeDoc" @getDoc="getDoc"></DocContent>
   </div>
   <EmptyKnowledge v-show="!cardList.length"></EmptyKnowledge>
+
+  <!-- 知识库编辑器（创建/编辑统一组件） -->
+  <KnowledgeBaseEditorModal 
+    :visible="uiStore.showKBEditorModal"
+    :mode="uiStore.kbEditorMode"
+    :kb-id="uiStore.currentKBId || undefined"
+    @update:visible="(val) => val ? null : uiStore.closeKBEditor()"
+    @success="handleKBEditorSuccess"
+  />
 </template>
 <style>
 .card-more {

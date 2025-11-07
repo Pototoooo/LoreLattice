@@ -119,9 +119,12 @@ import { MessagePlugin } from 'tdesign-vue-next'
 import { createKnowledgeBase, getKnowledgeBaseById, listKnowledgeFiles, updateKnowledgeBase } from '@/api/knowledge-base'
 import { updateKBConfig, type KBModelConfigRequest } from '@/api/initialization'
 import { listModels } from '@/api/model'
+import { useUIStore } from '@/stores/ui'
 import KBModelConfig from './settings/KBModelConfig.vue'
 import KBChunkingSettings from './settings/KBChunkingSettings.vue'
 import KBAdvancedSettings from './settings/KBAdvancedSettings.vue'
+
+const uiStore = useUIStore()
 
 // Props
 const props = defineProps<{
@@ -506,6 +509,11 @@ watch(() => props.visible, async (newVal) => {
     // 打开弹窗时，先重置状态
     resetState()
     
+    // 检查是否有初始 section，如果有则跳转
+    if (uiStore.kbEditorInitialSection) {
+      currentSection.value = uiStore.kbEditorInitialSection
+    }
+    
     // 加载模型列表
     await loadAllModels()
     
@@ -521,6 +529,7 @@ watch(() => props.visible, async (newVal) => {
     // 关闭弹窗时，延迟重置状态（等待动画结束）
     setTimeout(() => {
       resetState()
+      currentSection.value = 'basic' // 重置为默认 section
     }, 300)
   }
 })

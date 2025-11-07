@@ -24,10 +24,6 @@
           <t-icon name="server" class="menu-icon" />
           <span>Ollama</span>
         </div>
-        <div class="menu-item" @click="handleQuickNav('knowledge')">
-          <t-icon name="folder-open" class="menu-icon" />
-          <span>知识库</span>
-        </div>
         <div class="menu-divider"></div>
         <div class="menu-item" @click="handleSettings">
           <t-icon name="setting" class="menu-icon" />

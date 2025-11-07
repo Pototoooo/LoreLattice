@@ -378,7 +378,7 @@
             </div>
 
             <!-- 多模态配置区域 -->
-            <div class="config-section">
+            <div id="multimodal-config-section" class="config-section">
                 <h3><t-icon name="image" class="section-icon" />多模态配置</h3>
                 <div class="form-row">
                     <t-form-item name="multimodal.enabled">

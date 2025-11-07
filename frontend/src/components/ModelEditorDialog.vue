@@ -159,9 +159,9 @@
             <t-input 
               v-model.number="formData.dimension" 
               type="number"
-              :min="128"
-              :max="4096"
-              placeholder="如：1536"
+            :min="128"
+            :max="4096"
+            placeholder="如：1536"
               :disabled="formData.source === 'local' && checking"
             />
             <!-- Ollama 本地模型：自动检测维度按钮 -->
@@ -642,14 +642,14 @@ watch(() => formData.value.modelName, async (newValue, oldValue) => {
   
   // 处理下载逻辑
   if (newValue.startsWith('__download__')) {
-    // 提取模型名称
-    const modelName = newValue.replace('__download__', '')
-    
-    // 重置选择（避免显示 __download__ 前缀）
-    formData.value.modelName = ''
-    
-    // 开始下载
-    await startDownload(modelName)
+  // 提取模型名称
+  const modelName = newValue.replace('__download__', '')
+  
+  // 重置选择（避免显示 __download__ 前缀）
+  formData.value.modelName = ''
+  
+  // 开始下载
+  await startDownload(modelName)
     return
   }
   

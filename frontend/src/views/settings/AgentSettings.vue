@@ -34,7 +34,7 @@
           </p>
         </div>
       </div>
-    </div>
+      </div>
 
     <div class="settings-group">
 
@@ -298,7 +298,7 @@ onMounted(async () => {
     // 再等待一帧，确保所有事件监听器都已设置好
     requestAnimationFrame(() => {
       // 初始化完成，现在可以允许保存操作
-      isInitializing.value = false
+    isInitializing.value = false
     })
   } catch (error) {
     console.error('加载Agent配置失败:', error)
@@ -362,8 +362,8 @@ const handleMaxIterationsChangeDebounced = (value: number) => {
   // 清除之前的定时器
   if (maxIterationsDebounceTimer) {
     clearTimeout(maxIterationsDebounceTimer)
-  }
-  
+}
+
   // 设置新的定时器，300ms 后保存（减少延迟，提升响应速度）
   maxIterationsDebounceTimer = setTimeout(async () => {
     // 再次检查值是否变化（可能在等待期间值又变了）
@@ -371,28 +371,28 @@ const handleMaxIterationsChangeDebounced = (value: number) => {
       maxIterationsDebounceTimer = null
       return
     }
-    
-    try {
-      const config: AgentConfig = {
+  
+  try {
+    const config: AgentConfig = {
         enabled: isAgentReady.value, // 自动根据配置状态设置
         max_iterations: numValue, // 确保是数字类型
-        reflection_enabled: false,
-        allowed_tools: localAllowedTools.value,
-        temperature: localTemperature.value,
-        thinking_model_id: localThinkingModelId.value,
-        rerank_model_id: localRerankModelId.value
-      }
-      
-      await updateAgentConfig(config)
+      reflection_enabled: false,
+      allowed_tools: localAllowedTools.value,
+      temperature: localTemperature.value,
+      thinking_model_id: localThinkingModelId.value,
+      rerank_model_id: localRerankModelId.value
+    }
+    
+    await updateAgentConfig(config)
       settingsStore.updateAgentConfig({ maxIterations: numValue })
       lastSavedValue = numValue // 记录已保存的值
-      MessagePlugin.success('最大迭代次数已保存')
-    } catch (error) {
-      console.error('保存失败:', error)
-      MessagePlugin.error(getErrorMessage(error))
+    MessagePlugin.success('最大迭代次数已保存')
+  } catch (error) {
+    console.error('保存失败:', error)
+    MessagePlugin.error(getErrorMessage(error))
     } finally {
       maxIterationsDebounceTimer = null
-    }
+  }
   }, 300)
 }
 

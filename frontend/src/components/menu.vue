@@ -88,7 +88,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { onMounted, watch, computed, ref, reactive, nextTick } from 'vue';
+import { onMounted, watch, computed, ref, reactive, nextTick, h } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getSessionsList, delSession } from "@/api/chat/index";
 import { getKnowledgeBaseById, listKnowledgeBases, uploadKnowledgeFile } from '@/api/knowledge-base';
@@ -342,7 +342,36 @@ const upload = async (e: any) => {
         } else if (err.message) {
             errorMessage = err.message;
         }
-        MessagePlugin.error(errorMessage);
+        
+        // 如果是 VLM 配置错误，添加跳转链接
+        if (errorMessage.includes('VLM配置') || errorMessage.includes('多模态') || errorMessage.includes('对象存储')) {
+            const messageContent = h('div', { style: 'display: flex; align-items: center; gap: 8px; flex-wrap: wrap;' }, [
+                h('span', { style: 'flex: 1; min-width: 0;' }, errorMessage),
+                h('a', {
+                    href: '#',
+                    onClick: (e: Event) => {
+                        e.preventDefault();
+                        // 打开知识库设置弹框，并导航到高级设置部分
+                        console.log('Opening KB editor for:', currentKbId, 'section: advanced');
+                        uiStore.openEditKB(currentKbId, 'advanced');
+                    },
+                    style: 'color: #07C05F; text-decoration: none; font-weight: 500; cursor: pointer; white-space: nowrap; flex-shrink: 0;',
+                    onMouseenter: (e: Event) => {
+                        (e.target as HTMLElement).style.textDecoration = 'underline';
+                    },
+                    onMouseleave: (e: Event) => {
+                        (e.target as HTMLElement).style.textDecoration = 'none';
+                    }
+                }, '去设置 →')
+            ]);
+            
+            MessagePlugin.error({
+                content: messageContent,
+                duration: 5000
+            });
+        } else {
+            MessagePlugin.error(errorMessage);
+        }
     } finally {
         uploadInput.value.value = "";
     }

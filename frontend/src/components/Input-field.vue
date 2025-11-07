@@ -100,6 +100,15 @@ const onKeydown = (val: string, event: { e: { preventDefault(): unknown; keyCode
   }
 }
 
+const handleGoToAgentSettings = () => {
+  // 使用 uiStore 打开设置并跳转到 agent 部分
+  uiStore.openSettings('agent');
+  // 如果当前不在设置页面，导航到设置页面
+  if (route.path !== '/platform/settings') {
+    router.push('/platform/settings');
+  }
+}
+
 const toggleAgentMode = () => {
   // 如果要启用 Agent，先检查是否就绪
   // 注意：isAgentReady 是从 store 中计算的，需要确保 store 中的配置是最新的
@@ -114,12 +123,7 @@ const toggleAgentMode = () => {
           href: '#',
           onClick: (e: Event) => {
             e.preventDefault();
-            // 使用 uiStore 打开设置并跳转到 agent 部分
-            uiStore.openSettings('agent');
-            // 如果当前不在设置页面，导航到设置页面
-            if (route.path !== '/platform/settings') {
-              router.push('/platform/settings');
-            }
+            handleGoToAgentSettings();
           },
           style: 'color: #07C05F; text-decoration: none; font-weight: 500; cursor: pointer; white-space: nowrap; flex-shrink: 0;',
           onMouseenter: (e: Event) => {
@@ -169,9 +173,26 @@ onBeforeRouteUpdate((to, from, next) => {
       <div class="control-left">
         <!-- Agent 模式按钮 -->
         <t-tooltip 
-          :content="isAgentEnabled ? 'Agent 模式（已启用）' : (settingsStore.isAgentReady ? 'Agent 模式（已禁用，点击启用）' : 'Agent 未就绪，请先完成配置')" 
           placement="top"
+          :show-arrow="true"
+          :duration="0"
         >
+          <template #content>
+            <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+              <span>
+                {{ isAgentEnabled ? 'Agent 模式（已启用）' : (settingsStore.isAgentReady ? 'Agent 模式（已禁用，点击启用）' : 'Agent 未就绪，请先完成配置') }}
+              </span>
+              <a 
+                href="#"
+                @click.prevent="handleGoToAgentSettings"
+                style="color: #07C05F; text-decoration: none; font-size: 12px; cursor: pointer;"
+                @mouseenter="(e) => e.target.style.textDecoration = 'underline'"
+                @mouseleave="(e) => e.target.style.textDecoration = 'none'"
+              >
+                去设置 Agent →
+              </a>
+            </div>
+          </template>
           <div 
             class="control-btn agent-btn"
             :class="{ 
