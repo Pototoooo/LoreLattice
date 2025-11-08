@@ -1,25 +1,20 @@
 <template>
   <div class="plan-display">
-    <div v-if="data.task" class="plan-task">
-      <strong>任务:</strong> {{ data.task }}
-    </div>
-    
     <div v-if="data.steps && data.steps.length > 0" class="plan-steps">
-      <div class="steps-header">计划步骤 (共 {{ data.total_steps || data.steps.length }} 步):</div>
-      <div v-for="(step, index) in data.steps" :key="step.id || index" class="step-item">
-        <div class="step-header">
-          <span class="step-number">{{ index + 1 }}.</span>
-          <span class="step-status" :class="`status-${step.status}`">
-            {{ getStatusEmoji(step.status) }}
-          </span>
-          <span class="step-status-text" :class="`status-${step.status}`">
-            [{{ getStatusText(step.status) }}]
-          </span>
-          <span class="step-description">{{ step.description }}</span>
+      <div v-for="(step, index) in data.steps" :key="step.id || index" class="step-item" :class="`status-${step.status}`">
+        <div class="step-checkbox" :class="{ 'checked': step.status === 'completed', 'in-progress': step.status === 'in_progress' }">
+          <svg v-if="step.status === 'completed'" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="2" width="12" height="12" rx="2" fill="#07C05F"/>
+            <path d="M5 8L7 10L11 6" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="2" width="12" height="12" rx="2" stroke="#d1d5db" stroke-width="1.5" fill="none"/>
+          </svg>
         </div>
-        <div v-if="step.tools_to_use" class="step-tools">
-          <span class="tools-label">工具:</span> {{ step.tools_to_use }}
-        </div>
+        <span class="step-description" :class="{ 'completed': step.status === 'completed' }">
+          {{ step.description }}
+          <span v-if="step.status === 'in_progress'" class="sparkle">✨</span>
+        </span>
       </div>
     </div>
     
@@ -30,7 +25,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import type { PlanData } from '@/types/tool-results';
 
 interface Props {
@@ -38,139 +32,95 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
-const getStatusEmoji = (status: string): string => {
-  const emojiMap: Record<string, string> = {
-    pending: '⏳',
-    in_progress: '🔄',
-    completed: '✅',
-    skipped: '⏭️'
-  };
-  return emojiMap[status] || '⏳';
-};
-
-const getStatusText = (status: string): string => {
-  const textMap: Record<string, string> = {
-    pending: '待处理',
-    in_progress: '进行中',
-    completed: '已完成',
-    skipped: '已跳过'
-  };
-  return textMap[status] || status;
-};
 </script>
 
 <style lang="less" scoped>
 .plan-display {
   font-size: 13px;
-  color: #333;
-  background: #f9fafb;
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-}
-
-.plan-task {
-  margin-bottom: 16px;
-  padding: 10px;
-  background: #fff;
-  border-radius: 4px;
-  border-left: 3px solid #3b82f6;
-  
-  strong {
-    color: #1f2937;
-    font-weight: 600;
-  }
+  color: #666;
+  background: transparent;
+  padding: 8px 0 8px 12px;
+  margin: 0;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none;
 }
 
 .plan-steps {
-  .steps-header {
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 12px;
-    font-size: 14px;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .step-item {
-  margin-bottom: 12px;
-  padding: 10px;
-  background: #fff;
-  border-radius: 4px;
-  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 2px 0;
   transition: all 0.2s;
-  
-  &:hover {
-    border-color: #d1d5db;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  }
   
   &:last-child {
     margin-bottom: 0;
   }
-}
-
-.step-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 4px;
-}
-
-.step-number {
-  font-weight: 600;
-  color: #6b7280;
-  min-width: 20px;
-}
-
-.step-status {
-  font-size: 16px;
-  line-height: 1;
-}
-
-.step-status-text {
-  font-weight: 500;
-  font-size: 12px;
-  
-  &.status-pending {
-    color: #6b7280;
-  }
   
   &.status-in_progress {
-    color: #3b82f6;
+    .step-description {
+      color: #333;
+      font-weight: 500;
+    }
+  }
+}
+
+.step-checkbox {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &.checked {
+    svg {
+      rect {
+        fill: #07C05F;
+      }
+    }
   }
   
-  &.status-completed {
-    color: #10b981;
-  }
-  
-  &.status-skipped {
-    color: #9ca3af;
+  &.in-progress {
+    svg {
+      rect {
+        stroke: #07C05F;
+        stroke-width: 2;
+      }
+    }
   }
 }
 
 .step-description {
   flex: 1;
-  color: #1f2937;
+  color: #666;
   line-height: 1.5;
-}
-
-.step-tools {
-  margin-top: 6px;
-  padding-left: 26px;
-  font-size: 12px;
-  color: #6b7280;
+  font-size: 13px;
   
-  .tools-label {
-    font-weight: 500;
+  &.completed {
+    text-decoration: line-through;
+    color: #999;
+  }
+  
+  .sparkle {
+    margin-left: 4px;
+    font-size: 12px;
   }
 }
 
 .no-steps {
-  padding: 16px;
+  padding: 8px 12px;
   text-align: center;
   color: #9ca3af;
   font-style: italic;
+  font-size: 13px;
 }
 </style>
 

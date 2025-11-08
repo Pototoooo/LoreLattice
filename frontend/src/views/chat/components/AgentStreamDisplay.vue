@@ -2,16 +2,30 @@
   <div class="agent-stream-display">
     
     <!-- Collapsed intermediate steps -->
-    <div v-if="shouldShowCollapsedSteps" class="intermediate-steps-collapsed" @click="toggleIntermediateSteps">
-      <span class="collapse-icon">{{ showIntermediateSteps ? '▼' : '▶' }}</span>
-      <span class="collapse-text">
-        {{ intermediateStepsCount }} intermediate step{{ intermediateStepsCount !== 1 ? 's' : '' }} (click to {{ showIntermediateSteps ? 'collapse' : 'expand' }})
-      </span>
+    <div v-if="shouldShowCollapsedSteps" class="intermediate-steps-collapsed">
+      <div class="intermediate-steps-header" @click="toggleIntermediateSteps">
+        <div class="intermediate-steps-title">
+          <img :src="agentIcon" alt="" />
+          <span>{{ intermediateStepsSummary }}</span>
+        </div>
+        <div class="intermediate-steps-show-icon">
+          <t-icon :name="showIntermediateSteps ? 'chevron-up' : 'chevron-down'" />
+        </div>
+      </div>
     </div>
     
     <!-- Event Stream -->
     <template v-for="(event, index) in displayEvents" :key="getEventKey(event, index)">
-      <div v-if="event && event.type" class="event-item">
+      <div v-if="event && event.type" class="event-item" :data-event-index="index">
+        
+        <!-- Plan Task Change Event -->
+        <div v-if="event.type === 'plan_task_change'" class="plan-task-change-event">
+          <div class="plan-task-change-card">
+            <div class="plan-task-change-content">
+              <strong>任务:</strong> {{ event.task }}
+            </div>
+          </div>
+        </div>
         
         <!-- Thinking Event -->
         <div v-if="event.type === 'thinking'" class="thinking-event">
@@ -56,61 +70,73 @@
         >
           <div class="action-header" @click="toggleEvent(event.tool_call_id)">
             <div class="action-title">
-              <span class="action-icon" :class="{ 
-                'success': event.success === true, 
-                'error': event.success === false,
-                'pending': event.pending
-              }">
-                {{ event.pending ? '○' : (event.success ? '✓' : '✗') }}
-              </span>
+              <img v-if="event.tool_name && !isBookIcon(event.tool_name)" class="action-title-icon" :src="getToolIcon(event.tool_name)" alt="" />
+              <t-icon v-if="event.tool_name && isBookIcon(event.tool_name)" class="action-title-icon" name="book" />
               <!-- Custom header for todo_write tool -->
-              <span v-if="event.tool_name === 'todo_write' && event.tool_data?.steps" class="action-name">
-                制定计划 {{ getPlanStatusSummary(event) }}
-              </span>
-              <!-- Default header for other tools -->
-              <span v-else class="action-name">{{ getToolDescription(event) }}</span>
+              <t-tooltip v-if="event.tool_name === 'todo_write' && event.tool_data?.steps" :content="'更新计划'" placement="top">
+                <span class="action-name">
+                  更新计划
+                </span>
+              </t-tooltip>
+              <!-- Use tool summary as title if available, otherwise use description -->
+              <t-tooltip v-else :content="getToolTitle(event)" placement="top">
+                <span class="action-name">{{ getToolTitle(event) }}</span>
+              </t-tooltip>
             </div>
-            <span v-if="!event.pending" class="expand-icon">
-              {{ isEventExpanded(event.tool_call_id) ? '▼' : '▶' }}
-            </span>
+            <div v-if="!event.pending" class="action-show-icon">
+              <t-icon :name="isEventExpanded(event.tool_call_id) ? 'chevron-up' : 'chevron-down'" />
+            </div>
           </div>
           
-          <!-- External Tool Summary -->
-          <div v-if="getToolSummary(event) && !event.pending" class="tool-summary">
-            <!-- Thinking tool: render markdown -->
-            <div v-if="event.tool_name === 'thinking' && event.tool_data?.thought" 
-                 class="tool-summary-markdown" 
-                 v-html="renderMarkdown(event.tool_data.thought)">
+          <!-- Plan Status Summary (Fixed, always visible, outside action-details) -->
+          <div v-if="!event.pending && event.tool_name === 'todo_write' && event.tool_data?.steps" class="plan-status-summary-fixed">
+            <div class="plan-status-text">
+              <template v-for="(part, partIndex) in getPlanStatusItems(event)" :key="partIndex">
+                <t-icon :name="part.icon" :class="['status-icon', part.class]" />
+                <span>{{ part.label }} {{ part.count }}</span>
+                <span v-if="partIndex < getPlanStatusItems(event).length - 1" class="separator">·</span>
+              </template>
             </div>
-            <!-- Other tools: plain text -->
-            <span v-else>{{ getToolSummary(event) }}</span>
+          </div>
+          
+          <!-- Search Results Summary (Fixed, always visible, outside action-details) -->
+          <div v-if="!event.pending && (event.tool_name === 'search_knowledge' || event.tool_name === 'knowledge_search') && event.tool_data" class="search-results-summary-fixed">
+            <div class="results-summary-text">{{ getSearchResultsSummary(event.tool_data) }}</div>
           </div>
           
           <div v-if="isEventExpanded(event.tool_call_id) && !event.pending" class="action-details">
-            <div v-if="event.tool_name" class="detail-row">
-              <span class="detail-label">Tool:</span>
-              <code class="detail-value">{{ event.tool_name }}</code>
-            </div>
-            <!-- Hide Arguments for todo_write tool -->
-            <div v-if="event.arguments && event.tool_name !== 'todo_write'" class="detail-row">
-              <span class="detail-label">Arguments:</span>
-              <pre class="detail-code">{{ formatJSON(event.arguments) }}</pre>
-            </div>
+            <!-- Thinking tool: only render markdown thought content -->
+            <template v-if="event.tool_name === 'thinking' && event.tool_data?.thought">
+              <div class="thinking-thought-content">
+                <div class="thinking-thought-markdown markdown-content" v-html="renderMarkdown(event.tool_data.thought)"></div>
+              </div>
+            </template>
             
-            <!-- Use ToolResultRenderer if display_type is available -->
-            <div v-if="event.display_type && event.tool_data" class="detail-row">
-              <ToolResultRenderer 
-                :display-type="event.display_type"
-                :tool-data="event.tool_data"
-                :output="event.output"
-              />
-            </div>
-            
-            <!-- Fallback to original output display -->
-            <div v-else-if="event.output" class="detail-row">
-              <span class="detail-label">{{ event.success ? 'Output:' : 'Error:' }}</span>
-              <div class="detail-output">{{ event.output }}</div>
-            </div>
+            <!-- For other tools: show ToolResultRenderer or output -->
+            <template v-else>
+              <!-- Use ToolResultRenderer if display_type is available -->
+              <div v-if="event.display_type && event.tool_data" class="tool-result-wrapper">
+                <ToolResultRenderer 
+                  :display-type="event.display_type"
+                  :tool-data="event.tool_data"
+                  :output="event.output"
+                  :arguments="event.arguments"
+                />
+              </div>
+              
+              <!-- Fallback to original output display -->
+              <div v-else-if="event.output" class="tool-output-wrapper">
+                <div class="detail-output">{{ event.output }}</div>
+              </div>
+              
+              <!-- Show Arguments only if no display_type and not for todo_write -->
+              <div v-if="event.arguments && event.tool_name !== 'todo_write' && !event.display_type" class="tool-arguments-wrapper">
+                <div class="arguments-header">
+                  <span class="arguments-label">参数</span>
+                </div>
+                <pre class="detail-code">{{ formatJSON(event.arguments) }}</pre>
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -129,6 +155,13 @@ import { ref, computed, watch } from 'vue';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import ToolResultRenderer from './ToolResultRenderer.vue';
+
+// Import icons
+import agentIcon from '@/assets/img/agent.svg';
+import thinkingIcon from '@/assets/img/Frame3718.svg';
+import knowledgeIcon from '@/assets/img/zhishiku-thin.svg';
+import documentIcon from '@/assets/img/ziliao.svg';
+import fileAddIcon from '@/assets/img/file-add-green.svg';
 
 interface SessionData {
   isAgentMode?: boolean;
@@ -150,7 +183,19 @@ marked.use({
 const eventStream = computed(() => props.session?.agentEventStream || []);
 
 // Expanded events tracking (for tool calls)
+// Initialize with thinking tools expanded by default
 const expandedEvents = ref<Set<string>>(new Set());
+
+// Watch event stream to auto-expand thinking tools
+watch(eventStream, (stream) => {
+  if (!stream || !Array.isArray(stream)) return;
+  
+  stream.forEach((event: any) => {
+    if (event?.type === 'tool_call' && event?.tool_name === 'thinking' && event?.tool_call_id) {
+      expandedEvents.value.add(event.tool_call_id);
+    }
+  });
+}, { immediate: true, deep: true });
 
 // State for intermediate steps collapse
 const showIntermediateSteps = ref(false);
@@ -263,6 +308,93 @@ const intermediateStepsCount = computed(() => {
   return count;
 });
 
+// Get intermediate steps summary with special info
+const intermediateStepsSummary = computed(() => {
+  if (!finalContent.value || !eventStream.value) {
+    return '';
+  }
+  
+  const stream = eventStream.value;
+  const toolCalls: string[] = [];
+  let searchCount = 0;
+  let thinkingCount = 0;
+  let totalDuration = 0;
+  
+  for (const event of stream) {
+    if (event.type === 'tool_call' && event.tool_name) {
+      const toolName = event.tool_name;
+      if (toolName === 'search_knowledge' || toolName === 'knowledge_search') {
+        searchCount++;
+      } else if (toolName === 'thinking') {
+        // Count if it's not the final thinking
+        if (finalContent.value.type !== 'thinking' || event.event_id !== finalContent.value.event_id) {
+          thinkingCount++;
+        }
+      } else if (toolName !== 'todo_write') {
+        // Only add unique tool names
+        if (!toolCalls.includes(toolName)) {
+          toolCalls.push(toolName);
+        }
+      }
+      // Accumulate duration for tool calls
+      if (event.duration) {
+        totalDuration += event.duration;
+      } else if (event.duration_ms) {
+        totalDuration += event.duration_ms;
+      }
+    } else if (event.type === 'thinking' && event.content) {
+      // Count if it's not the final thinking
+      if (finalContent.value.type !== 'thinking' || event.event_id !== finalContent.value.event_id) {
+        thinkingCount++;
+        // Accumulate duration for thinking events
+        if (event.duration_ms) {
+          totalDuration += event.duration_ms;
+        }
+      }
+    }
+  }
+  
+  const parts: string[] = [];
+  if (searchCount > 0) {
+    parts.push(`检索知识库 ${searchCount} 次`);
+  }
+  if (thinkingCount > 0) {
+    parts.push(`思考 ${thinkingCount} 次`);
+  }
+  if (toolCalls.length > 0) {
+    const toolNames = toolCalls.map(name => {
+      if (name === 'get_document_info') return '获取文档';
+      if (name === 'get_related_chunks') return '获取相关片段';
+      return name;
+    });
+    if (toolNames.length === 1) {
+      parts.push(`调用 ${toolNames[0]}`);
+    } else {
+      parts.push(`调用工具 ${toolNames.join('、')}`);
+    }
+  }
+  
+  // Add duration info
+  if (totalDuration > 0) {
+    parts.push(`耗时 ${formatDuration(totalDuration)}`);
+  }
+  
+  if (parts.length === 0) {
+    return `${intermediateStepsCount.value} 个中间步骤`;
+  }
+  
+  // 优化连接词，使语句更流畅
+  if (parts.length === 1) {
+    return parts[0];
+  } else if (parts.length === 2) {
+    return `${parts[0]}，${parts[1]}`;
+  } else {
+    // 3个或以上：前几个用顿号，最后一个用逗号
+    const last = parts.pop();
+    return `${parts.join('、')}，${last}`;
+  }
+});
+
 // Should show the collapsed steps indicator
 const shouldShowCollapsedSteps = computed(() => {
   const result = isConversationDone.value && intermediateStepsCount.value > 0;
@@ -283,41 +415,70 @@ const displayEvents = computed(() => {
   
   console.log('[Collapse] displayEvents: total stream length:', validStream.length);
   
-  // If not done, show everything
+  // Track task changes for todo_write events
+  // This works for both real-time streaming and historical messages
+  let lastTask: string | null = null;
+  const result: any[] = [];
+  
+  for (let i = 0; i < validStream.length; i++) {
+    const event = validStream[i];
+    
+    // Check if this is a todo_write event with task change
+    if (event.type === 'tool_call' && event.tool_name === 'todo_write' && event.tool_data?.task) {
+      const currentTask = event.tool_data.task;
+      
+      // If task changed (or is first task), insert a task change event before the todo_write event
+      // For historical messages, we need to show the first task as well
+      if (lastTask === null || currentTask !== lastTask) {
+        result.push({
+          type: 'plan_task_change',
+          task: currentTask,
+          event_id: `plan-task-change-${event.tool_call_id || i}`,
+          timestamp: event.timestamp || Date.now()
+        });
+      }
+      
+      lastTask = currentTask;
+    }
+    
+    result.push(event);
+  }
+  
+  // If not done, show everything (with task change events)
   if (!isConversationDone.value) {
-    console.log('[Collapse] displayEvents: not done, showing all', validStream.length);
-    return validStream;
+    console.log('[Collapse] displayEvents: not done, showing all', result.length);
+    return result;
   }
   
   // If done but user wants to see intermediate steps, show all
   if (showIntermediateSteps.value) {
-    console.log('[Collapse] displayEvents: user expanded, showing all', validStream.length);
-    return validStream;
+    console.log('[Collapse] displayEvents: user expanded, showing all', result.length);
+    return result;
   }
   
   // Otherwise, show only final content
   const final = finalContent.value;
   if (!final) {
-    console.log('[Collapse] displayEvents: no final content, showing all', validStream.length);
-    return validStream;
+    console.log('[Collapse] displayEvents: no final content, showing all', result.length);
+    return result;
   }
   
   if (final.type === 'answer') {
     // Filter to show only answer events
-    const filtered = validStream.filter((e: any) => e.type === 'answer');
+    const filtered = result.filter((e: any) => e.type === 'answer');
     console.log('[Collapse] displayEvents: showing answer only', filtered.length);
     return filtered;
   } else if (final.type === 'thinking') {
     // Filter to show only the last thinking
-    const filtered = validStream.filter((e: any) => 
+    const filtered = result.filter((e: any) => 
       e.type === 'thinking' && e.event_id === final.event_id
     );
     console.log('[Collapse] displayEvents: showing last thinking only', filtered.length);
     return filtered;
   }
   
-  console.log('[Collapse] displayEvents: fallback, showing all', validStream.length);
-  return validStream;
+  console.log('[Collapse] displayEvents: fallback, showing all', result.length);
+  return result;
 });
 
 // Get unique key for event
@@ -374,21 +535,16 @@ const getToolSummary = (event: any): string => {
   const toolName = event.tool_name;
   const toolData = event.tool_data;
   
+  // For search tools, don't return summary here - it will be displayed in SearchResults component
   if (toolName === 'search_knowledge' || toolName === 'knowledge_search') {
-    if (toolData?.count !== undefined) {
-      const kbCount = toolData.kb_counts ? Object.keys(toolData.kb_counts).length : 0;
-      if (kbCount > 0) {
-        return `Found ${toolData.count} result${toolData.count !== 1 ? 's' : ''} from ${kbCount} knowledge base${kbCount !== 1 ? 's' : ''}`;
-      }
-      return `Found ${toolData.count} result${toolData.count !== 1 ? 's' : ''}`;
-    }
+    return '';
   } else if (toolName === 'get_document_info') {
     if (toolData?.title) {
-      return `Retrieved document: ${toolData.title}`;
+      return `获取文档：${toolData.title}`;
     }
   } else if (toolName === 'get_related_chunks') {
     if (toolData?.count !== undefined) {
-      return `Found ${toolData.count} related chunk${toolData.count !== 1 ? 's' : ''}`;
+      return `找到 ${toolData.count} 个相关片段`;
     }
   } else if (toolName === 'todo_write') {
     // Extract steps from tool data
@@ -407,48 +563,202 @@ const getToolSummary = (event: any): string => {
     }
   } else if (toolName === 'thinking') {
     // Return truthy value to trigger rendering, actual content rendered in template
-    return toolData?.thought ? 'thinking_content' : '';
+    return toolData?.thought ? '深度思考' : '';
   }
   
   return '';
 };
 
-// Get plan status summary for todo_write tool header
-const getPlanStatusSummary = (event: any): string => {
-  if (!event || !event.tool_data?.steps) return '';
+// Get plan status parts for todo_write tool header
+const getPlanStatusParts = (event: any) => {
+  if (!event || !event.tool_data?.steps) {
+    return { inProgress: 0, pending: 0, completed: 0 };
+  }
   
   const steps = event.tool_data.steps;
-  if (!Array.isArray(steps)) return '';
+  if (!Array.isArray(steps)) {
+    return { inProgress: 0, pending: 0, completed: 0 };
+  }
   
-  const inProgress = steps.filter((s: any) => s.status === 'in_progress').length;
-  const pending = steps.filter((s: any) => s.status === 'pending').length;
+  return {
+    inProgress: steps.filter((s: any) => s.status === 'in_progress').length,
+    pending: steps.filter((s: any) => s.status === 'pending').length,
+    completed: steps.filter((s: any) => s.status === 'completed').length
+  };
+};
+
+// Get plan status items for display with icons
+const getPlanStatusItems = (event: any) => {
+  const parts = getPlanStatusParts(event);
+  const items: Array<{ icon: string; class: string; label: string; count: number }> = [];
   
-  const parts = [];
-  if (inProgress > 0) parts.push(`🚀 进行中 ${inProgress}`);
-  if (pending > 0) parts.push(`📋 待处理 ${pending}`);
+  if (parts.inProgress > 0) {
+    items.push({
+      icon: 'play-circle-filled',
+      class: 'in-progress',
+      label: '进行中',
+      count: parts.inProgress
+    });
+  }
   
-  return parts.length > 0 ? parts.join(' · ') : '';
+  if (parts.pending > 0) {
+    items.push({
+      icon: 'time',
+      class: 'pending',
+      label: '待处理',
+      count: parts.pending
+    });
+  }
+  
+  if (parts.completed > 0) {
+    items.push({
+      icon: 'check-circle-filled',
+      class: 'completed',
+      label: '已完成',
+      count: parts.completed
+    });
+  }
+  
+  return items;
+};
+
+// Get plan status summary for todo_write tool header (deprecated, use getPlanStatusParts instead)
+const getPlanStatusSummary = (event: any): string => {
+  const parts = getPlanStatusParts(event);
+  const textParts = [];
+  if (parts.inProgress > 0) textParts.push(`🚀 进行中 ${parts.inProgress}`);
+  if (parts.pending > 0) textParts.push(`📋 待处理 ${parts.pending}`);
+  if (parts.completed > 0) textParts.push(`✅ 已完成 ${parts.completed}`);
+  return textParts.length > 0 ? textParts.join(' · ') : '';
+};
+
+// Check if tool should use book icon
+const isBookIcon = (toolName: string): boolean => {
+  return false; // 不再使用 t-icon 的 book，改用 SVG 图标
+};
+
+// Get icon for tool type
+const getToolIcon = (toolName: string): string => {
+  if (toolName === 'thinking') {
+    return thinkingIcon;
+  } else if (toolName === 'search_knowledge' || toolName === 'knowledge_search') {
+    return knowledgeIcon;
+  } else if (toolName === 'get_document_info' || toolName === 'get_related_chunks') {
+    return documentIcon;
+  } else if (toolName === 'todo_write') {
+    return fileAddIcon;
+  } else {
+    return documentIcon; // default icon
+  }
+};
+
+// Get search results summary text
+const getSearchResultsSummary = (toolData: any): string => {
+  if (!toolData) return '';
+  
+  const count = toolData.results?.length || toolData.count || 0;
+  if (count === 0) return '';
+  
+  const kbCount = toolData.kb_counts ? Object.keys(toolData.kb_counts).length : 0;
+  if (kbCount > 0) {
+    return `找到 ${count} 个结果，来自 ${kbCount} 个知识库`;
+  }
+  return `找到 ${count} 个结果`;
+};
+
+// Extract and format query parameters from args
+const getQueryText = (args: any): string => {
+  if (!args) return '';
+  
+  // Parse if it's a string
+  let parsedArgs = args;
+  if (typeof parsedArgs === 'string') {
+    try {
+      parsedArgs = JSON.parse(parsedArgs);
+    } catch (e) {
+      return '';
+    }
+  }
+  
+  if (!parsedArgs || typeof parsedArgs !== 'object') return '';
+  
+  const queries: string[] = [];
+  
+  // Add query if exists
+  if (parsedArgs.query && typeof parsedArgs.query === 'string') {
+    queries.push(parsedArgs.query);
+  }
+  
+  // Add vector_queries if exists
+  if (Array.isArray(parsedArgs.vector_queries) && parsedArgs.vector_queries.length > 0) {
+    const vectorQueries = parsedArgs.vector_queries
+      .filter((q: any) => q && typeof q === 'string')
+      .join(' ');
+    if (vectorQueries) {
+      queries.push(vectorQueries);
+    }
+  }
+  
+  // Add keyword_queries if exists
+  if (Array.isArray(parsedArgs.keyword_queries) && parsedArgs.keyword_queries.length > 0) {
+    const keywordQueries = parsedArgs.keyword_queries
+      .filter((q: any) => q && typeof q === 'string')
+      .join(' ');
+    if (keywordQueries) {
+      queries.push(keywordQueries);
+    }
+  }
+  
+  // Join all queries with space and remove duplicates
+  const uniqueQueries = Array.from(new Set(queries));
+  return uniqueQueries.join(' ');
+};
+
+// Get tool title - prefer summary over description, add query for search tools
+const getToolTitle = (event: any): string => {
+  if (event.pending) {
+    return `正在调用 ${event.tool_name}...`;
+  }
+  
+  const toolName = event.tool_name;
+  const isSearchTool = toolName === 'search_knowledge' || toolName === 'knowledge_search';
+  
+  // For search tools, use description with query text
+  if (isSearchTool) {
+    const baseTitle = getToolDescription(event);
+    if (event.arguments) {
+      const queryText = getQueryText(event.arguments);
+      if (queryText) {
+        return `${baseTitle}：「${queryText}」`;
+      }
+    }
+    return baseTitle;
+  }
+  
+  // Use tool summary if available
+  const summary = getToolSummary(event);
+  return summary || getToolDescription(event);
 };
 
 // Tool description
 const getToolDescription = (event: any): string => {
   if (event.pending) {
-    return `Calling ${event.tool_name}...`;
+    return `正在调用 ${event.tool_name}...`;
   }
   
   const success = event.success === true;
   const toolName = event.tool_name;
   
   if (toolName === 'search_knowledge' || toolName === 'knowledge_search') {
-    return success ? 'Searched knowledge base' : 'Failed to search knowledge base';
+    return success ? '检索知识库' : '检索知识库失败';
   } else if (toolName === 'get_document_info') {
-    return success ? 'Retrieved document information' : 'Failed to get document info';
+    return success ? '获取文档信息' : '获取文档信息失败';
   } else if (toolName === 'thinking') {
-    return success ? 'Completed thinking' : 'Thinking failed';
+    return success ? '完成思考' : '思考失败';
   } else if (toolName === 'todo_write') {
-    return success ? 'Updated task list' : 'Failed to update tasks';
+    return success ? '更新任务列表' : '更新任务列表失败';
   } else {
-    return success ? `Called ${toolName}` : `Error calling ${toolName}`;
+    return success ? `调用 ${toolName}` : `调用 ${toolName} 失败`;
   }
 };
 
@@ -492,41 +802,53 @@ const formatJSON = (obj: any): string => {
 }
 
 .intermediate-steps-collapsed {
-  cursor: pointer;
-  padding: 10px 14px;
-  background: #ffffff;
-  border-left: 3px solid #07c05f;
-  border-radius: 8px;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  user-select: none;
-  margin-bottom: 8px;
+  flex-direction: column;
+  font-size: 14px;
+  width: 100%;
+  border-radius: 8px;
+  background-color: #ffffff;
+  border-left: 3px solid #07c05f;
   box-shadow: 0 2px 4px rgba(7, 192, 95, 0.08);
-  animation: slideInDown 0.3s ease-out;
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 8px;
   
-  &:hover {
-    background: rgba(7, 192, 95, 0.04);
-    box-shadow: 0 2px 6px rgba(7, 192, 95, 0.12);
-  }
-  
-  &:active {
-    background: rgba(7, 192, 95, 0.08);
-  }
-  
-  .collapse-icon {
-    font-size: 12px;
-    color: #07c05f;
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    font-weight: 600;
-  }
-  
-  .collapse-text {
-    font-size: 14px;
+  .intermediate-steps-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
     color: #333333;
     font-weight: 500;
-    letter-spacing: -0.01em;
+    cursor: pointer;
+  }
+  
+  .intermediate-steps-title {
+    display: flex;
+    align-items: center;
+    
+    img {
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+    }
+    
+    span {
+      white-space: nowrap;
+      font-size: 14px;
+    }
+  }
+  
+  .intermediate-steps-show-icon {
+    font-size: 14px;
+    padding: 0 2px 1px 2px;
+    color: #07c05f;
+  }
+  
+  .intermediate-steps-header:hover {
+    background-color: rgba(7, 192, 95, 0.04);
   }
 }
 
@@ -821,19 +1143,17 @@ const formatJSON = (obj: any): string => {
 
 .action-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 6px 14px;
+  align-items: center;
+  padding: 10px 14px;
+  color: #333333;
+  font-weight: 500;
   cursor: pointer;
   user-select: none;
   transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    background: rgba(7, 192, 95, 0.04);
-  }
-  
-  &:active {
-    background: rgba(7, 192, 95, 0.08);
+    background-color: rgba(7, 192, 95, 0.04);
   }
 }
 
@@ -842,43 +1162,36 @@ const formatJSON = (obj: any): string => {
   align-items: center;
   gap: 8px;
   flex: 1;
-}
-
-.action-icon {
-  font-size: 14px;
-  font-weight: bold;
-  width: 18px;
-  height: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-
-  &.success {
-    color: #00a870;
-    background: rgba(0, 168, 112, 0.1);
-  }
-
-  &.error {
-    color: #e34d59;
-    background: rgba(227, 77, 89, 0.1);
+  min-width: 0; // Allow flex item to shrink below content size
+  
+  .action-title-icon {
+    width: 16px;
+    height: 16px;
+    color: #07c05f;
+    fill: currentColor;
+    flex-shrink: 0;
+    
+    // For t-icon component
+    :deep(svg) {
+      width: 16px;
+      height: 16px;
+      color: #07c05f;
+      fill: currentColor;
+    }
   }
   
-  &.pending {
-    color: #666666;
-    background: rgba(102, 102, 102, 0.1);
-    animation: pulse 1.5s ease-in-out infinite;
+  // Tooltip wrapper should also allow shrinking
+  :deep(.t-tooltip) {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .action-name {
+    white-space: nowrap;
+    font-size: 14px;
   }
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
 
 @keyframes fadeInUp {
   from {
@@ -940,77 +1253,262 @@ const formatJSON = (obj: any): string => {
   font-size: 14px;
   font-weight: 500;
   color: #333;
-}
-
-.expand-icon {
-  font-size: 12px;
-  color: #07c05f;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
-  font-weight: 600;
-  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   display: inline-block;
-  
-  &:hover {
-    opacity: 1;
-  }
+  max-width: 100%;
+  vertical-align: middle;
 }
 
-.action-header:hover .expand-icon {
-  transform: scale(1.1);
+.action-show-icon {
+  font-size: 14px;
+  padding: 0 2px 1px 2px;
+  color: #07c05f;
 }
 
 .action-details {
-  padding: 0 12px 12px 12px;
-  border-top: 1px solid #e5e7eb;
-  background: #fff;
-}
-
-.detail-row {
-  margin-top: 8px;
+  padding: 0;
+  border-top: 1px solid #f0f0f0;
+  background: #ffffff;
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
-.detail-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.detail-value {
-  font-size: 13px;
-  color: #07c05f;
-  background: rgba(7, 192, 95, 0.05);
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-family: 'Monaco', 'Courier New', monospace;
-  display: inline-block;
-}
-
-.detail-code {
-  font-size: 12px;
-  background: #f5f5f5;
-  padding: 8px;
-  border-radius: 4px;
-  font-family: 'Monaco', 'Courier New', monospace;
-  color: #333;
+.tool-result-wrapper {
   margin: 0;
-  overflow-x: auto;
-  border: 1px solid #e5e7eb;
 }
 
-.detail-output {
-  font-size: 13px;
-  color: #333;
-  background: #f5f5f5;
-  padding: 8px;
-  border-radius: 4px;
-  white-space: pre-wrap;
-  word-break: break-word;
-  border: 1px solid #e5e7eb;
+.search-results-summary-fixed {
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-top: 1px solid #e7e7e7;
+  
+  .results-summary-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    line-height: 1.5;
+  }
+}
+
+.plan-status-summary-fixed {
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-top: 1px solid #e7e7e7;
+  
+  .plan-status-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    
+    .status-icon {
+      font-size: 14px;
+      flex-shrink: 0;
+      
+      &.in-progress {
+        color: #07C05F;
+      }
+      
+      &.pending {
+        color: #fa8c16;
+      }
+      
+      &.completed {
+        color: #07C05F;
+      }
+    }
+    
+    .separator {
+      color: #999;
+      margin: 0 4px;
+    }
+    
+    span:not(.separator) {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.plan-task-change-event {
+  margin-bottom: 8px;
+  
+  .plan-task-change-card {
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #07C05F;
+    font-size: 13px;
+    color: #333;
+    
+    .plan-task-change-content {
+      strong {
+        color: #333;
+        font-weight: 600;
+        margin-right: 4px;
+      }
+    }
+  }
+}
+
+.tool-output-wrapper {
+  .detail-output {
+    font-size: 13px;
+    color: #333;
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 6px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    border: 1px solid #e5e7eb;
+    line-height: 1.6;
+  }
+}
+
+.thinking-thought-content {
+  padding: 8px 12px;
+  
+  .thinking-thought-markdown {
+    font-size: 14px;
+    color: #333333;
+    line-height: 1.6;
+    
+    :deep(p) {
+      margin: 6px 0;
+      line-height: 1.6;
+      font-size: 14px;
+      color: #333333;
+      
+      &:first-child {
+        margin-top: 0;
+      }
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    
+    :deep(code) {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 12px;
+      color: #333;
+    }
+    
+    :deep(pre) {
+      background: #f5f5f5;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 6px 0;
+      
+      code {
+        background: none;
+        padding: 0;
+      }
+    }
+    
+    :deep(ul), :deep(ol) {
+      margin: 6px 0;
+      padding-left: 24px;
+    }
+    
+    :deep(li) {
+      margin: 2px 0;
+      line-height: 1.6;
+    }
+    
+    :deep(blockquote) {
+      border-left: 3px solid #07c05f;
+      margin: 6px 0;
+      color: #666;
+      background: rgba(7, 192, 95, 0.05);
+      padding: 6px 12px;
+      border-radius: 4px;
+    }
+    
+    :deep(h1), :deep(h2), :deep(h3), :deep(h4), :deep(h5), :deep(h6) {
+      margin: 8px 0 4px 0;
+      font-weight: 600;
+      color: #333;
+      
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+    
+    :deep(a) {
+      color: #07c05f;
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    
+    :deep(table) {
+      border-collapse: collapse;
+      margin: 6px 0;
+      font-size: 12px;
+      
+      th, td {
+        border: 1px solid #e5e7eb;
+        padding: 6px 10px;
+      }
+      
+      th {
+        background: #f5f5f5;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.tool-arguments-wrapper {
+  margin-top: 8px;
+  
+  .arguments-header {
+    margin-bottom: 6px;
+    
+    .arguments-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+  
+  .detail-code {
+    font-size: 12px;
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 6px;
+    font-family: 'Monaco', 'Courier New', monospace;
+    color: #333;
+    margin: 0;
+    overflow-x: auto;
+    border: 1px solid #e5e7eb;
+    line-height: 1.5;
+  }
 }
 
 .loading-indicator {

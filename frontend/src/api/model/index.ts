@@ -16,6 +16,7 @@ export interface ModelConfig {
       truncate_prompt_tokens?: number;
     };
     interface_type?: 'ollama' | 'openai'; // VLLM专用
+    parameter_size?: string; // Ollama模型参数大小 (e.g., "7B", "13B", "70B")
   };
   is_default?: boolean;
   status?: string;

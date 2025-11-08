@@ -122,8 +122,8 @@ start_services() {
         echo "  - Jaeger:        localhost:16686"
         echo ""
         log_info "接下来的步骤:"
-        printf "%b\n" "${YELLOW}1. 在新终端运行后端:${NC} cd $PROJECT_ROOT && ./scripts/dev.sh app"
-        printf "%b\n" "${YELLOW}2. 在新终端运行前端:${NC} cd $PROJECT_ROOT && ./scripts/dev.sh frontend"
+        printf "%b\n" "${YELLOW}1. 在新终端运行后端:${NC} make dev-app"
+        printf "%b\n" "${YELLOW}2. 在新终端运行前端:${NC} make dev-frontend"
         return 0
     else
         log_error "服务启动失败"
@@ -219,7 +219,7 @@ start_app() {
     else
         log_info "未检测到 Air，使用普通模式启动"
         log_warning "提示: 安装 Air 可以实现代码修改后自动重启"
-        log_info "安装命令: go install github.com/cosmtrek/air@latest"
+        log_info "安装命令: go install github.com/air-verse/air@latest"
         # 运行应用
         go run cmd/server/main.go
     fi

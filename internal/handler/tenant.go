@@ -280,10 +280,9 @@ func (h *TenantHandler) GetTenantAgentConfig(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
 			"data": gin.H{
-				"enabled":            false,
-				"max_iterations":     5,
+				"max_iterations":     20,
 				"reflection_enabled": false,
-				"allowed_tools":      []string{"knowledge_search", "knowledge_search"},
+				"allowed_tools":      []string{"thinking", "todo_write", "knowledge_search", "get_related_chunks", "query_knowledge_graph", "get_document_info", "database_query"},
 				"temperature":        0.7,
 				"thinking_model_id":  "",
 				"rerank_model_id":    "",

@@ -19,7 +19,7 @@
         </div>
         <div style="min-height: 115px; margin: 16px auto 4px;width: 100%;max-width: 800px;">
             <InputField 
-                @send-msg="sendMsg" 
+                @send-msg="(query, modelId) => sendMsg(query, modelId)" 
                 @stop-generation="handleStopGeneration"
                 :isReplying="isReplying" 
                 :sessionId="session_id"
@@ -259,7 +259,7 @@ const handleStopGeneration = () => {
     // API 调用成功后，后端的 stop 事件会清空它
 };
 
-const sendMsg = async (value) => {
+const sendMsg = async (value, modelId = '') => {
     userquery.value = value;
     isReplying.value = true;
     loading.value = true;
@@ -291,6 +291,7 @@ const sendMsg = async (value) => {
         session_id: session_id.value, 
         knowledge_base_ids: kbIds,
         agent_enabled: agentEnabled,
+        summary_model_id: modelId,
         query: value, 
         method: 'POST', 
         url: endpoint
@@ -431,7 +432,7 @@ onChunk((data) => {
 })
 // 处理 Agent 流式数据 (Cursor-style UI)
 const handleAgentChunk = (data) => {
-    const message = messagesList.findLast((item) => item.request_id === data.id || item.id === data.id);
+    let message = messagesList.findLast((item) => item.request_id === data.id || item.id === data.id);
     
     if (!message) {
         // 创建新的 Assistant 消息 - 此时开始显示内容，关闭 loading
@@ -450,7 +451,8 @@ const handleAgentChunk = (data) => {
         messagesList.push(newMsg);
         loading.value = false; // 消息已创建，关闭 loading
         scrollToBottom();
-        return;
+        // Don't return - continue to process the current event data
+        message = newMsg;
     }
     
     message.isAgentMode = true;

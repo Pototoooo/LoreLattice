@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/Tencent/WeKnora/internal/types"
 )
@@ -16,10 +17,10 @@ type TodoWriteTool struct {
 
 // PlanStep represents a single step in the research plan
 type PlanStep struct {
-	ID          string `json:"id"`
-	Description string `json:"description"`
-	ToolsToUse  string `json:"tools_to_use"`
-	Status      string `json:"status"` // pending, in_progress, completed, skipped
+	ID          string   `json:"id"`
+	Description string   `json:"description"`
+	ToolsToUse  []string `json:"tools_to_use"`
+	Status      string   `json:"status"` // pending, in_progress, completed, skipped
 }
 
 // NewTodoWriteTool creates a new todo_write tool instance
@@ -220,8 +221,11 @@ func (t *TodoWriteTool) Parameters() map[string]interface{} {
 							"description": "Clear description of what to investigate or accomplish in this step",
 						},
 						"tools_to_use": map[string]interface{}{
-							"type":        "string",
-							"description": "Suggested tools for this step (e.g., 'knowledge_search', 'get_related_chunks')",
+							"type":        "array",
+							"description": "Suggested tools for this step (e.g., ['knowledge_search', 'get_related_chunks'])",
+							"items": map[string]interface{}{
+								"type": "string",
+							},
 						},
 						"status": map[string]interface{}{
 							"type":        "string",
@@ -252,7 +256,7 @@ func (t *TodoWriteTool) Execute(ctx context.Context, args map[string]interface{}
 				step := PlanStep{
 					ID:          getStringField(stepMap, "id"),
 					Description: getStringField(stepMap, "description"),
-					ToolsToUse:  getStringField(stepMap, "tools_to_use"),
+					ToolsToUse:  getStringArrayField(stepMap, "tools_to_use"),
 					Status:      getStringField(stepMap, "status"),
 				}
 				planSteps = append(planSteps, step)
@@ -286,6 +290,24 @@ func getStringField(m map[string]interface{}, key string) string {
 		return val
 	}
 	return ""
+}
+
+// Helper function to safely get string array field from map
+func getStringArrayField(m map[string]interface{}, key string) []string {
+	if val, ok := m[key].([]interface{}); ok {
+		result := make([]string, 0, len(val))
+		for _, item := range val {
+			if str, ok := item.(string); ok {
+				result = append(result, str)
+			}
+		}
+		return result
+	}
+	// Handle legacy string format for backward compatibility
+	if val, ok := m[key].(string); ok && val != "" {
+		return []string{val}
+	}
+	return []string{}
 }
 
 // generatePlanOutput generates a formatted plan output
@@ -336,8 +358,8 @@ func formatPlanStep(index int, step PlanStep) string {
 
 	output := fmt.Sprintf("  %d. %s [%s] %s\n", index, emoji, step.Status, step.Description)
 
-	if step.ToolsToUse != "" {
-		output += fmt.Sprintf("     工具: %s\n", step.ToolsToUse)
+	if len(step.ToolsToUse) > 0 {
+		output += fmt.Sprintf("     工具: %s\n", strings.Join(step.ToolsToUse, ", "))
 	}
 
 	return output

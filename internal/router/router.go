@@ -9,6 +9,7 @@ import (
 
 	"github.com/Tencent/WeKnora/internal/config"
 	"github.com/Tencent/WeKnora/internal/handler"
+	"github.com/Tencent/WeKnora/internal/handler/session"
 	"github.com/Tencent/WeKnora/internal/middleware"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
 )
@@ -31,7 +32,7 @@ type RouterParams struct {
 	TenantHandler         *handler.TenantHandler
 	TenantService         interfaces.TenantService
 	ChunkHandler          *handler.ChunkHandler
-	SessionHandler        *handler.SessionHandler
+	SessionHandler        *session.Handler
 	MessageHandler        *handler.MessageHandler
 	ModelHandler          *handler.ModelHandler
 	EvaluationHandler     *handler.EvaluationHandler
@@ -171,7 +172,7 @@ func RegisterMessageRoutes(r *gin.RouterGroup, handler *handler.MessageHandler) 
 }
 
 // RegisterSessionRoutes 注册路由
-func RegisterSessionRoutes(r *gin.RouterGroup, handler *handler.SessionHandler) {
+func RegisterSessionRoutes(r *gin.RouterGroup, handler *session.Handler) {
 	sessions := r.Group("/sessions")
 	{
 		sessions.POST("", handler.CreateSession)
@@ -187,7 +188,7 @@ func RegisterSessionRoutes(r *gin.RouterGroup, handler *handler.SessionHandler) 
 }
 
 // RegisterChatRoutes 注册路由
-func RegisterChatRoutes(r *gin.RouterGroup, handler *handler.SessionHandler) {
+func RegisterChatRoutes(r *gin.RouterGroup, handler *session.Handler) {
 	knowledgeChat := r.Group("/knowledge-chat")
 	{
 		knowledgeChat.POST("/:session_id", handler.KnowledgeQA)

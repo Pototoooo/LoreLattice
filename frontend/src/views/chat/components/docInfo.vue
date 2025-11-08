@@ -14,9 +14,7 @@
                 <t-popup overlayClassName="refer-to-layer" placement="bottom-left" width="400" :showArrow="false"
                     trigger="click">
                     <template #content>
-                        <div class="doc_content">
-                            <div v-html="safeProcessContent(item.content)"></div>
-                        </div>
+                        <ContentPopup :content="safeProcessContent(item.content)" :is-html="true" />
                     </template>
                     <span class="doc">
                         {{ session.knowledge_references.length < 2 ? item.knowledge_title : `${index +
@@ -29,6 +27,7 @@
 <script setup>
 import { onMounted, defineProps, computed, ref, reactive } from "vue";
 import { sanitizeHTML } from '@/utils/security';
+import ContentPopup from './tool-results/ContentPopup.vue';
 const props = defineProps({
     // 必填项
     content: {
@@ -149,5 +148,15 @@ const safeProcessContent = (content) => {
 <style>
 .refer-to-layer {
     width: 400px;
+    max-width: 500px;
+    
+    .t-popup__content {
+        max-height: 400px;
+        max-width: 500px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        word-wrap: break-word;
+        word-break: break-word;
+    }
 }
 </style>

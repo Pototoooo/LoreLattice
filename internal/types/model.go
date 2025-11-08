@@ -45,6 +45,7 @@ type ModelParameters struct {
 	BaseURL             string              `yaml:"base_url" json:"base_url"`
 	APIKey              string              `yaml:"api_key" json:"api_key"`
 	EmbeddingParameters EmbeddingParameters `yaml:"embedding_parameters" json:"embedding_parameters"`
+	ParameterSize       string              `yaml:"parameter_size" json:"parameter_size"` // Ollama model parameter size (e.g., "7B", "13B", "70B")
 }
 
 // Model represents the AI model

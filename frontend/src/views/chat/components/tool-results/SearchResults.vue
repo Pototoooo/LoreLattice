@@ -1,59 +1,37 @@
 <template>
   <div class="search-results">
-    <!-- Knowledge Base Statistics Card -->
-    <div v-if="kbCounts && Object.keys(kbCounts).length > 0" class="stats-card">
-      <div class="stats-title">知识库覆盖</div>
-      <div class="stats-list">
-        <div v-for="(count, kbId) in kbCounts" :key="kbId" class="stats-item">
-          <span>{{ kbId }}</span>
-          <span>{{ count }} 条结果</span>
-        </div>
-      </div>
-    </div>
-
     <!-- Search Results List -->
     <div v-if="results && results.length > 0" class="results-list">
       <div 
         v-for="result in results" 
         :key="result.chunk_id"
-        class="result-card"
+        class="result-item"
       >
-        <div class="result-header" @click="toggleResult(result.chunk_id)">
-          <div class="result-title">
-            <span class="result-index">#{{ result.result_index }}</span>
-            <span class="relevance-badge" :class="getRelevanceClass(result.relevance_level)">
-              {{ result.relevance_level }}
-            </span>
-            <span class="knowledge-title">{{ result.knowledge_title }}</span>
-          </div>
-          <div class="result-meta">
-            <span class="match-type-badge">
-              {{ getMatchTypeIcon(result.match_type) }} {{ result.match_type }}
-            </span>
-            <span class="score">{{ (result.score * 100).toFixed(0) }}%</span>
-            <span class="expand-icon" :class="{ expanded: expandedResults.includes(result.chunk_id) }">
-              ▶
-            </span>
-          </div>
-        </div>
-        
-        <div class="result-content" :class="{ expanded: expandedResults.includes(result.chunk_id) }">
-          <div class="info-section">
-            <div class="info-section-title">内容</div>
-            <div class="full-content">{{ result.content }}</div>
-          </div>
-          
-          <div class="info-section">
-            <div class="info-field">
-              <span class="field-label">片段ID:</span>
-              <span class="field-value"><code>{{ result.chunk_id }}</code></span>
-            </div>
-            <div class="info-field">
-              <span class="field-label">文档ID:</span>
-              <span class="field-value"><code>{{ result.knowledge_id }}</code></span>
+        <t-popup 
+          :overlayClassName="`result-popup-${result.chunk_id}`"
+          placement="bottom-left"
+          width="400"
+          :showArrow="false"
+          trigger="click"
+          destroy-on-close
+        >
+          <template #content>
+            <ContentPopup 
+              :content="result.content"
+              :chunk-id="result.chunk_id"
+              :knowledge-id="result.knowledge_id"
+            />
+          </template>
+          <div class="result-header">
+            <div class="result-title">
+              <span class="result-index">#{{ result.result_index }}</span>
+              <span class="relevance-badge" :class="getRelevanceClass(result.relevance_level)">
+                {{ result.relevance_level }}
+              </span>
+              <span class="knowledge-title">{{ result.knowledge_title }}</span>
             </div>
           </div>
-        </div>
+        </t-popup>
       </div>
     </div>
 
@@ -68,24 +46,55 @@
 import { ref, defineProps, computed } from 'vue';
 import type { SearchResultsData, SearchResultItem, RelevanceLevel } from '@/types/tool-results';
 import { getMatchTypeIcon } from '@/utils/tool-icons';
+import ContentPopup from './ContentPopup.vue';
 
 const props = defineProps<{
   data: SearchResultsData;
+  arguments?: Record<string, any> | string;
 }>();
-
-const expandedResults = ref<string[]>([]);
 
 const results = computed(() => props.data.results || []);
 const kbCounts = computed(() => props.data.kb_counts);
 
-const toggleResult = (chunkId: string) => {
-  const index = expandedResults.value.indexOf(chunkId);
-  if (index > -1) {
-    expandedResults.value.splice(index, 1);
-  } else {
-    expandedResults.value.push(chunkId);
+// Parse arguments if it's a string
+const parsedArguments = computed(() => {
+  const args = props.arguments;
+  if (!args) return null;
+  
+  // If it's already an object, return it
+  if (typeof args === 'object' && !Array.isArray(args)) {
+    return args;
   }
-};
+  
+  // If it's a string, try to parse it
+  if (typeof args === 'string') {
+    try {
+      return JSON.parse(args);
+    } catch (e) {
+      console.warn('Failed to parse arguments:', e);
+      return null;
+    }
+  }
+  
+  return null;
+});
+
+// Check if there are search parameters to display (excluding query parameters which are in title)
+const hasSearchParams = computed(() => {
+  const args = parsedArguments.value;
+  if (!args || typeof args !== 'object') return false;
+  
+  return !!(
+    (Array.isArray(args.knowledge_base_ids) && args.knowledge_base_ids.length > 0) ||
+    args.top_k || args.vector_threshold || args.keyword_threshold || args.min_score);
+});
+
+const hasOtherParams = computed(() => {
+  const args = parsedArguments.value;
+  if (!args || typeof args !== 'object') return false;
+  return !!(args.top_k || args.vector_threshold || args.keyword_threshold || args.min_score);
+});
+
 
 const getRelevanceClass = (level: RelevanceLevel): string => {
   const classMap: Record<RelevanceLevel, string> = {
@@ -104,7 +113,85 @@ const getRelevanceClass = (level: RelevanceLevel): string => {
 .search-results {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  padding: 0 0 0 12px;
+  gap: 4px;
+}
+
+.search-params {
+  padding: 10px 12px;
+  background: #f8f9fa;
+  border: 1px solid #e7e7e7;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  
+  .params-main {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .param-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    
+    .param-label {
+      font-weight: 600;
+      color: #666;
+      min-width: 75px;
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+    
+    .param-value {
+      color: #333;
+      flex: 1;
+      word-break: break-word;
+      line-height: 1.5;
+      font-size: 13px;
+    }
+  }
+  
+  .params-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-top: 6px;
+    border-top: 1px solid #e7e7e7;
+    
+    .param-meta-item {
+      font-size: 11px;
+      color: #666;
+      background: #ffffff;
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid #e7e7e7;
+      white-space: nowrap;
+    }
+  }
+}
+
+.stats-card {
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border: 1px solid #e7e7e7;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+  
+  .stats-label {
+    font-weight: 600;
+    color: #666;
+    margin-right: 6px;
+  }
+  
+  .stats-item-inline {
+    color: #333;
+  }
 }
 
 .results-list {
@@ -113,30 +200,115 @@ const getRelevanceClass = (level: RelevanceLevel): string => {
   gap: 8px;
 }
 
+.result-item {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.result-header {
+  padding: 4px 0;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  transition: color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    color: #07c05f;
+  }
+}
+
+.result-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+}
+
 .result-index {
-  font-size: 13px;
+  font-size: 11px;
   color: #8b8b8b;
   font-weight: 600;
+  flex-shrink: 0;
+}
+
+.relevance-badge {
+  flex-shrink: 0;
+  font-size: 11px;
+  padding: 2px 6px;
 }
 
 .knowledge-title {
-  font-size: 13px;
+  font-size: 12px;
   color: #333;
   flex: 1;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
-.score {
-  font-size: 12px;
-  color: #8b8b8b;
-  font-weight: 500;
+
+// Popup overlay styles
+:deep([class*="result-popup-"]) {
+  .t-popup__content {
+    max-height: 400px;
+    max-width: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    word-wrap: break-word;
+    word-break: break-word;
+  }
+}
+
+.info-section {
+  margin-top: 8px;
+  
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.full-content {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.8;
+  padding: 12px;
+  background: #ffffff;
+  border-radius: 4px;
+  border: 1px solid #e7e7e7;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 8px;
+}
+
+.info-field {
+  font-size: 11px;
+  margin-bottom: 3px;
+  
+  .field-label {
+    min-width: 60px;
+    font-size: 11px;
+  }
 }
 
 code {
   font-family: 'Monaco', 'Courier New', monospace;
-  font-size: 11px;
+  font-size: 10px;
   background: #f0f0f0;
-  padding: 2px 4px;
-  border-radius: 3px;
+  padding: 1px 4px;
+  border-radius: 2px;
 }
 </style>
+
 

@@ -400,7 +400,7 @@ func (s *sessionService) GenerateTitleAsync(ctx context.Context, session *types.
 
 // KnowledgeQA performs knowledge base question answering with LLM summarization
 // Events are emitted through eventBus (references, answer chunks, completion)
-func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session, query string, knowledgeBaseIDs []string, assistantMessageID string, eventBus *event.EventBus) error {
+func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session, query string, knowledgeBaseIDs []string, assistantMessageID string, summaryModelID string, eventBus *event.EventBus) error {
 	logger.Infof(ctx, "Knowledge base question answering parameters, session ID: %s, query: %s", session.ID, query)
 
 	// If no knowledge base IDs provided, fall back to session's default
@@ -416,8 +416,8 @@ func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session
 
 	logger.Infof(ctx, "Using knowledge bases: %v", knowledgeBaseIDs)
 
-	// Determine chat model ID: prioritize Remote models
-	chatModelID, err := s.selectChatModelID(ctx, session, knowledgeBaseIDs)
+	// Determine chat model ID: prioritize request's summaryModelID, then Remote models
+	chatModelID, err := s.selectChatModelIDWithOverride(ctx, session, knowledgeBaseIDs, summaryModelID)
 	if err != nil {
 		return err
 	}
@@ -489,6 +489,30 @@ func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session
 
 	logger.Info(ctx, "Knowledge base question answering initiated")
 	return nil
+}
+
+// selectChatModelIDWithOverride selects the appropriate chat model ID with priority for request override
+// Priority order:
+// 1. Request's summaryModelID (if provided and valid)
+// 2. Session's SummaryModelID if it's a Remote model
+// 3. First knowledge base with a Remote model
+// 4. Session's SummaryModelID (if not Remote)
+// 5. First knowledge base's SummaryModelID
+func (s *sessionService) selectChatModelIDWithOverride(ctx context.Context, session *types.Session, knowledgeBaseIDs []string, summaryModelID string) (string, error) {
+	// First, check if request has summaryModelID override
+	if summaryModelID != "" {
+		// Validate that the model exists
+		model, err := s.modelService.GetModelByID(ctx, summaryModelID)
+		if err != nil {
+			logger.Warnf(ctx, "Request provided invalid summary model ID %s: %v, falling back to default selection", summaryModelID, err)
+		} else if model != nil {
+			logger.Infof(ctx, "Using request's summary model override: %s", summaryModelID)
+			return summaryModelID, nil
+		}
+	}
+
+	// If no valid override, use default selection logic
+	return s.selectChatModelID(ctx, session, knowledgeBaseIDs)
 }
 
 // selectChatModelID selects the appropriate chat model ID with priority for Remote models

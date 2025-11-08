@@ -28,7 +28,7 @@ export function useStream() {
   let renderTimer: number | null = null
 
   // 启动流式请求
-  const startStream = async (params: { session_id: any; query: any; knowledge_base_ids?: string[]; agent_enabled?: boolean; method: string; url: string }) => {
+  const startStream = async (params: { session_id: any; query: any; knowledge_base_ids?: string[]; agent_enabled?: boolean; summary_model_id?: string; method: string; url: string }) => {
     // 重置状态
     output.value = '';
     error.value = null;
@@ -68,6 +68,10 @@ export function useStream() {
       // Always include knowledge_base_ids for agent-chat (already validated above)
       if (params.knowledge_base_ids !== undefined && params.knowledge_base_ids.length > 0) {
         postBody.knowledge_base_ids = params.knowledge_base_ids;
+      }
+      // Include summary_model_id if provided (for non-Agent mode)
+      if (params.summary_model_id) {
+        postBody.summary_model_id = params.summary_model_id;
       }
       
       await fetchEventSource(url, {

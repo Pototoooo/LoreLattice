@@ -115,7 +115,7 @@ export interface ThinkingData {
 export interface PlanStep {
     id: string;
     description: string;
-    tools_to_use?: string;
+    tools_to_use?: string[]; // Changed from string to array
     status: 'pending' | 'in_progress' | 'completed' | 'skipped';
 }
 

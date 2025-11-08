@@ -1,46 +1,32 @@
 <template>
   <div class="related-chunks">
-    <div class="info-section">
-      <div class="info-field">
-        <span class="field-label">参考片段:</span>
-        <span class="field-value"><code>{{ data.chunk_id }}</code></span>
-      </div>
-      <div class="info-field">
-        <span class="field-label">关系类型:</span>
-        <span class="field-value">{{ relationTypeLabel }}</span>
-      </div>
-      <div class="info-field">
-        <span class="field-label">相关片段数:</span>
-        <span class="field-value">{{ data.count }} 个</span>
-      </div>
-    </div>
-
     <div v-if="data.chunks && data.chunks.length > 0" class="chunks-list">
       <div 
         v-for="chunk in data.chunks" 
         :key="chunk.chunk_id"
-        class="result-card"
+        class="result-item"
       >
-        <div class="result-header" @click="toggleChunk(chunk.chunk_id)">
-          <div class="result-title">
-            <span class="chunk-index">片段 #{{ chunk.index }}</span>
-            <span class="chunk-position">(位置: {{ chunk.chunk_index }})</span>
+        <t-popup 
+          :overlayClassName="`chunk-popup-${chunk.chunk_id}`"
+          placement="bottom-left"
+          width="400"
+          :showArrow="false"
+          trigger="click"
+          destroy-on-close
+        >
+          <template #content>
+            <ContentPopup 
+              :content="chunk.content"
+              :chunk-id="chunk.chunk_id"
+            />
+          </template>
+          <div class="result-header">
+            <div class="result-title">
+              <span class="chunk-index">片段 #{{ chunk.index }}</span>
+              <span class="chunk-position">(位置: {{ chunk.chunk_index }})</span>
+            </div>
           </div>
-          <span class="expand-icon" :class="{ expanded: expandedChunks.includes(chunk.chunk_id) }">
-            ▶
-          </span>
-        </div>
-        
-        <div class="result-content" :class="{ expanded: expandedChunks.includes(chunk.chunk_id) }">
-          <div class="info-field">
-            <span class="field-label">片段ID:</span>
-            <span class="field-value"><code>{{ chunk.chunk_id }}</code></span>
-          </div>
-          <div class="info-section">
-            <div class="info-section-title">内容</div>
-            <div class="full-content">{{ chunk.content }}</div>
-          </div>
-        </div>
+        </t-popup>
       </div>
     </div>
 
@@ -53,29 +39,12 @@
 <script setup lang="ts">
 import { ref, defineProps, computed } from 'vue';
 import type { RelatedChunksData } from '@/types/tool-results';
+import ContentPopup from './ContentPopup.vue';
 
 const props = defineProps<{
   data: RelatedChunksData;
 }>();
 
-const expandedChunks = ref<string[]>([]);
-
-const relationTypeLabel = computed(() => {
-  const labels: Record<string, string> = {
-    'sequential': '顺序相关',
-    'semantic': '语义相关',
-  };
-  return labels[props.data.relation_type] || props.data.relation_type;
-});
-
-const toggleChunk = (chunkId: string) => {
-  const index = expandedChunks.value.indexOf(chunkId);
-  if (index > -1) {
-    expandedChunks.value.splice(index, 1);
-  } else {
-    expandedChunks.value.push(chunkId);
-  }
-};
 </script>
 
 <style lang="less" scoped>
@@ -84,24 +53,94 @@ const toggleChunk = (chunkId: string) => {
 .related-chunks {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
+  padding: 0 0 0 12px;
+  
+  .info-section {
+    margin-bottom: 8px;
+    padding: 0;
+    
+    .info-field {
+      font-size: 11px;
+      margin-bottom: 4px;
+      
+      .field-label {
+        font-size: 11px;
+        color: #8b8b8b;
+        min-width: 70px;
+      }
+      
+      .field-value {
+        font-size: 11px;
+        color: #666;
+      }
+    }
+  }
 }
 
 .chunks-list {
   display: flex;
   flex-direction: column;
+  gap: 4px;
+}
+
+.result-item {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.result-header {
+  padding: 4px 0;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
+  transition: color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    color: #07c05f;
+  }
+}
+
+.result-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
 }
 
 .chunk-index {
-  font-size: 13px;
+  font-size: 12px;
   color: #333;
   font-weight: 600;
+  flex-shrink: 0;
 }
 
 .chunk-position {
-  font-size: 12px;
+  font-size: 11px;
   color: #8b8b8b;
+}
+
+
+// Popup overlay styles
+:deep([class*="chunk-popup-"]) {
+  .t-popup__content {
+    max-height: 400px;
+    max-width: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    word-wrap: break-word;
+    word-break: break-word;
+  }
 }
 
 code {

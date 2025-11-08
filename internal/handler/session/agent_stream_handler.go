@@ -1,4 +1,4 @@
-package handler
+package session
 
 import (
 	"context"
@@ -406,22 +406,4 @@ func (h *AgentStreamHandler) handleComplete(ctx context.Context, evt event.Event
 	}
 
 	return nil
-}
-
-// Helper functions
-func getString(m map[string]interface{}, key string) string {
-	if val, ok := m[key].(string); ok {
-		return val
-	}
-	return ""
-}
-
-func getFloat64(m map[string]interface{}, key string) float64 {
-	if val, ok := m[key].(float64); ok {
-		return val
-	}
-	if val, ok := m[key].(int); ok {
-		return float64(val)
-	}
-	return 0.0
 }

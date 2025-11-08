@@ -4,6 +4,7 @@
     <SearchResults 
       v-if="displayType === 'search_results'" 
       :data="toolData as SearchResultsData" 
+      :arguments="toolArguments"
     />
     
     <!-- Chunk Detail -->
@@ -90,6 +91,7 @@ interface Props {
   displayType?: DisplayType;
   toolData?: Record<string, any>;
   output?: string;
+  arguments?: Record<string, any>;
 }
 
 const props = defineProps<Props>();
@@ -97,6 +99,7 @@ const props = defineProps<Props>();
 const displayType = computed(() => props.displayType);
 const toolData = computed(() => props.toolData || {});
 const output = computed(() => props.output || '');
+const toolArguments = computed(() => props.arguments || {});
 </script>
 
 <style lang="less" scoped>

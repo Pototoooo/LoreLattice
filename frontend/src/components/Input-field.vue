@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ref, defineEmits, onMounted, defineProps, computed, watch, nextTick, h } from "vue";
+import { ref, defineEmits, onMounted, onUnmounted, defineProps, computed, watch, nextTick, h } from "vue";
 import { useRoute, useRouter } from 'vue-router';
 import { onBeforeRouteUpdate } from 'vue-router';
 import { MessagePlugin } from "tdesign-vue-next";
 import { useSettingsStore } from '@/stores/settings';
 import { useUIStore } from '@/stores/ui';
-import { listKnowledgeBases } from '@/api/knowledge-base';
+import { listKnowledgeBases, getKnowledgeBaseById } from '@/api/knowledge-base';
 import { stopSession } from '@/api/chat';
 import KnowledgeBaseSelector from './KnowledgeBaseSelector.vue';
+import { getModel, type ModelConfig } from '@/api/model';
 
 const route = useRoute();
 const router = useRouter();
@@ -41,6 +42,14 @@ const selectedKbs = computed(() => {
   return knowledgeBases.value.filter(kb => selectedKbIds.value.includes(kb.id));
 });
 
+// 模型相关状态
+const availableModels = ref<ModelConfig[]>([]);
+const selectedModelId = ref<string>('');
+const thinkingModelName = ref<string>('');
+const showModelSelector = ref(false);
+const modelButtonRef = ref<HTMLElement>();
+const modelDropdownStyle = ref<Record<string, string>>({});
+
 // 显示的知识库标签（最多显示2个）
 const displayedKbs = computed(() => selectedKbs.value.slice(0, 2));
 const remainingCount = computed(() => Math.max(0, selectedKbs.value.length - 2));
@@ -50,14 +59,138 @@ const loadKnowledgeBases = async () => {
   try {
     const response: any = await listKnowledgeBases();
     if (response.data && Array.isArray(response.data)) {
-      knowledgeBases.value = response.data.filter((kb: any) => 
+      const validKbs = response.data.filter((kb: any) => 
         kb.embedding_model_id && kb.embedding_model_id !== '' &&
         kb.summary_model_id && kb.summary_model_id !== ''
       );
+      knowledgeBases.value = validKbs;
+      
+      // 清理无效的知识库ID（已删除或不存在于有效知识库列表中的）
+      const validKbIds = new Set(validKbs.map((kb: any) => kb.id));
+      const currentSelectedIds = settingsStore.settings.selectedKnowledgeBases || [];
+      const validSelectedIds = currentSelectedIds.filter((id: string) => validKbIds.has(id));
+      
+      // 如果有无效的ID，更新store
+      if (validSelectedIds.length !== currentSelectedIds.length) {
+        settingsStore.selectKnowledgeBases(validSelectedIds);
+      }
     }
   } catch (error) {
     console.error('Failed to load knowledge bases:', error);
   }
+};
+
+// 解析模型参数大小 (e.g., "7B", "13B", "70B" -> 7, 13, 70)
+const parseParameterSize = (paramSize: string | undefined): number => {
+  if (!paramSize) return 0;
+  const match = paramSize.match(/(\d+\.?\d*)/);
+  return match ? parseFloat(match[1]) : 0;
+};
+
+// 加载并选择模型
+const loadModelsFromKnowledgeBases = async () => {
+  if (selectedKbIds.value.length === 0) {
+    availableModels.value = [];
+    selectedModelId.value = '';
+    return;
+  }
+
+  try {
+    // 获取所有选中知识库的 summary_model_id
+    const modelIds = new Set<string>();
+    for (const kbId of selectedKbIds.value) {
+      try {
+        const kb: any = await getKnowledgeBaseById(kbId);
+        if (kb.data?.summary_model_id) {
+          modelIds.add(kb.data.summary_model_id);
+        }
+      } catch (error) {
+        console.error(`Failed to fetch KB ${kbId}:`, error);
+      }
+    }
+
+    // 获取所有模型的详细信息
+    const models: ModelConfig[] = [];
+    for (const modelId of Array.from(modelIds)) {
+      try {
+        const model = await getModel(modelId);
+        models.push(model);
+      } catch (error) {
+        console.error(`Failed to fetch model ${modelId}:`, error);
+      }
+    }
+
+    availableModels.value = models;
+
+    // 应用优先级选择算法
+    if (models.length > 0) {
+      selectModelByPriority(models);
+    } else {
+      selectedModelId.value = '';
+    }
+  } catch (error) {
+    console.error('Failed to load models from knowledge bases:', error);
+  }
+};
+
+// 根据优先级选择模型
+const selectModelByPriority = (models: ModelConfig[]) => {
+  // 1. 优先选择远程模型，按创建时间降序
+  const remoteModels = models
+    .filter(m => m.source === 'remote')
+    .sort((a, b) => {
+      const timeA = new Date(a.created_at || 0).getTime();
+      const timeB = new Date(b.created_at || 0).getTime();
+      return timeB - timeA;
+    });
+
+  if (remoteModels.length > 0) {
+    selectedModelId.value = remoteModels[0].id || '';
+    return;
+  }
+
+  // 2. 否则选择 Ollama 模型，按参数大小降序
+  const ollamaModels = models
+    .filter(m => m.source === 'local')
+    .sort((a, b) => {
+      const sizeA = parseParameterSize(a.parameters?.parameter_size);
+      const sizeB = parseParameterSize(b.parameters?.parameter_size);
+      return sizeB - sizeA;
+    });
+
+  if (ollamaModels.length > 0) {
+    selectedModelId.value = ollamaModels[0].id || '';
+    return;
+  }
+
+  // 3. 如果都没有，选择第一个
+  selectedModelId.value = models[0]?.id || '';
+};
+
+// 获取 Thinking 模型名称（Agent 模式）
+const loadThinkingModelName = async () => {
+  const thinkingModelId = settingsStore.agentConfig.thinkingModelId;
+  if (thinkingModelId) {
+    try {
+      const model = await getModel(thinkingModelId);
+      thinkingModelName.value = model.name || thinkingModelId;
+    } catch (error) {
+      console.error('Failed to fetch thinking model:', error);
+      thinkingModelName.value = thinkingModelId;
+    }
+  } else {
+    thinkingModelName.value = '';
+  }
+};
+
+// 计算当前选中的模型
+const selectedModel = computed(() => {
+  return availableModels.value.find(m => m.id === selectedModelId.value);
+});
+
+// 关闭模型选择器（点击外部）
+const closeModelSelector = () => {
+  showModelSelector.value = false;
 };
 
 onMounted(() => {
@@ -68,12 +201,55 @@ onMounted(() => {
   if (kbId && !selectedKbIds.value.includes(kbId)) {
     settingsStore.addKnowledgeBase(kbId);
   }
+
+  // 加载模型
+  if (isAgentEnabled.value) {
+    loadThinkingModelName();
+  } else {
+    loadModelsFromKnowledgeBases();
+  }
+
+  // 监听点击外部关闭下拉菜单
+  document.addEventListener('click', closeModelSelector);
+  // 监听窗口大小变化，重新计算位置
+  window.addEventListener('resize', () => {
+    if (showModelSelector.value) {
+      updateModelDropdownPosition();
+    }
+  });
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeModelSelector);
 });
 
 // 监听路由变化
 watch(() => route.params.kbId, (newKbId) => {
   if (newKbId && typeof newKbId === 'string' && !selectedKbIds.value.includes(newKbId)) {
     settingsStore.addKnowledgeBase(newKbId);
+  }
+});
+
+// 监听知识库选择变化，重新加载模型
+watch(selectedKbIds, () => {
+  if (!isAgentEnabled.value) {
+    loadModelsFromKnowledgeBases();
+  }
+}, { deep: true });
+
+// 监听 Agent 模式变化
+watch(isAgentEnabled, (newVal) => {
+  if (newVal) {
+    loadThinkingModelName();
+  } else {
+    loadModelsFromKnowledgeBases();
+  }
+});
+
+// 监听 Thinking 模型变化
+watch(() => settingsStore.agentConfig.thinkingModelId, () => {
+  if (isAgentEnabled.value) {
+    loadThinkingModelName();
   }
 });
 
@@ -91,8 +267,63 @@ const createSession = (val: string) => {
   if (props.isReplying) {
     return MessagePlugin.error("正在回复中，请稍后再试!");
   }
-  emit('send-msg', val);
+  emit('send-msg', val, selectedModelId.value);
   clearvalue();
+}
+
+// 计算模型下拉菜单位置
+const updateModelDropdownPosition = () => {
+  const anchor = modelButtonRef.value;
+  
+  if (!anchor) {
+    modelDropdownStyle.value = {
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)'
+    };
+    return;
+  }
+
+  const rect = anchor.getBoundingClientRect();
+  const dropdownWidth = 250;
+  const offsetY = 8;
+  
+  // 计算位置：默认在按钮下方
+  let top = rect.bottom + offsetY;
+  let left = rect.left;
+  
+  // 检查右侧边界
+  if (left + dropdownWidth > window.innerWidth) {
+    left = window.innerWidth - dropdownWidth - 10;
+  }
+  
+  // 检查下方空间
+  const dropdownMaxHeight = 400;
+  if (top + dropdownMaxHeight > window.innerHeight) {
+    // 如果下方空间不足，显示在按钮上方
+    top = rect.top - dropdownMaxHeight - offsetY;
+    if (top < 10) {
+      // 如果上方也不够，显示在屏幕中间
+      top = 10;
+    }
+  }
+  
+  modelDropdownStyle.value = {
+    position: 'fixed',
+    top: `${Math.round(top)}px`,
+    left: `${Math.round(left)}px`,
+    width: `${dropdownWidth}px`
+  };
+};
+
+const toggleModelSelector = () => {
+  showModelSelector.value = !showModelSelector.value;
+  if (showModelSelector.value) {
+    nextTick(() => {
+      updateModelDropdownPosition();
+    });
+  }
 }
 
 const clearvalue = () => {
@@ -280,6 +511,73 @@ onBeforeRouteUpdate((to, from, next) => {
           <div v-if="remainingCount > 0" class="kb-tag more-tag">
             +{{ remainingCount }}
           </div>
+        </div>
+
+        <!-- 模型显示 -->
+        <div v-if="selectedKbIds.length > 0" class="model-display">
+          <!-- Agent 模式：只读显示 Thinking 模型 -->
+          <div v-if="isAgentEnabled" class="model-badge">
+            <span class="model-label">Thinking:</span>
+            <span class="model-name">{{ thinkingModelName || '未配置' }}</span>
+          </div>
+
+          <!-- 非 Agent 模式：可选择的模型下拉 -->
+          <div 
+            v-else
+            ref="modelButtonRef" 
+            class="control-btn model-btn"
+            :class="{ 'active': selectedModel }"
+            @click.stop="toggleModelSelector"
+          >
+            <span class="model-btn-text">
+              {{ selectedModel ? selectedModel.name : '模型' }}
+            </span>
+            <svg 
+              width="12" 
+              height="12" 
+              viewBox="0 0 12 12" 
+              fill="currentColor"
+              class="dropdown-arrow"
+              :class="{ 'rotate': showModelSelector }"
+            >
+              <path d="M2.5 4.5L6 8L9.5 4.5H2.5Z"/>
+            </svg>
+          </div>
+
+          <!-- 模型选择下拉菜单 -->
+          <Teleport to="body">
+            <div v-if="showModelSelector && !isAgentEnabled" class="model-selector-overlay">
+              <div 
+                class="model-selector-dropdown"
+                :style="modelDropdownStyle"
+                @click.stop
+              >
+                <div class="model-selector-content">
+                  <div 
+                    v-for="model in availableModels" 
+                    :key="model.id"
+                    class="model-option"
+                    :class="{ 'selected': model.id === selectedModelId }"
+                    @click="selectedModelId = model.id || ''; showModelSelector = false"
+                  >
+                    <div class="model-option-main">
+                      <span class="model-option-name">{{ model.name }}</span>
+                      <span v-if="model.source === 'remote'" class="model-badge-remote">远程</span>
+                      <span v-else-if="model.parameters?.parameter_size" class="model-badge-local">
+                        {{ model.parameters.parameter_size }}
+                      </span>
+                    </div>
+                    <div v-if="model.description" class="model-option-desc">
+                      {{ model.description }}
+                    </div>
+                  </div>
+                  <div v-if="availableModels.length === 0" class="model-option empty">
+                    暂无可用模型
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Teleport>
         </div>
       </div>
 
@@ -664,5 +962,166 @@ const getImgSrc = (url: string) => {
     width: 16px;
     height: 16px;
   }
+}
+
+/* 模型显示样式 */
+.model-display {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.model-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(7, 192, 95, 0.08);
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.model-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.model-name {
+  color: #07C05F;
+  font-weight: 600;
+}
+
+.model-btn {
+  height: 28px;
+  padding: 0 10px;
+  min-width: auto;
+  
+  &.active {
+    background: rgba(7, 192, 95, 0.1);
+    color: #07C05F;
+    
+    &:hover {
+      background: rgba(7, 192, 95, 0.15);
+    }
+  }
+}
+
+.model-btn-text {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+  white-space: nowrap;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.model-btn.active .model-btn-text {
+  color: #07C05F;
+}
+
+/* 模型选择下拉菜单 */
+.model-selector-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+}
+
+.model-selector-dropdown {
+  z-index: 9999;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 350px;
+  max-height: 400px;
+  overflow: hidden;
+}
+
+.model-selector-content {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.model-option {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid #f0f0f0;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &:hover {
+    background: #f5f5f5;
+  }
+  
+  &.selected {
+    background: rgba(7, 192, 95, 0.08);
+    
+    .model-option-name {
+      color: #07C05F;
+      font-weight: 600;
+    }
+  }
+  
+  &.empty {
+    color: #999;
+    cursor: default;
+    text-align: center;
+    
+    &:hover {
+      background: white;
+    }
+  }
+}
+
+.model-option-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.model-option-name {
+  font-size: 14px;
+  color: #333;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.model-option-desc {
+  font-size: 12px;
+  color: #999;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.model-badge-remote,
+.model-badge-local {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 11px;
+  border-radius: 3px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.model-badge-remote {
+  background: rgba(7, 192, 95, 0.1);
+  color: #07C05F;
+}
+
+.model-badge-local {
+  background: rgba(82, 196, 26, 0.1);
+  color: #52c41a;
 }
 </style>
