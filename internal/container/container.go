@@ -6,6 +6,7 @@ package container
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"os"
 	"slices"
 	"strconv"
@@ -32,10 +33,12 @@ import (
 	"github.com/Tencent/WeKnora/internal/application/service/llmcontext"
 	"github.com/Tencent/WeKnora/internal/application/service/retriever"
 	"github.com/Tencent/WeKnora/internal/config"
+	"github.com/Tencent/WeKnora/internal/database"
 	"github.com/Tencent/WeKnora/internal/event"
 	"github.com/Tencent/WeKnora/internal/handler"
 	"github.com/Tencent/WeKnora/internal/handler/session"
 	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Tencent/WeKnora/internal/mcp"
 	"github.com/Tencent/WeKnora/internal/models/embedding"
 	"github.com/Tencent/WeKnora/internal/models/utils/ollama"
 	"github.com/Tencent/WeKnora/internal/router"
@@ -90,6 +93,10 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(repository.NewUserRepository))
 	must(container.Provide(repository.NewAuthTokenRepository))
 	must(container.Provide(neo4jRepo.NewNeo4jRepository))
+	must(container.Provide(repository.NewMCPServiceRepository))
+
+	// MCP manager for managing MCP client connections
+	must(container.Provide(mcp.NewMCPManager))
 
 	// Business service layer
 	must(container.Provide(service.NewTenantService))
@@ -103,6 +110,7 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(service.NewUserService))
 	must(container.Provide(service.NewChunkExtractService))
 	must(container.Provide(service.NewMessageService))
+	must(container.Provide(service.NewMCPServiceService))
 
 	// Agent service layer (requires event bus)
 	must(container.Provide(event.NewEventBus))
@@ -139,6 +147,7 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(handler.NewInitializationHandler))
 	must(container.Provide(handler.NewAuthHandler))
 	must(container.Provide(handler.NewSystemHandler))
+	must(container.Provide(handler.NewMCPServiceHandler))
 
 	// Router configuration
 	must(container.Provide(router.NewRouter))
@@ -211,9 +220,11 @@ func initContextStorage(redisClient *redis.Client) (llmcontext.ContextStorage, e
 //   - Error if connection fails
 func initDatabase(cfg *config.Config) (*gorm.DB, error) {
 	var dialector gorm.Dialector
+	var migrateDSN string
 	switch os.Getenv("DB_DRIVER") {
 	case "postgres":
-		dsn := fmt.Sprintf(
+		// DSN for GORM (key-value format)
+		gormDSN := fmt.Sprintf(
 			"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 			os.Getenv("DB_HOST"),
 			os.Getenv("DB_PORT"),
@@ -222,13 +233,48 @@ func initDatabase(cfg *config.Config) (*gorm.DB, error) {
 			os.Getenv("DB_NAME"),
 			"disable",
 		)
-		dialector = postgres.Open(dsn)
+		dialector = postgres.Open(gormDSN)
+
+		// DSN for golang-migrate (URL format)
+		// URL-encode password to handle special characters like !@#
+		dbPassword := os.Getenv("DB_PASSWORD")
+		encodedPassword := url.QueryEscape(dbPassword)
+
+		migrateDSN = fmt.Sprintf(
+			"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+			os.Getenv("DB_USER"),
+			encodedPassword, // Use encoded password
+			os.Getenv("DB_HOST"),
+			os.Getenv("DB_PORT"),
+			os.Getenv("DB_NAME"),
+		)
+
+		// Debug log (don't log password)
+		logger.Infof(context.Background(), "DB Config: user=%s host=%s port=%s dbname=%s",
+			os.Getenv("DB_USER"),
+			os.Getenv("DB_HOST"),
+			os.Getenv("DB_PORT"),
+			os.Getenv("DB_NAME"),
+		)
 	default:
 		return nil, fmt.Errorf("unsupported database driver: %s", os.Getenv("DB_DRIVER"))
 	}
 	db, err := gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
 		return nil, err
+	}
+
+	// Run database migrations automatically (optional, can be disabled via env var)
+	// To disable auto-migration, set AUTO_MIGRATE=false
+	if os.Getenv("AUTO_MIGRATE") != "false" {
+		logger.Infof(context.Background(), "Running database migrations...")
+		if err := database.RunMigrations(migrateDSN); err != nil {
+			// Log warning but don't fail startup - migrations might be handled externally
+			logger.Warnf(context.Background(), "Database migration failed: %v", err)
+			logger.Warnf(context.Background(), "Continuing with application startup. Please run migrations manually if needed.")
+		}
+	} else {
+		logger.Infof(context.Background(), "Auto-migration is disabled (AUTO_MIGRATE=false)")
 	}
 
 	// Auto-migrate database tables

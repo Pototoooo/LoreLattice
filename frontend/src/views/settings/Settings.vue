@@ -92,6 +92,11 @@
                 <div v-if="currentSection === 'api'" class="section">
                   <ApiInfo />
                 </div>
+
+                <!-- MCP 服务 -->
+                <div v-if="currentSection === 'mcp'" class="section">
+                  <McpSettings />
+                </div>
               </div>
             </div>
           </div>
@@ -112,6 +117,7 @@ import ApiInfo from './ApiInfo.vue'
 import GeneralSettings from './GeneralSettings.vue'
 import ModelSettings from './ModelSettings.vue'
 import OllamaSettings from './OllamaSettings.vue'
+import McpSettings from './McpSettings.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -136,6 +142,7 @@ const navItems = [
   },
   { key: 'ollama', icon: 'server', label: 'Ollama' },
   { key: 'agent', icon: 'chat', label: 'Agent 配置' },
+  { key: 'mcp', icon: 'link', label: 'MCP 服务' },
   { key: 'system', icon: 'info-circle', label: '系统信息' },
   { key: 'tenant', icon: 'user-circle', label: '租户信息' },
   { key: 'api', icon: 'secured', label: 'API 信息' }

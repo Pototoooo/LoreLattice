@@ -9,6 +9,7 @@ import (
 	"github.com/Tencent/WeKnora/internal/config"
 	"github.com/Tencent/WeKnora/internal/event"
 	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Tencent/WeKnora/internal/mcp"
 	"github.com/Tencent/WeKnora/internal/models/chat"
 	"github.com/Tencent/WeKnora/internal/models/rerank"
 	"github.com/Tencent/WeKnora/internal/types"
@@ -25,6 +26,8 @@ type agentService struct {
 	knowledgeBaseService interfaces.KnowledgeBaseService
 	knowledgeService     interfaces.KnowledgeService
 	chunkService         interfaces.ChunkService
+	mcpServiceService    interfaces.MCPServiceService
+	mcpManager           *mcp.MCPManager
 	eventBus             *event.EventBus
 	db                   *gorm.DB
 }
@@ -36,6 +39,8 @@ func NewAgentService(
 	knowledgeBaseService interfaces.KnowledgeBaseService,
 	knowledgeService interfaces.KnowledgeService,
 	chunkService interfaces.ChunkService,
+	mcpServiceService interfaces.MCPServiceService,
+	mcpManager *mcp.MCPManager,
 	eventBus *event.EventBus,
 	db *gorm.DB,
 ) interfaces.AgentService {
@@ -45,6 +50,8 @@ func NewAgentService(
 		knowledgeBaseService: knowledgeBaseService,
 		knowledgeService:     knowledgeService,
 		chunkService:         chunkService,
+		mcpServiceService:    mcpServiceService,
+		mcpManager:           mcpManager,
 		eventBus:             eventBus,
 		db:                   db,
 	}
@@ -89,6 +96,36 @@ func (s *agentService) CreateAgentEngine(
 	// Register tools
 	if err := s.registerTools(ctx, toolRegistry, config, chatModel, rerankModel); err != nil {
 		return nil, fmt.Errorf("failed to register tools: %w", err)
+	}
+
+	// Register MCP tools from enabled services for this tenant
+	tenantID := uint(0)
+	if tid, ok := ctx.Value(types.TenantIDContextKey).(uint); ok {
+		tenantID = tid
+	}
+	if tenantID > 0 && s.mcpServiceService != nil && s.mcpManager != nil {
+		// Get enabled MCP services for this tenant
+		mcpServices, err := s.mcpServiceService.ListMCPServices(ctx, tenantID)
+		if err != nil {
+			logger.Warnf(ctx, "Failed to list MCP services: %v", err)
+		} else {
+			// Filter enabled services
+			enabledServices := make([]*types.MCPService, 0)
+			for _, svc := range mcpServices {
+				if svc.Enabled {
+					enabledServices = append(enabledServices, svc)
+				}
+			}
+
+			// Register MCP tools
+			if len(enabledServices) > 0 {
+				if err := tools.RegisterMCPTools(toolRegistry, enabledServices, s.mcpManager); err != nil {
+					logger.Warnf(ctx, "Failed to register MCP tools: %v", err)
+				} else {
+					logger.Infof(ctx, "Registered MCP tools from %d enabled services", len(enabledServices))
+				}
+			}
+		}
 	}
 
 	// Get knowledge base detailed information for prompt

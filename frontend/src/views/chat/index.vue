@@ -287,11 +287,15 @@ const sendMsg = async (value, modelId = '') => {
     // Use agent-chat endpoint when agent is enabled, otherwise use knowledge-chat
     const endpoint = agentEnabled ? '/api/v1/agent-chat' : '/api/v1/knowledge-chat';
     
+    // Get selected MCP services from settings store (if available)
+    const mcpServiceIds = useSettingsStoreInstance.settings.selectedMCPServices || [];
+    
     await startStream({ 
         session_id: session_id.value, 
         knowledge_base_ids: kbIds,
         agent_enabled: agentEnabled,
         summary_model_id: modelId,
+        mcp_service_ids: mcpServiceIds,
         query: value, 
         method: 'POST', 
         url: endpoint

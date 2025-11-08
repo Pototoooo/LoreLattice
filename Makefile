@@ -167,6 +167,33 @@ migrate-up:
 migrate-down:
 	./scripts/migrate.sh down
 
+migrate-version:
+	./scripts/migrate.sh version
+
+migrate-create:
+	@if [ -z "$(name)" ]; then \
+		echo "Error: migration name is required"; \
+		echo "Usage: make migrate-create name=your_migration_name"; \
+		exit 1; \
+	fi
+	./scripts/migrate.sh create $(name)
+
+migrate-force:
+	@if [ -z "$(version)" ]; then \
+		echo "Error: version is required"; \
+		echo "Usage: make migrate-force version=4"; \
+		exit 1; \
+	fi
+	./scripts/migrate.sh force $(version)
+
+migrate-goto:
+	@if [ -z "$(version)" ]; then \
+		echo "Error: version is required"; \
+		echo "Usage: make migrate-goto version=3"; \
+		exit 1; \
+	fi
+	./scripts/migrate.sh goto $(version)
+
 # Generate API documentation
 docs:
 	swag init -g $(MAIN_PATH)/main.go -o ./docs

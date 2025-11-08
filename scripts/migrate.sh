@@ -7,7 +7,9 @@ DB_PORT=${DB_PORT:-5432}
 DB_USER=${DB_USER:-postgres}
 DB_PASSWORD=${DB_PASSWORD:-postgres}
 DB_NAME=${DB_NAME:-WeKnora}
-MIGRATIONS_DIR="/app/migrations"
+
+# Use versioned migrations directory
+MIGRATIONS_DIR="${MIGRATIONS_DIR:-migrations/versioned}"
 
 # Check if migrate tool is installed
 if ! command -v migrate &> /dev/null; then
@@ -44,9 +46,34 @@ case "$1" in
         fi
         echo "Creating migration files for $2..."
         migrate create -ext sql -dir ${MIGRATIONS_DIR} -seq $2
+        echo "Created:"
+        echo "  - ${MIGRATIONS_DIR}/$(ls -t ${MIGRATIONS_DIR} | head -1)"
+        echo "  - ${MIGRATIONS_DIR}/$(ls -t ${MIGRATIONS_DIR} | head -2 | tail -1)"
+        ;;
+    version)
+        echo "Checking current migration version..."
+        migrate -path ${MIGRATIONS_DIR} -database ${DB_URL} version
+        ;;
+    force)
+        if [ -z "$2" ]; then
+            echo "Error: Version number is required"
+            echo "Usage: $0 force <version>"
+            exit 1
+        fi
+        echo "Forcing migration version to $2..."
+        migrate -path ${MIGRATIONS_DIR} -database ${DB_URL} force $2
+        ;;
+    goto)
+        if [ -z "$2" ]; then
+            echo "Error: Version number is required"
+            echo "Usage: $0 goto <version>"
+            exit 1
+        fi
+        echo "Migrating to version $2..."
+        migrate -path ${MIGRATIONS_DIR} -database ${DB_URL} goto $2
         ;;
     *)
-        echo "Usage: $0 {up|down|create <migration_name>}"
+        echo "Usage: $0 {up|down|create <migration_name>|version|force <version>|goto <version>}"
         exit 1
         ;;
 esac

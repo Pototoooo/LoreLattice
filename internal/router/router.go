@@ -39,6 +39,7 @@ type RouterParams struct {
 	AuthHandler           *handler.AuthHandler
 	InitializationHandler *handler.InitializationHandler
 	SystemHandler         *handler.SystemHandler
+	MCPServiceHandler     *handler.MCPServiceHandler
 }
 
 // NewRouter 创建新的路由
@@ -85,6 +86,7 @@ func NewRouter(params RouterParams) *gin.Engine {
 		RegisterEvaluationRoutes(v1, params.EvaluationHandler)
 		RegisterInitializationRoutes(v1, params.InitializationHandler)
 		RegisterSystemRoutes(v1, params.SystemHandler)
+		RegisterMCPServiceRoutes(v1, params.MCPServiceHandler)
 	}
 
 	return r
@@ -292,5 +294,28 @@ func RegisterSystemRoutes(r *gin.RouterGroup, handler *handler.SystemHandler) {
 	systemRoutes := r.Group("/system")
 	{
 		systemRoutes.GET("/info", handler.GetSystemInfo)
+	}
+}
+
+// RegisterMCPServiceRoutes registers MCP service routes
+func RegisterMCPServiceRoutes(r *gin.RouterGroup, handler *handler.MCPServiceHandler) {
+	mcpServices := r.Group("/mcp-services")
+	{
+		// Create MCP service
+		mcpServices.POST("", handler.CreateMCPService)
+		// List MCP services
+		mcpServices.GET("", handler.ListMCPServices)
+		// Get MCP service by ID
+		mcpServices.GET("/:id", handler.GetMCPService)
+		// Update MCP service
+		mcpServices.PUT("/:id", handler.UpdateMCPService)
+		// Delete MCP service
+		mcpServices.DELETE("/:id", handler.DeleteMCPService)
+		// Test MCP service connection
+		mcpServices.POST("/:id/test", handler.TestMCPService)
+		// Get MCP service tools
+		mcpServices.GET("/:id/tools", handler.GetMCPServiceTools)
+		// Get MCP service resources
+		mcpServices.GET("/:id/resources", handler.GetMCPServiceResources)
 	}
 }
