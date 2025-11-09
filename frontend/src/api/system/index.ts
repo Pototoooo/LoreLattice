@@ -13,6 +13,12 @@ export interface ToolDefinition {
   description: string
 }
 
+export interface PlaceholderDefinition {
+  name: string
+  label: string
+  description: string
+}
+
 export interface AgentConfig {
   enabled: boolean
   max_iterations: number
@@ -22,7 +28,9 @@ export interface AgentConfig {
   thinking_model_id: string
   rerank_model_id: string
   knowledge_bases?: string[]
+  system_prompt?: string  // System prompt template with placeholders (optional)
   available_tools?: ToolDefinition[]  // GET 响应中包含，POST/PUT 不需要
+  available_placeholders?: PlaceholderDefinition[]  // GET 响应中包含，POST/PUT 不需要
 }
 
 export function getSystemInfo(): Promise<{ data: SystemInfo }> {

@@ -144,6 +144,9 @@ func (s *agentService) CreateAgentEngine(
 		}
 	}
 
+	// Get system prompt template from config (use default if empty)
+	systemPromptTemplate := config.SystemPrompt
+
 	// Create engine with provided EventBus and contextManager
 	engine := agent.NewAgentEngine(
 		config,
@@ -154,6 +157,7 @@ func (s *agentService) CreateAgentEngine(
 		kbInfos,
 		contextManager,
 		sessionID,
+		systemPromptTemplate,
 	)
 
 	return engine, nil

@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/Tencent/WeKnora/internal/agent"
 	"github.com/Tencent/WeKnora/internal/errors"
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/types"
@@ -234,6 +235,7 @@ type AgentConfigRequest struct {
 	Temperature       float64  `json:"temperature"`
 	ThinkingModelID   string   `json:"thinking_model_id"`
 	RerankModelID     string   `json:"rerank_model_id"`
+	SystemPrompt      string   `json:"system_prompt,omitempty"` // System prompt template with placeholders (optional)
 }
 
 // GetTenantAgentConfig retrieves the agent configuration for a tenant
@@ -273,6 +275,11 @@ func (h *TenantHandler) GetTenantAgentConfig(c *gin.Context) {
 		{"name": "get_document_info", "label": "获取文档信息", "description": "查看文档元数据"},
 		{"name": "database_query", "label": "查询数据库", "description": "查询数据库中的信息"},
 	}
+
+	// 定义可用的占位符列表
+	availablePlaceholders := []gin.H{
+		{"name": "knowledge_bases", "label": "知识库列表", "description": "自动格式化为表格形式的知识库列表，包含知识库名称、描述、文档数量、最近添加的文档等信息"},
+	}
 	if tenant.AgentConfig == nil {
 		// Return default config if not set
 		logger.Info(ctx, "Tenant has no agent config, returning defaults")
@@ -280,30 +287,40 @@ func (h *TenantHandler) GetTenantAgentConfig(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
 			"data": gin.H{
-				"max_iterations":     20,
-				"reflection_enabled": false,
-				"allowed_tools":      []string{"thinking", "todo_write", "knowledge_search", "get_related_chunks", "query_knowledge_graph", "get_document_info", "database_query"},
-				"temperature":        0.7,
-				"thinking_model_id":  "",
-				"rerank_model_id":    "",
-				"available_tools":    availableTools,
+				"max_iterations":         20,
+				"reflection_enabled":     false,
+				"allowed_tools":          []string{"thinking", "todo_write", "knowledge_search", "get_related_chunks", "query_knowledge_graph", "get_document_info", "database_query"},
+				"temperature":            0.7,
+				"thinking_model_id":      "",
+				"rerank_model_id":        "",
+				"system_prompt":          agent.DefaultReActSystemPrompt,
+				"available_tools":        availableTools,
+				"available_placeholders": availablePlaceholders,
 			},
 		})
 		return
+	}
+
+	// Get system prompt, use default if empty
+	systemPrompt := tenant.AgentConfig.SystemPrompt
+	if systemPrompt == "" {
+		systemPrompt = agent.DefaultReActSystemPrompt
 	}
 
 	logger.Infof(ctx, "Retrieved tenant agent config successfully, Tenant ID: %d", tenantID)
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"data": gin.H{
-			"enabled":            tenant.AgentConfig.Enabled,
-			"max_iterations":     tenant.AgentConfig.MaxIterations,
-			"reflection_enabled": tenant.AgentConfig.ReflectionEnabled,
-			"allowed_tools":      tenant.AgentConfig.AllowedTools,
-			"temperature":        tenant.AgentConfig.Temperature,
-			"thinking_model_id":  tenant.AgentConfig.ThinkingModelID,
-			"rerank_model_id":    tenant.AgentConfig.RerankModelID,
-			"available_tools":    availableTools,
+			"enabled":                tenant.AgentConfig.Enabled,
+			"max_iterations":         tenant.AgentConfig.MaxIterations,
+			"reflection_enabled":     tenant.AgentConfig.ReflectionEnabled,
+			"allowed_tools":          tenant.AgentConfig.AllowedTools,
+			"temperature":            tenant.AgentConfig.Temperature,
+			"thinking_model_id":      tenant.AgentConfig.ThinkingModelID,
+			"rerank_model_id":        tenant.AgentConfig.RerankModelID,
+			"system_prompt":          systemPrompt,
+			"available_tools":        availableTools,
+			"available_placeholders": availablePlaceholders,
 		},
 	})
 }
@@ -371,6 +388,7 @@ func (h *TenantHandler) UpdateTenantAgentConfig(c *gin.Context) {
 		Temperature:       req.Temperature,
 		ThinkingModelID:   req.ThinkingModelID,
 		RerankModelID:     req.RerankModelID,
+		SystemPrompt:      req.SystemPrompt,
 	}
 
 	updatedTenant, err := h.service.UpdateTenant(ctx, tenant)

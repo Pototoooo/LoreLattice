@@ -190,6 +190,68 @@
           </t-select>
         </div>
       </div>
+
+      <!-- 系统 Prompt -->
+      <div class="setting-row vertical">
+        <div class="setting-info">
+          <label>系统 Prompt</label>
+          <p class="desc">配置 Agent 的系统提示词，支持占位符模板。占位符会在运行时自动替换为实际内容。</p>
+          <div class="placeholder-hint">
+            <p class="hint-title">可用占位符：</p>
+            <ul class="placeholder-list">
+              <li v-for="placeholder in availablePlaceholders" :key="placeholder.name">
+                <code v-html="`{{${placeholder.name}}}`"></code> - {{ placeholder.label }}（{{ placeholder.description }}）
+              </li>
+            </ul>
+            <p class="hint-tip">提示：输入 <code>&#123;&#123;</code> 时会自动显示可用占位符</p>
+          </div>
+        </div>
+        <div class="setting-control full-width" style="position: relative;">
+          <div class="prompt-header">
+            <t-button
+              theme="default"
+              variant="outline"
+              size="small"
+              @click="handleResetToDefault"
+              :loading="isResettingPrompt"
+            >
+              恢复默认
+            </t-button>
+          </div>
+          <div class="prompt-textarea-wrapper">
+            <t-textarea
+              ref="promptTextareaRef"
+              v-model="localSystemPrompt"
+              :autosize="{ minRows: 15, maxRows: 30 }"
+              placeholder="请输入系统 Prompt，或留空使用默认 Prompt..."
+              @blur="handleSystemPromptChange"
+              @input="handlePromptInput"
+              @keydown="handlePromptKeydown"
+              style="width: 100%; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px;"
+            />
+          </div>
+          <!-- 占位符提示下拉框 -->
+          <teleport to="body">
+            <div v-if="showPlaceholderPopup && filteredPlaceholders.length > 0" class="placeholder-popup-wrapper" :style="popupStyle">
+              <div class="placeholder-popup">
+              <div
+                v-for="(placeholder, index) in filteredPlaceholders"
+                :key="placeholder.name"
+                class="placeholder-item"
+                :class="{ active: selectedPlaceholderIndex === index }"
+                @mousedown.prevent="insertPlaceholder(placeholder.name)"
+                @mouseenter="selectedPlaceholderIndex = index"
+              >
+                  <div class="placeholder-name">
+                    <code v-html="`{{${placeholder.name}}}`"></code>
+                  </div>
+                  <div class="placeholder-desc">{{ placeholder.description }}</div>
+                </div>
+              </div>
+            </div>
+          </teleport>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -198,9 +260,9 @@
 import { ref, onMounted, watch, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSettingsStore } from '@/stores/settings'
-import { MessagePlugin } from 'tdesign-vue-next'
+import { MessagePlugin, DialogPlugin } from 'tdesign-vue-next'
 import { listModels, type ModelConfig } from '@/api/model'
-import { getAgentConfig, updateAgentConfig, type AgentConfig, type ToolDefinition } from '@/api/system'
+import { getAgentConfig, updateAgentConfig, type AgentConfig, type ToolDefinition, type PlaceholderDefinition } from '@/api/system'
 
 const settingsStore = useSettingsStore()
 const router = useRouter()
@@ -211,6 +273,7 @@ const localTemperature = ref(0.7)
 const localThinkingModelId = ref('')
 const localRerankModelId = ref('')
 const localAllowedTools = ref<string[]>([])
+const localSystemPrompt = ref('')
 
 // 计算 Agent 是否就绪
 const isAgentReady = computed(() => {
@@ -248,11 +311,121 @@ const loadingModels = ref(false)
 
 // 可用工具列表
 const availableTools = ref<ToolDefinition[]>([])
+// 可用占位符列表
+const availablePlaceholders = ref<PlaceholderDefinition[]>([])
 
 // 配置加载状态
 const loadingConfig = ref(false)
 const configLoaded = ref(false) // 防止重复加载
 const isInitializing = ref(true) // 标记是否正在初始化，防止初始化时触发保存
+
+// 保存的 Prompt 值，用于比较是否变化
+let savedSystemPrompt = ''
+
+// 恢复默认 Prompt 的加载状态
+const isResettingPrompt = ref(false)
+
+// 占位符提示相关状态
+const promptTextareaRef = ref<any>(null)
+const showPlaceholderPopup = ref(false)
+const selectedPlaceholderIndex = ref(0)
+let placeholderPopupTimer: any = null
+const placeholderPrefix = ref('') // 当前输入的前缀，用于过滤
+const popupStyle = ref({ top: '0px', left: '0px' }) // 提示框位置
+
+// 设置 textarea 原生事件监听器
+const setupTextareaEventListeners = () => {
+  nextTick(() => {
+    const textarea = getTextareaElement()
+    if (textarea) {
+      // 添加原生 keydown 事件监听（使用 capture 阶段，确保优先处理）
+      textarea.addEventListener('keydown', (e: KeyboardEvent) => {
+        // 如果正在显示占位符提示，优先处理占位符相关的按键
+        if (showPlaceholderPopup.value && filteredPlaceholders.value.length > 0) {
+          if (e.key === 'ArrowDown') {
+            // 下箭头选择下一个
+            e.preventDefault()
+            e.stopPropagation()
+            e.stopImmediatePropagation()
+            if (selectedPlaceholderIndex.value < filteredPlaceholders.value.length - 1) {
+              selectedPlaceholderIndex.value++
+            } else {
+              selectedPlaceholderIndex.value = 0 // 循环到第一个
+            }
+            return
+          } else if (e.key === 'ArrowUp') {
+            // 上箭头选择上一个
+            e.preventDefault()
+            e.stopPropagation()
+            e.stopImmediatePropagation()
+            if (selectedPlaceholderIndex.value > 0) {
+              selectedPlaceholderIndex.value--
+            } else {
+              selectedPlaceholderIndex.value = filteredPlaceholders.value.length - 1 // 循环到最后一个
+            }
+            return
+          } else if (e.key === 'Enter') {
+            // Enter 键插入选中的占位符
+            e.preventDefault()
+            e.stopPropagation()
+            e.stopImmediatePropagation()
+            const selected = filteredPlaceholders.value[selectedPlaceholderIndex.value]
+            if (selected) {
+              insertPlaceholder(selected.name)
+            }
+            return
+          } else if (e.key === 'Escape') {
+            // ESC 键关闭提示
+            e.preventDefault()
+            e.stopPropagation()
+            e.stopImmediatePropagation()
+            showPlaceholderPopup.value = false
+            placeholderPrefix.value = ''
+            return
+          }
+        }
+        
+        // 如果按下的是 { 键
+        if (e.key === '{') {
+          // 清除之前的定时器
+          if (placeholderPopupTimer) {
+            clearTimeout(placeholderPopupTimer)
+          }
+          
+          // 延迟检查，等待输入完成（连续输入两个 {）
+          placeholderPopupTimer = setTimeout(() => {
+            checkAndShowPlaceholderPopup()
+          }, 150)
+        }
+      }, true) // 使用 capture 阶段
+      
+      // 添加原生 input 事件监听（作为备用）
+      textarea.addEventListener('input', () => {
+        if (placeholderPopupTimer) {
+          clearTimeout(placeholderPopupTimer)
+        }
+        placeholderPopupTimer = setTimeout(() => {
+          checkAndShowPlaceholderPopup()
+        }, 50)
+      })
+    }
+  })
+}
+
+// 获取 textarea 元素的辅助函数
+const getTextareaElement = (): HTMLTextAreaElement | null => {
+  if (promptTextareaRef.value) {
+    if (promptTextareaRef.value.$el) {
+      return promptTextareaRef.value.$el.querySelector('textarea')
+    } else if (promptTextareaRef.value instanceof HTMLTextAreaElement) {
+      return promptTextareaRef.value
+    }
+  }
+  
+  // 如果还是找不到，尝试通过 DOM 查找
+  const wrapper = document.querySelector('.setting-control.full-width')
+  return wrapper?.querySelector('textarea') || null
+}
 
 // 初始化加载
 onMounted(async () => {
@@ -275,7 +448,13 @@ onMounted(async () => {
     localThinkingModelId.value = config.thinking_model_id
     localRerankModelId.value = config.rerank_model_id
     localAllowedTools.value = config.allowed_tools || []
+    localSystemPrompt.value = config.system_prompt || ''
+    savedSystemPrompt = config.system_prompt || '' // 记录已保存的值
     availableTools.value = config.available_tools || []
+    availablePlaceholders.value = config.available_placeholders || []
+    
+    // 调试信息
+    console.log('加载的占位符列表:', availablePlaceholders.value)
     
     // 统一加载所有模型（只调用一次API）
     if (config.thinking_model_id || config.rerank_model_id) {
@@ -298,7 +477,10 @@ onMounted(async () => {
     // 再等待一帧，确保所有事件监听器都已设置好
     requestAnimationFrame(() => {
       // 初始化完成，现在可以允许保存操作
-    isInitializing.value = false
+      isInitializing.value = false
+      
+      // 设置原生事件监听器（作为备用方案）
+      setupTextareaEventListeners()
     })
   } catch (error) {
     console.error('加载Agent配置失败:', error)
@@ -380,7 +562,8 @@ const handleMaxIterationsChangeDebounced = (value: number) => {
       allowed_tools: localAllowedTools.value,
       temperature: localTemperature.value,
       thinking_model_id: localThinkingModelId.value,
-      rerank_model_id: localRerankModelId.value
+      rerank_model_id: localRerankModelId.value,
+      system_prompt: localSystemPrompt.value
     }
     
     await updateAgentConfig(config)
@@ -443,7 +626,8 @@ const handleThinkingModelChange = async (value: string) => {
       allowed_tools: localAllowedTools.value,
       temperature: localTemperature.value,
       thinking_model_id: value,
-      rerank_model_id: localRerankModelId.value
+      rerank_model_id: localRerankModelId.value,
+      system_prompt: localSystemPrompt.value
     }
     
     await updateAgentConfig(config)
@@ -476,7 +660,8 @@ const handleRerankModelChange = async (value: string) => {
       allowed_tools: localAllowedTools.value,
       temperature: localTemperature.value,
       thinking_model_id: localThinkingModelId.value,
-      rerank_model_id: value
+      rerank_model_id: value,
+      system_prompt: localSystemPrompt.value
     }
     
     await updateAgentConfig(config)
@@ -556,7 +741,8 @@ const handleTemperatureChange = async (value: number) => {
       allowed_tools: localAllowedTools.value,
       temperature: value,
       thinking_model_id: localThinkingModelId.value,
-      rerank_model_id: localRerankModelId.value
+      rerank_model_id: localRerankModelId.value,
+      system_prompt: localSystemPrompt.value
     }
     
     await updateAgentConfig(config)
@@ -581,7 +767,8 @@ const handleAllowedToolsChange = async (value: string[]) => {
       allowed_tools: value,
       temperature: localTemperature.value,
       thinking_model_id: localThinkingModelId.value,
-      rerank_model_id: localRerankModelId.value
+      rerank_model_id: localRerankModelId.value,
+      system_prompt: localSystemPrompt.value
     }
     
     await updateAgentConfig(config)
@@ -592,6 +779,293 @@ const handleAllowedToolsChange = async (value: string[]) => {
     MessagePlugin.error(getErrorMessage(error))
     // 回滚
     localAllowedTools.value = settingsStore.agentConfig.allowedTools
+  }
+}
+
+// 处理系统 Prompt 键盘事件（作为备用，主要逻辑在原生事件监听器中）
+const handlePromptKeydown = (e: KeyboardEvent) => {
+  // 如果正在显示占位符提示，且输入的是字母、数字或下划线，实时更新过滤
+  if (showPlaceholderPopup.value && /^[a-zA-Z0-9_]$/.test(e.key)) {
+    // 延迟检查，等待字符输入完成
+    if (placeholderPopupTimer) {
+      clearTimeout(placeholderPopupTimer)
+    }
+    placeholderPopupTimer = setTimeout(() => {
+      checkAndShowPlaceholderPopup()
+    }, 50)
+  }
+}
+
+// 过滤后的占位符列表（根据前缀匹配）
+const filteredPlaceholders = computed(() => {
+  if (!placeholderPrefix.value) {
+    return availablePlaceholders.value
+  }
+  
+  const prefix = placeholderPrefix.value.toLowerCase()
+  return availablePlaceholders.value.filter(p => 
+    p.name.toLowerCase().startsWith(prefix)
+  )
+})
+
+// 计算光标在 textarea 中的像素位置
+const calculateCursorPosition = (textarea: HTMLTextAreaElement) => {
+  const cursorPos = textarea.selectionStart
+  const textBeforeCursor = localSystemPrompt.value.substring(0, cursorPos)
+  
+  // 获取 textarea 的样式和位置
+  const style = window.getComputedStyle(textarea)
+  const textareaRect = textarea.getBoundingClientRect()
+  
+  // 计算行数和当前行的文本
+  const lines = textBeforeCursor.split('\n')
+  const currentLine = lines.length - 1
+  const lineText = lines[currentLine] || ''
+  
+  // 获取行高
+  const lineHeight = parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.2
+  
+  // 获取 padding
+  const paddingTop = parseFloat(style.paddingTop) || 0
+  const paddingLeft = parseFloat(style.paddingLeft) || 0
+  
+  // 使用 canvas 测量当前行的文本宽度（更准确）
+  const canvas = document.createElement('canvas')
+  const context = canvas.getContext('2d')
+  let textWidth = 0
+  
+  if (context) {
+    context.font = `${style.fontSize} ${style.fontFamily}`
+    textWidth = context.measureText(lineText).width
+  } else {
+    // 回退方案：使用等宽字体估算（Monaco/Menlo 是等宽字体）
+    const charWidth = parseFloat(style.fontSize) * 0.6 // 等宽字体字符宽度约为字体大小的 0.6 倍
+    textWidth = lineText.length * charWidth
+  }
+  
+  // 计算光标位置的 top（考虑滚动）
+  const scrollTop = textarea.scrollTop
+  const top = textareaRect.top + paddingTop + (currentLine * lineHeight) - scrollTop + lineHeight + 4
+  
+  // 计算光标位置的 left（考虑滚动）
+  const scrollLeft = textarea.scrollLeft
+  const left = textareaRect.left + paddingLeft + textWidth - scrollLeft
+  
+  return { top, left }
+}
+
+// 检查并显示占位符提示
+const checkAndShowPlaceholderPopup = () => {
+  const textarea = getTextareaElement()
+  
+  if (!textarea) {
+    return
+  }
+  
+  const cursorPos = textarea.selectionStart
+  const textBeforeCursor = localSystemPrompt.value.substring(0, cursorPos)
+  
+  // 检查是否输入了 {{（从光标位置向前查找最近的 {{）
+  // 需要找到光标前最近的 {{，且中间没有 }}
+  let lastOpenPos = -1
+  for (let i = cursorPos - 1; i >= 0; i--) {
+    if (i > 0 && textBeforeCursor[i - 1] === '{' && textBeforeCursor[i] === '{') {
+      // 找到了 {{
+      const textAfterOpen = textBeforeCursor.substring(i + 1)
+      // 检查是否已经包含 }}（说明占位符已完成）
+      if (!textAfterOpen.includes('}}')) {
+        lastOpenPos = i - 1
+        break
+      }
+    }
+  }
+  
+  if (lastOpenPos === -1) {
+    // 没有找到有效的 {{，隐藏提示
+    showPlaceholderPopup.value = false
+    placeholderPrefix.value = ''
+    return
+  }
+  
+  // 获取 {{ 之后到光标位置的内容作为前缀
+  const textAfterOpen = textBeforeCursor.substring(lastOpenPos + 2)
+  
+  // 更新前缀
+  placeholderPrefix.value = textAfterOpen
+  
+  // 根据前缀过滤占位符
+  const filtered = filteredPlaceholders.value
+  
+  if (filtered.length > 0) {
+    // 有匹配的占位符，显示提示
+    // 计算光标位置
+    nextTick(() => {
+      const position = calculateCursorPosition(textarea)
+      popupStyle.value = {
+        top: `${position.top}px`,
+        left: `${position.left}px`
+      }
+      showPlaceholderPopup.value = true
+      // 重置选中索引为第一个（默认选择第一个）
+      selectedPlaceholderIndex.value = 0
+    })
+  } else {
+    // 没有匹配的占位符，隐藏提示
+    showPlaceholderPopup.value = false
+  }
+}
+
+// 处理系统 Prompt 输入
+const handlePromptInput = () => {
+  // 清除之前的定时器
+  if (placeholderPopupTimer) {
+    clearTimeout(placeholderPopupTimer)
+  }
+  
+  // 延迟检查，避免频繁触发
+  placeholderPopupTimer = setTimeout(() => {
+    checkAndShowPlaceholderPopup()
+  }, 50)
+}
+
+// 插入占位符
+const insertPlaceholder = (placeholderName: string) => {
+  const textarea = getTextareaElement()
+  if (!textarea) {
+    return
+  }
+  
+  // 先关闭提示，避免触发 blur 事件
+  showPlaceholderPopup.value = false
+  placeholderPrefix.value = ''
+  selectedPlaceholderIndex.value = 0
+  
+  // 延迟执行，确保提示框已关闭
+  nextTick(() => {
+    const cursorPos = textarea.selectionStart
+    const textBeforeCursor = localSystemPrompt.value.substring(0, cursorPos)
+    const textAfterCursor = localSystemPrompt.value.substring(cursorPos)
+    
+    // 找到最后一个 {{ 的位置
+    const lastOpenPos = textBeforeCursor.lastIndexOf('{{')
+    if (lastOpenPos === -1) {
+      // 如果没有找到 {{，直接插入完整的占位符
+      const placeholder = `{{${placeholderName}}}`
+      localSystemPrompt.value = textBeforeCursor + placeholder + textAfterCursor
+      // 设置光标位置
+      nextTick(() => {
+        const newPos = cursorPos + placeholder.length
+        textarea.setSelectionRange(newPos, newPos)
+        textarea.focus()
+      })
+    } else {
+      // 替换 {{ 到光标位置的内容为完整的占位符
+      const beforePlaceholder = textBeforeCursor.substring(0, lastOpenPos)
+      const placeholder = `{{${placeholderName}}}`
+      localSystemPrompt.value = beforePlaceholder + placeholder + textAfterCursor
+      // 设置光标位置
+      nextTick(() => {
+        const newPos = lastOpenPos + placeholder.length
+        textarea.setSelectionRange(newPos, newPos)
+        textarea.focus()
+      })
+    }
+  })
+}
+
+// 恢复默认 Prompt
+const handleResetToDefault = async () => {
+  const confirmDialog = DialogPlugin.confirm({
+    header: '恢复默认 Prompt',
+    body: '确定要恢复为默认 Prompt 吗？当前的自定义 Prompt 将被覆盖。',
+    confirmBtn: '确定',
+    cancelBtn: '取消',
+    onConfirm: async () => {
+      try {
+        isResettingPrompt.value = true
+        
+        // 通过设置 system_prompt 为空字符串来获取默认值
+        // 后端在 system_prompt 为空时会返回默认值
+        const tempConfig: AgentConfig = {
+          enabled: isAgentReady.value,
+          max_iterations: localMaxIterations.value,
+          reflection_enabled: false,
+          allowed_tools: localAllowedTools.value,
+          temperature: localTemperature.value,
+          thinking_model_id: localThinkingModelId.value,
+          rerank_model_id: localRerankModelId.value,
+          system_prompt: '' // 空字符串表示使用默认
+        }
+        
+        await updateAgentConfig(tempConfig)
+        
+        // 重新加载配置以获取默认 Prompt 的完整内容
+        const res = await getAgentConfig()
+        const defaultPrompt = res.data.system_prompt || ''
+        
+        // 设置为默认 Prompt 的内容
+        localSystemPrompt.value = defaultPrompt
+        savedSystemPrompt = defaultPrompt
+        
+        MessagePlugin.success('已恢复为默认 Prompt')
+        confirmDialog.hide()
+      } catch (error) {
+        console.error('恢复默认 Prompt 失败:', error)
+        MessagePlugin.error(getErrorMessage(error))
+      } finally {
+        isResettingPrompt.value = false
+      }
+    }
+  })
+}
+
+// 处理系统 Prompt 变化
+const handleSystemPromptChange = async (e?: FocusEvent) => {
+  // 如果点击的是占位符提示框，不触发保存
+  if (e?.relatedTarget) {
+    const target = e.relatedTarget as HTMLElement
+    if (target.closest('.placeholder-popup-wrapper')) {
+      return
+    }
+  }
+  
+  // 延迟检查，避免点击占位符时立即触发
+  await nextTick()
+  
+  // 如果占位符提示框还在显示，说明用户点击了占位符，不触发保存
+  if (showPlaceholderPopup.value) {
+    return
+  }
+  
+  // 隐藏占位符提示
+  placeholderPrefix.value = ''
+  
+  // 如果正在初始化，不触发保存
+  if (isInitializing.value) return
+  
+  // 检查内容是否变化
+  if (localSystemPrompt.value === savedSystemPrompt) {
+    return // 内容没变，不调用接口
+  }
+  
+  try {
+    const config: AgentConfig = {
+      enabled: isAgentReady.value,
+      max_iterations: localMaxIterations.value,
+      reflection_enabled: false,
+      allowed_tools: localAllowedTools.value,
+      temperature: localTemperature.value,
+      thinking_model_id: localThinkingModelId.value,
+      rerank_model_id: localRerankModelId.value,
+      system_prompt: localSystemPrompt.value
+    }
+    
+    await updateAgentConfig(config)
+    savedSystemPrompt = localSystemPrompt.value // 更新已保存的值
+    MessagePlugin.success('系统 Prompt 已保存')
+  } catch (error) {
+    console.error('保存系统 Prompt 失败:', error)
+    MessagePlugin.error(getErrorMessage(error))
   }
 }
 
@@ -760,7 +1234,6 @@ watch(isAgentReady, (newValue, oldValue) => {
 .setting-info {
   flex: 1;
   max-width: 65%;
-  padding-right: 24px;
 
   label {
     font-size: 15px;
@@ -828,6 +1301,112 @@ watch(isAgentReady, (newValue, oldValue) => {
       color: #07C05F;
       font-weight: 500;
     }
+  }
+}
+
+.prompt-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.prompt-textarea-wrapper {
+  width: 100%;
+}
+
+.setting-control.full-width {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.placeholder-hint {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f5f7fa;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.6;
+
+  .hint-title {
+    font-weight: 500;
+    color: #333;
+    margin: 0 0 8px 0;
+  }
+
+  .placeholder-list {
+    margin: 8px 0;
+    padding-left: 20px;
+    color: #666;
+
+    li {
+      margin: 4px 0;
+
+      code {
+        background: #fff;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 11px;
+        color: #e83e8c;
+        border: 1px solid #e1e8ed;
+      }
+    }
+  }
+
+  .hint-tip {
+    margin: 8px 0 0 0;
+    color: #999;
+    font-style: italic;
+  }
+}
+
+.placeholder-popup-wrapper {
+  position: fixed;
+  z-index: 10001;
+  pointer-events: auto;
+}
+
+.placeholder-popup {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 400px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.placeholder-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover,
+  &.active {
+    background-color: #f5f7fa;
+  }
+
+  .placeholder-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+
+    code {
+      background: #f5f7fa;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 12px;
+      color: #e83e8c;
+    }
+  }
+
+  .placeholder-desc {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
   }
 }
 

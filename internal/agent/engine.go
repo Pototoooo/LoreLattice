@@ -31,6 +31,7 @@ type AgentEngine struct {
 	knowledgeBasesInfo []*KnowledgeBaseInfo      // Detailed knowledge base information for prompt
 	contextManager     interfaces.ContextManager // Context manager for writing agent conversation to LLM context
 	sessionID          string                    // Session ID for context management
+	systemPromptTemplate string                  // System prompt template (optional, uses default if empty)
 }
 
 // listToolNames returns tool.function names for logging
@@ -52,19 +53,21 @@ func NewAgentEngine(
 	knowledgeBasesInfo []*KnowledgeBaseInfo,
 	contextManager interfaces.ContextManager,
 	sessionID string,
+	systemPromptTemplate string,
 ) *AgentEngine {
 	if eventBus == nil {
 		eventBus = event.NewEventBus()
 	}
 	return &AgentEngine{
-		config:             config,
-		toolRegistry:       toolRegistry,
-		chatModel:          chatModel,
-		knowledgeService:   knowledgeService,
-		eventBus:           eventBus,
-		knowledgeBasesInfo: knowledgeBasesInfo,
-		contextManager:     contextManager,
-		sessionID:          sessionID,
+		config:              config,
+		toolRegistry:        toolRegistry,
+		chatModel:           chatModel,
+		knowledgeService:    knowledgeService,
+		eventBus:            eventBus,
+		knowledgeBasesInfo:  knowledgeBasesInfo,
+		contextManager:      contextManager,
+		sessionID:           sessionID,
+		systemPromptTemplate: systemPromptTemplate,
 	}
 }
 
@@ -85,7 +88,7 @@ func (e *AgentEngine) Execute(ctx context.Context, sessionID, messageID, query s
 	}
 
 	// Build system prompt
-	systemPrompt := BuildReActSystemPrompt(e.knowledgeBasesInfo)
+	systemPrompt := BuildReActSystemPrompt(e.knowledgeBasesInfo, e.systemPromptTemplate)
 	logger.Debugf(ctx, "[Agent] SystemPrompt Length: %d characters", len(systemPrompt))
 	logger.Debugf(ctx, "[Agent] SystemPrompt (stream)\n----\n%s\n----", systemPrompt)
 
@@ -642,7 +645,7 @@ func (e *AgentEngine) streamFinalAnswerToEventBus(
 		len(state.RoundSteps), countTotalToolCalls(state.RoundSteps))
 
 	// Build messages with all context
-	systemPrompt := BuildReActSystemPrompt(e.knowledgeBasesInfo)
+	systemPrompt := BuildReActSystemPrompt(e.knowledgeBasesInfo, e.systemPromptTemplate)
 
 	messages := []chat.Message{
 		{Role: "system", Content: systemPrompt},
