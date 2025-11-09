@@ -32,6 +32,8 @@ type Tenant struct {
 	AgentConfig *AgentConfig `yaml:"agent_config" json:"agent_config" gorm:"type:jsonb"`
 	// Global Context configuration for this tenant (default for all sessions)
 	ContextConfig *ContextConfig `yaml:"context_config" json:"context_config" gorm:"type:jsonb"`
+	// Global WebSearch configuration for this tenant
+	WebSearchConfig *WebSearchConfig `yaml:"web_search_config" json:"web_search_config" gorm:"type:jsonb"`
 	// Creation time
 	CreatedAt time.Time `yaml:"created_at" json:"created_at"`
 	// Last updated time

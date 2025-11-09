@@ -28,7 +28,7 @@ export function useStream() {
   let renderTimer: number | null = null
 
   // 启动流式请求
-  const startStream = async (params: { session_id: any; query: any; knowledge_base_ids?: string[]; agent_enabled?: boolean; summary_model_id?: string; method: string; url: string }) => {
+  const startStream = async (params: { session_id: any; query: any; knowledge_base_ids?: string[]; agent_enabled?: boolean; web_search_enabled?: boolean; summary_model_id?: string; mcp_service_ids?: string[]; method: string; url: string }) => {
     // 重置状态
     output.value = '';
     error.value = null;
@@ -69,9 +69,17 @@ export function useStream() {
       if (params.knowledge_base_ids !== undefined && params.knowledge_base_ids.length > 0) {
         postBody.knowledge_base_ids = params.knowledge_base_ids;
       }
+      // Include web_search_enabled if provided
+      if (params.web_search_enabled !== undefined) {
+        postBody.web_search_enabled = params.web_search_enabled;
+      }
       // Include summary_model_id if provided (for non-Agent mode)
       if (params.summary_model_id) {
         postBody.summary_model_id = params.summary_model_id;
+      }
+      // Include mcp_service_ids if provided (for Agent mode)
+      if (params.mcp_service_ids !== undefined && params.mcp_service_ids.length > 0) {
+        postBody.mcp_service_ids = params.mcp_service_ids;
       }
       
       await fetchEventSource(url, {

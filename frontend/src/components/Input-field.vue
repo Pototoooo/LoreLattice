@@ -17,6 +17,9 @@ const uiStore = useUIStore();
 let query = ref("");
 const showKbSelector = ref(false);
 const atButtonRef = ref<HTMLElement>();
+const showAgentModeSelector = ref(false);
+const agentModeButtonRef = ref<HTMLElement>();
+const agentModeDropdownStyle = ref<Record<string, string>>({});
 
 const props = defineProps({
   isReplying: {
@@ -34,6 +37,7 @@ const props = defineProps({
 });
 
 const isAgentEnabled = computed(() => settingsStore.isAgentEnabled);
+const isWebSearchEnabled = computed(() => settingsStore.isWebSearchEnabled);
 const selectedKbIds = computed(() => settingsStore.settings.selectedKnowledgeBases || []);
 
 // 获取已选择的知识库信息
@@ -193,6 +197,11 @@ const closeModelSelector = () => {
   showModelSelector.value = false;
 };
 
+// 关闭 Agent 模式选择器（点击外部）
+const closeAgentModeSelector = () => {
+  showAgentModeSelector.value = false;
+};
+
 onMounted(() => {
   loadKnowledgeBases();
   
@@ -211,16 +220,21 @@ onMounted(() => {
 
   // 监听点击外部关闭下拉菜单
   document.addEventListener('click', closeModelSelector);
+  document.addEventListener('click', closeAgentModeSelector);
   // 监听窗口大小变化，重新计算位置
   window.addEventListener('resize', () => {
     if (showModelSelector.value) {
       updateModelDropdownPosition();
+    }
+    if (showAgentModeSelector.value) {
+      updateAgentModeDropdownPosition();
     }
   });
 });
 
 onUnmounted(() => {
   document.removeEventListener('click', closeModelSelector);
+  document.removeEventListener('click', closeAgentModeSelector);
 });
 
 // 监听路由变化
@@ -317,6 +331,51 @@ const updateModelDropdownPosition = () => {
   };
 };
 
+// 计算 Agent 模式下拉菜单位置
+const updateAgentModeDropdownPosition = () => {
+  const anchor = agentModeButtonRef.value;
+  
+  if (!anchor) {
+    agentModeDropdownStyle.value = {
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)'
+    };
+    return;
+  }
+
+  const rect = anchor.getBoundingClientRect();
+  const dropdownWidth = 200;
+  const offsetY = 8;
+  
+  // 计算位置：默认在按钮下方
+  let top = rect.bottom + offsetY;
+  let left = rect.left;
+  
+  // 检查右侧边界
+  if (left + dropdownWidth > window.innerWidth) {
+    left = window.innerWidth - dropdownWidth - 10;
+  }
+  
+  // 检查下方空间
+  const dropdownMaxHeight = 150;
+  if (top + dropdownMaxHeight > window.innerHeight) {
+    // 如果下方空间不足，显示在按钮上方
+    top = rect.top - dropdownMaxHeight - offsetY;
+    if (top < 10) {
+      top = 10;
+    }
+  }
+  
+  agentModeDropdownStyle.value = {
+    position: 'fixed',
+    top: `${Math.round(top)}px`,
+    left: `${Math.round(left)}px`,
+    width: `${dropdownWidth}px`
+  };
+};
+
 const toggleModelSelector = () => {
   showModelSelector.value = !showModelSelector.value;
   if (showModelSelector.value) {
@@ -324,6 +383,36 @@ const toggleModelSelector = () => {
       updateModelDropdownPosition();
     });
   }
+}
+
+const toggleAgentModeSelector = () => {
+  // 如果 Agent 未就绪，显示提示
+  if (!settingsStore.isAgentReady && !isAgentEnabled.value) {
+    toggleAgentMode();
+    return;
+  }
+  
+  showAgentModeSelector.value = !showAgentModeSelector.value;
+  if (showAgentModeSelector.value) {
+    nextTick(() => {
+      updateAgentModeDropdownPosition();
+    });
+  }
+}
+
+const selectAgentMode = (mode: 'normal' | 'agent') => {
+  if (mode === 'agent' && !settingsStore.isAgentReady) {
+    toggleAgentMode();
+    showAgentModeSelector.value = false;
+    return;
+  }
+  
+  const shouldEnableAgent = mode === 'agent';
+  if (shouldEnableAgent !== isAgentEnabled.value) {
+    settingsStore.toggleAgent(shouldEnableAgent);
+    MessagePlugin.success(shouldEnableAgent ? '已切换到 Agent 模式' : '已切换到普通模式');
+  }
+  showAgentModeSelector.value = false;
 }
 
 const clearvalue = () => {
@@ -389,6 +478,13 @@ const toggleAgentMode = () => {
   MessagePlugin.success(message);
 }
 
+const toggleWebSearch = () => {
+  const currentValue = settingsStore.isWebSearchEnabled;
+  const newValue = !currentValue;
+  settingsStore.toggleWebSearch(newValue);
+  MessagePlugin.success(newValue ? '网络搜索已开启' : '网络搜索已关闭');
+}
+
 const toggleKbSelector = () => {
   showKbSelector.value = !showKbSelector.value;
 }
@@ -437,41 +533,142 @@ onBeforeRouteUpdate((to, from, next) => {
     <div class="control-bar">
       <!-- 左侧控制按钮 -->
       <div class="control-left">
-        <!-- Agent 模式按钮 -->
-        <t-tooltip 
-          placement="top"
-          :show-arrow="true"
-          :duration="0"
+        <!-- Agent 模式切换按钮 -->
+        <div 
+          ref="agentModeButtonRef"
+          class="control-btn agent-mode-btn"
+          :class="{ 
+            'active': isAgentEnabled,
+            'agent-active': isAgentEnabled
+          }"
+          @click.stop="toggleAgentModeSelector"
         >
-          <template #content>
-            <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
-              <span>
-                {{ isAgentEnabled ? 'Agent 模式（已启用）' : (settingsStore.isAgentReady ? 'Agent 模式（已禁用，点击启用）' : 'Agent 未就绪，请先完成配置') }}
-              </span>
-              <a 
-                href="#"
-                @click.prevent="handleGoToAgentSettings"
-                style="color: #07C05F; text-decoration: none; font-size: 12px; cursor: pointer;"
-                @mouseenter="(e) => e.target.style.textDecoration = 'underline'"
-                @mouseleave="(e) => e.target.style.textDecoration = 'none'"
-              >
-                去设置 Agent →
-              </a>
-            </div>
-          </template>
-          <div 
-            class="control-btn agent-btn"
-            :class="{ 
-              'active': isAgentEnabled,
-              'disabled': !isAgentEnabled && !settingsStore.isAgentReady
-            }"
-            @click="toggleAgentMode"
+          <img 
+            v-if="isAgentEnabled"
+            :src="getImgSrc('agent-active.svg')" 
+            alt="Agent模式" 
+            class="control-icon agent-icon"
+          />
+          <svg 
+            v-else
+            width="18" 
+            height="18" 
+            viewBox="0 0 16 16" 
+            fill="currentColor"
+            class="control-icon normal-mode-icon"
           >
-            <img 
-              :src="isAgentEnabled ? getImgSrc('agent-active.svg') : getImgSrc('agent.svg')" 
-              alt="Agent" 
-              class="control-icon"
-            />
+            <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM1.5 8a6.5 6.5 0 1 1 13 0 6.5 6.5 0 0 1-13 0z"/>
+            <path d="M8 4.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM6 8a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+          </svg>
+          <span class="agent-mode-text">
+            {{ isAgentEnabled ? 'Agent 模式' : '普通模式' }}
+          </span>
+          <svg 
+            width="12" 
+            height="12" 
+            viewBox="0 0 12 12" 
+            fill="currentColor"
+            class="dropdown-arrow"
+            :class="{ 'rotate': showAgentModeSelector }"
+          >
+            <path d="M2.5 4.5L6 8L9.5 4.5H2.5Z"/>
+          </svg>
+        </div>
+
+        <!-- Agent 模式选择下拉菜单 -->
+        <Teleport to="body">
+          <div v-if="showAgentModeSelector" class="agent-mode-selector-overlay" @click="closeAgentModeSelector">
+            <div 
+              class="agent-mode-selector-dropdown"
+              :style="agentModeDropdownStyle"
+              @click.stop
+            >
+              <div 
+                class="agent-mode-option"
+                :class="{ 'selected': !isAgentEnabled }"
+                @click="selectAgentMode('normal')"
+              >
+                <div class="agent-mode-option-main">
+                  <span class="agent-mode-option-name">普通模式</span>
+                  <span class="agent-mode-option-desc">基于知识库的 RAG 问答</span>
+                </div>
+                <svg 
+                  v-if="!isAgentEnabled"
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 16 16" 
+                  fill="currentColor"
+                  class="check-icon"
+                >
+                  <path d="M13.5 4.5L6 12L2.5 8.5L3.5 7.5L6 10L12.5 3.5L13.5 4.5Z"/>
+                </svg>
+              </div>
+              <div 
+                class="agent-mode-option"
+                :class="{ 
+                  'selected': isAgentEnabled,
+                  'disabled': !settingsStore.isAgentReady && !isAgentEnabled 
+                }"
+                @click="selectAgentMode('agent')"
+              >
+                <div class="agent-mode-option-main">
+                  <span class="agent-mode-option-name">Agent 模式</span>
+                  <span class="agent-mode-option-desc">ReAct 推理框架，多步思考</span>
+                </div>
+                <svg 
+                  v-if="isAgentEnabled"
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 16 16" 
+                  fill="currentColor"
+                  class="check-icon"
+                >
+                  <path d="M13.5 4.5L6 12L2.5 8.5L3.5 7.5L6 10L12.5 3.5L13.5 4.5Z"/>
+                </svg>
+                <div v-if="!settingsStore.isAgentReady && !isAgentEnabled" class="agent-mode-warning">
+                  <t-tooltip content="Agent 未就绪，请先在设置中完成配置" placement="left">
+                    <t-icon name="error-circle" class="warning-icon" />
+                  </t-tooltip>
+                </div>
+              </div>
+              <div v-if="!settingsStore.isAgentReady && !isAgentEnabled" class="agent-mode-footer">
+                <a 
+                  href="#"
+                  @click.prevent="handleGoToAgentSettings"
+                  class="agent-mode-link"
+                >
+                  前往设置 →
+                </a>
+              </div>
+            </div>
+          </div>
+        </Teleport>
+
+        <!-- WebSearch 开关按钮 -->
+        <t-tooltip 
+          :content="isWebSearchEnabled ? '关闭网络搜索' : '开启网络搜索'"
+          placement="top"
+        >
+          <div 
+            class="control-btn websearch-btn"
+            :class="{ 'active': isWebSearchEnabled }"
+            @click.stop="toggleWebSearch"
+          >
+            <svg 
+              width="18" 
+              height="18" 
+              viewBox="0 0 18 18" 
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              class="control-icon websearch-icon"
+              :class="{ 'active': isWebSearchEnabled }"
+            >
+              <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.2" fill="none"/>
+              <path d="M 9 2 A 3.5 7 0 0 0 9 16" stroke="currentColor" stroke-width="1.2" fill="none"/>
+              <path d="M 9 2 A 3.5 7 0 0 1 9 16" stroke="currentColor" stroke-width="1.2" fill="none"/>
+              <line x1="2.94" y1="5.5" x2="15.06" y2="5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              <line x1="2.94" y1="12.5" x2="15.06" y2="12.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
           </div>
         </t-tooltip>
 
@@ -719,28 +916,74 @@ const getImgSrc = (url: string) => {
   }
 }
 
-.agent-btn {
-  width: 28px;
+.agent-mode-btn {
   height: 28px;
-  padding: 0;
-
-  &.active {
-    background: rgba(7, 192, 95, 0.1);
+  padding: 0 10px;
+  min-width: auto;
+  font-weight: 500;
+  border: 1.5px solid transparent;
+  transition: all 0.2s ease;
+  position: relative;
+  
+  &.active,
+  &.agent-active {
+    background: linear-gradient(135deg, rgba(7, 192, 95, 0.15) 0%, rgba(7, 192, 95, 0.1) 100%);
+    border-color: rgba(7, 192, 95, 0.4);
+    box-shadow: 0 2px 6px rgba(7, 192, 95, 0.12);
+    
+    .agent-mode-text {
+      color: #07C05F;
+      font-weight: 600;
+    }
+    
+    .agent-icon {
+      filter: brightness(0) saturate(100%) invert(58%) sepia(87%) saturate(1234%) hue-rotate(95deg) brightness(98%) contrast(89%);
+    }
+    
+    .dropdown-arrow {
+      color: #07C05F;
+    }
     
     &:hover {
-      background: rgba(7, 192, 95, 0.15);
+      background: linear-gradient(135deg, rgba(7, 192, 95, 0.2) 0%, rgba(7, 192, 95, 0.15) 100%);
+      border-color: rgba(7, 192, 95, 0.6);
+      box-shadow: 0 3px 10px rgba(7, 192, 95, 0.2);
+      transform: translateY(-1px);
     }
   }
-
-  &.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  
+  &:not(.agent-active) {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: #e0e0e0;
+    
+    .agent-mode-text {
+      color: #666;
+    }
+    
+    .normal-mode-icon {
+      color: #666;
+    }
     
     &:hover {
-      background: #f5f5f5;
-      transform: none;
+      background: rgba(255, 255, 255, 1);
+      border-color: #b0b0b0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     }
   }
+}
+
+.agent-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.agent-mode-text {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+  white-space: nowrap;
+  margin: 0 4px;
 }
 
 .control-icon {
@@ -773,6 +1016,48 @@ const getImgSrc = (url: string) => {
 
 .kb-btn.active .kb-btn-text {
   color: #07C05F;
+}
+
+.websearch-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  min-width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &.active {
+    background: rgba(7, 192, 95, 0.1);
+    
+    .websearch-icon {
+      color: #07C05F;
+    }
+    
+    &:hover {
+      background: rgba(7, 192, 95, 0.15);
+    }
+  }
+  
+  &:not(.active) {
+    .websearch-icon {
+      color: #666;
+    }
+    
+    &:hover {
+      background: #f0f0f0;
+      
+      .websearch-icon {
+        color: #333;
+      }
+    }
+  }
+}
+
+.websearch-icon {
+  width: 18px;
+  height: 18px;
+  transition: all 0.2s ease;
 }
 
 .dropdown-arrow {
@@ -1124,4 +1409,131 @@ const getImgSrc = (url: string) => {
   background: rgba(82, 196, 26, 0.1);
   color: #52c41a;
 }
+
+/* Agent 模式选择下拉菜单 */
+.agent-mode-selector-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+}
+
+.agent-mode-selector-dropdown {
+  z-index: 9999;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(7, 192, 95, 0.08);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  padding: 4px;
+  min-width: 200px;
+}
+
+.agent-mode-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  position: relative;
+  margin: 2px 0;
+  
+  &:hover:not(.disabled) {
+    background: rgba(7, 192, 95, 0.1);
+    transform: translateX(2px);
+  }
+  
+  &:active:not(.disabled) {
+    transform: translateX(1px);
+  }
+  
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    
+    &:hover {
+      background: transparent;
+      transform: none;
+    }
+  }
+  
+  // 选中状态的选项有更明显的背景
+  &.selected {
+    background: rgba(7, 192, 95, 0.06);
+    
+    .agent-mode-option-name {
+      color: #07C05F;
+      font-weight: 700;
+    }
+  }
+}
+
+.agent-mode-option-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.agent-mode-option-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.4;
+  transition: color 0.2s ease;
+}
+
+.agent-mode-option-desc {
+  font-size: 12px;
+  color: #999;
+  line-height: 1.3;
+}
+
+.check-icon {
+  width: 16px;
+  height: 16px;
+  color: #07C05F;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.agent-mode-warning {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  
+  .warning-icon {
+    color: #ff9800;
+    font-size: 16px;
+  }
+}
+
+.agent-mode-footer {
+  padding: 8px 12px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 4px;
+}
+
+.agent-mode-link {
+  color: #07C05F;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    color: #00a651;
+    text-decoration: underline;
+  }
+}
 </style>
+
+

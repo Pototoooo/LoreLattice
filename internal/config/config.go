@@ -24,6 +24,7 @@ type Config struct {
 	StreamManager  *StreamManagerConfig  `yaml:"stream_manager" json:"stream_manager"`
 	ExtractManager *ExtractManagerConfig `yaml:"extract" json:"extract"`
 	Agent          *AgentGlobalConfig    `yaml:"agent" json:"agent"`
+	WebSearch      *WebSearchConfig      `yaml:"web_search" json:"web_search"`
 }
 
 type DocReaderConfig struct {
@@ -197,4 +198,30 @@ type AgentGlobalConfig struct {
 	DefaultTemperature   float64  `yaml:"default_temperature" json:"default_temperature"`
 	ReflectionEnabled    bool     `yaml:"reflection_enabled" json:"reflection_enabled"`
 	DefaultTools         []string `yaml:"default_tools" json:"default_tools"`
+}
+
+// WebSearchConfig represents the web search configuration
+type WebSearchConfig struct {
+	Providers []WebSearchProviderConfig `yaml:"providers" json:"providers"`
+	Default   WebSearchDefaultConfig    `yaml:"default" json:"default"`
+	Timeout   int                       `yaml:"timeout" json:"timeout"` // 超时时间（秒）
+}
+
+// WebSearchProviderConfig represents configuration for a web search provider
+type WebSearchProviderConfig struct {
+	ID             string `yaml:"id" json:"id"`
+	Name           string `yaml:"name" json:"name"`
+	Free           bool   `yaml:"free" json:"free"`
+	RequiresAPIKey bool   `yaml:"requires_api_key" json:"requires_api_key"`
+	Description    string `yaml:"description,omitempty" json:"description,omitempty"`
+	APIURL         string `yaml:"api_url,omitempty" json:"api_url,omitempty"`
+}
+
+// WebSearchDefaultConfig represents the default web search configuration
+type WebSearchDefaultConfig struct {
+	Provider          string   `yaml:"provider" json:"provider"`
+	MaxResults        int      `yaml:"max_results" json:"max_results"`
+	IncludeDate       bool     `yaml:"include_date" json:"include_date"`
+	CompressionMethod string   `yaml:"compression_method" json:"compression_method"`
+	Blacklist         []string `yaml:"blacklist" json:"blacklist"`
 }

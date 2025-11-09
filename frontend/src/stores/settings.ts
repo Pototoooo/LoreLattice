@@ -10,6 +10,7 @@ interface Settings {
   selectedKnowledgeBases: string[];  // 当前选中的知识库ID列表
   modelConfig: ModelConfig;  // 模型配置
   ollamaConfig: OllamaConfig;  // Ollama配置
+  webSearchEnabled: boolean;  // 网络搜索是否启用
 }
 
 // Agent 配置接口
@@ -71,7 +72,8 @@ const defaultSettings: Settings = {
   ollamaConfig: {
     baseUrl: "http://localhost:11434",
     enabled: true
-  }
+  },
+  webSearchEnabled: false  // 默认关闭网络搜索
 };
 
 export const useSettingsStore = defineStore("settings", {
@@ -97,6 +99,9 @@ export const useSettingsStore = defineStore("settings", {
     
     // 获取模型配置
     modelConfig: (state) => state.settings.modelConfig || defaultSettings.modelConfig,
+    
+    // 网络搜索是否启用
+    isWebSearchEnabled: (state) => state.settings.webSearchEnabled || false,
   },
 
   actions: {
@@ -224,7 +229,7 @@ export const useSettingsStore = defineStore("settings", {
     // 移除单个知识库
     removeKnowledgeBase(kbId: string) {
       this.settings.selectedKnowledgeBases = 
-        this.settings.selectedKnowledgeBases.filter(id => id !== kbId);
+        this.settings.selectedKnowledgeBases.filter((id: string) => id !== kbId);
       localStorage.setItem("WeKnora_settings", JSON.stringify(this.settings));
     },
     
@@ -237,6 +242,12 @@ export const useSettingsStore = defineStore("settings", {
     // 获取选中的知识库列表
     getSelectedKnowledgeBases(): string[] {
       return this.settings.selectedKnowledgeBases || [];
+    },
+    
+    // 启用/禁用网络搜索
+    toggleWebSearch(enabled: boolean) {
+      this.settings.webSearchEnabled = enabled;
+      localStorage.setItem("WeKnora_settings", JSON.stringify(this.settings));
     },
   },
 }); 

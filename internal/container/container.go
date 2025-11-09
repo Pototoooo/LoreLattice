@@ -119,6 +119,13 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	// Session service (depends on agent service)
 	must(container.Provide(service.NewSessionService))
 
+	// Web search service
+	must(container.Provide(service.NewWebSearchService))
+	// Register WebSearchService as interface for dependency injection
+	must(container.Provide(func(ws *service.WebSearchService) interfaces.WebSearchService {
+		return ws
+	}))
+
 	// Chat pipeline components for processing chat requests
 	must(container.Provide(chatpipline.NewEventManager))
 	must(container.Invoke(chatpipline.NewPluginTracing))
@@ -148,6 +155,7 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(handler.NewAuthHandler))
 	must(container.Provide(handler.NewSystemHandler))
 	must(container.Provide(handler.NewMCPServiceHandler))
+	must(container.Provide(handler.NewWebSearchHandler))
 
 	// Router configuration
 	must(container.Provide(router.NewRouter))

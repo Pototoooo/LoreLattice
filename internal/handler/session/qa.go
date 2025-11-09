@@ -118,7 +118,7 @@ func (h *Handler) KnowledgeQA(c *gin.Context) {
 	}
 
 	// Use shared function to handle KnowledgeQA request
-	h.handleKnowledgeQARequest(ctx, c, session, request.Query, knowledgeBaseIDs, assistantMessage, true, request.SummaryModelID)
+	h.handleKnowledgeQARequest(ctx, c, session, request.Query, knowledgeBaseIDs, assistantMessage, true, request.SummaryModelID, request.WebSearchEnabled)
 }
 
 // AgentQA handles agent-based question answering with conversation history and streaming
@@ -256,7 +256,7 @@ func (h *Handler) AgentQA(c *gin.Context) {
 		logger.Infof(ctx, "Delegating to KnowledgeQA with knowledge bases: %v", knowledgeBaseIDs)
 
 		// Use shared function to handle KnowledgeQA request (no title generation for AgentQA fallback)
-		h.handleKnowledgeQARequest(ctx, c, session, request.Query, knowledgeBaseIDs, assistantMessage, false, request.SummaryModelID)
+		h.handleKnowledgeQARequest(ctx, c, session, request.Query, knowledgeBaseIDs, assistantMessage, false, request.SummaryModelID, request.WebSearchEnabled)
 		return
 	}
 
@@ -353,6 +353,7 @@ func (h *Handler) handleKnowledgeQARequest(
 	assistantMessage *types.Message,
 	generateTitle bool, // Whether to generate title if session has no title
 	summaryModelID string, // Optional summary model ID (overrides session default)
+	webSearchEnabled bool, // Whether web search is enabled
 ) {
 	sessionID := session.ID
 	requestID := getRequestID(c)
@@ -421,7 +422,7 @@ func (h *Handler) handleKnowledgeQARequest(
 				logger.ErrorWithFields(asyncCtx, errors.NewInternalServerError("Knowledge QA service panicked"), nil)
 			}
 		}()
-		err := h.sessionService.KnowledgeQA(asyncCtx, session, query, knowledgeBaseIDs, assistantMessage.ID, summaryModelID, eventBus)
+		err := h.sessionService.KnowledgeQA(asyncCtx, session, query, knowledgeBaseIDs, assistantMessage.ID, summaryModelID, webSearchEnabled, eventBus)
 		if err != nil {
 			logger.ErrorWithFields(asyncCtx, err, nil)
 			// Emit error event to dedicated EventBus

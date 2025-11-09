@@ -269,6 +269,9 @@ const sendMsg = async (value, modelId = '') => {
     // Get agent mode status from settings store
     const agentEnabled = useSettingsStoreInstance.isAgentEnabled;
     
+    // Get web search status from settings store
+    const webSearchEnabled = useSettingsStoreInstance.isWebSearchEnabled;
+    
     // Get knowledge_base_ids from settings store (selected by user via KnowledgeBaseSelector)
     const kbIds = useSettingsStoreInstance.settings.selectedKnowledgeBases || [];
     
@@ -294,6 +297,7 @@ const sendMsg = async (value, modelId = '') => {
         session_id: session_id.value, 
         knowledge_base_ids: kbIds,
         agent_enabled: agentEnabled,
+        web_search_enabled: webSearchEnabled,
         summary_model_id: modelId,
         mcp_service_ids: mcpServiceIds,
         query: value, 

@@ -26,7 +26,23 @@
                     }]"
                     @click="handleNavClick(item)"
                   >
-                    <t-icon :name="item.icon" class="nav-icon" />
+                    <!-- 网络搜索使用自定义 SVG 图标 -->
+                    <svg 
+                      v-if="item.key === 'websearch'"
+                      width="18" 
+                      height="18" 
+                      viewBox="0 0 18 18" 
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="nav-icon"
+                    >
+                      <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                      <path d="M 9 2 A 3.5 7 0 0 0 9 16" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                      <path d="M 9 2 A 3.5 7 0 0 1 9 16" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                      <line x1="2.94" y1="5.5" x2="15.06" y2="5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                      <line x1="2.94" y1="12.5" x2="15.06" y2="12.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                    </svg>
+                    <t-icon v-else :name="item.icon" class="nav-icon" />
                     <span class="nav-label">{{ item.label }}</span>
                     <t-icon 
                       v-if="item.children && item.children.length > 0"
@@ -78,6 +94,11 @@
                   <AgentSettings />
                 </div>
 
+                <!-- 网络搜索配置 -->
+                <div v-if="currentSection === 'websearch'" class="section">
+                  <WebSearchSettings />
+                </div>
+
                 <!-- 系统信息 -->
                 <div v-if="currentSection === 'system'" class="section">
                   <SystemInfo />
@@ -118,6 +139,7 @@ import GeneralSettings from './GeneralSettings.vue'
 import ModelSettings from './ModelSettings.vue'
 import OllamaSettings from './OllamaSettings.vue'
 import McpSettings from './McpSettings.vue'
+import WebSearchSettings from './WebSearchSettings.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -142,6 +164,7 @@ const navItems = [
   },
   { key: 'ollama', icon: 'server', label: 'Ollama' },
   { key: 'agent', icon: 'chat', label: 'Agent 配置' },
+  { key: 'websearch', icon: 'search', label: '网络搜索' },
   { key: 'mcp', icon: 'link', label: 'MCP 服务' },
   { key: 'system', icon: 'info-circle', label: '系统信息' },
   { key: 'tenant', icon: 'user-circle', label: '租户信息' },

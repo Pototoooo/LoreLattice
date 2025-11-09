@@ -37,6 +37,10 @@ type ChatManage struct {
 	// Event system for streaming responses
 	EventBus  EventBusInterface `json:"-"` // EventBus for emitting streaming events
 	MessageID string            `json:"-"` // Assistant message ID for event emission
+
+	// Web search configuration (internal use)
+	TenantID         uint `json:"-"` // Tenant ID for retrieving web search config
+	WebSearchEnabled bool `json:"-"` // Whether web search is enabled for this request
 }
 
 // Clone creates a deep copy of the ChatManage object

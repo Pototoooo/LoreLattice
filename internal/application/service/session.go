@@ -400,8 +400,8 @@ func (s *sessionService) GenerateTitleAsync(ctx context.Context, session *types.
 
 // KnowledgeQA performs knowledge base question answering with LLM summarization
 // Events are emitted through eventBus (references, answer chunks, completion)
-func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session, query string, knowledgeBaseIDs []string, assistantMessageID string, summaryModelID string, eventBus *event.EventBus) error {
-	logger.Infof(ctx, "Knowledge base question answering parameters, session ID: %s, query: %s", session.ID, query)
+func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session, query string, knowledgeBaseIDs []string, assistantMessageID string, summaryModelID string, webSearchEnabled bool, eventBus *event.EventBus) error {
+	logger.Infof(ctx, "Knowledge base question answering parameters, session ID: %s, query: %s, webSearchEnabled: %v", session.ID, query, webSearchEnabled)
 
 	// If no knowledge base IDs provided, fall back to session's default
 	if len(knowledgeBaseIDs) == 0 {
@@ -455,6 +455,11 @@ func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session
 		FallbackResponse: session.FallbackResponse,
 		EventBus:         eventBus.AsEventBusInterface(), // NEW: For pipeline to emit events directly
 	}
+
+	// Store web search configuration in chatManage for pipeline processing
+	// PluginSearch will handle web search integration
+	chatManage.TenantID = session.TenantID
+	chatManage.WebSearchEnabled = webSearchEnabled
 
 	// Start knowledge QA event processing
 	logger.Info(ctx, "Triggering knowledge base question answering event")

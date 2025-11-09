@@ -613,3 +613,66 @@ agent:
     - get_related_chunks
     - query_knowledge_graph
     - get_document_info
+
+# WebSearch 配置
+web_search:
+  # 可用搜索引擎列表
+  providers:
+    - id: "kuaisou"
+      name: "快搜"
+      free: false
+      requires_api_key: true
+      description: "高性能实时网页搜索"
+      api_url: "https://platform.kuaisou.com/api/v1/search"
+    - id: "google"
+      name: "Google"
+      free: true
+      requires_api_key: false
+      description: "Google搜索（免费）"
+      api_url: "https://www.googleapis.com/customsearch/v1"
+    - id: "baidu"
+      name: "百度"
+      free: true
+      requires_api_key: false
+      description: "百度搜索（免费）"
+    - id: "bing"
+      name: "Bing"
+      free: true
+      requires_api_key: false
+      description: "Bing搜索（免费）"
+    - id: "bocha"
+      name: "博查"
+      free: false
+      requires_api_key: true
+      description: "专为AI应用设计的搜索API"
+    - id: "zhipu"
+      name: "智谱"
+      free: false
+      requires_api_key: true
+      description: "智谱搜索API"
+    - id: "tavily"
+      name: "Tavily"
+      free: false
+      requires_api_key: true
+      description: "Tavily AI搜索API"
+    - id: "searxng"
+      name: "Searxng"
+      free: true
+      requires_api_key: false
+      description: "Searxng开源元搜索引擎"
+    - id: "exa"
+      name: "Exa"
+      free: false
+      requires_api_key: true
+      description: "Exa AI搜索API"
+  
+  # 默认配置
+  default:
+    provider: "kuaisou"
+    max_results: 5
+    include_date: true
+    compression_method: "none"
+    blacklist: []
+  
+  # 全局超时设置
+  timeout: 10

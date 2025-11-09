@@ -410,3 +410,145 @@ func (h *TenantHandler) UpdateTenantAgentConfig(c *gin.Context) {
 		"message": "Agent configuration updated successfully",
 	})
 }
+
+// GetTenantWebSearchConfig returns the web search configuration for a tenant
+// Tenant ID is obtained from the authentication context
+func (h *TenantHandler) GetTenantWebSearchConfig(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	logger.Info(ctx, "Start getting tenant web search config")
+
+	// Get tenant ID from authentication context
+	tenantID := c.GetUint(types.TenantIDContextKey.String())
+	if tenantID == 0 {
+		logger.Error(ctx, "Tenant ID is empty")
+		c.Error(errors.NewBadRequestError("Tenant ID cannot be empty"))
+		return
+	}
+
+	// Get tenant
+	tenant, err := h.service.GetTenantByID(ctx, tenantID)
+	if err != nil {
+		if appErr, ok := errors.IsAppError(err); ok {
+			logger.Error(ctx, "Failed to retrieve tenant: application error", appErr)
+			c.Error(appErr)
+		} else {
+			logger.ErrorWithFields(ctx, err, nil)
+			c.Error(errors.NewInternalServerError("Failed to retrieve tenant").WithDetails(err.Error()))
+		}
+		return
+	}
+
+	// Hide API key in response
+	var responseConfig *types.WebSearchConfig
+	if tenant.WebSearchConfig != nil {
+		responseConfig = &types.WebSearchConfig{
+			Provider:           tenant.WebSearchConfig.Provider,
+			APIKey:             "", // Hide API key
+			MaxResults:         tenant.WebSearchConfig.MaxResults,
+			IncludeDate:        tenant.WebSearchConfig.IncludeDate,
+			CompressionMethod:  tenant.WebSearchConfig.CompressionMethod,
+			Blacklist:          tenant.WebSearchConfig.Blacklist,
+			EmbeddingModelID:   tenant.WebSearchConfig.EmbeddingModelID,
+			EmbeddingDimension: tenant.WebSearchConfig.EmbeddingDimension,
+			RerankModelID:      tenant.WebSearchConfig.RerankModelID,
+			DocumentFragments:  tenant.WebSearchConfig.DocumentFragments,
+		}
+		// If API key exists, show a masked version
+		if tenant.WebSearchConfig.APIKey != "" {
+			responseConfig.APIKey = "***" // Masked API key
+		}
+	}
+
+	logger.Infof(ctx, "Tenant web search config retrieved successfully, Tenant ID: %d", tenantID)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    responseConfig,
+	})
+}
+
+// UpdateTenantWebSearchConfig updates the web search configuration for a tenant
+// Tenant ID is obtained from the authentication context
+func (h *TenantHandler) UpdateTenantWebSearchConfig(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	logger.Info(ctx, "Start updating tenant web search config")
+
+	// Get tenant ID from authentication context
+	tenantID := c.GetUint(types.TenantIDContextKey.String())
+	if tenantID == 0 {
+		logger.Error(ctx, "Tenant ID is empty")
+		c.Error(errors.NewBadRequestError("Tenant ID cannot be empty"))
+		return
+	}
+
+	var req types.WebSearchConfig
+	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Error(ctx, "Failed to parse request parameters", err)
+		c.Error(errors.NewValidationError("Invalid request data").WithDetails(err.Error()))
+		return
+	}
+
+	// Validate configuration
+	if req.MaxResults < 1 || req.MaxResults > 50 {
+		c.Error(errors.NewBadRequestError("max_results must be between 1 and 50"))
+		return
+	}
+
+	// Get existing tenant
+	tenant, err := h.service.GetTenantByID(ctx, tenantID)
+	if err != nil {
+		if appErr, ok := errors.IsAppError(err); ok {
+			logger.Error(ctx, "Failed to retrieve tenant: application error", appErr)
+			c.Error(appErr)
+		} else {
+			logger.ErrorWithFields(ctx, err, nil)
+			c.Error(errors.NewInternalServerError("Failed to retrieve tenant").WithDetails(err.Error()))
+		}
+		return
+	}
+
+	// Update web search configuration
+	// If API key is "***", keep the existing API key
+	if req.APIKey == "***" && tenant.WebSearchConfig != nil {
+		req.APIKey = tenant.WebSearchConfig.APIKey
+	}
+
+	tenant.WebSearchConfig = &req
+
+	updatedTenant, err := h.service.UpdateTenant(ctx, tenant)
+	if err != nil {
+		if appErr, ok := errors.IsAppError(err); ok {
+			logger.Error(ctx, "Failed to update tenant: application error", appErr)
+			c.Error(appErr)
+		} else {
+			logger.ErrorWithFields(ctx, err, nil)
+			c.Error(errors.NewInternalServerError("Failed to update tenant web search config").WithDetails(err.Error()))
+		}
+		return
+	}
+
+	// Hide API key in response
+	responseConfig := &types.WebSearchConfig{
+		Provider:           updatedTenant.WebSearchConfig.Provider,
+		APIKey:             "", // Hide API key
+		MaxResults:         updatedTenant.WebSearchConfig.MaxResults,
+		IncludeDate:        updatedTenant.WebSearchConfig.IncludeDate,
+		CompressionMethod:  updatedTenant.WebSearchConfig.CompressionMethod,
+		Blacklist:          updatedTenant.WebSearchConfig.Blacklist,
+		EmbeddingModelID:   updatedTenant.WebSearchConfig.EmbeddingModelID,
+		EmbeddingDimension: updatedTenant.WebSearchConfig.EmbeddingDimension,
+		RerankModelID:      updatedTenant.WebSearchConfig.RerankModelID,
+		DocumentFragments:  updatedTenant.WebSearchConfig.DocumentFragments,
+	}
+	if updatedTenant.WebSearchConfig.APIKey != "" {
+		responseConfig.APIKey = "***" // Masked API key
+	}
+
+	logger.Infof(ctx, "Tenant web search config updated successfully, Tenant ID: %d", tenantID)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    responseConfig,
+		"message": "Web search configuration updated successfully",
+	})
+}

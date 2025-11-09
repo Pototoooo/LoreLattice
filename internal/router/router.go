@@ -40,6 +40,7 @@ type RouterParams struct {
 	InitializationHandler *handler.InitializationHandler
 	SystemHandler         *handler.SystemHandler
 	MCPServiceHandler     *handler.MCPServiceHandler
+	WebSearchHandler      *handler.WebSearchHandler
 }
 
 // NewRouter 创建新的路由
@@ -87,6 +88,7 @@ func NewRouter(params RouterParams) *gin.Engine {
 		RegisterInitializationRoutes(v1, params.InitializationHandler)
 		RegisterSystemRoutes(v1, params.SystemHandler)
 		RegisterMCPServiceRoutes(v1, params.MCPServiceHandler)
+		RegisterWebSearchRoutes(v1, params.WebSearchHandler)
 	}
 
 	return r
@@ -224,6 +226,10 @@ func RegisterTenantRoutes(r *gin.RouterGroup, handler *handler.TenantHandler) {
 		// Tenant ID is obtained from authentication context
 		tenantRoutes.GET("/agent-config", handler.GetTenantAgentConfig)
 		tenantRoutes.PUT("/agent-config", handler.UpdateTenantAgentConfig)
+		// Web search configuration management (tenant-level)
+		// Tenant ID is obtained from authentication context
+		tenantRoutes.GET("/web-search-config", handler.GetTenantWebSearchConfig)
+		tenantRoutes.PUT("/web-search-config", handler.UpdateTenantWebSearchConfig)
 	}
 }
 
@@ -317,5 +323,15 @@ func RegisterMCPServiceRoutes(r *gin.RouterGroup, handler *handler.MCPServiceHan
 		mcpServices.GET("/:id/tools", handler.GetMCPServiceTools)
 		// Get MCP service resources
 		mcpServices.GET("/:id/resources", handler.GetMCPServiceResources)
+	}
+}
+
+// RegisterWebSearchRoutes registers web search routes
+func RegisterWebSearchRoutes(r *gin.RouterGroup, webSearchHandler *handler.WebSearchHandler) {
+	// Web search providers
+	webSearch := r.Group("/web-search")
+	{
+		// Get available providers
+		webSearch.GET("/providers", webSearchHandler.GetProviders)
 	}
 }
