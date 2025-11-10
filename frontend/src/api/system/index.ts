@@ -38,9 +38,9 @@ export function getSystemInfo(): Promise<{ data: SystemInfo }> {
 }
 
 export function getAgentConfig(): Promise<{ data: AgentConfig }> {
-  return get('/api/v1/tenants/agent-config')
+  return get('/api/v1/tenants/kv/agent-config')
 }
 
 export function updateAgentConfig(config: AgentConfig): Promise<{ data: AgentConfig }> {
-  return put('/api/v1/tenants/agent-config', config)
+  return put('/api/v1/tenants/kv/agent-config', config)
 }

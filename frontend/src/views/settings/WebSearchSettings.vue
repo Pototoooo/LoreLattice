@@ -31,11 +31,6 @@
               <div class="provider-option-wrapper">
                 <div class="provider-option">
                   <span class="provider-name">{{ provider.name }}</span>
-                  <div class="provider-tags">
-                    <t-tag v-if="provider.free" size="small" theme="success">免费</t-tag>
-                    <t-tag v-else size="small" theme="warning">付费</t-tag>
-                    <t-tag v-if="provider.requires_api_key" size="small" theme="default">需API密钥</t-tag>
-                  </div>
                 </div>
                 <div v-if="provider.description" class="provider-desc">
                   {{ provider.description }}
@@ -400,6 +395,36 @@ onMounted(async () => {
   color: #999;
   line-height: 1.4;
   margin-top: 2px;
+}
+
+/* 修复下拉项描述与条目重叠：让选项支持多行自适应高度 */
+:deep(.t-select-option) {
+  height: auto;
+  align-items: flex-start;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+:deep(.t-select-option__content) {
+  white-space: normal;
+}
+
+</style>
+<style lang="less">
+.t-select__dropdown .t-select-option {
+  height: auto;
+  align-items: flex-start;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.t-select__dropdown .t-select-option__content {
+  white-space: normal;
+}
+.t-select__dropdown .provider-option-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 2px 0;
 }
 </style>
 

@@ -222,14 +222,10 @@ func RegisterTenantRoutes(r *gin.RouterGroup, handler *handler.TenantHandler) {
 		tenantRoutes.DELETE("/:id", handler.DeleteTenant)
 		tenantRoutes.GET("", handler.ListTenants)
 
-		// Agent configuration management (tenant-level)
+		// Generic KV configuration management (tenant-level)
 		// Tenant ID is obtained from authentication context
-		tenantRoutes.GET("/agent-config", handler.GetTenantAgentConfig)
-		tenantRoutes.PUT("/agent-config", handler.UpdateTenantAgentConfig)
-		// Web search configuration management (tenant-level)
-		// Tenant ID is obtained from authentication context
-		tenantRoutes.GET("/web-search-config", handler.GetTenantWebSearchConfig)
-		tenantRoutes.PUT("/web-search-config", handler.UpdateTenantWebSearchConfig)
+		tenantRoutes.GET("/kv/:key", handler.GetTenantKV)
+		tenantRoutes.PUT("/kv/:key", handler.UpdateTenantKV)
 	}
 }
 

@@ -5,6 +5,12 @@ import (
 	"strings"
 )
 
+const (
+	DefaultAgentTemperature       = 0.7
+	DefaultAgentMaxIterations     = 20
+	DefaultAgentReflectionEnabled = false
+)
+
 // formatFileSize formats file size in human-readable format
 func formatFileSize(size int64) string {
 	const (
@@ -40,6 +46,24 @@ type KnowledgeBaseInfo struct {
 	Description string
 	DocCount    int
 	RecentDocs  []RecentDocInfo // Recently added documents (up to 10)
+}
+
+// PlaceholderDefinition defines a placeholder exposed to UI/configuration
+type PlaceholderDefinition struct {
+	Name        string `json:"name"`
+	Label       string `json:"label"`
+	Description string `json:"description"`
+}
+
+// AvailablePlaceholders lists all supported prompt placeholders for UI hints
+func AvailablePlaceholders() []PlaceholderDefinition {
+	return []PlaceholderDefinition{
+		{
+			Name:        "knowledge_bases",
+			Label:       "知识库列表",
+			Description: "自动格式化为表格形式的知识库列表，包含知识库名称、描述、文档数量、最近添加的文档等信息",
+		},
+	}
 }
 
 // formatKnowledgeBaseList formats knowledge base information for the prompt

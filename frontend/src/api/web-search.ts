@@ -29,13 +29,13 @@ export function getWebSearchProviders() {
   return get('/api/v1/web-search/providers')
 }
 
-// Get tenant web search config
+// Get tenant web search config via KV API
 export function getTenantWebSearchConfig() {
-  return get('/api/v1/tenants/web-search-config')
+  return get('/api/v1/tenants/kv/web-search-config')
 }
 
-// Update tenant web search config
+// Update tenant web search config via KV API
 export function updateTenantWebSearchConfig(config: WebSearchConfig) {
-  return put('/api/v1/tenants/web-search-config', config)
+  return put('/api/v1/tenants/kv/web-search-config', config)
 }
 

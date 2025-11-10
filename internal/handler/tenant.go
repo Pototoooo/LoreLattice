@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/Tencent/WeKnora/internal/agent"
+	agenttools "github.com/Tencent/WeKnora/internal/agent/tools"
 	"github.com/Tencent/WeKnora/internal/errors"
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/types"
@@ -240,45 +241,34 @@ type AgentConfigRequest struct {
 
 // GetTenantAgentConfig retrieves the agent configuration for a tenant
 // This is the global agent configuration that applies to all sessions by default
-// Tenant ID is obtained from the authentication context
 func (h *TenantHandler) GetTenantAgentConfig(c *gin.Context) {
 	ctx := c.Request.Context()
-
 	logger.Info(ctx, "Start retrieving tenant agent config")
 
-	// Get tenant ID from authentication context
-	tenantID := c.GetUint(types.TenantIDContextKey.String())
-	if tenantID == 0 {
-		logger.Error(ctx, "Tenant ID is empty")
-		c.Error(errors.NewBadRequestError("Tenant ID cannot be empty"))
+	tenant := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
+	if tenant == nil {
+		logger.Error(ctx, "Tenant is empty")
+		c.Error(errors.NewBadRequestError("Tenant is empty"))
 		return
 	}
-
-	tenant, err := h.service.GetTenantByID(ctx, tenantID)
-	if err != nil {
-		if appErr, ok := errors.IsAppError(err); ok {
-			logger.Error(ctx, "Failed to retrieve tenant: application error", appErr)
-			c.Error(appErr)
-		} else {
-			logger.ErrorWithFields(ctx, err, nil)
-			c.Error(errors.NewInternalServerError("Failed to retrieve tenant").WithDetails(err.Error()))
-		}
-		return
-	}
-	// 定义所有可用工具及其描述（与 internal/agent/tools 注册的工具对应）
-	availableTools := []gin.H{
-		{"name": "thinking", "label": "思考", "description": "AI 进行深度思考和推理"},
-		{"name": "todo_write", "label": "制定计划", "description": "为复杂任务制定执行计划"},
-		{"name": "knowledge_search", "label": "知识搜索", "description": "在知识库中搜索相关信息"},
-		{"name": "get_related_chunks", "label": "获取相关片段", "description": "查找相关的知识片段"},
-		{"name": "query_knowledge_graph", "label": "查询知识图谱", "description": "从知识图谱中查询关系"},
-		{"name": "get_document_info", "label": "获取文档信息", "description": "查看文档元数据"},
-		{"name": "database_query", "label": "查询数据库", "description": "查询数据库中的信息"},
+	// 从 tools 包集中配置可用工具列表
+	availableTools := make([]gin.H, 0)
+	for _, t := range agenttools.AvailableToolDefinitions() {
+		availableTools = append(availableTools, gin.H{
+			"name":        t.Name,
+			"label":       t.Label,
+			"description": t.Description,
+		})
 	}
 
-	// 定义可用的占位符列表
-	availablePlaceholders := []gin.H{
-		{"name": "knowledge_bases", "label": "知识库列表", "description": "自动格式化为表格形式的知识库列表，包含知识库名称、描述、文档数量、最近添加的文档等信息"},
+	// 从 agent 包获取占位符定义
+	availablePlaceholders := make([]gin.H, 0)
+	for _, p := range agent.AvailablePlaceholders() {
+		availablePlaceholders = append(availablePlaceholders, gin.H{
+			"name":        p.Name,
+			"label":       p.Label,
+			"description": p.Description,
+		})
 	}
 	if tenant.AgentConfig == nil {
 		// Return default config if not set
@@ -287,10 +277,10 @@ func (h *TenantHandler) GetTenantAgentConfig(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
 			"data": gin.H{
-				"max_iterations":         20,
-				"reflection_enabled":     false,
-				"allowed_tools":          []string{"thinking", "todo_write", "knowledge_search", "get_related_chunks", "query_knowledge_graph", "get_document_info", "database_query"},
-				"temperature":            0.7,
+				"max_iterations":         agent.DefaultAgentMaxIterations,
+				"reflection_enabled":     agent.DefaultAgentReflectionEnabled,
+				"allowed_tools":          agenttools.DefaultAllowedTools(),
+				"temperature":            agent.DefaultAgentTemperature,
 				"thinking_model_id":      "",
 				"rerank_model_id":        "",
 				"system_prompt":          agent.DefaultReActSystemPrompt,
@@ -307,7 +297,7 @@ func (h *TenantHandler) GetTenantAgentConfig(c *gin.Context) {
 		systemPrompt = agent.DefaultReActSystemPrompt
 	}
 
-	logger.Infof(ctx, "Retrieved tenant agent config successfully, Tenant ID: %d", tenantID)
+	logger.Infof(ctx, "Retrieved tenant agent config successfully, Tenant ID: %d", tenant.ID)
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"data": gin.H{
@@ -325,22 +315,11 @@ func (h *TenantHandler) GetTenantAgentConfig(c *gin.Context) {
 	})
 }
 
-// UpdateTenantAgentConfig updates the agent configuration for a tenant
+// updateTenantAgentConfigInternal updates the agent configuration for a tenant
 // This sets the global agent configuration for all sessions in this tenant
-// Tenant ID is obtained from the authentication context
-func (h *TenantHandler) UpdateTenantAgentConfig(c *gin.Context) {
+func (h *TenantHandler) updateTenantAgentConfigInternal(c *gin.Context) {
 	ctx := c.Request.Context()
-
 	logger.Info(ctx, "Start updating tenant agent config")
-
-	// Get tenant ID from authentication context
-	tenantID := c.GetUint(types.TenantIDContextKey.String())
-	if tenantID == 0 {
-		logger.Error(ctx, "Tenant ID is empty")
-		c.Error(errors.NewBadRequestError("Tenant ID cannot be empty"))
-		return
-	}
-
 	var req AgentConfigRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		logger.Error(ctx, "Failed to parse request parameters", err)
@@ -367,15 +346,10 @@ func (h *TenantHandler) UpdateTenantAgentConfig(c *gin.Context) {
 	}
 
 	// Get existing tenant
-	tenant, err := h.service.GetTenantByID(ctx, tenantID)
-	if err != nil {
-		if appErr, ok := errors.IsAppError(err); ok {
-			logger.Error(ctx, "Failed to retrieve tenant: application error", appErr)
-			c.Error(appErr)
-		} else {
-			logger.ErrorWithFields(ctx, err, nil)
-			c.Error(errors.NewInternalServerError("Failed to retrieve tenant").WithDetails(err.Error()))
-		}
+	tenant := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
+	if tenant.AgentConfig == nil {
+		logger.Error(ctx, "Tenant has no agent config")
+		c.Error(errors.NewBadRequestError("Tenant has no agent config"))
 		return
 	}
 
@@ -403,7 +377,7 @@ func (h *TenantHandler) UpdateTenantAgentConfig(c *gin.Context) {
 		return
 	}
 
-	logger.Infof(ctx, "Tenant agent config updated successfully, Tenant ID: %d", tenantID)
+	logger.Infof(ctx, "Tenant agent config updated successfully, Tenant ID: %d", tenant.ID)
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"data":    updatedTenant.AgentConfig,
@@ -411,111 +385,74 @@ func (h *TenantHandler) UpdateTenantAgentConfig(c *gin.Context) {
 	})
 }
 
-// GetTenantWebSearchConfig returns the web search configuration for a tenant
-// Tenant ID is obtained from the authentication context
-func (h *TenantHandler) GetTenantWebSearchConfig(c *gin.Context) {
+// GetTenantKV provides a generic KV-style getter for tenant-level configurations
+// Supported keys:
+// - "agent-config": returns tenant.AgentConfig with additional available_* fields
+// - "web-search-config": returns masked tenant.WebSearchConfig (API key masked)
+func (h *TenantHandler) GetTenantKV(c *gin.Context) {
 	ctx := c.Request.Context()
+	key := c.Param("key")
 
-	logger.Info(ctx, "Start getting tenant web search config")
-
-	// Get tenant ID from authentication context
-	tenantID := c.GetUint(types.TenantIDContextKey.String())
-	if tenantID == 0 {
-		logger.Error(ctx, "Tenant ID is empty")
-		c.Error(errors.NewBadRequestError("Tenant ID cannot be empty"))
+	switch key {
+	case "agent-config":
+		h.GetTenantAgentConfig(c)
+		return
+	case "web-search-config":
+		h.GetTenantWebSearchConfig(c)
+		return
+	default:
+		logger.Info(ctx, "KV key not supported", "key", key)
+		c.Error(errors.NewBadRequestError("unsupported key"))
 		return
 	}
-
-	// Get tenant
-	tenant, err := h.service.GetTenantByID(ctx, tenantID)
-	if err != nil {
-		if appErr, ok := errors.IsAppError(err); ok {
-			logger.Error(ctx, "Failed to retrieve tenant: application error", appErr)
-			c.Error(appErr)
-		} else {
-			logger.ErrorWithFields(ctx, err, nil)
-			c.Error(errors.NewInternalServerError("Failed to retrieve tenant").WithDetails(err.Error()))
-		}
-		return
-	}
-
-	// Hide API key in response
-	var responseConfig *types.WebSearchConfig
-	if tenant.WebSearchConfig != nil {
-		responseConfig = &types.WebSearchConfig{
-			Provider:           tenant.WebSearchConfig.Provider,
-			APIKey:             "", // Hide API key
-			MaxResults:         tenant.WebSearchConfig.MaxResults,
-			IncludeDate:        tenant.WebSearchConfig.IncludeDate,
-			CompressionMethod:  tenant.WebSearchConfig.CompressionMethod,
-			Blacklist:          tenant.WebSearchConfig.Blacklist,
-			EmbeddingModelID:   tenant.WebSearchConfig.EmbeddingModelID,
-			EmbeddingDimension: tenant.WebSearchConfig.EmbeddingDimension,
-			RerankModelID:      tenant.WebSearchConfig.RerankModelID,
-			DocumentFragments:  tenant.WebSearchConfig.DocumentFragments,
-		}
-		// If API key exists, show a masked version
-		if tenant.WebSearchConfig.APIKey != "" {
-			responseConfig.APIKey = "***" // Masked API key
-		}
-	}
-
-	logger.Infof(ctx, "Tenant web search config retrieved successfully, Tenant ID: %d", tenantID)
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"data":    responseConfig,
-	})
 }
 
-// UpdateTenantWebSearchConfig updates the web search configuration for a tenant
-// Tenant ID is obtained from the authentication context
-func (h *TenantHandler) UpdateTenantWebSearchConfig(c *gin.Context) {
+// UpdateTenantKV provides a generic KV-style updater for tenant-level configurations
+// Body is the JSON value to set for the key.
+func (h *TenantHandler) UpdateTenantKV(c *gin.Context) {
 	ctx := c.Request.Context()
+	key := c.Param("key")
 
-	logger.Info(ctx, "Start updating tenant web search config")
-
-	// Get tenant ID from authentication context
-	tenantID := c.GetUint(types.TenantIDContextKey.String())
-	if tenantID == 0 {
-		logger.Error(ctx, "Tenant ID is empty")
-		c.Error(errors.NewBadRequestError("Tenant ID cannot be empty"))
+	switch key {
+	case "agent-config":
+		h.updateTenantAgentConfigInternal(c)
+		return
+	case "web-search-config":
+		h.updateTenantWebSearchConfigInternal(c)
+		return
+	default:
+		logger.Info(ctx, "KV key not supported", "key", key)
+		c.Error(errors.NewBadRequestError("unsupported key"))
 		return
 	}
+}
 
-	var req types.WebSearchConfig
-	if err := c.ShouldBindJSON(&req); err != nil {
+// updateTenantWebSearchConfigInternal updates tenant's web search config
+func (h *TenantHandler) updateTenantWebSearchConfigInternal(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	// Bind directly into the strong typed struct
+	var cfg types.WebSearchConfig
+	if err := c.ShouldBindJSON(&cfg); err != nil {
 		logger.Error(ctx, "Failed to parse request parameters", err)
 		c.Error(errors.NewValidationError("Invalid request data").WithDetails(err.Error()))
 		return
 	}
 
 	// Validate configuration
-	if req.MaxResults < 1 || req.MaxResults > 50 {
+	if cfg.MaxResults < 1 || cfg.MaxResults > 50 {
 		c.Error(errors.NewBadRequestError("max_results must be between 1 and 50"))
 		return
 	}
 
-	// Get existing tenant
-	tenant, err := h.service.GetTenantByID(ctx, tenantID)
-	if err != nil {
-		if appErr, ok := errors.IsAppError(err); ok {
-			logger.Error(ctx, "Failed to retrieve tenant: application error", appErr)
-			c.Error(appErr)
-		} else {
-			logger.ErrorWithFields(ctx, err, nil)
-			c.Error(errors.NewInternalServerError("Failed to retrieve tenant").WithDetails(err.Error()))
-		}
+	tenant := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
+	if tenant == nil {
+		logger.Error(ctx, "Tenant is empty")
+		c.Error(errors.NewBadRequestError("Tenant is empty"))
 		return
 	}
 
-	// Update web search configuration
-	// If API key is "***", keep the existing API key
-	if req.APIKey == "***" && tenant.WebSearchConfig != nil {
-		req.APIKey = tenant.WebSearchConfig.APIKey
-	}
-
-	tenant.WebSearchConfig = &req
-
+	tenant.WebSearchConfig = &cfg
 	updatedTenant, err := h.service.UpdateTenant(ctx, tenant)
 	if err != nil {
 		if appErr, ok := errors.IsAppError(err); ok {
@@ -527,28 +464,28 @@ func (h *TenantHandler) UpdateTenantWebSearchConfig(c *gin.Context) {
 		}
 		return
 	}
-
-	// Hide API key in response
-	responseConfig := &types.WebSearchConfig{
-		Provider:           updatedTenant.WebSearchConfig.Provider,
-		APIKey:             "", // Hide API key
-		MaxResults:         updatedTenant.WebSearchConfig.MaxResults,
-		IncludeDate:        updatedTenant.WebSearchConfig.IncludeDate,
-		CompressionMethod:  updatedTenant.WebSearchConfig.CompressionMethod,
-		Blacklist:          updatedTenant.WebSearchConfig.Blacklist,
-		EmbeddingModelID:   updatedTenant.WebSearchConfig.EmbeddingModelID,
-		EmbeddingDimension: updatedTenant.WebSearchConfig.EmbeddingDimension,
-		RerankModelID:      updatedTenant.WebSearchConfig.RerankModelID,
-		DocumentFragments:  updatedTenant.WebSearchConfig.DocumentFragments,
-	}
-	if updatedTenant.WebSearchConfig.APIKey != "" {
-		responseConfig.APIKey = "***" // Masked API key
-	}
-
-	logger.Infof(ctx, "Tenant web search config updated successfully, Tenant ID: %d", tenantID)
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"data":    responseConfig,
+		"data":    updatedTenant.WebSearchConfig,
 		"message": "Web search configuration updated successfully",
+	})
+}
+
+// GetTenantWebSearchConfig returns the web search configuration for a tenant
+func (h *TenantHandler) GetTenantWebSearchConfig(c *gin.Context) {
+	ctx := c.Request.Context()
+	logger.Info(ctx, "Start getting tenant web search config")
+	// Get tenant
+	tenant := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
+	if tenant == nil {
+		logger.Error(ctx, "Tenant is empty")
+		c.Error(errors.NewBadRequestError("Tenant is empty"))
+		return
+	}
+
+	logger.Infof(ctx, "Tenant web search config retrieved successfully, Tenant ID: %d", tenant.ID)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    tenant.WebSearchConfig,
 	})
 }
