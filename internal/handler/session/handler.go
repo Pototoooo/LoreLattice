@@ -62,7 +62,7 @@ func (h *Handler) CreateSession(c *gin.Context) {
 	// - Knowledge base can be specified in each query request (AgentQA/KnowledgeQA)
 	// - Agent mode can access multiple knowledge bases via AgentConfig.KnowledgeBases
 	// - Knowledge base can be switched during conversation
-	isAgentMode := request.AgentConfig != nil && request.AgentConfig.Enabled
+	isAgentMode := request.AgentConfig != nil && request.AgentConfig.AgentModeEnabled
 	hasAgentKnowledgeBases := request.AgentConfig != nil && len(request.AgentConfig.KnowledgeBases) > 0
 
 	logger.Infof(

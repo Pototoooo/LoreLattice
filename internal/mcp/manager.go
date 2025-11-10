@@ -36,6 +36,11 @@ func NewMCPManager() *MCPManager {
 
 // GetOrCreateClient gets an existing client or creates a new one
 func (m *MCPManager) GetOrCreateClient(service *types.MCPService) (MCPClient, error) {
+	// Check if service is enabled
+	if !service.Enabled {
+		return nil, fmt.Errorf("MCP service %s is not enabled", service.Name)
+	}
+
 	// Check if client already exists
 	m.clientsMu.RLock()
 	client, exists := m.clients[service.ID]
@@ -65,16 +70,27 @@ func (m *MCPManager) GetOrCreateClient(service *types.MCPService) (MCPClient, er
 		return nil, fmt.Errorf("failed to create MCP client: %w", err)
 	}
 
-	// Connect to service
-	ctx, cancel := context.WithTimeout(m.ctx, 30*time.Second)
-	defer cancel()
-
-	if err := client.Connect(ctx); err != nil {
+	// For SSE connections, Connect() starts a persistent connection that needs a long-lived context
+	// Use manager's context (m.ctx) which persists for the lifetime of the manager
+	// The HTTP client's timeout will handle connection timeouts, not context cancellation
+	if err := client.Connect(m.ctx); err != nil {
 		return nil, fmt.Errorf("failed to connect to MCP service: %w", err)
 	}
 
-	// Initialize
-	if _, err := client.Initialize(ctx); err != nil {
+	// Initialize needs a timeout to prevent hanging, but the connection context should remain alive
+	// Use a timeout context only for the initialization request
+	initTimeout := 30 * time.Second
+	if service.AdvancedConfig != nil && service.AdvancedConfig.Timeout > 0 {
+		initTimeout = time.Duration(service.AdvancedConfig.Timeout) * time.Second
+		if initTimeout > 60*time.Second {
+			initTimeout = 60 * time.Second
+		}
+	}
+
+	initCtx, initCancel := context.WithTimeout(m.ctx, initTimeout)
+	defer initCancel() // Safe to cancel after init - it's a one-time operation
+
+	if _, err := client.Initialize(initCtx); err != nil {
 		client.Disconnect()
 		return nil, fmt.Errorf("failed to initialize MCP client: %w", err)
 	}
@@ -82,7 +98,7 @@ func (m *MCPManager) GetOrCreateClient(service *types.MCPService) (MCPClient, er
 	// Store client
 	m.clients[service.ID] = client
 
-	logger.GetLogger(ctx).Infof("MCP client created and initialized for service: %s", service.Name)
+	logger.GetLogger(m.ctx).Infof("MCP client created and initialized for service: %s", service.Name)
 	return client, nil
 }
 

@@ -105,6 +105,9 @@ func (s *mcpServiceService) UpdateMCPService(ctx context.Context, service *types
 		return fmt.Errorf("MCP service not found")
 	}
 
+	// Store old enabled state BEFORE any updates
+	oldEnabled := existing.Enabled
+
 	// Merge updates: only update fields that are provided (non-zero or explicitly set)
 	// This ensures that false values for enabled field are properly updated
 	// Handler ensures that service.Enabled is only set if "enabled" key exists in the request
@@ -146,10 +149,35 @@ func (s *mcpServiceService) UpdateMCPService(ctx context.Context, service *types
 		return fmt.Errorf("failed to update MCP service: %w", err)
 	}
 
-	// Close existing client connection to force reconnect with new config
-	s.mcpManager.CloseClient(service.ID)
+	// Check if critical configuration changed (URL, transport type, or auth config)
+	configChanged := false
+	if service.URL != "" && service.URL != existing.URL {
+		configChanged = true
+	}
+	if service.TransportType != "" && service.TransportType != existing.TransportType {
+		configChanged = true
+	}
+	if service.AuthConfig != nil {
+		configChanged = true
+	}
 
-	logger.GetLogger(ctx).Infof("MCP service updated: %s (ID: %s)", existing.Name, service.ID)
+	// Close existing client connection if:
+	// 1. Service is now disabled (need to close connection)
+	// 2. Critical configuration changed (need to reconnect with new config)
+	if !existing.Enabled {
+		s.mcpManager.CloseClient(service.ID)
+		logger.GetLogger(ctx).Infof("MCP service disabled, connection closed: %s (ID: %s)", existing.Name, service.ID)
+	} else if configChanged {
+		s.mcpManager.CloseClient(service.ID)
+		logger.GetLogger(ctx).Infof("MCP service config changed, connection closed for reconnect: %s (ID: %s)", existing.Name, service.ID)
+	} else if oldEnabled != existing.Enabled && existing.Enabled {
+		// Service was just enabled (was disabled, now enabled)
+		// Close any existing connection to ensure clean state
+		s.mcpManager.CloseClient(service.ID)
+		logger.GetLogger(ctx).Infof("MCP service enabled, existing connection closed for clean state: %s (ID: %s)", existing.Name, service.ID)
+	}
+
+	logger.GetLogger(ctx).Infof("MCP service updated: %s (ID: %s), enabled: %v", existing.Name, service.ID, existing.Enabled)
 	return nil
 }
 

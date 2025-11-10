@@ -151,6 +151,8 @@ func (h *Handler) AgentQA(c *gin.Context) {
 
 	logger.Infof(ctx, "Agent QA request, session ID: %s, query: %s", sessionID, request.Query)
 
+	tenantInfo := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
+
 	// Get session information first
 	session, err := h.sessionService.GetSession(ctx, sessionID)
 	if err != nil {
@@ -213,6 +215,14 @@ func (h *Handler) AgentQA(c *gin.Context) {
 		logger.Infof(ctx, "Web search mode changed from %v to %v", currentWebSearchEnabled, request.WebSearchEnabled)
 		configChanged = true
 	}
+	summaryModelID := request.SummaryModelID
+	if summaryModelID == "" {
+		summaryModelID = tenantInfo.AgentConfig.ThinkingModelID
+	}
+	if summaryModelID != session.SummaryModelID {
+		configChanged = true
+		session.SummaryModelID = summaryModelID
+	}
 
 	// If configuration changed, clear context and update session
 	if configChanged {
@@ -230,6 +240,7 @@ func (h *Handler) AgentQA(c *gin.Context) {
 		session.AgentConfig.KnowledgeBases = request.KnowledgeBaseIDs
 		session.AgentConfig.AgentModeEnabled = request.AgentEnabled
 		session.AgentConfig.WebSearchEnabled = request.WebSearchEnabled
+		session.SummaryModelID = summaryModelID
 		// Persist the session changes
 		if err := h.sessionService.UpdateSession(ctx, session); err != nil {
 			logger.Errorf(ctx, "Failed to update session %s: %v", sessionID, err)

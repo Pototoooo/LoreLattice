@@ -119,7 +119,7 @@ func (s *agentService) CreateAgentEngine(
 
 			// Register MCP tools
 			if len(enabledServices) > 0 {
-				if err := tools.RegisterMCPTools(toolRegistry, enabledServices, s.mcpManager); err != nil {
+				if err := tools.RegisterMCPTools(ctx, toolRegistry, enabledServices, s.mcpManager); err != nil {
 					logger.Warnf(ctx, "Failed to register MCP tools: %v", err)
 				} else {
 					logger.Infof(ctx, "Registered MCP tools from %d enabled services", len(enabledServices))

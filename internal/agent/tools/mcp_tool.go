@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/mcp"
@@ -164,27 +165,41 @@ func sanitizeName(name string) string {
 }
 
 // RegisterMCPTools registers MCP tools from given services
-func RegisterMCPTools(registry *ToolRegistry, services []*types.MCPService, mcpManager *mcp.MCPManager) error {
+func RegisterMCPTools(ctx context.Context, registry *ToolRegistry, services []*types.MCPService, mcpManager *mcp.MCPManager) error {
 	if len(services) == 0 {
 		return nil
 	}
 
-	ctx := context.Background()
+	// Use provided context, but don't add timeout here
+	// The GetOrCreateClient has its own timeout for connection/init
+	// For ListTools, we use a reasonable timeout to prevent hanging
+	// but longer than before since ListTools may need time for SSE communication
+	listToolsTimeout := 30 * time.Second
+	if ctx == nil || ctx == context.Background() {
+		// If no context provided, create one with timeout
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(context.Background(), listToolsTimeout)
+		defer cancel()
+	}
 
 	for _, service := range services {
 		if !service.Enabled {
 			continue
 		}
 
-		// Get or create client
+		// Get or create client (this may take time, but has its own timeout)
 		client, err := mcpManager.GetOrCreateClient(service)
 		if err != nil {
 			logger.GetLogger(ctx).Errorf("Failed to create MCP client for service %s: %v", service.Name, err)
 			continue
 		}
 
-		// List tools from the service
-		tools, err := client.ListTools(ctx)
+		// List tools from the service with timeout
+		// Create a new context with timeout for this specific operation
+		listCtx, cancel := context.WithTimeout(ctx, listToolsTimeout)
+		tools, err := client.ListTools(listCtx)
+		cancel() // Cancel after ListTools completes
+
 		if err != nil {
 			logger.GetLogger(ctx).Errorf("Failed to list tools from MCP service %s: %v", service.Name, err)
 			continue
@@ -202,9 +217,12 @@ func RegisterMCPTools(registry *ToolRegistry, services []*types.MCPService, mcpM
 }
 
 // GetMCPToolsInfo returns information about available MCP tools
-func GetMCPToolsInfo(services []*types.MCPService, mcpManager *mcp.MCPManager) (map[string][]string, error) {
+func GetMCPToolsInfo(ctx context.Context, services []*types.MCPService, mcpManager *mcp.MCPManager) (map[string][]string, error) {
 	result := make(map[string][]string)
-	ctx := context.Background()
+
+	// Use provided context with timeout
+	infoCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	defer cancel()
 
 	for _, service := range services {
 		if !service.Enabled {
@@ -216,7 +234,7 @@ func GetMCPToolsInfo(services []*types.MCPService, mcpManager *mcp.MCPManager) (
 			continue
 		}
 
-		tools, err := client.ListTools(ctx)
+		tools, err := client.ListTools(infoCtx)
 		if err != nil {
 			continue
 		}

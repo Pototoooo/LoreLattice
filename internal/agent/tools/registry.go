@@ -3,6 +3,7 @@ package tools
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
@@ -59,6 +60,7 @@ func (r *ToolRegistry) ListTools() []string {
 
 // GetFunctionDefinitions returns function definitions for allowed tools
 // This is used for LLM function calling
+// MCP tools (names starting with "mcp_") are always included, regardless of allowedTools list
 func (r *ToolRegistry) GetFunctionDefinitions(allowedTools []string) []types.FunctionDefinition {
 	definitions := make([]types.FunctionDefinition, 0)
 
@@ -80,9 +82,10 @@ func (r *ToolRegistry) GetFunctionDefinitions(allowedTools []string) []types.Fun
 		allowedMap[name] = true
 	}
 
-	// Only include allowed tools
+	// Include allowed tools AND all MCP tools (names starting with "mcp_")
 	for name, tool := range r.tools {
-		if allowedMap[name] {
+		// Include if it's in the allowed list OR if it's an MCP tool
+		if allowedMap[name] || strings.HasPrefix(name, "mcp_") {
 			definitions = append(definitions, types.FunctionDefinition{
 				Name:        tool.Name(),
 				Description: tool.Description(),

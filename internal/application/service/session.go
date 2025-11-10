@@ -795,7 +795,7 @@ func (s *sessionService) AgentQA(ctx context.Context, session *types.Session, qu
 	tenantInfo := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
 
 	// Check if agent is enabled at session level
-	if session.AgentConfig == nil || !session.AgentConfig.Enabled {
+	if session.AgentConfig == nil || !session.AgentConfig.AgentModeEnabled {
 		logger.Warnf(ctx, "Agent not enabled for session: %s", sessionID)
 		return errors.New("agent not enabled for this session")
 	}
@@ -810,7 +810,7 @@ func (s *sessionService) AgentQA(ctx context.Context, session *types.Session, qu
 	// Tenant config provides the runtime parameters (MaxIterations, Temperature, Tools, Models)
 	// Session config provides Enabled and KnowledgeBases
 	agentConfig := &types.AgentConfig{
-		Enabled:           session.AgentConfig.Enabled,
+		Enabled:           session.AgentConfig.AgentModeEnabled,
 		MaxIterations:     tenantInfo.AgentConfig.MaxIterations,
 		ReflectionEnabled: tenantInfo.AgentConfig.ReflectionEnabled,
 		AllowedTools:      tenantInfo.AgentConfig.AllowedTools,
