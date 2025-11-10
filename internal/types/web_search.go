@@ -44,7 +44,7 @@ type WebSearchResult struct {
 	URL         string     `json:"url"`                    // 结果URL
 	Snippet     string     `json:"snippet"`                // 摘要片段
 	Content     string     `json:"content"`                // 完整内容（可选，需要额外抓取）
-	Source      string     `json:"source"`                 // 来源（如：kuaisou, baidu等）
+	Source      string     `json:"source"`                 // 来源（如：duckduckgo等）
 	PublishedAt *time.Time `json:"published_at,omitempty"` // 发布时间（如果有）
 }
 

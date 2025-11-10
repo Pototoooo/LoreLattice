@@ -24,8 +24,9 @@ type AgentConfig struct {
 // SessionAgentConfig represents session-level agent configuration
 // Sessions only store Enabled and KnowledgeBases; other configs are read from Tenant at runtime
 type SessionAgentConfig struct {
-	Enabled        bool     `json:"enabled"`         // Whether agent mode is enabled for this session
-	KnowledgeBases []string `json:"knowledge_bases"` // Accessible knowledge base IDs for this session
+	AgentModeEnabled bool     `json:"agent_mode_enabled"` // Whether agent mode is enabled for this session
+	WebSearchEnabled bool     `json:"web_search_enabled"` // Whether web search is enabled for this session
+	KnowledgeBases   []string `json:"knowledge_bases"`    // Accessible knowledge base IDs for this session
 }
 
 // Value implements driver.Valuer interface for AgentConfig

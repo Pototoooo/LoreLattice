@@ -22,6 +22,8 @@ type KnowledgeService interface {
 	CreateKnowledgeFromURL(ctx context.Context, kbID string, url string, enableMultimodel *bool) (*types.Knowledge, error)
 	// CreateKnowledgeFromPassage creates knowledge from text passages.
 	CreateKnowledgeFromPassage(ctx context.Context, kbID string, passage []string) (*types.Knowledge, error)
+	// CreateKnowledgeFromPassageSync creates knowledge from text passages and waits until chunks are indexed.
+	CreateKnowledgeFromPassageSync(ctx context.Context, kbID string, passage []string) (*types.Knowledge, error)
 	// GetKnowledgeByID retrieves knowledge by ID.
 	GetKnowledgeByID(ctx context.Context, id string) (*types.Knowledge, error)
 	// GetKnowledgeBatch retrieves a batch of knowledge by IDs.

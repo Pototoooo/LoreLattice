@@ -29,10 +29,14 @@ func getAsynqRedisClientOpt() *asynq.RedisClientOpt {
 	return opt
 }
 
-func NewAsyncqClient() *asynq.Client {
+func NewAsyncqClient() (*asynq.Client, error) {
 	opt := getAsynqRedisClientOpt()
 	client := asynq.NewClient(opt)
-	return client
+	err := client.Ping()
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
 }
 
 func NewAsynqServer() *asynq.Server {

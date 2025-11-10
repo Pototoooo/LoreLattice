@@ -32,9 +32,6 @@
                 <div class="provider-option">
                   <span class="provider-name">{{ provider.name }}</span>
                 </div>
-                <div v-if="provider.description" class="provider-desc">
-                  {{ provider.description }}
-                </div>
               </div>
             </t-option>
           </t-select>

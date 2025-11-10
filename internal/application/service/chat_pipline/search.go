@@ -2,6 +2,7 @@ package chatpipline
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
@@ -11,30 +12,37 @@ import (
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/redis/go-redis/v9"
 )
 
 // PluginSearch implements search functionality for chat pipeline
 type PluginSearch struct {
 	knowledgeBaseService interfaces.KnowledgeBaseService
+	knowledgeService     interfaces.KnowledgeService
 	modelService         interfaces.ModelService
 	config               *config.Config
 	webSearchService     interfaces.WebSearchService
 	tenantService        interfaces.TenantService
+	redisClient          *redis.Client
 }
 
 func NewPluginSearch(eventManager *EventManager,
 	knowledgeBaseService interfaces.KnowledgeBaseService,
+	knowledgeService interfaces.KnowledgeService,
 	modelService interfaces.ModelService,
 	config *config.Config,
 	webSearchService interfaces.WebSearchService,
 	tenantService interfaces.TenantService,
+	redisClient *redis.Client,
 ) *PluginSearch {
 	res := &PluginSearch{
 		knowledgeBaseService: knowledgeBaseService,
+		knowledgeService:     knowledgeService,
 		modelService:         modelService,
 		config:               config,
 		webSearchService:     webSearchService,
 		tenantService:        tenantService,
+		redisClient:          redisClient,
 	}
 	eventManager.Register(res)
 	return res
@@ -62,44 +70,37 @@ func (p *PluginSearch) OnEvent(ctx context.Context,
 		return ErrSearch.WithError(nil)
 	}
 
+	// Run KB search and web search concurrently
 	logger.Infof(ctx, "Searching across %d knowledge base(s): %v", len(knowledgeBaseIDs), knowledgeBaseIDs)
-
-	// Prepare search parameters
-	searchParams := types.SearchParams{
-		QueryText:        strings.TrimSpace(chatManage.RewriteQuery),
-		VectorThreshold:  chatManage.VectorThreshold,
-		KeywordThreshold: chatManage.KeywordThreshold,
-		MatchCount:       chatManage.EmbeddingTopK,
-	}
-	logger.Infof(ctx, "Search parameters: %v", searchParams)
-
-	// Parallel search across multiple knowledge bases
 	var wg sync.WaitGroup
 	var mu sync.Mutex
-	var allResults []*types.SearchResult
+	allResults := make([]*types.SearchResult, 0)
 
-	for _, kbID := range knowledgeBaseIDs {
-		wg.Add(1)
-		go func(knowledgeBaseID string) {
-			defer wg.Done()
-
-			results, err := p.knowledgeBaseService.HybridSearch(ctx, knowledgeBaseID, searchParams)
-			if err != nil {
-				logger.Errorf(ctx, "Failed to search KB %s: %v", knowledgeBaseID, err)
-				return
-			}
-
-			logger.Infof(ctx, "KB %s search results count: %d", knowledgeBaseID, len(results))
-
+	wg.Add(2)
+	// Goroutine 1: Knowledge base search (rewrite + processed)
+	go func() {
+		defer wg.Done()
+		kbResults := p.searchKnowledgeBases(ctx, knowledgeBaseIDs, chatManage)
+		if len(kbResults) > 0 {
 			mu.Lock()
-			allResults = append(allResults, results...)
+			allResults = append(allResults, kbResults...)
 			mu.Unlock()
-		}(kbID)
-	}
+		}
+	}()
+
+	// Goroutine 2: Web search (if enabled)
+	go func() {
+		defer wg.Done()
+		webResults := p.searchWebIfEnabled(ctx, chatManage)
+		if len(webResults) > 0 {
+			mu.Lock()
+			allResults = append(allResults, webResults...)
+			mu.Unlock()
+		}
+	}()
 
 	wg.Wait()
 
-	logger.Infof(ctx, "Total search results from all KBs: %d", len(allResults))
 	chatManage.SearchResult = allResults
 
 	// Add relevant results from chat history
@@ -107,67 +108,6 @@ func (p *PluginSearch) OnEvent(ctx context.Context,
 	if historyResult != nil {
 		logger.Infof(ctx, "Add history result, result count: %d", len(historyResult))
 		chatManage.SearchResult = append(chatManage.SearchResult, historyResult...)
-	}
-
-	// Try search with processed query if different from rewrite query
-	if chatManage.RewriteQuery != chatManage.ProcessedQuery {
-		searchParams.QueryText = strings.TrimSpace(chatManage.ProcessedQuery)
-		logger.Infof(ctx, "Searching with processed query: %s", searchParams.QueryText)
-
-		var wg2 sync.WaitGroup
-		var mu2 sync.Mutex
-		var processedResults []*types.SearchResult
-
-		for _, kbID := range knowledgeBaseIDs {
-			wg2.Add(1)
-			go func(knowledgeBaseID string) {
-				defer wg2.Done()
-
-				results, err := p.knowledgeBaseService.HybridSearch(ctx, knowledgeBaseID, searchParams)
-				if err != nil {
-					logger.Errorf(ctx, "Failed to search KB %s with processed query: %v", knowledgeBaseID, err)
-					return
-				}
-
-				logger.Infof(ctx, "KB %s processed query results count: %d", knowledgeBaseID, len(results))
-
-				mu2.Lock()
-				processedResults = append(processedResults, results...)
-				mu2.Unlock()
-			}(kbID)
-		}
-
-		wg2.Wait()
-
-		logger.Infof(ctx, "Total processed query results from all KBs: %d", len(processedResults))
-		chatManage.SearchResult = append(chatManage.SearchResult, processedResults...)
-	}
-
-	// Perform web search if enabled and merge results with KB search results
-	if chatManage.WebSearchEnabled && p.webSearchService != nil && p.tenantService != nil && chatManage.TenantID > 0 {
-		// Get tenant to retrieve web search config
-		tenant, err := p.tenantService.GetTenantByID(ctx, chatManage.TenantID)
-		if err != nil {
-			logger.Warnf(ctx, "Failed to get tenant for web search: %v", err)
-		} else if tenant != nil && tenant.WebSearchConfig != nil && tenant.WebSearchConfig.Provider != "" {
-			// Perform web search in parallel with KB search (already completed)
-			logger.Infof(ctx, "Performing web search with provider: %s", tenant.WebSearchConfig.Provider)
-			webResults, err := p.webSearchService.Search(ctx, tenant.WebSearchConfig, chatManage.RewriteQuery)
-			if err != nil {
-				logger.Warnf(ctx, "Web search failed: %v", err)
-			} else {
-				// Convert web search results to SearchResult
-				webSearchResults := convertWebSearchResults(webResults)
-				logger.Infof(ctx, "Web search returned %d results", len(webSearchResults))
-				// Merge web search results with KB search results
-				if len(webSearchResults) > 0 {
-					chatManage.SearchResult = append(chatManage.SearchResult, webSearchResults...)
-					logger.Infof(ctx, "Merged web search results, total results: %d", len(chatManage.SearchResult))
-				}
-			}
-		} else {
-			logger.Warnf(ctx, "Web search enabled but no valid configuration found for tenant %d", chatManage.TenantID)
-		}
 	}
 
 	// Remove duplicate results
@@ -214,6 +154,136 @@ func removeDuplicateResults(results []*types.SearchResult) []*types.SearchResult
 		}
 	}
 	return uniqueResults
+}
+
+// searchKnowledgeBases performs KB searches for rewrite and processed queries across KB IDs
+func (p *PluginSearch) searchKnowledgeBases(ctx context.Context, knowledgeBaseIDs []string, chatManage *types.ChatManage) []*types.SearchResult {
+	// Build base params for rewrite query
+	baseParams := types.SearchParams{
+		QueryText:        strings.TrimSpace(chatManage.RewriteQuery),
+		VectorThreshold:  chatManage.VectorThreshold,
+		KeywordThreshold: chatManage.KeywordThreshold,
+		MatchCount:       chatManage.EmbeddingTopK,
+	}
+
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var results []*types.SearchResult
+
+	// Search with rewrite query
+	for _, kbID := range knowledgeBaseIDs {
+		wg.Add(1)
+		go func(knowledgeBaseID string) {
+			defer wg.Done()
+			res, err := p.knowledgeBaseService.HybridSearch(ctx, knowledgeBaseID, baseParams)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to search KB %s: %v", knowledgeBaseID, err)
+				return
+			}
+			logger.Infof(ctx, "KB %s search results count: %d", knowledgeBaseID, len(res))
+			mu.Lock()
+			results = append(results, res...)
+			mu.Unlock()
+		}(kbID)
+	}
+
+	wg.Wait()
+
+	// If processed query differs, search again
+	if chatManage.RewriteQuery != chatManage.ProcessedQuery {
+		paramsProcessed := baseParams
+		paramsProcessed.QueryText = strings.TrimSpace(chatManage.ProcessedQuery)
+		logger.Infof(ctx, "Searching with processed query: %s", paramsProcessed.QueryText)
+
+		wg = sync.WaitGroup{}
+		for _, kbID := range knowledgeBaseIDs {
+			wg.Add(1)
+			go func(knowledgeBaseID string) {
+				defer wg.Done()
+				res, err := p.knowledgeBaseService.HybridSearch(ctx, knowledgeBaseID, paramsProcessed)
+				if err != nil {
+					logger.Errorf(ctx, "Failed to search KB %s with processed query: %v", knowledgeBaseID, err)
+					return
+				}
+				logger.Infof(ctx, "KB %s processed query results count: %d", knowledgeBaseID, len(res))
+				mu.Lock()
+				results = append(results, res...)
+				mu.Unlock()
+			}(kbID)
+		}
+		wg.Wait()
+	}
+
+	logger.Infof(ctx, "Total KB results (rewrite + processed): %d", len(results))
+	return results
+}
+
+// searchWebIfEnabled executes web search when enabled and returns converted results
+func (p *PluginSearch) searchWebIfEnabled(ctx context.Context, chatManage *types.ChatManage) []*types.SearchResult {
+	if !(chatManage.WebSearchEnabled && p.webSearchService != nil && p.tenantService != nil && chatManage.TenantID > 0) {
+		return nil
+	}
+	tenant := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
+	if tenant == nil || tenant.WebSearchConfig == nil || tenant.WebSearchConfig.Provider == "" {
+		logger.Warnf(ctx, "Web search enabled but no valid configuration found for tenant %d", chatManage.TenantID)
+		return nil
+	}
+
+	logger.Infof(ctx, "Performing web search with provider: %s", tenant.WebSearchConfig.Provider)
+	webResults, err := p.webSearchService.Search(ctx, tenant.WebSearchConfig, chatManage.RewriteQuery)
+	if err != nil {
+		logger.Warnf(ctx, "Web search failed: %v", err)
+		return nil
+	}
+	// Build questions (rewrite + processed if different)
+	questions := []string{strings.TrimSpace(chatManage.RewriteQuery)}
+	if chatManage.ProcessedQuery != "" && chatManage.ProcessedQuery != chatManage.RewriteQuery {
+		questions = append(questions, strings.TrimSpace(chatManage.ProcessedQuery))
+	}
+	// Load session-scoped temp KB state from Redis
+	var tempKBID string
+	seen := map[string]bool{}
+	ids := []string{}
+	stateKey := fmt.Sprintf("tempkb:%s", chatManage.SessionID)
+	if raw, getErr := p.redisClient.Get(ctx, stateKey).Bytes(); getErr == nil && len(raw) > 0 {
+		var state struct {
+			KBID         string          `json:"kbID"`
+			KnowledgeIDs []string        `json:"knowledgeIDs"`
+			SeenURLs     map[string]bool `json:"seenURLs"`
+		}
+		if err := json.Unmarshal(raw, &state); err == nil {
+			tempKBID = state.KBID
+			ids = state.KnowledgeIDs
+			if state.SeenURLs != nil {
+				seen = state.SeenURLs
+			}
+		}
+	}
+	compressed, kbID, newSeen, newIDs, err := p.webSearchService.CompressWithRAG(
+		ctx, chatManage.SessionID, tempKBID, questions, webResults, tenant.WebSearchConfig,
+		p.knowledgeBaseService, p.knowledgeService, seen, ids,
+	)
+	if err != nil {
+		logger.Warnf(ctx, "RAG compression failed, falling back to raw: %v", err)
+	} else {
+		webResults = compressed
+		// Persist temp KB state back into Redis
+		state := struct {
+			KBID         string          `json:"kbID"`
+			KnowledgeIDs []string        `json:"knowledgeIDs"`
+			SeenURLs     map[string]bool `json:"seenURLs"`
+		}{
+			KBID:         kbID,
+			KnowledgeIDs: newIDs,
+			SeenURLs:     newSeen,
+		}
+		if b, mErr := json.Marshal(state); mErr == nil {
+			_ = p.redisClient.Set(ctx, stateKey, b, 0).Err()
+		}
+	}
+	res := convertWebSearchResults(webResults)
+	logger.Infof(ctx, "Web search returned %d results", len(res))
+	return res
 }
 
 // convertWebSearchResults converts WebSearchResult to SearchResult

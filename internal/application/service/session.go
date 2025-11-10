@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -16,6 +17,7 @@ import (
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 )
@@ -36,6 +38,8 @@ type sessionService struct {
 	eventManager         *chatpipline.EventManager       // Event manager for chat pipeline
 	agentService         interfaces.AgentService         // Service for agent operations
 	sessionStorage       llmcontext.ContextStorage       // Session storage
+	knowledgeService     interfaces.KnowledgeService     // Service for knowledge operations
+	redisClient          *redis.Client                   // Redis client for temp KB state
 }
 
 // NewSessionService creates a new session service instance with all required dependencies
@@ -43,22 +47,26 @@ func NewSessionService(cfg *config.Config,
 	sessionRepo interfaces.SessionRepository,
 	messageRepo interfaces.MessageRepository,
 	knowledgeBaseService interfaces.KnowledgeBaseService,
+	knowledgeService interfaces.KnowledgeService,
 	modelService interfaces.ModelService,
 	tenantService interfaces.TenantService,
 	eventManager *chatpipline.EventManager,
 	agentService interfaces.AgentService,
 	sessionStorage llmcontext.ContextStorage,
+	redisClient *redis.Client,
 ) interfaces.SessionService {
 	return &sessionService{
 		cfg:                  cfg,
 		sessionRepo:          sessionRepo,
 		messageRepo:          messageRepo,
 		knowledgeBaseService: knowledgeBaseService,
+		knowledgeService:     knowledgeService,
 		modelService:         modelService,
 		tenantService:        tenantService,
 		eventManager:         eventManager,
 		agentService:         agentService,
 		sessionStorage:       sessionStorage,
+		redisClient:          redisClient,
 	}
 }
 
@@ -201,6 +209,30 @@ func (s *sessionService) DeleteSession(ctx context.Context, id string) error {
 	// Get tenant ID from context
 	tenantID := ctx.Value(types.TenantIDContextKey).(uint)
 	logger.Infof(ctx, "Deleting session, ID: %s, tenant ID: %d", id, tenantID)
+
+	// Cleanup temporary KB stored in Redis for this session
+	if s.redisClient != nil {
+		stateKey := fmt.Sprintf("tempkb:%s", id)
+		if raw, getErr := s.redisClient.Get(ctx, stateKey).Bytes(); getErr == nil && len(raw) > 0 {
+			var state struct {
+				KBID         string          `json:"kbID"`
+				KnowledgeIDs []string        `json:"knowledgeIDs"`
+				SeenURLs     map[string]bool `json:"seenURLs"`
+			}
+			if err := json.Unmarshal(raw, &state); err == nil && strings.TrimSpace(state.KBID) != "" {
+				logger.Infof(ctx, "Cleaning temporary KB for session %s: %s", id, state.KBID)
+				for _, kid := range state.KnowledgeIDs {
+					if delErr := s.knowledgeService.DeleteKnowledge(ctx, kid); delErr != nil {
+						logger.Warnf(ctx, "Failed to delete temp knowledge %s: %v", kid, delErr)
+					}
+				}
+				if delErr := s.knowledgeBaseService.DeleteKnowledgeBase(ctx, state.KBID); delErr != nil {
+					logger.Warnf(ctx, "Failed to delete temp knowledge base %s: %v", state.KBID, delErr)
+				}
+				_ = s.redisClient.Del(ctx, stateKey).Err()
+			}
+		}
+	}
 
 	// Delete session from repository
 	err := s.sessionRepo.Delete(ctx, tenantID, id)

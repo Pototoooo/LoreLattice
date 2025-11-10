@@ -44,7 +44,7 @@
         </div>
         
         <!-- Answer Event -->
-        <div v-else-if="event.type === 'answer'" class="answer-event">
+        <div v-else-if="event.type === 'answer' && event.content && event.content.trim()" class="answer-event">
           <div 
             class="answer-content-wrapper"
             :class="{ 

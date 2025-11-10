@@ -351,7 +351,26 @@ func (s *knowledgeService) CreateKnowledgeFromURL(ctx context.Context,
 func (s *knowledgeService) CreateKnowledgeFromPassage(ctx context.Context,
 	kbID string, passage []string,
 ) (*types.Knowledge, error) {
-	logger.Info(ctx, "Start creating knowledge from passage")
+	return s.createKnowledgeFromPassageInternal(ctx, kbID, passage, false)
+}
+
+// CreateKnowledgeFromPassageSync creates a knowledge entry from text passages and waits for indexing to complete.
+func (s *knowledgeService) CreateKnowledgeFromPassageSync(ctx context.Context,
+	kbID string, passage []string,
+) (*types.Knowledge, error) {
+	return s.createKnowledgeFromPassageInternal(ctx, kbID, passage, true)
+}
+
+// createKnowledgeFromPassageInternal consolidates the common logic for creating knowledge from passages.
+// When syncMode is true, chunk processing is performed synchronously; otherwise, it's processed asynchronously.
+func (s *knowledgeService) createKnowledgeFromPassageInternal(ctx context.Context,
+	kbID string, passage []string, syncMode bool,
+) (*types.Knowledge, error) {
+	if syncMode {
+		logger.Info(ctx, "Start creating knowledge from passage (sync)")
+	} else {
+		logger.Info(ctx, "Start creating knowledge from passage")
+	}
 	logger.Infof(ctx, "Knowledge base ID: %s, passage count: %d", kbID, len(passage))
 
 	// 验证段落内容安全性
@@ -374,7 +393,11 @@ func (s *knowledgeService) CreateKnowledgeFromPassage(ctx context.Context,
 	}
 
 	// Create knowledge record
-	logger.Info(ctx, "Creating knowledge record")
+	if syncMode {
+		logger.Info(ctx, "Creating knowledge record (sync)")
+	} else {
+		logger.Info(ctx, "Creating knowledge record")
+	}
 	knowledge := &types.Knowledge{
 		ID:               uuid.New().String(),
 		TenantID:         ctx.Value(types.TenantIDContextKey).(uint),
@@ -394,11 +417,16 @@ func (s *knowledgeService) CreateKnowledgeFromPassage(ctx context.Context,
 		return nil, err
 	}
 
-	// Process passages asynchronously
-	logger.Info(ctx, "Starting asynchronous passage processing")
-	go s.processDocumentFromPassage(ctx, kb, knowledge, safePassages)
-
-	logger.Infof(ctx, "Knowledge from passage created successfully, ID: %s", knowledge.ID)
+	// Process passages
+	if syncMode {
+		logger.Info(ctx, "Processing passage synchronously")
+		s.processDocumentFromPassage(ctx, kb, knowledge, safePassages)
+		logger.Infof(ctx, "Knowledge from passage created successfully (sync), ID: %s", knowledge.ID)
+	} else {
+		logger.Info(ctx, "Starting asynchronous passage processing")
+		go s.processDocumentFromPassage(ctx, kb, knowledge, safePassages)
+		logger.Infof(ctx, "Knowledge from passage created successfully, ID: %s", knowledge.ID)
+	}
 	return knowledge, nil
 }
 

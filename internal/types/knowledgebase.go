@@ -18,6 +18,8 @@ type KnowledgeBase struct {
 	ID string `yaml:"id" json:"id" gorm:"type:varchar(36);primaryKey"`
 	// Name of the knowledge base
 	Name string `yaml:"name" json:"name"`
+	// Whether this knowledge base is temporary (ephemeral) and should be hidden from UI
+	IsTemporary bool `yaml:"is_temporary" json:"is_temporary" gorm:"default:false"`
 	// Description of the knowledge base
 	Description string `yaml:"description" json:"description"`
 	// Tenant ID

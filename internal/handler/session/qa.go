@@ -203,9 +203,14 @@ func (h *Handler) AgentQA(c *gin.Context) {
 	}
 
 	// Check if agent mode has changed
-	currentAgentEnabled := session.AgentConfig.Enabled
+	currentAgentEnabled := session.AgentConfig.AgentModeEnabled
 	if request.AgentEnabled != currentAgentEnabled {
 		logger.Infof(ctx, "Agent mode changed from %v to %v", currentAgentEnabled, request.AgentEnabled)
+		configChanged = true
+	}
+	currentWebSearchEnabled := session.AgentConfig.AgentModeEnabled
+	if request.WebSearchEnabled != currentWebSearchEnabled {
+		logger.Infof(ctx, "Web search mode changed from %v to %v", currentWebSearchEnabled, request.WebSearchEnabled)
 		configChanged = true
 	}
 
@@ -219,8 +224,12 @@ func (h *Handler) AgentQA(c *gin.Context) {
 				// Continue anyway - this is not a fatal error
 			}
 		}
+		if knowledgeBasesChanged {
+			// todo clear temp kb
+		}
 		session.AgentConfig.KnowledgeBases = request.KnowledgeBaseIDs
-		session.AgentConfig.Enabled = request.AgentEnabled
+		session.AgentConfig.AgentModeEnabled = request.AgentEnabled
+		session.AgentConfig.WebSearchEnabled = request.WebSearchEnabled
 		// Persist the session changes
 		if err := h.sessionService.UpdateSession(ctx, session); err != nil {
 			logger.Errorf(ctx, "Failed to update session %s: %v", sessionID, err)
