@@ -31,6 +31,7 @@ import { sanitizeHTML, safeMarkdownToHTML, createSafeImage, isValidImageURL } fr
 marked.use({
     mangle: false,
     headerIds: false,
+    breaks: true,  // 全局启用单个换行支持
 });
 const emit = defineEmits(['scroll-bottom'])
 const renderer = new marked.Renderer();
@@ -104,22 +105,27 @@ const processMarkdown = (markdownText) => {
     // 首先对 Markdown 内容进行安全处理
     const safeMarkdown = safeMarkdownToHTML(markdownText);
     
-    // 自定义安全的渲染器处理图片
-    const renderer = {
-        image(href, title, text) {
-            // 验证图片 URL 是否安全
-            if (!isValidImageURL(href)) {
-                return `<p>无效的图片链接</p>`;
-            }
-            // 使用安全的图片创建函数
-            return createSafeImage(href, text || '', title || '');
+    // 创建自定义渲染器实例，继承默认渲染器
+    const customRenderer = new marked.Renderer();
+    // 覆盖图片渲染方法
+    customRenderer.image = function(href, title, text) {
+        // 验证图片 URL 是否安全
+        if (!isValidImageURL(href)) {
+            return `<p>无效的图片链接</p>`;
         }
+        // 使用安全的图片创建函数
+        return createSafeImage(href, text || '', title || '');
     };
 
-    marked.use({ renderer });
+    // 创建临时的 marked 配置，包含 renderer 和 breaks 选项
+    // breaks: true 会将单个换行渲染为 <br>，而不是忽略
+    const markedOptions = {
+        renderer: customRenderer,
+        breaks: true  // 启用单个换行支持
+    };
 
-    // 安全地渲染 Markdown
-    let html = marked.parse(safeMarkdown);
+    // 安全地渲染 Markdown，直接传递选项
+    let html = marked.parse(safeMarkdown, markedOptions);
 
     // 使用 DOMPurify 进行最终的安全清理
     const sanitizedHTML = sanitizeHTML(html);
@@ -212,6 +218,8 @@ onMounted(async () => {
     font-size: 14px;
     color: #333333;
     line-height: 1.6;
+    /* 确保换行符正确显示 */
+    white-space: pre-line;  /* 保留换行符，但合并多个空格 */
 }
 
 .markdown-content {
