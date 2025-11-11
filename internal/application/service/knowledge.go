@@ -54,6 +54,7 @@ var (
 // service 实现知识服务接口
 type knowledgeService struct {
 	config          *config.Config
+	retrieveEngine  interfaces.RetrieveEngineRegistry
 	repo            interfaces.KnowledgeRepository
 	kbService       interfaces.KnowledgeBaseService
 	tenantRepo      interfaces.TenantRepository
@@ -79,6 +80,7 @@ func NewKnowledgeService(
 	modelService interfaces.ModelService,
 	task *asynq.Client,
 	graphEngine interfaces.RetrieveGraphRepository,
+	retrieveEngine interfaces.RetrieveEngineRegistry,
 ) (interfaces.KnowledgeService, error) {
 	return &knowledgeService{
 		config:          config,
@@ -92,6 +94,7 @@ func NewKnowledgeService(
 		modelService:    modelService,
 		task:            task,
 		graphEngine:     graphEngine,
+		retrieveEngine:  retrieveEngine,
 	}, nil
 }
 
@@ -482,7 +485,7 @@ func (s *knowledgeService) DeleteKnowledge(ctx context.Context, id string) error
 	// Delete knowledge embeddings from vector store
 	wg.Go(func() error {
 		tenantInfo := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
-		retrieveEngine, err := retriever.NewCompositeRetrieveEngine(tenantInfo.RetrieverEngines.Engines)
+		retrieveEngine, err := retriever.NewCompositeRetrieveEngine(s.retrieveEngine, tenantInfo.RetrieverEngines.Engines)
 		if err != nil {
 			logger.GetLogger(ctx).WithField("error", err).Errorf("DeleteKnowledge delete knowledge embedding failed")
 			return err
@@ -556,7 +559,7 @@ func (s *knowledgeService) DeleteKnowledgeList(ctx context.Context, ids []string
 	// 2. Delete knowledge embeddings from vector store
 	wg.Go(func() error {
 		tenantInfo := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
-		retrieveEngine, err := retriever.NewCompositeRetrieveEngine(tenantInfo.RetrieverEngines.Engines)
+		retrieveEngine, err := retriever.NewCompositeRetrieveEngine(s.retrieveEngine, tenantInfo.RetrieverEngines.Engines)
 		if err != nil {
 			logger.GetLogger(ctx).WithField("error", err).Errorf("DeleteKnowledge delete knowledge embedding failed")
 			return err
@@ -1146,7 +1149,7 @@ func (s *knowledgeService) processChunks(ctx context.Context,
 
 	// Initialize retrieval engine
 	tenantInfo := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
-	retrieveEngine, err := retriever.NewCompositeRetrieveEngine(tenantInfo.RetrieverEngines.Engines)
+	retrieveEngine, err := retriever.NewCompositeRetrieveEngine(s.retrieveEngine, tenantInfo.RetrieverEngines.Engines)
 	if err != nil {
 		knowledge.ParseStatus = "failed"
 		knowledge.ErrorMessage = err.Error()
@@ -1541,7 +1544,7 @@ func (s *knowledgeService) updateChunkVector(ctx context.Context, kbID string, c
 	}
 
 	tenantInfo := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
-	retrieveEngine, err := retriever.NewCompositeRetrieveEngine(tenantInfo.RetrieverEngines.Engines)
+	retrieveEngine, err := retriever.NewCompositeRetrieveEngine(s.retrieveEngine, tenantInfo.RetrieverEngines.Engines)
 	if err != nil {
 		return err
 	}
@@ -1804,7 +1807,7 @@ func (s *knowledgeService) CloneChunk(ctx context.Context, src, dst *types.Knowl
 	}
 
 	tenantInfo := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
-	retrieveEngine, err := retriever.NewCompositeRetrieveEngine(tenantInfo.RetrieverEngines.Engines)
+	retrieveEngine, err := retriever.NewCompositeRetrieveEngine(s.retrieveEngine, tenantInfo.RetrieverEngines.Engines)
 	if err != nil {
 		return err
 	}

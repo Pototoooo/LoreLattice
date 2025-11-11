@@ -11,7 +11,6 @@ import (
 	"github.com/Tencent/WeKnora/internal/common"
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/models/embedding"
-	"github.com/Tencent/WeKnora/internal/runtime"
 	"github.com/Tencent/WeKnora/internal/tracing"
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
@@ -60,11 +59,7 @@ func (c *CompositeRetrieveEngine) Retrieve(ctx context.Context,
 }
 
 // NewCompositeRetrieveEngine creates a new composite retrieve engine with the given parameters
-func NewCompositeRetrieveEngine(engineParams []types.RetrieverEngineParams) (*CompositeRetrieveEngine, error) {
-	var registry interfaces.RetrieveEngineRegistry
-	runtime.GetContainer().Invoke(func(r interfaces.RetrieveEngineRegistry) {
-		registry = r
-	})
+func NewCompositeRetrieveEngine(registry interfaces.RetrieveEngineRegistry, engineParams []types.RetrieverEngineParams) (*CompositeRetrieveEngine, error) {
 	engineInfos := make(map[types.RetrieverEngineType]*engineInfo)
 	for _, engineParam := range engineParams {
 		repo, err := registry.GetRetrieveEngineService(engineParam.RetrieverEngineType)

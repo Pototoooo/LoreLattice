@@ -16,7 +16,8 @@ export type DisplayType =
     | 'graph_query_results'
     | 'thinking'
     | 'plan'
-    | 'database_query';
+    | 'database_query'
+    | 'web_search_results';
 
 // Search result item
 export interface SearchResultItem {
@@ -136,6 +137,25 @@ export interface DatabaseQueryData {
     query: string;
 }
 
+// Web search result item
+export interface WebSearchResultItem {
+    result_index: number;
+    title: string;
+    url: string;
+    snippet?: string;
+    content?: string;
+    source?: string;
+    published_at?: string;
+}
+
+// Web search results data
+export interface WebSearchResultsData {
+    display_type: 'web_search_results';
+    query: string;
+    results: WebSearchResultItem[];
+    count: number;
+}
+
 // Union type for all tool result data
 export type ToolResultData =
     | SearchResultsData
@@ -146,7 +166,8 @@ export type ToolResultData =
     | GraphQueryResultsData
     | ThinkingData
     | PlanData
-    | DatabaseQueryData;
+    | DatabaseQueryData
+    | WebSearchResultsData;
 
 // Action data (from index.vue)
 export interface ActionData {

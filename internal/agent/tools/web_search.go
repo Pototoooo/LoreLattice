@@ -232,19 +232,14 @@ func (t *WebSearchTool) Execute(ctx context.Context, args map[string]interface{}
 		formattedResults = append(formattedResults, resultData)
 	}
 
-	output += "=== Usage Guidelines ===\n"
-	output += "- Use these results to answer questions about current information\n"
-	output += "- Verify information from multiple sources when possible\n"
-	output += "- Check the publication date to ensure information is current\n"
-	output += "- Results are automatically compressed to extract relevant content\n"
-
 	return &types.ToolResult{
 		Success: true,
 		Output:  output,
 		Data: map[string]interface{}{
-			"query":   query,
-			"results": formattedResults,
-			"count":   len(webResults),
+			"query":        query,
+			"results":      formattedResults,
+			"count":        len(webResults),
+			"display_type": "web_search_results",
 		},
 	}, nil
 }

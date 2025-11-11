@@ -767,17 +767,17 @@ func (t *KnowledgeSearchTool) formatOutput(
 		})
 	}
 
-	// Add usage guidance
-	output += "\n\n=== Usage Guidelines ===\n"
-	output += "- High relevance (>=0.8): directly usable for answering\n"
-	output += "- Medium relevance (0.6-0.8): use as supplementary reference\n"
-	output += "- Low relevance (<0.6): use with caution, may not be accurate\n"
-	if totalBeforeFilter > len(results) {
-		output += "- Results below threshold have been automatically filtered\n"
-	}
-	output += "- Full content is already included in search results above\n"
-	output += "- Results are deduplicated across knowledge bases and sorted by relevance\n"
-	output += "- Use get_related_chunks to expand context if needed\n"
+	// // Add usage guidance
+	// output += "\n\n=== Usage Guidelines ===\n"
+	// output += "- High relevance (>=0.8): directly usable for answering\n"
+	// output += "- Medium relevance (0.6-0.8): use as supplementary reference\n"
+	// output += "- Low relevance (<0.6): use with caution, may not be accurate\n"
+	// if totalBeforeFilter > len(results) {
+	// 	output += "- Results below threshold have been automatically filtered\n"
+	// }
+	// output += "- Full content is already included in search results above\n"
+	// output += "- Results are deduplicated across knowledge bases and sorted by relevance\n"
+	// output += "- Use get_related_chunks to expand context if needed\n"
 
 	data := map[string]interface{}{
 		"knowledge_base_ids": kbsToSearch,

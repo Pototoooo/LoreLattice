@@ -301,30 +301,13 @@ func (s *agentService) getKnowledgeBaseInfos(ctx context.Context, kbIDs []string
 						break
 					}
 					recentDocs = append(recentDocs, agent.RecentDocInfo{
-						Title:     k.Title,
-						FileName:  k.FileName,
-						Type:      k.FileType,
-						CreatedAt: k.CreatedAt.Format("2006-01-02"),
-					})
-				}
-			}
-		} else {
-			// Fallback: use ListKnowledgeByKnowledgeBaseID
-			knowledges, err := s.knowledgeService.ListKnowledgeByKnowledgeBaseID(ctx, kbID)
-			if err == nil && knowledges != nil {
-				docCount = len(knowledges)
-				// Get up to 10 most recent (assuming the list is already sorted)
-				for i, k := range knowledges {
-					if i >= 10 {
-						break
-					}
-					recentDocs = append(recentDocs, agent.RecentDocInfo{
 						KnowledgeID: k.ID,
 						Title:       k.Title,
+						Description: k.Description,
 						FileName:    k.FileName,
-						FileSize:    k.FileSize,
 						Type:        k.FileType,
 						CreatedAt:   k.CreatedAt.Format("2006-01-02"),
+						FileSize:    k.FileSize,
 					})
 				}
 			}

@@ -19,7 +19,7 @@ type AgentStreamEvent struct {
 
 // AgentEngine defines the interface for agent execution engine
 type AgentEngine interface {
-	// ExecuteStreamWithHistory executes the agent with conversation history and returns a stream of events
+	// Execute executes the agent with conversation history and returns a stream of events
 	Execute(ctx context.Context, sessionID, messageID, query string, llmContext []chat.Message) (*types.AgentState, error)
 }
 

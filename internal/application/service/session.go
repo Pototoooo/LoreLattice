@@ -764,7 +764,13 @@ func (s *sessionService) SearchKnowledge(ctx context.Context,
 func (s *sessionService) AgentQA(ctx context.Context, session *types.Session, query string, assistantMessageID string, eventBus *event.EventBus) error {
 	sessionID := session.ID
 	tenantID := ctx.Value(types.TenantIDContextKey).(uint)
-	logger.Infof(ctx, "Start agent-based question answering, session ID: %s, tenant ID: %d, query: %s", sessionID, tenantID, query)
+	sessionJSON, err := json.Marshal(session)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to marshal session, session ID: %s, error: %v", sessionID, err)
+		return fmt.Errorf("failed to marshal session: %w", err)
+	}
+	logger.Infof(ctx, "Start agent-based question answering, session ID: %s, tenant ID: %d, query: %s, session: %s",
+		sessionID, tenantID, query, string(sessionJSON))
 
 	// Build effective agent configuration by merging session and tenant configs
 	// Session-level config: Enabled, KnowledgeBases (stored in session.AgentConfig)

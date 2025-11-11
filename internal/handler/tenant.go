@@ -283,7 +283,7 @@ func (h *TenantHandler) GetTenantAgentConfig(c *gin.Context) {
 				"temperature":            agent.DefaultAgentTemperature,
 				"thinking_model_id":      "",
 				"rerank_model_id":        "",
-				"system_prompt":          agent.DefaultReActSystemPrompt,
+				"system_prompt":          agent.DefaultSystemPromptTemplate,
 				"available_tools":        availableTools,
 				"available_placeholders": availablePlaceholders,
 			},
@@ -294,7 +294,7 @@ func (h *TenantHandler) GetTenantAgentConfig(c *gin.Context) {
 	// Get system prompt, use default if empty
 	systemPrompt := tenant.AgentConfig.SystemPrompt
 	if systemPrompt == "" {
-		systemPrompt = agent.DefaultReActSystemPrompt
+		systemPrompt = agent.DefaultSystemPromptTemplate
 	}
 
 	logger.Infof(ctx, "Retrieved tenant agent config successfully, Tenant ID: %d", tenant.ID)

@@ -22,6 +22,64 @@ func NewChunkHandler(service interfaces.ChunkService) *ChunkHandler {
 	return &ChunkHandler{service: service}
 }
 
+// GetChunkByIDOnly gets a chunk by its ID only (without requiring knowledge_id)
+func (h *ChunkHandler) GetChunkByIDOnly(c *gin.Context) {
+	ctx := c.Request.Context()
+	logger.Info(ctx, "Start retrieving chunk by ID only")
+
+	chunkID := c.Param("id")
+	if chunkID == "" {
+		logger.Error(ctx, "Chunk ID is empty")
+		c.Error(errors.NewBadRequestError("Chunk ID cannot be empty"))
+		return
+	}
+
+	// Get tenant ID from context
+	tenantID, exists := c.Get(types.TenantIDContextKey.String())
+	if !exists {
+		logger.Error(ctx, "Failed to get tenant ID")
+		c.Error(errors.NewUnauthorizedError("Unauthorized"))
+		return
+	}
+
+	logger.Infof(ctx, "Retrieving chunk by ID, chunk ID: %s, tenant ID: %d", chunkID, tenantID)
+
+	// Get chunk by ID
+	chunk, err := h.service.GetChunkByID(ctx, chunkID)
+	if err != nil {
+		if err == service.ErrChunkNotFound {
+			logger.Warnf(ctx, "Chunk not found, chunk ID: %s", chunkID)
+			c.Error(errors.NewNotFoundError("Chunk not found"))
+			return
+		}
+		logger.ErrorWithFields(ctx, err, nil)
+		c.Error(errors.NewInternalServerError(err.Error()))
+		return
+	}
+
+	// Validate tenant ID
+	if chunk.TenantID != tenantID.(uint) {
+		logger.Warnf(
+			ctx,
+			"Tenant has no permission to access chunk, chunk ID: %s, req tenant: %d, chunk tenant: %d",
+			chunkID, tenantID.(uint), chunk.TenantID,
+		)
+		c.Error(errors.NewForbiddenError("No permission to access this chunk"))
+		return
+	}
+
+	// 对 chunk 内容进行安全清理
+	if chunk.Content != "" {
+		chunk.Content = secutils.SanitizeForDisplay(chunk.Content)
+	}
+
+	logger.Infof(ctx, "Successfully retrieved chunk by ID, chunk ID: %s", chunkID)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    chunk,
+	})
+}
+
 // ListKnowledgeChunks lists all chunks for a given knowledge ID
 func (h *ChunkHandler) ListKnowledgeChunks(c *gin.Context) {
 	ctx := c.Request.Context()

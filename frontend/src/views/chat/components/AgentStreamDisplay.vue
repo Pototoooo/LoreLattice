@@ -6,7 +6,7 @@
       <div class="intermediate-steps-header" @click="toggleIntermediateSteps">
         <div class="intermediate-steps-title">
           <img :src="agentIcon" alt="" />
-          <span>{{ intermediateStepsSummary }}</span>
+          <span v-html="intermediateStepsSummaryHtml"></span>
         </div>
         <div class="intermediate-steps-show-icon">
           <t-icon :name="showIntermediateSteps ? 'chevron-up' : 'chevron-down'" />
@@ -101,7 +101,12 @@
           
           <!-- Search Results Summary (Fixed, always visible, outside action-details) -->
           <div v-if="!event.pending && (event.tool_name === 'search_knowledge' || event.tool_name === 'knowledge_search') && event.tool_data" class="search-results-summary-fixed">
-            <div class="results-summary-text">{{ getSearchResultsSummary(event.tool_data) }}</div>
+            <div class="results-summary-text" v-html="getSearchResultsSummary(event.tool_data)"></div>
+          </div>
+          
+          <!-- Web Search Results Summary (Fixed, always visible, outside action-details) -->
+          <div v-if="!event.pending && event.tool_name === 'web_search' && event.tool_data" class="search-results-summary-fixed">
+            <div class="results-summary-text">找到 <strong>{{ getResultsCount(event.tool_data) }}</strong> 个网络搜索结果</div>
           </div>
           
           <div v-if="isEventExpanded(event.tool_call_id) && !event.pending" class="action-details">
@@ -148,13 +153,94 @@
       <img class="botanswer_loading_gif" src="@/assets/img/botanswer_loading.gif" alt="Processing...">
     </div>
   </div>
+  <!-- 全局浮层：统一承载 Web/KB 的 hover 内容 -->
+  <Teleport to="body">
+    <div
+      v-if="floatPopup.visible"
+      class="kb-float-popup"
+      :style="{ top: floatPopup.top + 'px', left: floatPopup.left + 'px', width: floatPopup.width + 'px' }"
+      @mouseenter="cancelFloatClose()"
+      @mouseleave="scheduleFloatClose()"
+    >
+      <div class="t-popup__content">
+        <template v-if="floatPopup.type === 'web'">
+          <div class="tip-title">{{ floatPopup.title || '' }}</div>
+          <div class="tip-url">{{ floatPopup.url || '' }}</div>
+        </template>
+        <template v-else>
+          <div v-if="floatPopup.loading" class="tip-loading">加载中...</div>
+          <div v-else-if="floatPopup.error" class="tip-error">{{ floatPopup.error }}</div>
+          <div v-else class="tip-content" v-html="floatPopup.content"></div>
+          <div v-if="floatPopup.chunkId" class="tip-meta">片段ID: {{ floatPopup.chunkId.slice(0, 25) + '...' }}</div>
+        </template>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { useRouter } from 'vue-router';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import ToolResultRenderer from './ToolResultRenderer.vue';
+import { getChunkByIdOnly } from '@/api/knowledge-base';
+
+const router = useRouter();
+
+// 浮层状态（Web/KB 共用）
+const floatPopup = ref<{
+  visible: boolean;
+  top: number;
+  left: number;
+  width: number;
+  type: 'kb' | 'web';
+  // web
+  url?: string;
+  title?: string;
+  // kb
+  loading: boolean;
+  error?: string;
+  content?: string;
+  chunkId?: string;
+}>({
+  visible: false,
+  top: 0,
+  left: 0,
+  width: 420,
+  type: 'kb',
+  url: '',
+  title: '',
+  loading: false,
+  error: undefined,
+  content: '',
+  chunkId: undefined,
+});
+let floatCloseTimer: number | null = null;
+
+const scheduleFloatClose = () => {
+  if (floatCloseTimer) window.clearTimeout(floatCloseTimer);
+  floatCloseTimer = window.setTimeout(() => {
+    floatPopup.value.visible = false;
+  }, 150);
+};
+
+const cancelFloatClose = () => {
+  if (floatCloseTimer) {
+    window.clearTimeout(floatCloseTimer);
+    floatCloseTimer = null;
+  }
+};
+
+const openFloatForEl = (el: HTMLElement, widthAdjust = 120) => {
+  const rect = el.getBoundingClientRect();
+  const pageTop = window.scrollY || document.documentElement.scrollTop || 0;
+  const pageLeft = window.scrollX || document.documentElement.scrollLeft || 0;
+  floatPopup.value.top = rect.bottom + pageTop + 2;
+  floatPopup.value.left = rect.left + pageLeft;
+  floatPopup.value.width = Math.min(520, Math.max(320, rect.width + widthAdjust));
+  floatPopup.value.visible = true;
+};
 
 // Import icons
 import agentIcon from '@/assets/img/agent.svg';
@@ -162,6 +248,7 @@ import thinkingIcon from '@/assets/img/Frame3718.svg';
 import knowledgeIcon from '@/assets/img/zhishiku-thin.svg';
 import documentIcon from '@/assets/img/ziliao.svg';
 import fileAddIcon from '@/assets/img/file-add-green.svg';
+import webSearchGlobeGreenIcon from '@/assets/img/websearch-globe-green.svg';
 
 interface SessionData {
   isAgentMode?: boolean;
@@ -356,10 +443,10 @@ const intermediateStepsSummary = computed(() => {
   
   const parts: string[] = [];
   if (searchCount > 0) {
-    parts.push(`检索知识库 ${searchCount} 次`);
+    parts.push(`检索知识库 <strong>${searchCount}</strong> 次`);
   }
   if (thinkingCount > 0) {
-    parts.push(`思考 ${thinkingCount} 次`);
+    parts.push(`思考 <strong>${thinkingCount}</strong> 次`);
   }
   if (toolCalls.length > 0) {
     const toolNames = toolCalls.map(name => {
@@ -376,11 +463,17 @@ const intermediateStepsSummary = computed(() => {
   
   // Add duration info
   if (totalDuration > 0) {
-    parts.push(`耗时 ${formatDuration(totalDuration)}`);
+    const durationStr = formatDuration(totalDuration);
+    // Extract numbers from duration string (e.g., "300ms" -> "300", "3s" -> "3", "2m 30s" -> "2" and "30")
+    // Process "ms" first to avoid matching "m" and "s" separately, then process "s" and "m"
+    const durationHtml = durationStr
+      .replace(/(\d+)(ms)/g, '<strong>$1</strong>$2')
+      .replace(/(\d+)([sm])(?!\w)/g, '<strong>$1</strong>$2');
+    parts.push(`耗时 ${durationHtml}`);
   }
   
   if (parts.length === 0) {
-    return `${intermediateStepsCount.value} 个中间步骤`;
+    return `<strong>${intermediateStepsCount.value}</strong> 个中间步骤`;
   }
   
   // 优化连接词，使语句更流畅
@@ -393,6 +486,11 @@ const intermediateStepsSummary = computed(() => {
     const last = parts.pop();
     return `${parts.join('、')}，${last}`;
   }
+});
+
+// HTML version of intermediate steps summary with colored numbers
+const intermediateStepsSummaryHtml = computed(() => {
+  return intermediateStepsSummary.value;
 });
 
 // Should show the collapsed steps indicator
@@ -505,6 +603,242 @@ const isEventExpanded = (eventId: string): boolean => {
   return expandedEvents.value.has(eventId);
 };
 
+// Delegated handlers for span-based citation clicks/keyboard
+const handleCitationActivate = (el: HTMLElement) => {
+  const url = el.getAttribute('data-url');
+  if (!url) return;
+  try {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  } catch {
+    // noop
+  }
+};
+
+// KB citations: 悬停用浮层展示摘要；点击跳转 KB 详情
+const kbChunkDetails = ref<Record<string, { content?: string; loading: boolean; error?: string }>>({});
+
+const loadChunkDetails = async (chunkId: string) => {
+  // Skip if already loaded or currently loading
+  if (kbChunkDetails.value[chunkId]) {
+    if (kbChunkDetails.value[chunkId].loading) {
+      return; // Already loading
+    }
+    if (kbChunkDetails.value[chunkId].content) {
+      // Already loaded, update tooltip immediately
+      updateKBCitationTooltip(chunkId, kbChunkDetails.value[chunkId].content);
+      return;
+    }
+  }
+  
+  // Set loading state
+  kbChunkDetails.value[chunkId] = { loading: true };
+  updateKBCitationTooltip(chunkId); // Show loading state
+  
+  try {
+    const response = await getChunkByIdOnly(chunkId);
+    if (response.data && response.data.content) {
+      kbChunkDetails.value[chunkId] = {
+        content: response.data.content,
+        loading: false
+      };
+      // Update the tooltip content in the DOM
+      updateKBCitationTooltip(chunkId, response.data.content);
+    } else {
+      const errorMsg = '未找到内容';
+      kbChunkDetails.value[chunkId] = {
+        loading: false,
+        error: errorMsg
+      };
+      updateKBCitationTooltip(chunkId, undefined, errorMsg);
+    }
+  } catch (error: any) {
+    console.error('Failed to load chunk details:', error);
+    const errorMsg = error?.message || '加载失败';
+    kbChunkDetails.value[chunkId] = {
+      loading: false,
+      error: errorMsg
+    };
+    updateKBCitationTooltip(chunkId, undefined, errorMsg);
+  }
+};
+
+const updateKBCitationTooltip = (chunkId: string, content?: string, error?: string) => {
+  // Find all KB citation elements with this chunk ID
+  const citations = document.querySelectorAll(`.citation-kb[data-chunk-id="${chunkId}"]`);
+  citations.forEach((citation) => {
+    const tipElement = citation.querySelector('.citation-tip');
+    if (tipElement) {
+      const doc = citation.getAttribute('data-doc') || '';
+      const shortChunkId = `${chunkId.substring(0, 25)}...`;
+      
+      const renderContent = (inner: string) => {
+        tipElement.innerHTML = `
+          <span class="t-popup__content">
+            ${inner}
+            <span class="tip-meta">片段ID: ${shortChunkId}</span>
+          </span>
+        `;
+      };
+      
+      if (error) {
+        renderContent(`<span class="tip-error">${error}</span>`);
+      } else if (content) {
+        const shortContent = content.length > 600 ? content.substring(0, 600) + '...' : content;
+        const escapedContent = shortContent
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\n/g, '<br>');
+        renderContent(`<span class="tip-content">${escapedContent}</span>`);
+      } else {
+        renderContent(`<span class="tip-loading">加载中...</span>`);
+      }
+    }
+  });
+};
+
+// 统一 hover 入口（Web/KB）
+let kbHoverTimer: number | null = null;
+const onHover = (e: Event) => {
+  const target = e.target as HTMLElement;
+  if (!target) return;
+  const kbEl = target.closest?.('.citation-kb') as HTMLElement | null;
+  const webEl = target.closest?.('.citation-web') as HTMLElement | null;
+  // KB
+  if (kbEl) {
+    const chunkId = kbEl.getAttribute('data-chunk-id') || '';
+    if (!chunkId) return;
+    if (kbHoverTimer) window.clearTimeout(kbHoverTimer);
+    kbHoverTimer = window.setTimeout(() => {
+      floatPopup.value.type = 'kb';
+      floatPopup.value.loading = true;
+      floatPopup.value.error = undefined;
+      floatPopup.value.content = '';
+      floatPopup.value.chunkId = chunkId;
+      openFloatForEl(kbEl);
+      loadChunkDetails(chunkId);
+    }, 80);
+    return;
+  }
+  // Web
+  if (webEl) {
+    const url = webEl.getAttribute('data-url') || '';
+    const title = webEl.querySelector('.tip-title')?.textContent || webEl.getAttribute('data-title') || '';
+    if (kbHoverTimer) window.clearTimeout(kbHoverTimer);
+    kbHoverTimer = window.setTimeout(() => {
+      floatPopup.value.type = 'web';
+      floatPopup.value.url = url;
+      floatPopup.value.title = title || '';
+      openFloatForEl(webEl, 60);
+    }, 40);
+    return;
+  }
+};
+
+const onHoverOut = (e: Event) => {
+  const rt = (e as MouseEvent).relatedTarget as HTMLElement | null;
+  if (rt && (rt.closest?.('.citation-kb') || rt.closest?.('.citation-web') || rt.closest?.('.kb-float-popup'))) {
+    return;
+  }
+  if (kbHoverTimer) {
+    window.clearTimeout(kbHoverTimer);
+    kbHoverTimer = null;
+  }
+  scheduleFloatClose();
+};
+
+const onRootClick = (e: Event) => {
+  const target = e.target as HTMLElement;
+  if (!target) return;
+  
+  // Handle web citation clicks
+  const webEl = target.closest?.('.citation-web') as HTMLElement | null;
+  if (webEl && webEl.getAttribute('data-url')) {
+    e.preventDefault();
+    handleCitationActivate(webEl);
+    return;
+  }
+  
+  // Handle KB citation clicks -> navigate to KB detail page
+  const kbEl = target.closest?.('.citation-kb') as HTMLElement | null;
+  if (kbEl && kbEl.getAttribute('data-kb-id')) {
+    e.preventDefault();
+    e.stopPropagation();
+    const kbId = kbEl.getAttribute('data-kb-id');
+    if (kbId) {
+      try {
+        // Navigate to knowledge base detail page
+        router.push(`/platform/knowledge-bases/${kbId}`);
+      } catch (error) {
+        console.error('Failed to navigate to knowledge base:', error);
+      }
+    }
+    return;
+  }
+};
+
+const onRootKeydown = (e: KeyboardEvent) => {
+  const target = e.target as HTMLElement;
+  if (!target) return;
+  
+  // Handle web citation keyboard
+  const webEl = target.closest?.('.citation-web') as HTMLElement | null;
+  if (webEl) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleCitationActivate(webEl);
+    }
+    return;
+  }
+  
+  // Handle KB citation keyboard -> navigate to KB detail
+  const kbEl = target.closest?.('.citation-kb') as HTMLElement | null;
+  if (kbEl) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const kbId = kbEl.getAttribute('data-kb-id');
+      if (kbId) {
+        try {
+          router.push(`/platform/knowledge-bases/${kbId}`);
+        } catch (error) {
+          console.error('Failed to navigate to knowledge base:', error);
+        }
+      }
+    }
+    return;
+  }
+};
+
+onMounted(() => {
+  const root = document.querySelector('.agent-stream-display');
+  if (!root) return;
+  root.addEventListener('click', onRootClick, true);
+  const keydownListener: EventListener = (evt: Event) => onRootKeydown(evt as KeyboardEvent);
+  // Store on element for removal
+  (root as any).__citationKeydown__ = keydownListener;
+  root.addEventListener('keydown', keydownListener, true);
+  // 统一 hover 监听
+  root.addEventListener('mouseover', onHover, true);
+  root.addEventListener('mouseout', onHoverOut, true);
+  window.addEventListener('scroll', scheduleFloatClose, true);
+  window.addEventListener('resize', scheduleFloatClose, true);
+});
+
+onBeforeUnmount(() => {
+  const root = document.querySelector('.agent-stream-display');
+  if (!root) return;
+  root.removeEventListener('click', onRootClick, true);
+  root.removeEventListener('mouseover', onHover, true);
+  root.removeEventListener('mouseout', onHoverOut, true);
+  window.removeEventListener('scroll', scheduleFloatClose, true);
+  window.removeEventListener('resize', scheduleFloatClose, true);
+  const keydownListener: EventListener | undefined = (root as any).__citationKeydown__;
+  if (keydownListener) {
+    root.removeEventListener('keydown', keydownListener, true);
+    delete (root as any).__citationKeydown__;
+  }
+});
+
 // Markdown rendering function
 const renderMarkdown = (content: any): string => {
   if (!content) return '';
@@ -514,12 +848,59 @@ const renderMarkdown = (content: any): string => {
   if (!contentStr.trim()) return '';
   
   try {
-    const html = marked.parse(contentStr) as string;
+    // Preprocess custom citation tags into safe HTML the sanitizer will allow
+    // Supported formats:
+    //   <kb kb_id="..." doc="..." chunk_id="..." />
+    //   <web url="https://..." title="Example" />
+    const processed = contentStr
+      // Web citations -> compact clickable badges with domain text; hover shows title via native tooltip
+      .replace(
+        /<web\s+url="([^"]+)"\s+title="([^"]+)"\s*\/>/g,
+        (_m: string, url: string, title: string) => {
+          // Extract domain for compact display
+          let domain = url;
+          try {
+            const u = new URL(url);
+            const host = u.hostname || '';
+            const parts = host.split('.');
+            if (parts.length >= 2) {
+              // prefer second-level domain: last two labels
+              domain = parts.slice(-2).join('.');
+            } else {
+              domain = host || url;
+            }
+          } catch {
+            // keep original url text if parsing fails
+          }
+          // Escape double quotes in title for attribute safety
+          const safeTitle = String(title || '').replace(/"/g, '&quot;');
+          const safeUrl = String(url || '').replace(/"/g, '&quot;');
+          // Render with embedded tooltip blocks to allow styled parts (bold title)
+          const tipTitle = safeTitle || '';
+          const tipUrl = safeUrl || '';
+          // Keep lightweight tooltip (no t-popup container) to avoid global popup styling
+          return `<span class="citation citation-web" data-url="${safeUrl}" role="link" tabindex="0"><span class="citation-icon web"></span><span class="citation-domain">${domain}</span><span class="citation-tip"><span class="tip-title">${tipTitle}</span><span class="tip-url">${tipUrl}</span></span></span>`;
+        }
+      )
+      // KB citations -> inline badges with simplified display
+      .replace(
+        /<kb\s+kb_id="([^"]+)"\s+doc="([^"]+)"\s+chunk_id="([^"]+)"\s*\/>/g,
+        (_m, kbId, doc, chunkId) => {
+          // Escape doc name for safety
+          const safeDoc = String(doc || '').replace(/"/g, '&quot;');
+          const safeKbId = String(kbId || '').replace(/"/g, '&quot;');
+          const safeChunkId = String(chunkId || '').replace(/"/g, '&quot;');
+          // Initial tooltip content (single t-popup container; will be updated on hover)
+          return `<span class="citation citation-kb" data-kb-id="${safeKbId}" data-chunk-id="${safeChunkId}" data-doc="${safeDoc}" role="button" tabindex="0"><span class="citation-icon kb"></span><span class="citation-text">${safeDoc}</span><span class="citation-tip"><span class="t-popup__content"><span class="tip-loading">加载中...</span></span></span></span>`;
+        }
+      );
+
+    const html = marked.parse(processed) as string;
     if (!html) return '';
     
     return DOMPurify.sanitize(html, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'code', 'pre', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'table', 'thead', 'tbody', 'tr', 'th', 'td'],
-      ALLOWED_ATTR: ['href', 'title', 'target', 'rel']
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'code', 'pre', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'span', 'table', 'thead', 'tbody', 'tr', 'th', 'td'],
+      ALLOWED_ATTR: ['href', 'title', 'target', 'rel', 'data-tooltip', 'data-url', 'data-kb-id', 'data-chunk-id', 'data-doc', 'class', 'role', 'tabindex']
     });
   } catch (e) {
     console.error('Markdown rendering error:', e, 'Content:', contentStr.substring(0, 100));
@@ -643,6 +1024,8 @@ const getToolIcon = (toolName: string): string => {
     return thinkingIcon;
   } else if (toolName === 'search_knowledge' || toolName === 'knowledge_search') {
     return knowledgeIcon;
+  } else if (toolName === 'web_search') {
+    return webSearchGlobeGreenIcon;
   } else if (toolName === 'get_document_info' || toolName === 'get_related_chunks') {
     return documentIcon;
   } else if (toolName === 'todo_write') {
@@ -652,7 +1035,7 @@ const getToolIcon = (toolName: string): string => {
   }
 };
 
-// Get search results summary text
+// Get search results summary text (returns HTML with colored numbers)
 const getSearchResultsSummary = (toolData: any): string => {
   if (!toolData) return '';
   
@@ -661,9 +1044,25 @@ const getSearchResultsSummary = (toolData: any): string => {
   
   const kbCount = toolData.kb_counts ? Object.keys(toolData.kb_counts).length : 0;
   if (kbCount > 0) {
-    return `找到 ${count} 个结果，来自 ${kbCount} 个知识库`;
+    return `找到 <strong>${count}</strong> 个结果，来自 <strong>${kbCount}</strong> 个知识库`;
   }
-  return `找到 ${count} 个结果`;
+  return `找到 <strong>${count}</strong> 个结果`;
+};
+
+// Get web search results summary text
+const getWebSearchResultsSummary = (toolData: any): string => {
+  if (!toolData) return '';
+  
+  const count = toolData.results?.length || toolData.count || 0;
+  if (count === 0) return '';
+  
+  return `找到 ${count} 个网络搜索结果`;
+};
+
+// Get results count (number only) for web search summary
+const getResultsCount = (toolData: any): number => {
+  if (!toolData) return 0;
+  return toolData.results?.length || toolData.count || 0;
 };
 
 // Extract and format query parameters from args
@@ -722,6 +1121,7 @@ const getToolTitle = (event: any): string => {
   
   const toolName = event.tool_name;
   const isSearchTool = toolName === 'search_knowledge' || toolName === 'knowledge_search';
+  const isWebSearchTool = toolName === 'web_search';
   
   // For search tools, use description with query text
   if (isSearchTool) {
@@ -731,6 +1131,22 @@ const getToolTitle = (event: any): string => {
       if (queryText) {
         return `${baseTitle}：「${queryText}」`;
       }
+    }
+    return baseTitle;
+  }
+  
+  // For web search tools, use description with query text
+  if (isWebSearchTool) {
+    const baseTitle = getToolDescription(event);
+    // Try to get query from arguments or tool_data
+    let queryText = '';
+    if (event.arguments && typeof event.arguments === 'object' && event.arguments.query) {
+      queryText = event.arguments.query;
+    } else if (event.tool_data && event.tool_data.query) {
+      queryText = event.tool_data.query;
+    }
+    if (queryText) {
+      return `${baseTitle}：「${queryText}」`;
     }
     return baseTitle;
   }
@@ -751,6 +1167,8 @@ const getToolDescription = (event: any): string => {
   
   if (toolName === 'search_knowledge' || toolName === 'knowledge_search') {
     return success ? '检索知识库' : '检索知识库失败';
+  } else if (toolName === 'web_search') {
+    return success ? '网络搜索' : '网络搜索失败';
   } else if (toolName === 'get_document_info') {
     return success ? '获取文档信息' : '获取文档信息失败';
   } else if (toolName === 'thinking') {
@@ -838,6 +1256,11 @@ const formatJSON = (obj: any): string => {
     span {
       white-space: nowrap;
       font-size: 14px;
+      
+      :deep(strong) {
+        color: #07c05f;
+        font-weight: 600;
+      }
     }
   }
   
@@ -994,6 +1417,16 @@ const formatJSON = (obj: any): string => {
     line-height: 1.6;
     
     &.markdown-content {
+      /* citation-web styles moved to global fallback below to avoid duplication */
+      
+      /* keyboard focus */
+      :deep(.citation-web:focus-visible) {
+        outline: 2px solid #34d399; /* green-400 */
+        outline-offset: 2px;
+      }
+      
+      /* KB citation styles are defined globally, no need to override here */
+      
       :deep(p) {
         margin: 8px 0;
         line-height: 1.6;
@@ -1289,6 +1722,12 @@ const formatJSON = (obj: any): string => {
     font-weight: 500;
     color: #333;
     line-height: 1.5;
+    
+    // Use :deep() to apply styles to v-html content
+    :deep(strong) {
+      color: #07c05f;
+      font-weight: 600;
+    }
   }
 }
 
@@ -1480,6 +1919,218 @@ const formatJSON = (obj: any): string => {
       }
     }
   }
+}
+
+/* Global citation styles fallback to ensure rendering in any container */
+:deep(.citation) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 10px;
+  padding: 2px 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  background-clip: padding-box;
+  margin: 0 4px;
+}
+
+:deep(.citation .citation-tip) {
+  display: none !important;
+}
+
+:deep(.citation-web) {
+  /* Align with app primary green scheme */
+  background: #f0fdf4;           /* green-50 */
+  color: #065f46;                /* green-800 */
+  border: 1px solid #bbf7d0;     /* green-200 */
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+}
+
+:deep(.citation-web:hover) {
+  /* Subtle hover in green tone */
+  background: #d1fae5;           /* green-100 */
+  border-color: #86efac;         /* green-300 */
+  color: #065f46;                /* keep readable on light bg */
+}
+
+/* Embedded tooltip bubble (structured, supports bold title) */
+:deep(.citation-web .citation-tip) {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  white-space: pre-wrap;
+  z-index: 9999;
+  color: #111827;
+  background: #f9fafb;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  max-width: 520px;
+  min-width: 200px;
+  pointer-events: none;
+}
+
+:deep(.citation-web:hover .citation-tip) {
+  display: block;
+}
+
+:deep(.citation-web .citation-tip .tip-title) {
+  display: block;
+  font-weight: 600; /* bold title */
+  margin-bottom: 4px;
+}
+
+:deep(.citation-web .citation-tip .tip-url) {
+  display: block;
+  opacity: 0.9;
+}
+
+/* Citation icons */
+:deep(.citation .citation-icon) {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 0px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+/* Web icon (globe) */
+:deep(.citation .citation-icon.web) {
+  background-image: url("../../../assets/img/websearch-globe-green.svg");
+}
+
+/* Knowledge base icon */
+:deep(.citation .citation-icon.kb) {
+  background-image: url("../../../assets/img/zhishiku-thin.svg");
+}
+
+/* KB citation styles - same green theme as web citations */
+:deep(.citation.citation-kb) {
+  /* Green theme - same as web citations */
+  background: #f0fdf4;           /* green-50 */
+  color: #065f46;                /* green-800 */
+  border: 1px solid #bbf7d0;     /* green-200 */
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+:deep(.citation.citation-kb:hover) {
+  /* Subtle hover in green tone */
+  background: #d1fae5;           /* green-100 */
+  border-color: #86efac;         /* green-300 */
+  color: #065f46;                /* keep readable on light bg */
+}
+
+:deep(.citation.citation-kb:focus-visible) {
+  outline: 2px solid #34d399;    /* green-400 */
+  outline-offset: 2px;
+}
+
+/* KB citation tooltip styles (same as web citation) */
+:deep(.citation.citation-kb .citation-tip) {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 100%;                 /* 紧贴父元素底部，避免鼠标穿过空隙导致消失 */
+  /* popup container mimic */
+  z-index: 9999;
+  color: #111827;
+  background: transparent;    /* 外层透明，避免顶部出现白边 */
+  border-radius: 0;
+  padding: 8px 0 0;          /* 仅用上内边距制造视觉间距，保持可 hover 区域连续 */
+  font-size: 12px;
+  line-height: 1.5;
+  box-shadow: none;           /* 阴影放到内部容器 */
+  width: 420px;            /* fixed width to avoid layout jump */
+  min-height: 120px;       /* reserve space to avoid jitter before content arrives */
+  pointer-events: auto;      /* 允许在弹层内部滚动与交互 */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+:deep(.citation.citation-kb:hover .citation-tip) {
+  display: block;
+}
+
+/* inner content mimic of t-popup__content */
+:deep(.citation.citation-kb .citation-tip .t-popup__content) {
+  display: block;
+  padding: 12px 14px;        /* actual padding here */
+  max-height: 340px;
+  overflow-y: auto;          /* inner scroll */
+  background: #f9fafb;       /* 背景、圆角与阴影移动到内部容器 */
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  box-sizing: border-box;
+  overscroll-behavior: contain;         /* 防止滚动穿透到页面 */
+  -webkit-overflow-scrolling: touch;    /* iOS 惯性滚动 */
+}
+
+:deep(.citation.citation-kb .citation-tip .tip-title) {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #065f46;                /* green-800 to match citation */
+}
+
+:deep(.citation.citation-kb .citation-tip .tip-doc) {
+  display: block;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+:deep(.citation.citation-kb .citation-tip .tip-content) {
+  display: block;
+  color: #374151;
+  line-height: 1.6;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 4px;
+  word-break: break-word;
+  white-space: normal;
+}
+
+:deep(.citation.citation-kb .citation-tip .tip-content::-webkit-scrollbar) {
+  width: 6px;
+}
+
+:deep(.citation.citation-kb .citation-tip .tip-content::-webkit-scrollbar-track) {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+:deep(.citation.citation-kb .citation-tip .tip-content::-webkit-scrollbar-thumb) {
+  background: #888;
+  border-radius: 3px;
+}
+
+:deep(.citation.citation-kb .citation-tip .tip-content::-webkit-scrollbar-thumb:hover) {
+  background: #555;
+}
+
+:deep(.citation.citation-kb .citation-tip .tip-loading) {
+  display: block;
+  color: #6b7280;
+  font-style: italic;
+  font-size: 11px;
+}
+
+:deep(.citation.citation-kb .citation-tip .tip-error) {
+  display: block;
+  color: #dc2626;
+  font-size: 11px;
+  margin-top: 4px;
 }
 
 .tool-arguments-wrapper {

@@ -55,6 +55,12 @@
       :data="toolData as DatabaseQueryData" 
     />
     
+    <!-- Web Search Results Display -->
+    <WebSearchResults 
+      v-else-if="displayType === 'web_search_results'" 
+      :data="toolData as WebSearchResultsData" 
+    />
+    
     <!-- Fallback: Display raw output -->
     <div v-else class="fallback-output">
       <div class="detail-output">{{ output }}</div>
@@ -74,7 +80,8 @@ import type {
   GraphQueryResultsData,
   ThinkingData,
   PlanData,
-  DatabaseQueryData
+  DatabaseQueryData,
+  WebSearchResultsData
 } from '@/types/tool-results';
 
 import SearchResults from './tool-results/SearchResults.vue';
@@ -86,6 +93,7 @@ import GraphQueryResults from './tool-results/GraphQueryResults.vue';
 import ThinkingDisplay from './tool-results/ThinkingDisplay.vue';
 import PlanDisplay from './tool-results/PlanDisplay.vue';
 import DatabaseQuery from './tool-results/DatabaseQuery.vue';
+import WebSearchResults from './tool-results/WebSearchResults.vue';
 
 interface Props {
   displayType?: DisplayType;

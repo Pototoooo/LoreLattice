@@ -88,7 +88,7 @@ func (e *AgentEngine) Execute(ctx context.Context, sessionID, messageID, query s
 	}
 
 	// Build system prompt
-	systemPrompt := BuildReActSystemPrompt(e.knowledgeBasesInfo, e.systemPromptTemplate)
+	systemPrompt := BuildReActSystemPromptWithStatus(e.knowledgeBasesInfo, e.config.WebSearchEnabled, e.systemPromptTemplate)
 	logger.Debugf(ctx, "[Agent] SystemPrompt Length: %d characters", len(systemPrompt))
 	logger.Debugf(ctx, "[Agent] SystemPrompt (stream)\n----\n%s\n----", systemPrompt)
 
@@ -328,7 +328,7 @@ func (e *AgentEngine) executeLoop(
 				// Optional: Reflection after each tool call (streaming)
 				if e.config.ReflectionEnabled && result != nil {
 					reflection, err := e.streamReflectionToEventBus(
-						ctx, tc.ID, tc.Function.Name, args, result.Output,
+						ctx, tc.ID, tc.Function.Name, result.Output,
 						state.CurrentRound, sessionID,
 					)
 					if err != nil {
@@ -524,7 +524,6 @@ func (e *AgentEngine) streamReflectionToEventBus(
 	ctx context.Context,
 	toolCallID string,
 	toolName string,
-	args map[string]interface{},
 	result string,
 	iteration int,
 	sessionID string,
@@ -645,7 +644,7 @@ func (e *AgentEngine) streamFinalAnswerToEventBus(
 		len(state.RoundSteps), countTotalToolCalls(state.RoundSteps))
 
 	// Build messages with all context
-	systemPrompt := BuildReActSystemPrompt(e.knowledgeBasesInfo, e.systemPromptTemplate)
+	systemPrompt := BuildReActSystemPromptWithStatus(e.knowledgeBasesInfo, e.config.WebSearchEnabled, e.systemPromptTemplate)
 
 	messages := []chat.Message{
 		{Role: "system", Content: systemPrompt},

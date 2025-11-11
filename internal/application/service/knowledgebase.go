@@ -21,10 +21,11 @@ var ErrInvalidTenantID = errors.New("invalid tenant ID")
 
 // knowledgeBaseService implements the knowledge base service interface
 type knowledgeBaseService struct {
-	repo         interfaces.KnowledgeBaseRepository
-	kgRepo       interfaces.KnowledgeRepository
-	chunkRepo    interfaces.ChunkRepository
-	modelService interfaces.ModelService
+	repo           interfaces.KnowledgeBaseRepository
+	kgRepo         interfaces.KnowledgeRepository
+	chunkRepo      interfaces.ChunkRepository
+	modelService   interfaces.ModelService
+	retrieveEngine interfaces.RetrieveEngineRegistry
 }
 
 // NewKnowledgeBaseService creates a new knowledge base service
@@ -32,12 +33,14 @@ func NewKnowledgeBaseService(repo interfaces.KnowledgeBaseRepository,
 	kgRepo interfaces.KnowledgeRepository,
 	chunkRepo interfaces.ChunkRepository,
 	modelService interfaces.ModelService,
+	retrieveEngine interfaces.RetrieveEngineRegistry,
 ) interfaces.KnowledgeBaseService {
 	return &knowledgeBaseService{
-		repo:         repo,
-		kgRepo:       kgRepo,
-		chunkRepo:    chunkRepo,
-		modelService: modelService,
+		repo:           repo,
+		kgRepo:         kgRepo,
+		chunkRepo:      chunkRepo,
+		modelService:   modelService,
+		retrieveEngine: retrieveEngine,
 	}
 }
 
@@ -268,7 +271,7 @@ func (s *knowledgeBaseService) HybridSearch(ctx context.Context,
 	logger.Infof(ctx, "Creating composite retrieval engine, tenant ID: %d", tenantInfo.ID)
 
 	// Create a composite retrieval engine with tenant's configured retrievers
-	retrieveEngine, err := retriever.NewCompositeRetrieveEngine(tenantInfo.RetrieverEngines.Engines)
+	retrieveEngine, err := retriever.NewCompositeRetrieveEngine(s.retrieveEngine, tenantInfo.RetrieverEngines.Engines)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create retrieval engine: %v", err)
 		return nil, err

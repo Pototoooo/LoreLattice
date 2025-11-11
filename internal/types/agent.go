@@ -125,7 +125,6 @@ func (s *AgentStep) GetObservations() []string {
 type AgentState struct {
 	CurrentRound  int             `json:"current_round"`  // Current round number
 	RoundSteps    []AgentStep     `json:"round_steps"`    // All steps taken so far in the current round
-	Plan          []string        `json:"plan,omitempty"` // Execution plan (if planning enabled)
 	IsComplete    bool            `json:"is_complete"`    // Whether agent has finished
 	FinalAnswer   string          `json:"final_answer"`   // The final answer to the query
 	KnowledgeRefs []*SearchResult `json:"knowledge_refs"` // Collected knowledge references

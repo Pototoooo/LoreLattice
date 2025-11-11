@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/errors"
 	"github.com/Tencent/WeKnora/internal/event"
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/types"
@@ -137,15 +136,6 @@ func (h *Handler) writeAgentQueryEvent(ctx context.Context, sessionID, assistant
 		})
 		// Non-fatal error, continue
 	}
-}
-
-// validateSessionAndGetID validates and extracts session ID from URL parameter
-func validateSessionID(c *gin.Context) (string, error) {
-	sessionID := c.Param("session_id")
-	if sessionID == "" {
-		return "", errors.NewBadRequestError(errors.ErrInvalidSessionID.Error())
-	}
-	return sessionID, nil
 }
 
 // getRequestID gets the request ID from gin context

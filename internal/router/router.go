@@ -101,6 +101,8 @@ func RegisterChunkRoutes(r *gin.RouterGroup, handler *handler.ChunkHandler) {
 	{
 		// 获取分块列表
 		chunks.GET("/:knowledge_id", handler.ListKnowledgeChunks)
+		// 通过chunk_id获取单个chunk（不需要knowledge_id）
+		chunks.GET("/by-id/:id", handler.GetChunkByIDOnly)
 		// 删除分块
 		chunks.DELETE("/:knowledge_id/:id", handler.DeleteChunk)
 		// 删除知识下的所有分块

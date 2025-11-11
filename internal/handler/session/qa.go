@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"runtime"
@@ -143,6 +144,7 @@ func (h *Handler) AgentQA(c *gin.Context) {
 		c.Error(errors.NewBadRequestError(err.Error()))
 		return
 	}
+	logger.Infof(ctx, "Agent QA request, request: %+v", request)
 
 	// Validate query content
 	if request.Query == "" {
@@ -150,8 +152,6 @@ func (h *Handler) AgentQA(c *gin.Context) {
 		c.Error(errors.NewBadRequestError("Query content cannot be empty"))
 		return
 	}
-
-	logger.Infof(ctx, "Agent QA request, session ID: %s, query: %s", sessionID, request.Query)
 
 	tenantInfo := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
 
@@ -162,6 +162,13 @@ func (h *Handler) AgentQA(c *gin.Context) {
 		c.Error(errors.NewNotFoundError("Session not found"))
 		return
 	}
+	sessionJSON, err := json.Marshal(session)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to marshal session, session ID: %s, error: %v", sessionID, err)
+		c.Error(errors.NewInternalServerError(err.Error()))
+		return
+	}
+	logger.Infof(ctx, "Before AgentQA, Session: %s", string(sessionJSON))
 
 	// Create assistant message
 	assistantMessage := &types.Message{
@@ -212,7 +219,7 @@ func (h *Handler) AgentQA(c *gin.Context) {
 		logger.Infof(ctx, "Agent mode changed from %v to %v", currentAgentEnabled, request.AgentEnabled)
 		configChanged = true
 	}
-	currentWebSearchEnabled := session.AgentConfig.AgentModeEnabled
+	currentWebSearchEnabled := session.AgentConfig.WebSearchEnabled
 	if request.WebSearchEnabled != currentWebSearchEnabled {
 		logger.Infof(ctx, "Web search mode changed from %v to %v", currentWebSearchEnabled, request.WebSearchEnabled)
 		configChanged = true
@@ -228,16 +235,15 @@ func (h *Handler) AgentQA(c *gin.Context) {
 
 	// If configuration changed, clear context and update session
 	if configChanged {
-		logger.Infof(ctx, "Configuration changed, clearing context for session: %s", sessionID)
-		if knowledgeBasesChanged {
-			// Clear the LLM context to prevent contamination
-			if err := h.sessionService.ClearContext(ctx, sessionID); err != nil {
-				logger.Errorf(ctx, "Failed to clear context for session %s: %v", sessionID, err)
-				// Continue anyway - this is not a fatal error
-			}
+		logger.Warnf(ctx, "Configuration changed, clearing context for session: %s", sessionID)
+		// Clear the LLM context to prevent contamination
+		if err := h.sessionService.ClearContext(ctx, sessionID); err != nil {
+			logger.Errorf(ctx, "Failed to clear context for session %s: %v", sessionID, err)
+			// Continue anyway - this is not a fatal error
 		}
-		if knowledgeBasesChanged {
-			// todo clear temp kb
+		if err := h.sessionService.DeleteWebSearchTempKBState(ctx, sessionID); err != nil {
+			logger.Errorf(ctx, "Failed to delete temp knowledge base for session %s: %v", sessionID, err)
+			// Continue anyway - this is not a fatal error
 		}
 		session.AgentConfig.KnowledgeBases = request.KnowledgeBaseIDs
 		session.AgentConfig.AgentModeEnabled = request.AgentEnabled
