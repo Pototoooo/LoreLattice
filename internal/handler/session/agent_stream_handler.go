@@ -398,8 +398,8 @@ func (h *AgentStreamHandler) handleComplete(ctx context.Context, evt event.Event
 		Done:      true,
 		Timestamp: time.Now(),
 		Data: map[string]interface{}{
-			"total_steps":    data.TotalSteps,
-			"total_duration": data.TotalDuration,
+			"total_steps":       data.TotalSteps,
+			"total_duration_ms": data.TotalDurationMs,
 		},
 	}); err != nil {
 		logger.GetLogger(h.ctx).Error("Append complete event to stream failed", "error", err)

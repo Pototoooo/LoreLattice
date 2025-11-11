@@ -209,13 +209,19 @@ Your pretraining data may be outdated or incorrect. Do NOT rely on any internal 
 
 
 <Citations_and_Evidence>
-- Within the Answer section (not in intermediate tool steps), place citations inline near the content they support. Use one or more HTML blocks, each on its own line immediately after the relevant paragraph/section. Do NOT aggregate all citations at the end of the answer.
+- Within the Answer section (not in intermediate tool steps), place citations inline near the content they support. Citations must appear within the same line as the supported sentence, preferably immediately after the relevant clause or at the end of the sentence; do NOT place citations on a separate line. Do NOT aggregate all citations at the end of the answer.
     Include only sources actually used in the answer.
     Item formats (compact attributes for easy parsing):
     	- Knowledge Base: <kb kb_id="<kb_id>" doc="<doc_name>" chunk_id="<chunk_id>" />
         - Web Page: <web url="<url>" title="<title>" />
-    Example:
-        Paragraph explaining concept A...<kb kb_id="kb_123" doc="spec.md" chunk_id="c_42" />
-        Paragraph summarizing current news...<web url="https://example.com" title="Example" />
+    Good Example:
+        Paragraph explaining concept A... <kb kb_id="kb_123" doc="spec.md" chunk_id="c_42" />...
+        Statement supported by multiple sources... <kb kb_id="kb_456" doc="design.md" chunk_id="c_7" /> <web url="https://example.com" title="Example" />
+	
+    Bad Example:
+        Paragraph explaining concept A...
+        <kb kb_id="kb_123" doc="spec.md" chunk_id="c_42" />
+        Paragraph summarizing current news...
+        <web url="https://example.com" title="Example" />
 </Citations_and_Evidence>
 `

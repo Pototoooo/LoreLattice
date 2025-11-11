@@ -9,6 +9,7 @@ import { listKnowledgeBases, getKnowledgeBaseById } from '@/api/knowledge-base';
 import { stopSession } from '@/api/chat';
 import KnowledgeBaseSelector from './KnowledgeBaseSelector.vue';
 import { getModel, type ModelConfig } from '@/api/model';
+import { getTenantWebSearchConfig } from '@/api/web-search';
 
 const route = useRoute();
 const router = useRouter();
@@ -39,6 +40,7 @@ const props = defineProps({
 const isAgentEnabled = computed(() => settingsStore.isAgentEnabled);
 const isWebSearchEnabled = computed(() => settingsStore.isWebSearchEnabled);
 const selectedKbIds = computed(() => settingsStore.settings.selectedKnowledgeBases || []);
+const isWebSearchConfigured = ref(false);
 
 // 获取已选择的知识库信息
 const knowledgeBases = ref<Array<{ id: string; name: string }>>([]);
@@ -81,6 +83,25 @@ const loadKnowledgeBases = async () => {
     }
   } catch (error) {
     console.error('Failed to load knowledge bases:', error);
+  }
+};
+
+const loadWebSearchConfig = async () => {
+  try {
+    const response: any = await getTenantWebSearchConfig();
+    const config = response?.data;
+    const configured = !!(config && config.provider);
+    isWebSearchConfigured.value = configured;
+
+    if (!configured && settingsStore.isWebSearchEnabled) {
+      settingsStore.toggleWebSearch(false);
+    }
+  } catch (error) {
+    console.error('Failed to load web search config:', error);
+    isWebSearchConfigured.value = false;
+    if (settingsStore.isWebSearchEnabled) {
+      settingsStore.toggleWebSearch(false);
+    }
   }
 };
 
@@ -204,6 +225,7 @@ const closeAgentModeSelector = () => {
 
 onMounted(() => {
   loadKnowledgeBases();
+  loadWebSearchConfig();
   
   // 如果从知识库内部进入，自动选中该知识库
   const kbId = (route.params as any)?.kbId as string;
@@ -241,6 +263,12 @@ onUnmounted(() => {
 watch(() => route.params.kbId, (newKbId) => {
   if (newKbId && typeof newKbId === 'string' && !selectedKbIds.value.includes(newKbId)) {
     settingsStore.addKnowledgeBase(newKbId);
+  }
+});
+
+watch(() => uiStore.showSettingsModal, (visible, prevVisible) => {
+  if (prevVisible && !visible) {
+    loadWebSearchConfig();
   }
 });
 
@@ -429,6 +457,13 @@ const onKeydown = (val: string, event: { e: { preventDefault(): unknown; keyCode
   }
 }
 
+const handleGoToWebSearchSettings = () => {
+  uiStore.openSettings('websearch');
+  if (route.path !== '/platform/settings') {
+    router.push('/platform/settings');
+  }
+};
+
 const handleGoToAgentSettings = () => {
   // 使用 uiStore 打开设置并跳转到 agent 部分
   uiStore.openSettings('agent');
@@ -465,7 +500,7 @@ const toggleAgentMode = () => {
       ]);
       
       MessagePlugin.warning({
-        content: messageContent,
+        content: () => messageContent,
         duration: 5000
       });
       return
@@ -479,11 +514,36 @@ const toggleAgentMode = () => {
 }
 
 const toggleWebSearch = () => {
+  if (!isWebSearchConfigured.value) {
+    const messageContent = h('div', { style: 'display: flex; flex-direction: column; gap: 6px; max-width: 280px;' }, [
+      h('span', { style: 'color: #333; line-height: 1.5;' }, '未配置网络搜索引擎，请先在设置中完成搜索引擎选择与接口配置。'),
+      h('a', {
+        href: '#',
+        onClick: (e: Event) => {
+          e.preventDefault();
+          handleGoToWebSearchSettings();
+        },
+        style: 'color: #07C05F; text-decoration: none; font-weight: 500; cursor: pointer; align-self: flex-start;',
+        onMouseenter: (e: Event) => {
+          (e.target as HTMLElement).style.textDecoration = 'underline';
+        },
+        onMouseleave: (e: Event) => {
+          (e.target as HTMLElement).style.textDecoration = 'none';
+        }
+      }, '去设置 →')
+    ]);
+    MessagePlugin.warning({
+      content: () => messageContent,
+      duration: 5000
+    });
+    return;
+  }
+
   const currentValue = settingsStore.isWebSearchEnabled;
   const newValue = !currentValue;
   settingsStore.toggleWebSearch(newValue);
   MessagePlugin.success(newValue ? '网络搜索已开启' : '网络搜索已关闭');
-}
+};
 
 const toggleKbSelector = () => {
   showKbSelector.value = !showKbSelector.value;
@@ -645,13 +705,17 @@ onBeforeRouteUpdate((to, from, next) => {
         </Teleport>
 
         <!-- WebSearch 开关按钮 -->
-        <t-tooltip 
-          :content="isWebSearchEnabled ? '关闭网络搜索' : '开启网络搜索'"
-          placement="top"
-        >
+        <t-tooltip placement="top">
+          <template #content>
+            <span v-if="isWebSearchConfigured">{{ isWebSearchEnabled ? '关闭网络搜索' : '开启网络搜索' }}</span>
+            <div v-else class="websearch-tooltip-disabled">
+              <span>未配置网络搜索引擎</span>
+              <a href="#" @click.prevent="handleGoToWebSearchSettings">前往设置 →</a>
+            </div>
+          </template>
           <div 
             class="control-btn websearch-btn"
-            :class="{ 'active': isWebSearchEnabled }"
+            :class="{ 'active': isWebSearchEnabled && isWebSearchConfigured, 'disabled': !isWebSearchConfigured }"
             @click.stop="toggleWebSearch"
           >
             <svg 
@@ -661,7 +725,7 @@ onBeforeRouteUpdate((to, from, next) => {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               class="control-icon websearch-icon"
-              :class="{ 'active': isWebSearchEnabled }"
+              :class="{ 'active': isWebSearchEnabled && isWebSearchConfigured }"
             >
               <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.2" fill="none"/>
               <path d="M 9 2 A 3.5 7 0 0 0 9 16" stroke="currentColor" stroke-width="1.2" fill="none"/>
@@ -1052,6 +1116,25 @@ const getImgSrc = (url: string) => {
       }
     }
   }
+}
+
+:global(.websearch-tooltip-disabled) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 220px;
+  font-size: 12px;
+  color: #666;
+}
+
+:global(.websearch-tooltip-disabled a) {
+  color: #07C05F;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+:global(.websearch-tooltip-disabled a:hover) {
+  text-decoration: underline;
 }
 
 .websearch-icon {
