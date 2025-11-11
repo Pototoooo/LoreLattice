@@ -2,7 +2,6 @@ package chatpipline
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
@@ -12,7 +11,6 @@ import (
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
-	"github.com/redis/go-redis/v9"
 )
 
 // PluginSearch implements search functionality for chat pipeline
@@ -23,7 +21,7 @@ type PluginSearch struct {
 	config               *config.Config
 	webSearchService     interfaces.WebSearchService
 	tenantService        interfaces.TenantService
-	redisClient          *redis.Client
+	sessionService       interfaces.SessionService
 }
 
 func NewPluginSearch(eventManager *EventManager,
@@ -33,7 +31,7 @@ func NewPluginSearch(eventManager *EventManager,
 	config *config.Config,
 	webSearchService interfaces.WebSearchService,
 	tenantService interfaces.TenantService,
-	redisClient *redis.Client,
+	sessionService interfaces.SessionService,
 ) *PluginSearch {
 	res := &PluginSearch{
 		knowledgeBaseService: knowledgeBaseService,
@@ -42,7 +40,7 @@ func NewPluginSearch(eventManager *EventManager,
 		config:               config,
 		webSearchService:     webSearchService,
 		tenantService:        tenantService,
-		redisClient:          redisClient,
+		sessionService:       sessionService,
 	}
 	eventManager.Register(res)
 	return res
@@ -240,25 +238,8 @@ func (p *PluginSearch) searchWebIfEnabled(ctx context.Context, chatManage *types
 	if chatManage.ProcessedQuery != "" && chatManage.ProcessedQuery != chatManage.RewriteQuery {
 		questions = append(questions, strings.TrimSpace(chatManage.ProcessedQuery))
 	}
-	// Load session-scoped temp KB state from Redis
-	var tempKBID string
-	seen := map[string]bool{}
-	ids := []string{}
-	stateKey := fmt.Sprintf("tempkb:%s", chatManage.SessionID)
-	if raw, getErr := p.redisClient.Get(ctx, stateKey).Bytes(); getErr == nil && len(raw) > 0 {
-		var state struct {
-			KBID         string          `json:"kbID"`
-			KnowledgeIDs []string        `json:"knowledgeIDs"`
-			SeenURLs     map[string]bool `json:"seenURLs"`
-		}
-		if err := json.Unmarshal(raw, &state); err == nil {
-			tempKBID = state.KBID
-			ids = state.KnowledgeIDs
-			if state.SeenURLs != nil {
-				seen = state.SeenURLs
-			}
-		}
-	}
+	// Load session-scoped temp KB state from Redis using SessionService
+	tempKBID, seen, ids := p.sessionService.GetWebSearchTempKBState(ctx, chatManage.SessionID)
 	compressed, kbID, newSeen, newIDs, err := p.webSearchService.CompressWithRAG(
 		ctx, chatManage.SessionID, tempKBID, questions, webResults, tenant.WebSearchConfig,
 		p.knowledgeBaseService, p.knowledgeService, seen, ids,
@@ -267,19 +248,8 @@ func (p *PluginSearch) searchWebIfEnabled(ctx context.Context, chatManage *types
 		logger.Warnf(ctx, "RAG compression failed, falling back to raw: %v", err)
 	} else {
 		webResults = compressed
-		// Persist temp KB state back into Redis
-		state := struct {
-			KBID         string          `json:"kbID"`
-			KnowledgeIDs []string        `json:"knowledgeIDs"`
-			SeenURLs     map[string]bool `json:"seenURLs"`
-		}{
-			KBID:         kbID,
-			KnowledgeIDs: newIDs,
-			SeenURLs:     newSeen,
-		}
-		if b, mErr := json.Marshal(state); mErr == nil {
-			_ = p.redisClient.Set(ctx, stateKey, b, 0).Err()
-		}
+		// Persist temp KB state back into Redis using SessionService
+		p.sessionService.SaveWebSearchTempKBState(ctx, chatManage.SessionID, kbID, newSeen, newIDs)
 	}
 	res := convertWebSearchResults(webResults)
 	logger.Infof(ctx, "Web search returned %d results", len(res))

@@ -112,19 +112,17 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(service.NewMessageService))
 	must(container.Provide(service.NewMCPServiceService))
 
-	// Agent service layer (requires event bus)
+	// Web search service (needed by AgentService)
+	must(container.Provide(service.NewWebSearchService))
+
+	// Agent service layer (requires event bus, web search service)
+	// SessionService is passed as parameter to CreateAgentEngine method when creating AgentService
 	must(container.Provide(event.NewEventBus))
 	must(container.Provide(service.NewAgentService))
 
 	// Session service (depends on agent service)
+	// SessionService is created after AgentService and passes itself to AgentService.CreateAgentEngine when needed
 	must(container.Provide(service.NewSessionService))
-
-	// Web search service
-	must(container.Provide(service.NewWebSearchService))
-	// Register WebSearchService as interface for dependency injection
-	must(container.Provide(func(ws *service.WebSearchService) interfaces.WebSearchService {
-		return ws
-	}))
 
 	// Chat pipeline components for processing chat requests
 	must(container.Provide(chatpipline.NewEventManager))

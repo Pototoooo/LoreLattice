@@ -23,15 +23,15 @@ func generateEventID(suffix string) string {
 
 // AgentEngine is the core engine for running ReAct agents
 type AgentEngine struct {
-	config             *types.AgentConfig
-	toolRegistry       *tools.ToolRegistry
-	chatModel          chat.Chat
-	knowledgeService   interfaces.KnowledgeBaseService
-	eventBus           *event.EventBus
-	knowledgeBasesInfo []*KnowledgeBaseInfo      // Detailed knowledge base information for prompt
-	contextManager     interfaces.ContextManager // Context manager for writing agent conversation to LLM context
-	sessionID          string                    // Session ID for context management
-	systemPromptTemplate string                  // System prompt template (optional, uses default if empty)
+	config               *types.AgentConfig
+	toolRegistry         *tools.ToolRegistry
+	chatModel            chat.Chat
+	knowledgeService     interfaces.KnowledgeBaseService
+	eventBus             *event.EventBus
+	knowledgeBasesInfo   []*KnowledgeBaseInfo      // Detailed knowledge base information for prompt
+	contextManager       interfaces.ContextManager // Context manager for writing agent conversation to LLM context
+	sessionID            string                    // Session ID for context management
+	systemPromptTemplate string                    // System prompt template (optional, uses default if empty)
 }
 
 // listToolNames returns tool.function names for logging
@@ -59,14 +59,14 @@ func NewAgentEngine(
 		eventBus = event.NewEventBus()
 	}
 	return &AgentEngine{
-		config:              config,
-		toolRegistry:        toolRegistry,
-		chatModel:           chatModel,
-		knowledgeService:    knowledgeService,
-		eventBus:            eventBus,
-		knowledgeBasesInfo:  knowledgeBasesInfo,
-		contextManager:      contextManager,
-		sessionID:           sessionID,
+		config:               config,
+		toolRegistry:         toolRegistry,
+		chatModel:            chatModel,
+		knowledgeService:     knowledgeService,
+		eventBus:             eventBus,
+		knowledgeBasesInfo:   knowledgeBasesInfo,
+		contextManager:       contextManager,
+		sessionID:            sessionID,
 		systemPromptTemplate: systemPromptTemplate,
 	}
 }
@@ -391,7 +391,7 @@ func (e *AgentEngine) executeLoop(
 
 // buildToolsForLLM builds the tools list for LLM function calling
 func (e *AgentEngine) buildToolsForLLM() []chat.Tool {
-	functionDefs := e.toolRegistry.GetFunctionDefinitions(e.config.AllowedTools)
+	functionDefs := e.toolRegistry.GetFunctionDefinitions()
 	tools := make([]chat.Tool, 0, len(functionDefs))
 	for _, def := range functionDefs {
 		tools = append(tools, chat.Tool{
@@ -601,8 +601,8 @@ func (e *AgentEngine) streamThinkingToEventBus(
 		opts,
 		func(chunk *types.StreamResponse, fullContent string) {
 			if chunk.Content != "" {
-				logger.Debugf(ctx, "[Agent][Thinking][Iteration-%d] Emitting thought chunk: %d chars",
-					iteration+1, len(chunk.Content))
+				// logger.Debugf(ctx, "[Agent][Thinking][Iteration-%d] Emitting thought chunk: %d chars",
+				// 	iteration+1, len(chunk.Content))
 				e.eventBus.Emit(ctx, event.Event{
 					ID:        thinkingID, // Same ID for all chunks in this stream
 					Type:      event.EventAgentThought,

@@ -3,7 +3,6 @@ package tools
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
@@ -58,42 +57,16 @@ func (r *ToolRegistry) ListTools() []string {
 	return names
 }
 
-// GetFunctionDefinitions returns function definitions for allowed tools
-// This is used for LLM function calling
-// MCP tools (names starting with "mcp_") are always included, regardless of allowedTools list
-func (r *ToolRegistry) GetFunctionDefinitions(allowedTools []string) []types.FunctionDefinition {
+// GetFunctionDefinitions returns function definitions for all registered tools
+func (r *ToolRegistry) GetFunctionDefinitions() []types.FunctionDefinition {
 	definitions := make([]types.FunctionDefinition, 0)
-
-	// If no allowed tools specified, return all tools
-	if len(allowedTools) == 0 {
-		for _, tool := range r.tools {
-			definitions = append(definitions, types.FunctionDefinition{
-				Name:        tool.Name(),
-				Description: tool.Description(),
-				Parameters:  tool.Parameters(),
-			})
-		}
-		return definitions
+	for _, tool := range r.tools {
+		definitions = append(definitions, types.FunctionDefinition{
+			Name:        tool.Name(),
+			Description: tool.Description(),
+			Parameters:  tool.Parameters(),
+		})
 	}
-
-	// Create a map for quick lookup
-	allowedMap := make(map[string]bool)
-	for _, name := range allowedTools {
-		allowedMap[name] = true
-	}
-
-	// Include allowed tools AND all MCP tools (names starting with "mcp_")
-	for name, tool := range r.tools {
-		// Include if it's in the allowed list OR if it's an MCP tool
-		if allowedMap[name] || strings.HasPrefix(name, "mcp_") {
-			definitions = append(definitions, types.FunctionDefinition{
-				Name:        tool.Name(),
-				Description: tool.Description(),
-				Parameters:  tool.Parameters(),
-			})
-		}
-	}
-
 	return definitions
 }
 

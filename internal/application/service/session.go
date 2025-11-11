@@ -211,27 +211,8 @@ func (s *sessionService) DeleteSession(ctx context.Context, id string) error {
 	logger.Infof(ctx, "Deleting session, ID: %s, tenant ID: %d", id, tenantID)
 
 	// Cleanup temporary KB stored in Redis for this session
-	if s.redisClient != nil {
-		stateKey := fmt.Sprintf("tempkb:%s", id)
-		if raw, getErr := s.redisClient.Get(ctx, stateKey).Bytes(); getErr == nil && len(raw) > 0 {
-			var state struct {
-				KBID         string          `json:"kbID"`
-				KnowledgeIDs []string        `json:"knowledgeIDs"`
-				SeenURLs     map[string]bool `json:"seenURLs"`
-			}
-			if err := json.Unmarshal(raw, &state); err == nil && strings.TrimSpace(state.KBID) != "" {
-				logger.Infof(ctx, "Cleaning temporary KB for session %s: %s", id, state.KBID)
-				for _, kid := range state.KnowledgeIDs {
-					if delErr := s.knowledgeService.DeleteKnowledge(ctx, kid); delErr != nil {
-						logger.Warnf(ctx, "Failed to delete temp knowledge %s: %v", kid, delErr)
-					}
-				}
-				if delErr := s.knowledgeBaseService.DeleteKnowledgeBase(ctx, state.KBID); delErr != nil {
-					logger.Warnf(ctx, "Failed to delete temp knowledge base %s: %v", state.KBID, delErr)
-				}
-				_ = s.redisClient.Del(ctx, stateKey).Err()
-			}
-		}
+	if err := s.DeleteWebSearchTempKBState(ctx, id); err != nil {
+		logger.Warnf(ctx, "Failed to cleanup temporary KB for session %s: %v", id, err)
 	}
 
 	// Delete session from repository
@@ -486,12 +467,9 @@ func (s *sessionService) KnowledgeQA(ctx context.Context, session *types.Session
 		},
 		FallbackResponse: session.FallbackResponse,
 		EventBus:         eventBus.AsEventBusInterface(), // NEW: For pipeline to emit events directly
+		WebSearchEnabled: webSearchEnabled,
+		TenantID:         session.TenantID,
 	}
-
-	// Store web search configuration in chatManage for pipeline processing
-	// PluginSearch will handle web search integration
-	chatManage.TenantID = session.TenantID
-	chatManage.WebSearchEnabled = webSearchEnabled
 
 	// Start knowledge QA event processing
 	logger.Info(ctx, "Triggering knowledge base question answering event")
@@ -817,7 +795,14 @@ func (s *sessionService) AgentQA(ctx context.Context, session *types.Session, qu
 		Temperature:       tenantInfo.AgentConfig.Temperature,
 		ThinkingModelID:   tenantInfo.AgentConfig.ThinkingModelID,
 		RerankModelID:     tenantInfo.AgentConfig.RerankModelID,
-		KnowledgeBases:    session.AgentConfig.KnowledgeBases, // Use session's knowledge bases
+		KnowledgeBases:    session.AgentConfig.KnowledgeBases,   // Use session's knowledge bases
+		WebSearchEnabled:  session.AgentConfig.WebSearchEnabled, // Web search enabled from session config
+	}
+
+	// Set web search max results from tenant config (default: 5)
+	agentConfig.WebSearchMaxResults = 5
+	if tenantInfo.WebSearchConfig != nil && tenantInfo.WebSearchConfig.MaxResults > 0 {
+		agentConfig.WebSearchMaxResults = tenantInfo.WebSearchConfig.MaxResults
 	}
 
 	logger.Infof(ctx, "Merged agent config from tenant %d and session %s", tenantInfo.ID, sessionID)
@@ -880,7 +865,7 @@ func (s *sessionService) AgentQA(ctx context.Context, session *types.Session, qu
 
 	// Create agent engine with EventBus and ContextManager
 	logger.Info(ctx, "Creating agent engine")
-	engine, err := s.agentService.CreateAgentEngine(ctx, agentConfig, eventBus, contextManager, session.ID)
+	engine, err := s.agentService.CreateAgentEngine(ctx, agentConfig, eventBus, contextManager, session.ID, s)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create agent engine: %v", err)
 		return err
@@ -958,4 +943,96 @@ func (s *sessionService) ClearContext(ctx context.Context, sessionID string) err
 	return s.sessionStorage.Delete(ctx, sessionID)
 }
 
-// processAgentEvents is no longer needed - events are handled directly by Handler layer via EventBus subscription
+// GetWebSearchTempKBState retrieves the temporary KB state for web search from Redis
+func (s *sessionService) GetWebSearchTempKBState(ctx context.Context, sessionID string) (tempKBID string, seenURLs map[string]bool, knowledgeIDs []string) {
+	stateKey := fmt.Sprintf("tempkb:%s", sessionID)
+	if raw, getErr := s.redisClient.Get(ctx, stateKey).Bytes(); getErr == nil && len(raw) > 0 {
+		var state struct {
+			KBID         string          `json:"kbID"`
+			KnowledgeIDs []string        `json:"knowledgeIDs"`
+			SeenURLs     map[string]bool `json:"seenURLs"`
+		}
+		if err := json.Unmarshal(raw, &state); err == nil {
+			tempKBID = state.KBID
+			ids := state.KnowledgeIDs
+			if state.SeenURLs != nil {
+				seenURLs = state.SeenURLs
+			} else {
+				seenURLs = make(map[string]bool)
+			}
+			return tempKBID, seenURLs, ids
+		}
+	}
+	return "", make(map[string]bool), []string{}
+}
+
+// SaveWebSearchTempKBState saves the temporary KB state for web search to Redis
+func (s *sessionService) SaveWebSearchTempKBState(ctx context.Context, sessionID string, tempKBID string, seenURLs map[string]bool, knowledgeIDs []string) {
+	stateKey := fmt.Sprintf("tempkb:%s", sessionID)
+	state := struct {
+		KBID         string          `json:"kbID"`
+		KnowledgeIDs []string        `json:"knowledgeIDs"`
+		SeenURLs     map[string]bool `json:"seenURLs"`
+	}{
+		KBID:         tempKBID,
+		KnowledgeIDs: knowledgeIDs,
+		SeenURLs:     seenURLs,
+	}
+	if b, err := json.Marshal(state); err == nil {
+		_ = s.redisClient.Set(ctx, stateKey, b, 0).Err()
+	}
+}
+
+// DeleteWebSearchTempKBState deletes the temporary KB state for web search from Redis and cleans up associated knowledge base and knowledge items
+func (s *sessionService) DeleteWebSearchTempKBState(ctx context.Context, sessionID string) error {
+	if s.redisClient == nil {
+		return nil
+	}
+
+	stateKey := fmt.Sprintf("tempkb:%s", sessionID)
+	raw, getErr := s.redisClient.Get(ctx, stateKey).Bytes()
+	if getErr != nil || len(raw) == 0 {
+		// No state found, nothing to clean up
+		return nil
+	}
+
+	var state struct {
+		KBID         string          `json:"kbID"`
+		KnowledgeIDs []string        `json:"knowledgeIDs"`
+		SeenURLs     map[string]bool `json:"seenURLs"`
+	}
+	if err := json.Unmarshal(raw, &state); err != nil {
+		// Invalid state, just delete the key
+		_ = s.redisClient.Del(ctx, stateKey).Err()
+		return nil
+	}
+
+	// If KBID is empty, just delete the Redis key
+	if strings.TrimSpace(state.KBID) == "" {
+		_ = s.redisClient.Del(ctx, stateKey).Err()
+		return nil
+	}
+
+	logger.Infof(ctx, "Cleaning temporary KB for session %s: %s", sessionID, state.KBID)
+
+	// Delete all knowledge items
+	for _, kid := range state.KnowledgeIDs {
+		if delErr := s.knowledgeService.DeleteKnowledge(ctx, kid); delErr != nil {
+			logger.Warnf(ctx, "Failed to delete temp knowledge %s: %v", kid, delErr)
+		}
+	}
+
+	// Delete the knowledge base
+	if delErr := s.knowledgeBaseService.DeleteKnowledgeBase(ctx, state.KBID); delErr != nil {
+		logger.Warnf(ctx, "Failed to delete temp knowledge base %s: %v", state.KBID, delErr)
+	}
+
+	// Delete the Redis key
+	if delErr := s.redisClient.Del(ctx, stateKey).Err(); delErr != nil {
+		logger.Warnf(ctx, "Failed to delete Redis key %s: %v", stateKey, delErr)
+		return fmt.Errorf("failed to delete Redis key: %w", delErr)
+	}
+
+	logger.Infof(ctx, "Successfully cleaned up temporary KB for session %s", sessionID)
+	return nil
+}

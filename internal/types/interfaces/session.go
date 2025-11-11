@@ -43,6 +43,12 @@ type SessionService interface {
 	AgentQA(ctx context.Context, session *types.Session, query string, assistantMessageID string, eventBus *event.EventBus) error
 	// ClearContext clears the LLM context for a session
 	ClearContext(ctx context.Context, sessionID string) error
+	// GetWebSearchTempKBState retrieves the temporary KB state for web search from Redis
+	GetWebSearchTempKBState(ctx context.Context, sessionID string) (tempKBID string, seenURLs map[string]bool, knowledgeIDs []string)
+	// SaveWebSearchTempKBState saves the temporary KB state for web search to Redis
+	SaveWebSearchTempKBState(ctx context.Context, sessionID string, tempKBID string, seenURLs map[string]bool, knowledgeIDs []string)
+	// DeleteWebSearchTempKBState deletes the temporary KB state for web search from Redis and cleans up associated knowledge base and knowledge items
+	DeleteWebSearchTempKBState(ctx context.Context, sessionID string) error
 }
 
 // SessionRepository defines the session repository interface

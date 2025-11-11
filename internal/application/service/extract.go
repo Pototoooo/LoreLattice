@@ -53,10 +53,10 @@ func NewChunkExtractService(
 	chunkRepo interfaces.ChunkRepository,
 	graphEngine interfaces.RetrieveGraphRepository,
 ) interfaces.Extracter {
-	generator := chatpipline.NewQAPromptGenerator(chatpipline.NewFormater(), config.ExtractManager.ExtractGraph)
-	ctx := context.Background()
-	logger.Debugf(ctx, "chunk extract system prompt: %s", generator.System(ctx))
-	logger.Debugf(ctx, "chunk extract user prompt: %s", generator.User(ctx, "demo"))
+	// generator := chatpipline.NewQAPromptGenerator(chatpipline.NewFormater(), config.ExtractManager.ExtractGraph)
+	// ctx := context.Background()
+	// logger.Debugf(ctx, "chunk extract system prompt: %s", generator.System(ctx))
+	// logger.Debugf(ctx, "chunk extract user prompt: %s", generator.User(ctx, "demo"))
 	return &ChunkExtractService{
 		template:          config.ExtractManager.ExtractGraph,
 		modelService:      modelService,

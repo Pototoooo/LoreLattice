@@ -2,7 +2,9 @@ package session
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"runtime"
 	"time"
 
 	"github.com/Tencent/WeKnora/internal/errors"
@@ -336,7 +338,13 @@ func (h *Handler) AgentQA(c *gin.Context) {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				logger.ErrorWithFields(asyncCtx, errors.NewInternalServerError("Agent QA service panicked"), nil)
+				buf := make([]byte, 1024)
+				runtime.Stack(buf, true)
+				logger.ErrorWithFields(asyncCtx,
+					errors.NewInternalServerError(fmt.Sprintf("Agent QA service panicked: %v\n%s", r, string(buf))),
+					map[string]interface{}{
+						"session_id": sessionID,
+					})
 			}
 			h.completeAssistantMessage(asyncCtx, assistantMessage)
 			logger.Infof(asyncCtx, "Agent QA service completed for session: %s", sessionID)

@@ -279,7 +279,7 @@ func (s *WebSearchService) Search(ctx context.Context, config *types.WebSearchCo
 }
 
 // NewWebSearchService creates a new web search service
-func NewWebSearchService(cfg *config.Config) (*WebSearchService, error) {
+func NewWebSearchService(cfg *config.Config) (interfaces.WebSearchService, error) {
 	if cfg.WebSearch == nil {
 		return nil, fmt.Errorf("web search config is not available")
 	}

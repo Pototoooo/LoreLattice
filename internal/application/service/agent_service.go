@@ -10,7 +10,6 @@ import (
 	"github.com/Tencent/WeKnora/internal/event"
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/mcp"
-	"github.com/Tencent/WeKnora/internal/models/chat"
 	"github.com/Tencent/WeKnora/internal/models/rerank"
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
@@ -30,6 +29,7 @@ type agentService struct {
 	mcpManager           *mcp.MCPManager
 	eventBus             *event.EventBus
 	db                   *gorm.DB
+	webSearchService     interfaces.WebSearchService
 }
 
 // NewAgentService creates a new agent service
@@ -43,6 +43,7 @@ func NewAgentService(
 	mcpManager *mcp.MCPManager,
 	eventBus *event.EventBus,
 	db *gorm.DB,
+	webSearchService interfaces.WebSearchService,
 ) interfaces.AgentService {
 	return &agentService{
 		cfg:                  cfg,
@@ -54,6 +55,7 @@ func NewAgentService(
 		mcpManager:           mcpManager,
 		eventBus:             eventBus,
 		db:                   db,
+		webSearchService:     webSearchService,
 	}
 }
 
@@ -64,6 +66,7 @@ func (s *agentService) CreateAgentEngine(
 	eventBus *event.EventBus,
 	contextManager interfaces.ContextManager,
 	sessionID string,
+	sessionService interfaces.SessionService,
 ) (interfaces.AgentEngine, error) {
 	logger.Infof(ctx, "Creating agent engine with custom EventBus")
 
@@ -94,7 +97,7 @@ func (s *agentService) CreateAgentEngine(
 	toolRegistry := tools.NewToolRegistry(s.knowledgeBaseService, s.knowledgeService, s.chunkService, s.db)
 
 	// Register tools
-	if err := s.registerTools(ctx, toolRegistry, config, chatModel, rerankModel); err != nil {
+	if err := s.registerTools(ctx, toolRegistry, config, rerankModel, sessionID, sessionService); err != nil {
 		return nil, fmt.Errorf("failed to register tools: %w", err)
 	}
 
@@ -168,8 +171,9 @@ func (s *agentService) registerTools(
 	ctx context.Context,
 	registry *tools.ToolRegistry,
 	config *types.AgentConfig,
-	chatModel chat.Chat,
 	rerankModel rerank.Reranker,
+	sessionID string,
+	sessionService interfaces.SessionService,
 ) error {
 	// If no specific tools allowed, register default tools
 	allowedTools := config.AllowedTools
@@ -177,25 +181,19 @@ func (s *agentService) registerTools(
 		// Register default tools from config
 		if s.cfg.Agent != nil && len(s.cfg.Agent.DefaultTools) > 0 {
 			allowedTools = s.cfg.Agent.DefaultTools
-		} else {
-			// Fallback to all tools
-			allowedTools = []string{
-				"thinking",
-				"todo_write",
-				"knowledge_search",
-				"get_related_chunks",
-				"query_knowledge_graph",
-				"get_document_info",
-				"database_query",
-			}
 		}
 	}
+	// If web search is enabled, add web_search to allowedTools
+	if config.WebSearchEnabled {
+		allowedTools = append(allowedTools, "web_search")
+	}
+
 	// Get tenant ID from context
 	tenantID := uint(0)
 	if tid, ok := ctx.Value(types.TenantIDContextKey).(uint); ok {
 		tenantID = tid
 	}
-	logger.Infof(ctx, "Registering tools: %v, tenant ID: %d", allowedTools, tenantID)
+	logger.Infof(ctx, "Registering tools: %v, tenant ID: %d, webSearchEnabled: %v", allowedTools, tenantID, config.WebSearchEnabled)
 
 	// Register each allowed tool
 	for _, toolName := range allowedTools {
@@ -214,6 +212,17 @@ func (s *agentService) registerTools(
 			registry.RegisterTool(tools.NewGetDocumentInfoTool(s.knowledgeService, s.chunkService))
 		case "database_query":
 			registry.RegisterTool(tools.NewDatabaseQueryTool(s.db, tenantID))
+		case "web_search":
+			registry.RegisterTool(tools.NewWebSearchTool(
+				s.webSearchService,
+				s.knowledgeBaseService,
+				s.knowledgeService,
+				sessionService,
+				sessionID,
+				config.WebSearchMaxResults,
+			))
+			logger.Infof(ctx, "Registered web_search tool for session: %s, maxResults: %d", sessionID, config.WebSearchMaxResults)
+
 		default:
 			logger.Warnf(ctx, "Unknown tool: %s", toolName)
 		}

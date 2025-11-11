@@ -26,7 +26,7 @@ type AgentEngine interface {
 // AgentService defines the interface for agent-related operations
 type AgentService interface {
 	// CreateAgentEngine creates an agent engine with the given configuration, EventBus, and ContextManager
-	CreateAgentEngine(ctx context.Context, config *types.AgentConfig, eventBus *event.EventBus, contextManager ContextManager, sessionID string) (AgentEngine, error)
+	CreateAgentEngine(ctx context.Context, config *types.AgentConfig, eventBus *event.EventBus, contextManager ContextManager, sessionID string, sessionService SessionService) (AgentEngine, error)
 
 	// ValidateConfig validates an agent configuration
 	ValidateConfig(config *types.AgentConfig) error
