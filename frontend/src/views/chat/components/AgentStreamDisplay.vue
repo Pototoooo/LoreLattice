@@ -223,8 +223,13 @@ let floatCloseTimer: number | null = null;
 const scheduleFloatClose = () => {
   if (floatCloseTimer) window.clearTimeout(floatCloseTimer);
   floatCloseTimer = window.setTimeout(() => {
-    floatPopup.value.visible = false;
-  }, 260);
+    // Double-check mouse is not over citation or popup before closing
+    const hoveredCitation = document.querySelector('.citation-kb:hover, .citation-web:hover');
+    const hoveredPopup = document.querySelector('.kb-float-popup:hover');
+    if (!hoveredCitation && !hoveredPopup) {
+      floatPopup.value.visible = false;
+    }
+  }, 300);
 };
 
 const cancelFloatClose = () => {
@@ -238,10 +243,13 @@ const openFloatForEl = (el: HTMLElement, widthAdjust = 120) => {
   const rect = el.getBoundingClientRect();
   const pageTop = window.scrollY || document.documentElement.scrollTop || 0;
   const pageLeft = window.scrollX || document.documentElement.scrollLeft || 0;
-  floatPopup.value.top = rect.bottom + pageTop + 2;
+  // Reduce gap to minimize mouseout triggers when moving to popup
+  floatPopup.value.top = rect.bottom + pageTop + 1;
   floatPopup.value.left = rect.left + pageLeft;
-  floatPopup.value.width = Math.min(520, Math.max(320, rect.width + widthAdjust));
+  floatPopup.value.width = Math.min(520, Math.max(380, rect.width + widthAdjust));
   floatPopup.value.visible = true;
+  // Cancel any pending close when opening
+  cancelFloatClose();
 };
 
 // Import icons
@@ -762,6 +770,7 @@ const onHover = (e: Event) => {
     const title = webEl.querySelector('.tip-title')?.textContent || webEl.getAttribute('data-title') || '';
     if (kbHoverTimer) window.clearTimeout(kbHoverTimer);
     kbHoverTimer = window.setTimeout(() => {
+      cancelFloatClose(); // Cancel any pending close
       floatPopup.value.type = 'web';
       floatPopup.value.url = url;
       floatPopup.value.title = title || '';
@@ -773,13 +782,17 @@ const onHover = (e: Event) => {
 
 const onHoverOut = (e: Event) => {
   const rt = (e as MouseEvent).relatedTarget as HTMLElement | null;
+  // If mouse is moving to another citation or the popup, don't close
   if (rt && (rt.closest?.('.citation-kb') || rt.closest?.('.citation-web') || rt.closest?.('.kb-float-popup'))) {
     return;
   }
+  // Cancel any pending hover timer
   if (kbHoverTimer) {
     window.clearTimeout(kbHoverTimer);
     kbHoverTimer = null;
   }
+  // Use a small delay to allow mouse to move to popup
+  // The scheduleFloatClose will double-check before actually closing
   scheduleFloatClose();
 };
 
@@ -2000,41 +2013,12 @@ const formatJSON = (obj: any): string => {
   color: #065f46;                /* keep readable on light bg */
 }
 
-/* Embedded tooltip bubble (structured, supports bold title) */
+/* Embedded tooltip bubble - hidden, use global floatPopup instead */
 :deep(.citation-web .citation-tip) {
-  display: none;
-  position: absolute;
-  left: 0;
-  top: calc(100% + 8px);
-  white-space: pre-wrap;
-  z-index: 9999;
-  color: #111827;
-  background: #f9fafb;
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 12px;
-  line-height: 1.5;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-  max-width: 520px;
-  min-width: 200px;
+  display: none !important;
   pointer-events: none;
 }
 
-:deep(.citation-web:hover .citation-tip) {
-  display: block;
-}
-
-:deep(.citation-web .citation-tip .tip-title) {
-  display: block;
-  font-weight: 600; /* bold title */
-  margin-bottom: 4px;
-  color: #07C05F;
-}
-
-:deep(.citation-web .citation-tip .tip-url) {
-  display: block;
-  opacity: 0.9;
-}
 
 /* Citation icons */
 :deep(.citation .citation-icon) {
@@ -2087,11 +2071,10 @@ const formatJSON = (obj: any): string => {
 
 .kb-float-popup .tip-title {
   font-weight: 600;
-  color: #065f46;
+  color: #07C05F;
 }
 
 .kb-float-popup .tip-url {
-  color: #2563eb;
   word-break: break-word;
 }
 
