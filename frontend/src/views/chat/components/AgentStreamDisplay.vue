@@ -179,6 +179,7 @@
           <div class="tip-url">{{ floatPopup.url || '' }}</div>
         </template>
         <template v-else>
+          <div v-if="floatPopup.knowledgeTitle" class="tip-meta"><strong>{{ floatPopup.knowledgeTitle }}</strong></div>
           <div v-if="floatPopup.loading" class="tip-loading">加载中...</div>
           <div v-else-if="floatPopup.error" class="tip-error">{{ floatPopup.error }}</div>
           <div v-else class="tip-content" v-html="floatPopup.content"></div>
@@ -241,6 +242,7 @@ const floatPopup = ref<{
   error?: string;
   content?: string;
   chunkId?: string;
+  knowledgeTitle?: string;
 }>({
   visible: false,
   top: 0,
@@ -661,8 +663,7 @@ const escapeHtml = (value: string): string =>
     .replace(/'/g, '&#39;');
 
 const buildKbTooltipContent = (content: string): string => {
-  const trimmed = content.length > KB_SNIPPET_LIMIT ? content.substring(0, KB_SNIPPET_LIMIT) + '...' : content;
-  const escapedContent = escapeHtml(trimmed).replace(/\n/g, '<br>');
+  const escapedContent = escapeHtml(content).replace(/\n/g, '<br>');
   return `<span class="tip-content">${escapedContent}</span>`;
 };
 
@@ -757,12 +758,14 @@ const onHover = (e: Event) => {
   // KB
   if (kbEl) {
     const chunkId = kbEl.getAttribute('data-chunk-id') || '';
+    const knowledgeTitle = kbEl.getAttribute('data-doc') || '';
     if (!chunkId) return;
     if (kbHoverTimer) window.clearTimeout(kbHoverTimer);
     kbHoverTimer = window.setTimeout(() => {
       cancelFloatClose();
       floatPopup.value.type = 'kb';
       floatPopup.value.chunkId = chunkId;
+      floatPopup.value.knowledgeTitle = knowledgeTitle;
       const cacheEntry = kbChunkDetails.value[chunkId];
       if (cacheEntry) {
         syncFloatPopupFromCache(chunkId, cacheEntry);
@@ -997,12 +1000,25 @@ const renderMarkdown = (content: any): string => {
             return '';
           }
 
-          // Escape doc name for safety
-          const safeDoc = String(doc || '').replace(/"/g, '&quot;');
-          const safeKbId = String(kbId || '').replace(/"/g, '&quot;');
-          const safeChunkId = String(chunkId || '').replace(/"/g, '&quot;');
+          // Escape attributes for safety
+          const safeDoc = escapeHtml(doc);
+          const safeKbId = escapeHtml(kbId);
+          const safeChunkId = escapeHtml(chunkId);
+
+          const truncateMiddle = (text: string, maxLength = 13): string => {
+            if (!text) return '';
+            if (text.length <= maxLength) return text;
+            const half = Math.floor((maxLength - 3) / 2);
+            const start = text.slice(0, half + ((maxLength - 3) % 2));
+            const end = text.slice(-half);
+            return `${start}...${end}`;
+          };
+
+          const displayDoc = escapeHtml(truncateMiddle(doc));
+          console.log('displayDoc', displayDoc);
+
           // Initial tooltip content (single t-popup container; will be updated on hover)
-          return `<span class="citation citation-kb" data-kb-id="${safeKbId}" data-chunk-id="${safeChunkId}" data-doc="${safeDoc}" role="button" tabindex="0"><span class="citation-icon kb"></span><span class="citation-text">${safeDoc}</span><span class="citation-tip"><span class="t-popup__content"><span class="tip-loading">加载中...</span></span></span></span>`;
+          return `<span class="citation citation-kb" data-kb-id="${safeKbId}" data-chunk-id="${safeChunkId}" data-doc="${safeDoc}" role="button" tabindex="0"><span class="citation-icon kb"></span><span class="citation-text">${displayDoc}</span><span class="citation-tip"><span class="t-popup__content"><span class="tip-loading">加载中...</span></span></span></span>`;
         }
       );
 
@@ -1699,8 +1715,8 @@ const handleAddToKnowledge = (answerEvent: any) => {
     &.action-pending {
       opacity: 1;
       box-shadow: none;
-      border-color: rgba(7, 192, 95, 0.35);
-      background: linear-gradient(120deg, rgba(7, 192, 95, 0.04), rgba(255, 255, 255, 0.9));
+      border-color: rgba(7, 192, 95, 0.18);
+      background: linear-gradient(120deg, rgba(7, 192, 95, 0.01), rgba(255, 255, 255, 0.98));
 
       &::after {
         content: '';
@@ -1709,12 +1725,12 @@ const handleAddToKnowledge = (answerEvent: any) => {
         background: linear-gradient(
           120deg,
           rgba(255, 255, 255, 0) 0%,
-          rgba(255, 255, 255, 0.8) 35%,
-          rgba(7, 192, 95, 0.15) 55%,
+          rgba(255, 255, 255, 0.3) 40%,
+          rgba(7, 192, 95, 0.06) 55%,
           rgba(255, 255, 255, 0) 85%
         );
         transform: translateX(-100%);
-        animation: actionPendingShimmer 1.6s ease-in-out infinite;
+        animation: actionPendingShimmer 2.8s ease-in-out infinite;
         pointer-events: none;
         z-index: 0;
       }
@@ -1873,13 +1889,13 @@ const handleAddToKnowledge = (answerEvent: any) => {
 
 @keyframes actionPendingShimmer {
   0% {
-    transform: translateX(-120%);
+    transform: translateX(-90%);
   }
   50% {
-    transform: translateX(-10%);
+    transform: translateX(-5%);
   }
   100% {
-    transform: translateX(120%);
+    transform: translateX(90%);
   }
 }
 
@@ -2273,7 +2289,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
 }
 
 .kb-float-popup .tip-meta {
-  margin-top: 8px;
+  margin-top: 1px;
   font-size: 11px;
   color: #6b7280;
 }
@@ -2294,6 +2310,9 @@ const handleAddToKnowledge = (answerEvent: any) => {
   margin: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
+  max-height: 250px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* KB citation styles - same green theme as web citations */
