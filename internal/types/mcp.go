@@ -15,6 +15,7 @@ type MCPTransportType string
 const (
 	MCPTransportSSE            MCPTransportType = "sse"             // Server-Sent Events
 	MCPTransportHTTPStreamable MCPTransportType = "http-streamable" // HTTP Streamable
+	MCPTransportStdio          MCPTransportType = "stdio"           // Stdio (Standard Input/Output)
 )
 
 // MCPService represents an MCP (Model Context Protocol) service configuration
@@ -25,10 +26,12 @@ type MCPService struct {
 	Description    string             `json:"description" gorm:"type:text"`
 	Enabled        bool               `json:"enabled" gorm:"default:true;index"`
 	TransportType  MCPTransportType   `json:"transport_type" gorm:"type:varchar(50);not null"`
-	URL            string             `json:"url" gorm:"type:varchar(512);not null"`
+	URL            *string            `json:"url,omitempty" gorm:"type:varchar(512)"` // Optional: required for SSE/HTTP Streamable
 	Headers        MCPHeaders         `json:"headers" gorm:"type:json"`
 	AuthConfig     *MCPAuthConfig     `json:"auth_config" gorm:"type:json"`
 	AdvancedConfig *MCPAdvancedConfig `json:"advanced_config" gorm:"type:json"`
+	StdioConfig    *MCPStdioConfig    `json:"stdio_config,omitempty" gorm:"type:json"` // Required for stdio transport
+	EnvVars        MCPEnvVars         `json:"env_vars,omitempty" gorm:"type:json"`     // Environment variables for stdio
 	CreatedAt      time.Time          `json:"created_at"`
 	UpdatedAt      time.Time          `json:"updated_at"`
 	DeletedAt      gorm.DeletedAt     `json:"deleted_at" gorm:"index"`
@@ -50,6 +53,15 @@ type MCPAdvancedConfig struct {
 	RetryCount int `json:"retry_count"` // Number of retries, default: 3
 	RetryDelay int `json:"retry_delay"` // Delay between retries in seconds, default: 1
 }
+
+// MCPStdioConfig represents stdio transport configuration
+type MCPStdioConfig struct {
+	Command string   `json:"command"` // Command: "uvx" or "npx"
+	Args    []string `json:"args"`    // Command arguments array
+}
+
+// MCPEnvVars represents environment variables as a map
+type MCPEnvVars map[string]string
 
 // MCPTool represents a tool exposed by an MCP service
 type MCPTool struct {
@@ -141,6 +153,47 @@ func (c *MCPAdvancedConfig) Scan(value interface{}) error {
 		return nil
 	}
 	return json.Unmarshal(b, c)
+}
+
+// Value implements driver.Valuer interface for MCPStdioConfig
+func (c *MCPStdioConfig) Value() (driver.Value, error) {
+	if c == nil {
+		return nil, nil
+	}
+	return json.Marshal(c)
+}
+
+// Scan implements sql.Scanner interface for MCPStdioConfig
+func (c *MCPStdioConfig) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+	b, ok := value.([]byte)
+	if !ok {
+		return nil
+	}
+	return json.Unmarshal(b, c)
+}
+
+// Value implements driver.Valuer interface for MCPEnvVars
+func (e MCPEnvVars) Value() (driver.Value, error) {
+	if e == nil {
+		return nil, nil
+	}
+	return json.Marshal(e)
+}
+
+// Scan implements sql.Scanner interface for MCPEnvVars
+func (e *MCPEnvVars) Scan(value interface{}) error {
+	if value == nil {
+		*e = nil
+		return nil
+	}
+	b, ok := value.([]byte)
+	if !ok {
+		return nil
+	}
+	return json.Unmarshal(b, e)
 }
 
 // GetDefaultAdvancedConfig returns default advanced configuration

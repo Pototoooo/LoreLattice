@@ -49,7 +49,10 @@ WORKDIR /app
 # Install runtime dependencies
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories && \
     apk update && apk upgrade && \
-    apk add --no-cache build-base postgresql-client mysql-client ca-certificates tzdata sed curl bash vim wget
+    apk add --no-cache build-base postgresql-client mysql-client ca-certificates tzdata sed curl bash vim wget \
+    nodejs npm python3 py3-pip && \
+    pip3 install --no-cache-dir pipx && \
+    pipx install uvx
 
 # Create a non-root user and switch to it
 RUN mkdir -p /data/files && \

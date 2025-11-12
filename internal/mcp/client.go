@@ -95,7 +95,10 @@ func NewMCPClient(config *ClientConfig) (MCPClient, error) {
 	var err error
 	switch config.Service.TransportType {
 	case types.MCPTransportSSE:
-		mcpClient, err = client.NewSSEMCPClient(config.Service.URL,
+		if config.Service.URL == nil || *config.Service.URL == "" {
+			return nil, fmt.Errorf("URL is required for SSE transport")
+		}
+		mcpClient, err = client.NewSSEMCPClient(*config.Service.URL,
 			client.WithHTTPClient(httpClient),
 			client.WithHeaders(headers),
 		)
@@ -103,13 +106,37 @@ func NewMCPClient(config *ClientConfig) (MCPClient, error) {
 			return nil, fmt.Errorf("failed to create SSE client: %w", err)
 		}
 	case types.MCPTransportHTTPStreamable:
+		if config.Service.URL == nil || *config.Service.URL == "" {
+			return nil, fmt.Errorf("URL is required for HTTP Streamable transport")
+		}
 		// For HTTP streamable, we need to use transport options
-		mcpClient, err = client.NewStreamableHttpClient(config.Service.URL,
+		mcpClient, err = client.NewStreamableHttpClient(*config.Service.URL,
 			transport.WithHTTPBasicClient(httpClient),
 			transport.WithHTTPHeaders(headers),
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create HTTP streamable client: %w", err)
+		}
+	case types.MCPTransportStdio:
+		if config.Service.StdioConfig == nil {
+			return nil, fmt.Errorf("stdio_config is required for stdio transport")
+		}
+
+		// Convert env vars map to []string format (KEY=value)
+		envVars := make([]string, 0, len(config.Service.EnvVars))
+		for key, value := range config.Service.EnvVars {
+			envVars = append(envVars, fmt.Sprintf("%s=%s", key, value))
+		}
+
+		// Create stdio client with options
+		// NewStdioMCPClientWithOptions(command string, env []string, args []string, opts ...transport.StdioOption)
+		mcpClient, err = client.NewStdioMCPClientWithOptions(
+			config.Service.StdioConfig.Command,
+			envVars,
+			config.Service.StdioConfig.Args,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create stdio client: %w", err)
 		}
 	default:
 		return nil, ErrUnsupportedTransport
@@ -133,7 +160,12 @@ func (c *mcpGoClient) Connect(ctx context.Context) error {
 	}
 
 	c.connected = true
-	logger.GetLogger(ctx).Infof("MCP client connected to %s", c.service.URL)
+	if c.service.TransportType == types.MCPTransportStdio {
+		logger.GetLogger(ctx).Infof("MCP stdio client connected: %s %v",
+			c.service.StdioConfig.Command, c.service.StdioConfig.Args)
+	} else {
+		logger.GetLogger(ctx).Infof("MCP client connected to %s", *c.service.URL)
+	}
 	return nil
 }
 

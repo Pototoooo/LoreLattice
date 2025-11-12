@@ -36,11 +36,11 @@
               <div class="service-name">
                 {{ service.name }}
                 <t-tag 
-                  :theme="service.transport_type === 'sse' ? 'success' : 'primary'" 
+                  :theme="getTransportTypeTheme(service.transport_type)" 
                   size="small"
                   variant="light"
                 >
-                  {{ service.transport_type === 'sse' ? 'SSE' : 'HTTP Streamable' }}
+                  {{ getTransportTypeLabel(service.transport_type) }}
                 </t-tag>
               </div>
               <div class="service-controls">
@@ -271,6 +271,34 @@ const handleMenuAction = (data: { value: string }, service: MCPService) => {
     handleEdit(service)
   } else if (value.startsWith('delete-')) {
     handleDelete(service)
+  }
+}
+
+// Get transport type theme for tag
+const getTransportTypeTheme = (transportType: string) => {
+  switch (transportType) {
+    case 'sse':
+      return 'success'
+    case 'http-streamable':
+      return 'primary'
+    case 'stdio':
+      return 'warning'
+    default:
+      return 'default'
+  }
+}
+
+// Get transport type label
+const getTransportTypeLabel = (transportType: string) => {
+  switch (transportType) {
+    case 'sse':
+      return 'SSE'
+    case 'http-streamable':
+      return 'HTTP Streamable'
+    case 'stdio':
+      return 'Stdio'
+    default:
+      return transportType
   }
 }
 

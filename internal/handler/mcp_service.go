@@ -151,8 +151,34 @@ func (h *MCPServiceHandler) UpdateMCPService(c *gin.Context) {
 	if transportType, ok := updateData["transport_type"].(string); ok {
 		service.TransportType = types.MCPTransportType(transportType)
 	}
-	if url, ok := updateData["url"].(string); ok {
-		service.URL = url
+	if url, ok := updateData["url"].(string); ok && url != "" {
+		service.URL = &url
+	} else if _, exists := updateData["url"]; exists {
+		// Explicitly set to nil if provided as null/empty
+		service.URL = nil
+	}
+	if stdioConfig, ok := updateData["stdio_config"].(map[string]interface{}); ok {
+		config := &types.MCPStdioConfig{}
+		if command, ok := stdioConfig["command"].(string); ok {
+			config.Command = command
+		}
+		if args, ok := stdioConfig["args"].([]interface{}); ok {
+			config.Args = make([]string, len(args))
+			for i, arg := range args {
+				if str, ok := arg.(string); ok {
+					config.Args[i] = str
+				}
+			}
+		}
+		service.StdioConfig = config
+	}
+	if envVars, ok := updateData["env_vars"].(map[string]interface{}); ok {
+		service.EnvVars = make(types.MCPEnvVars)
+		for k, v := range envVars {
+			if str, ok := v.(string); ok {
+				service.EnvVars[k] = str
+			}
+		}
 	}
 	if headers, ok := updateData["headers"].(map[string]interface{}); ok {
 		service.Headers = make(types.MCPHeaders)

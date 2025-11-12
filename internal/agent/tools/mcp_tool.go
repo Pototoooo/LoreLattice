@@ -73,6 +73,18 @@ func (t *MCPTool) Execute(ctx context.Context, args map[string]interface{}) (*ty
 		}, nil
 	}
 
+	// For stdio transport, ensure connection is released after use
+	isStdio := t.service.TransportType == types.MCPTransportStdio
+	if isStdio {
+		defer func() {
+			if err := client.Disconnect(); err != nil {
+				logger.GetLogger(ctx).Warnf("Failed to disconnect stdio MCP client: %v", err)
+			} else {
+				logger.GetLogger(ctx).Infof("Stdio MCP client disconnected after tool execution")
+			}
+		}()
+	}
+
 	// Call the tool via MCP
 	result, err := client.CallTool(ctx, t.mcpTool.Name, args)
 	if err != nil {
@@ -192,6 +204,16 @@ func RegisterMCPTools(ctx context.Context, registry *ToolRegistry, services []*t
 		if err != nil {
 			logger.GetLogger(ctx).Errorf("Failed to create MCP client for service %s: %v", service.Name, err)
 			continue
+		}
+
+		// For stdio transport, ensure connection is released after listing tools
+		isStdio := service.TransportType == types.MCPTransportStdio
+		if isStdio {
+			defer func() {
+				if err := client.Disconnect(); err != nil {
+					logger.GetLogger(ctx).Warnf("Failed to disconnect stdio MCP client after listing tools: %v", err)
+				}
+			}()
 		}
 
 		// List tools from the service with timeout

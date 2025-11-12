@@ -6,8 +6,8 @@ export interface MCPService {
   name: string
   description: string
   enabled: boolean
-  transport_type: 'sse' | 'http-streamable'
-  url: string
+  transport_type: 'sse' | 'http-streamable' | 'stdio'
+  url?: string // Optional: required for SSE/HTTP Streamable
   headers?: Record<string, string>
   auth_config?: {
     api_key?: string
@@ -19,6 +19,11 @@ export interface MCPService {
     retry_count?: number
     retry_delay?: number
   }
+  stdio_config?: {
+    command: 'uvx' | 'npx' // Command: uvx or npx
+    args: string[] // Command arguments array
+  }
+  env_vars?: Record<string, string> // Environment variables for stdio transport
   created_at?: string
   updated_at?: string
 }

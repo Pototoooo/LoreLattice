@@ -127,8 +127,14 @@ func (s *mcpServiceService) UpdateMCPService(ctx context.Context, service *types
 		if service.TransportType != "" {
 			existing.TransportType = service.TransportType
 		}
-		if service.URL != "" {
+		if service.URL != nil {
 			existing.URL = service.URL
+		}
+		if service.StdioConfig != nil {
+			existing.StdioConfig = service.StdioConfig
+		}
+		if service.EnvVars != nil {
+			existing.EnvVars = service.EnvVars
 		}
 		if service.Headers != nil {
 			existing.Headers = service.Headers
@@ -149,9 +155,19 @@ func (s *mcpServiceService) UpdateMCPService(ctx context.Context, service *types
 		return fmt.Errorf("failed to update MCP service: %w", err)
 	}
 
-	// Check if critical configuration changed (URL, transport type, or auth config)
+	// Check if critical configuration changed (URL/StdioConfig, transport type, or auth config)
 	configChanged := false
-	if service.URL != "" && service.URL != existing.URL {
+	if service.URL != nil && existing.URL != nil && *service.URL != *existing.URL {
+		configChanged = true
+	} else if (service.URL != nil) != (existing.URL != nil) {
+		configChanged = true
+	}
+	if service.StdioConfig != nil && existing.StdioConfig != nil {
+		if service.StdioConfig.Command != existing.StdioConfig.Command ||
+			!equalStringSlices(service.StdioConfig.Args, existing.StdioConfig.Args) {
+			configChanged = true
+		}
+	} else if (service.StdioConfig != nil) != (existing.StdioConfig != nil) {
 		configChanged = true
 	}
 	if service.TransportType != "" && service.TransportType != existing.TransportType {
@@ -321,4 +337,17 @@ func (s *mcpServiceService) GetMCPServiceResources(ctx context.Context, tenantID
 	}
 
 	return resources, nil
+}
+
+// equalStringSlices compares two string slices for equality
+func equalStringSlices(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }

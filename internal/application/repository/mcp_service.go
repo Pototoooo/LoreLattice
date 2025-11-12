@@ -108,8 +108,14 @@ func (r *mcpServiceRepository) Update(ctx context.Context, service *types.MCPSer
 	if service.TransportType != "" {
 		updateMap["transport_type"] = service.TransportType
 	}
-	if service.URL != "" {
-		updateMap["url"] = service.URL
+	if service.URL != nil {
+		updateMap["url"] = *service.URL
+	}
+	if service.StdioConfig != nil {
+		updateMap["stdio_config"] = service.StdioConfig
+	}
+	if service.EnvVars != nil {
+		updateMap["env_vars"] = service.EnvVars
 	}
 	if service.Headers != nil {
 		updateMap["headers"] = service.Headers
