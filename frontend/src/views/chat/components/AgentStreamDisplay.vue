@@ -44,23 +44,25 @@
         </div>
         
         <!-- Answer Event -->
-        <div v-else-if="event.type === 'answer' && event.content && event.content.trim()" class="answer-event">
+        <div v-else-if="event.type === 'answer' && (event.done || (event.content && event.content.trim()))" class="answer-event">
           <div 
+            v-if="event.content && event.content.trim()"
             class="answer-content-wrapper"
             :class="{ 
               'answer-active': !event.done,
               'answer-done': event.done
             }"
           >
-            <div v-if="event.content" 
-                 class="answer-content markdown-content" 
+            <div class="answer-content markdown-content" 
                  v-html="renderMarkdown(event.content)">
             </div>
           </div>
           <div v-if="event.done" class="answer-toolbar">
-            <t-button size="small" variant="outline" shape="round" @click.stop="handleAddToKnowledge(event)">
+            <t-button size="small" variant="outline" shape="round" @click.stop="handleCopyAnswer(event)" title="复制">
+              <t-icon name="copy" />
+            </t-button>
+            <t-button size="small" variant="outline" shape="round" @click.stop="handleAddToKnowledge(event)" title="添加到知识库">
               <t-icon name="add" />
-              <span>添加到知识库</span>
             </t-button>
           </div>
         </div>
@@ -393,16 +395,33 @@ const finalContent = computed(() => {
     return null;
   }
   
-  // Check if there's an answer with content
+  // Check if there's an answer event
   const answerEvents = stream.filter((e: any) => e.type === 'answer');
+  const doneAnswer = answerEvents.find((e: any) => e.done === true);
   const hasAnswerContent = answerEvents.some((e: any) => e.content && e.content.trim());
   
-  console.log('[Collapse] Answer events:', answerEvents.length, 'Has content:', hasAnswerContent);
+  console.log('[Collapse] Answer events:', answerEvents.length, 'Done answer:', !!doneAnswer, 'Has content:', hasAnswerContent);
   
+  // Priority: answer with content > last thinking (if answer is empty)
   if (hasAnswerContent) {
     // Answer has content, it's the final content
-    console.log('[Collapse] finalContent: showing answer');
+    console.log('[Collapse] finalContent: showing answer with content');
     return { type: 'answer' };
+  } else if (doneAnswer) {
+    // Answer is done but empty, find last thinking with content to show as final content
+    // (answer toolbar will still be shown via displayEvents logic)
+    const thinkingEvents = stream.filter((e: any) => e.type === 'thinking' && e.content && e.content.trim());
+    console.log('[Collapse] Thinking events with content:', thinkingEvents.length);
+    
+    if (thinkingEvents.length > 0) {
+      const lastThinking = thinkingEvents[thinkingEvents.length - 1];
+      console.log('[Collapse] finalContent: showing last thinking (answer empty, toolbar will show)', lastThinking.event_id);
+      return { type: 'thinking', event_id: lastThinking.event_id, showAnswerToolbar: true };
+    } else {
+      // No thinking content, show empty answer
+      console.log('[Collapse] finalContent: showing empty answer');
+      return { type: 'answer' };
+    }
   } else {
     // Answer is empty, find last thinking with content
     const thinkingEvents = stream.filter((e: any) => e.type === 'thinking' && e.content && e.content.trim());
@@ -595,12 +614,21 @@ const displayEvents = computed(() => {
     console.log('[Collapse] displayEvents: showing answer only', filtered.length);
     return filtered;
   } else if (final.type === 'thinking') {
-    // Filter to show only the last thinking
-    const filtered = result.filter((e: any) => 
+    // Show the last thinking as final content
+    const thinkingFiltered = result.filter((e: any) => 
       e.type === 'thinking' && e.event_id === final.event_id
     );
-    console.log('[Collapse] displayEvents: showing last thinking only', filtered.length);
-    return filtered;
+    
+    // If answer is done but empty, also include answer event for toolbar
+    if (final.showAnswerToolbar) {
+      const answerEvents = result.filter((e: any) => e.type === 'answer' && e.done === true);
+      const combined = [...thinkingFiltered, ...answerEvents];
+      console.log('[Collapse] displayEvents: showing last thinking + answer toolbar', combined.length);
+      return combined;
+    }
+    
+    console.log('[Collapse] displayEvents: showing last thinking only', thinkingFiltered.length);
+    return thinkingFiltered;
   }
   
   console.log('[Collapse] displayEvents: fallback, showing all', result.length);
@@ -1341,7 +1369,7 @@ const formatJSON = (obj: any): string => {
 const buildManualMarkdown = (question: string, answer: string): string => {
   const safeQuestion = question?.trim() || '（无提问内容）';
   const safeAnswer = answer?.trim() || '（无回答内容）';
-  return `# 用户提问\n${safeQuestion}\n\n# 助手回答\n${safeAnswer}\n`;
+  return `${safeAnswer}`;
 };
 
 const formatManualTitle = (question: string): string => {
@@ -1355,15 +1383,66 @@ const formatManualTitle = (question: string): string => {
   return condensed.length > 40 ? `${condensed.slice(0, 40)}...` : condensed;
 };
 
-const handleAddToKnowledge = (answerEvent: any) => {
+// Helper function to get actual content (from answer or last thinking)
+const getActualContent = (answerEvent: any): string => {
+  // First try to get content from answer event
   const answerContent = (answerEvent?.content || '').trim();
-  if (!answerContent) {
+  if (answerContent) {
+    return answerContent;
+  }
+  
+  // If answer is empty, try to get from last thinking
+  const stream = eventStream.value;
+  if (stream && Array.isArray(stream)) {
+    const thinkingEvents = stream.filter((e: any) => e.type === 'thinking' && e.content && e.content.trim());
+    if (thinkingEvents.length > 0) {
+      const lastThinking = thinkingEvents[thinkingEvents.length - 1];
+      return (lastThinking.content || '').trim();
+    }
+  }
+  
+  return '';
+};
+
+const handleCopyAnswer = async (answerEvent: any) => {
+  const content = getActualContent(answerEvent);
+  if (!content) {
+    MessagePlugin.warning('当前回答为空，无法复制');
+    return;
+  }
+
+  try {
+    // 尝试使用现代 Clipboard API
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(content);
+      MessagePlugin.success('已复制到剪贴板');
+    } else {
+      // 降级到传统方式
+      const textArea = document.createElement('textarea');
+      textArea.value = content;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      MessagePlugin.success('已复制到剪贴板');
+    }
+  } catch (err) {
+    console.error('复制失败:', err);
+    MessagePlugin.error('复制失败，请手动复制');
+  }
+};
+
+const handleAddToKnowledge = (answerEvent: any) => {
+  const content = getActualContent(answerEvent);
+  if (!content) {
     MessagePlugin.warning('当前回答为空，无法保存到知识库');
     return;
   }
 
   const question = (props.userQuery || '').trim();
-  const manualContent = buildManualMarkdown(question, answerContent);
+  const manualContent = buildManualMarkdown(question, content);
   const manualTitle = formatManualTitle(question);
 
   uiStore.openManualEditor({
@@ -1672,13 +1751,81 @@ const handleAddToKnowledge = (answerEvent: any) => {
 
   .answer-toolbar {
     display: flex;
-    justify-content: flex-end;
-    margin-top: 10px;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-top: 5px;
 
     :deep(.t-button) {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      min-width: auto;
+      width: auto;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #666;
+      transition: all 0.2s ease;
+      
+      // 确保按钮内容区域正确显示
+      .t-button__content {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+      }
+      
+      // t-button__text 包含图标，需要显示但只显示图标
+      .t-button__text {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+      }
+      
+      // 确保图标显示
+      .t-icon {
+        display: inline-flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        color: #666;
+      }
+      
+      // 确保 SVG 图标也显示
+      .t-icon svg {
+        display: block !important;
+        width: 16px;
+        height: 16px;
+      }
+      
+      // 隐藏文字节点（但不是图标）
+      .t-button__text > :not(.t-icon) {
+        display: none;
+      }
+      
+      // Hover 效果
+      &:hover:not(:disabled) {
+        background: rgba(7, 192, 95, 0.08);
+        border-color: rgba(7, 192, 95, 0.3);
+        color: #07c05f;
+        
+        .t-icon {
+          color: #07c05f;
+        }
+      }
+      
+      // Active 效果
+      &:active:not(:disabled) {
+        background: rgba(7, 192, 95, 0.12);
+        border-color: rgba(7, 192, 95, 0.4);
+        transform: translateY(0.5px);
+      }
     }
   }
 }
