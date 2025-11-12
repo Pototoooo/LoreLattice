@@ -137,6 +137,8 @@ const reconstructEventStreamFromSteps = (agentSteps, messageContent, isCompleted
                 content: step.thought,
                 done: true,
                 thinking: false,
+                // Extract duration from step if available
+                duration_ms: step.duration || undefined,
             });
         }
         
@@ -152,7 +154,9 @@ const reconstructEventStreamFromSteps = (agentSteps, messageContent, isCompleted
                     success: toolCall.result?.success !== false,
                     output: toolCall.result?.output || '',
                     error: toolCall.result?.error || undefined,
+                    // Use both duration and duration_ms for compatibility
                     duration: toolCall.duration,
+                    duration_ms: toolCall.duration,
                     display_type: toolCall.result?.data?.display_type,
                     tool_data: toolCall.result?.data,
                 });
@@ -597,7 +601,10 @@ const handleAgentChunk = (data) => {
                     toolCallEvent.success = success;
                     toolCallEvent.output = success ? (data.data.output || data.content) : (data.data.error || data.content);
                     toolCallEvent.error = !success ? (data.data.error || data.content) : undefined;
-                    toolCallEvent.duration = data.data.duration_ms;
+                    // Set both duration and duration_ms for compatibility
+                    const duration = data.data.duration_ms !== undefined ? data.data.duration_ms : data.data.duration;
+                    toolCallEvent.duration = duration;
+                    toolCallEvent.duration_ms = duration;
                     toolCallEvent.display_type = data.data.display_type;
                     toolCallEvent.tool_data = data.data;
                     

@@ -1,5 +1,5 @@
 <template>
-  <div class="agent-stream-display">
+  <div ref="rootElement" class="agent-stream-display">
     
     <!-- Collapsed intermediate steps -->
     <div v-if="shouldShowCollapsedSteps" class="intermediate-steps-collapsed">
@@ -131,7 +131,12 @@
               
               <!-- Fallback to original output display -->
               <div v-else-if="event.output" class="tool-output-wrapper">
-                <div class="detail-output">{{ event.output }}</div>
+                <div class="fallback-header">
+                  <span class="fallback-label">原始输出</span>
+                </div>
+                <div class="detail-output-wrapper">
+                  <div class="detail-output">{{ event.output }}</div>
+                </div>
               </div>
               
               <!-- Show Arguments only if no display_type and not for todo_write -->
@@ -179,7 +184,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
@@ -187,6 +192,9 @@ import ToolResultRenderer from './ToolResultRenderer.vue';
 import { getChunkByIdOnly } from '@/api/knowledge-base';
 
 const router = useRouter();
+
+// 根元素引用
+const rootElement = ref<HTMLElement | null>(null);
 
 // 浮层状态（Web/KB 共用）
 const KB_SNIPPET_LIMIT = 600;
@@ -415,7 +423,6 @@ const intermediateStepsSummary = computed(() => {
   const toolCalls: string[] = [];
   let searchCount = 0;
   let thinkingCount = 0;
-  let totalDuration = 0;
   
   for (const event of stream) {
     if (event.type === 'tool_call' && event.tool_name) {
@@ -433,22 +440,13 @@ const intermediateStepsSummary = computed(() => {
           toolCalls.push(toolName);
         }
       }
-      // Accumulate duration for tool calls
-      if (event.duration) {
-        totalDuration += event.duration;
-      } else if (event.duration_ms) {
-        totalDuration += event.duration_ms;
-      }
+      
     } else if (event.type === 'thinking' && event.content) {
       // Count if it's not the final thinking
       if (finalContent.value.type !== 'thinking' || event.event_id !== finalContent.value.event_id) {
         thinkingCount++;
-        // Accumulate duration for thinking events
-        if (event.duration_ms) {
-          totalDuration += event.duration_ms;
-        }
       }
-    }
+    } 
   }
   
   const parts: string[] = [];
@@ -469,17 +467,6 @@ const intermediateStepsSummary = computed(() => {
     } else {
       parts.push(`调用工具 ${toolNames.join('、')}`);
     }
-  }
-  
-  // Add duration info
-  if (totalDuration > 0) {
-    const durationStr = formatDuration(totalDuration);
-    // Extract numbers from duration string (e.g., "300ms" -> "300", "3s" -> "3", "2m 30s" -> "2" and "30")
-    // Process "ms" first to avoid matching "m" and "s" separately, then process "s" and "m"
-    const durationHtml = durationStr
-      .replace(/(\d+)(ms)/g, '<strong>$1</strong>$2')
-      .replace(/(\d+)([sm])(?!\w)/g, '<strong>$1</strong>$2');
-    parts.push(`耗时 ${durationHtml}`);
   }
   
   if (parts.length === 0) {
@@ -868,22 +855,25 @@ const onRootKeydown = (e: KeyboardEvent) => {
 };
 
 onMounted(() => {
-  const root = document.querySelector('.agent-stream-display');
-  if (!root) return;
-  root.addEventListener('click', onRootClick, true);
-  const keydownListener: EventListener = (evt: Event) => onRootKeydown(evt as KeyboardEvent);
-  // Store on element for removal
-  (root as any).__citationKeydown__ = keydownListener;
-  root.addEventListener('keydown', keydownListener, true);
-  // 统一 hover 监听
-  root.addEventListener('mouseover', onHover, true);
-  root.addEventListener('mouseout', onHoverOut, true);
-  window.addEventListener('scroll', scheduleFloatClose, true);
-  window.addEventListener('resize', scheduleFloatClose, true);
+  // 使用 nextTick 确保 DOM 已渲染
+  nextTick(() => {
+    const root = rootElement.value;
+    if (!root) return;
+    root.addEventListener('click', onRootClick, true);
+    const keydownListener: EventListener = (evt: Event) => onRootKeydown(evt as KeyboardEvent);
+    // Store on element for removal
+    (root as any).__citationKeydown__ = keydownListener;
+    root.addEventListener('keydown', keydownListener, true);
+    // 统一 hover 监听
+    root.addEventListener('mouseover', onHover, true);
+    root.addEventListener('mouseout', onHoverOut, true);
+    window.addEventListener('scroll', scheduleFloatClose, true);
+    window.addEventListener('resize', scheduleFloatClose, true);
+  });
 });
 
 onBeforeUnmount(() => {
-  const root = document.querySelector('.agent-stream-display');
+  const root = rootElement.value;
   if (!root) return;
   root.removeEventListener('click', onRootClick, true);
   root.removeEventListener('mouseover', onHover, true);
@@ -1865,16 +1855,67 @@ const formatJSON = (obj: any): string => {
 }
 
 .tool-output-wrapper {
-  .detail-output {
-    font-size: 13px;
-    color: #333;
-    background: #ffffff;
-    padding: 12px;
-    border-radius: 6px;
-    white-space: pre-wrap;
-    word-break: break-word;
+  margin: 12px 0;
+  padding: 0 10px;
+  
+  .fallback-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 4px;
+    
+    .fallback-label {
+      font-size: 12px;
+      color: #666;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+  }
+  
+  .detail-output-wrapper {
+    position: relative;
+    background: #fafafa;
     border: 1px solid #e5e7eb;
-    line-height: 1.6;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    
+    .detail-output {
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'Courier New', monospace;
+      font-size: 12px;
+      color: #333;
+      padding: 16px;
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.6;
+      max-height: 400px;
+      overflow-y: auto;
+      overflow-x: auto;
+      background: #ffffff;
+      display: block;
+      
+      // 滚动条样式
+      &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: #f5f5f5;
+        border-radius: 4px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 4px;
+        
+        &:hover {
+          background: #9ca3af;
+        }
+      }
+    }
   }
 }
 
@@ -2134,6 +2175,8 @@ const formatJSON = (obj: any): string => {
 
 .tool-arguments-wrapper {
   margin-top: 8px;
+  padding: 0 10px;
+  margin-bottom: 8px;
   
   .arguments-header {
     margin-bottom: 6px;

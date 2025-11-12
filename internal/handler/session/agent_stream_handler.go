@@ -123,9 +123,15 @@ func (h *AgentStreamHandler) handleToolCall(ctx context.Context, evt event.Event
 		return nil
 	}
 
+	h.mu.Lock()
+	// Track start time for this tool call (use tool_call_id as key)
+	h.eventStartTimes[data.ToolCallID] = time.Now()
+	h.mu.Unlock()
+
 	metadata := map[string]interface{}{
-		"tool_name": data.ToolName,
-		"arguments": data.Arguments,
+		"tool_name":    data.ToolName,
+		"arguments":    data.Arguments,
+		"tool_call_id": data.ToolCallID,
 	}
 
 	// Append event to stream
@@ -150,6 +156,18 @@ func (h *AgentStreamHandler) handleToolResult(ctx context.Context, evt event.Eve
 		return nil
 	}
 
+	h.mu.Lock()
+	// Calculate duration from start time if available, otherwise use provided duration
+	var durationMs int64
+	if startTime, exists := h.eventStartTimes[data.ToolCallID]; exists {
+		durationMs = time.Since(startTime).Milliseconds()
+		delete(h.eventStartTimes, data.ToolCallID)
+	} else if data.Duration > 0 {
+		// Fallback to provided duration if start time not tracked
+		durationMs = data.Duration
+	}
+	h.mu.Unlock()
+
 	// Send SSE response (both success and failure)
 	responseType := types.ResponseTypeToolResult
 	content := data.Output
@@ -162,11 +180,12 @@ func (h *AgentStreamHandler) handleToolResult(ctx context.Context, evt event.Eve
 
 	// Build metadata including tool result data for rich frontend rendering
 	metadata := map[string]interface{}{
-		"tool_name": data.ToolName,
-		"success":   data.Success,
-		"output":    data.Output,
-		"error":     data.Error,
-		"duration":  data.Duration,
+		"tool_name":    data.ToolName,
+		"success":      data.Success,
+		"output":       data.Output,
+		"error":        data.Error,
+		"duration_ms":  durationMs,
+		"tool_call_id": data.ToolCallID,
 	}
 
 	// Merge tool result data (contains display_type, formatted results, etc.)
@@ -264,8 +283,30 @@ func (h *AgentStreamHandler) handleFinalAnswer(ctx context.Context, evt event.Ev
 	}
 
 	h.mu.Lock()
+	// Track start time on first chunk
+	if _, exists := h.eventStartTimes[evt.ID]; !exists {
+		h.eventStartTimes[evt.ID] = time.Now()
+	}
+
 	// Accumulate final answer locally for assistant message (database)
 	h.finalAnswer += data.Content
+
+	// Calculate duration if done
+	var metadata map[string]interface{}
+	if data.Done {
+		startTime := h.eventStartTimes[evt.ID]
+		duration := time.Since(startTime)
+		metadata = map[string]interface{}{
+			"event_id":     evt.ID,
+			"duration_ms":  duration.Milliseconds(),
+			"completed_at": time.Now().Unix(),
+		}
+		delete(h.eventStartTimes, evt.ID)
+	} else {
+		metadata = map[string]interface{}{
+			"event_id": evt.ID,
+		}
+	}
 	h.mu.Unlock()
 
 	// Append this chunk to stream (frontend will accumulate by event ID)
@@ -275,6 +316,7 @@ func (h *AgentStreamHandler) handleFinalAnswer(ctx context.Context, evt event.Ev
 		Content:   data.Content, // Just this chunk
 		Done:      data.Done,
 		Timestamp: time.Now(),
+		Data:      metadata,
 	}); err != nil {
 		logger.GetLogger(h.ctx).Error("Append answer event to stream failed", "error", err)
 	}

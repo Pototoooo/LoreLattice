@@ -63,7 +63,12 @@
     
     <!-- Fallback: Display raw output -->
     <div v-else class="fallback-output">
-      <div class="detail-output">{{ output }}</div>
+      <div class="fallback-header">
+        <span class="fallback-label">原始输出</span>
+      </div>
+      <div class="detail-output-wrapper">
+        <div class="detail-output">{{ output }}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -116,15 +121,67 @@ const toolArguments = computed(() => props.arguments || {});
 }
 
 .fallback-output {
-  .detail-output {
-    font-size: 13px;
-    color: #333;
-    background: #f5f5f5;
-    padding: 8px;
-    border-radius: 4px;
-    white-space: pre-wrap;
-    word-break: break-word;
-    border: 1px solid #e7e7e7;
+  margin: 12px 0;
+  padding: 0;
+  
+  .fallback-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 4px;
+    
+    .fallback-label {
+      font-size: 12px;
+      color: #666;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+  }
+  
+  .detail-output-wrapper {
+    position: relative;
+    background: #fafafa;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    
+    .detail-output {
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'Courier New', monospace;
+      font-size: 12px;
+      color: #333;
+      padding: 16px;
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.6;
+      max-height: 400px;
+      overflow-y: auto;
+      overflow-x: auto;
+      background: #ffffff;
+      display: block;
+      
+      // 滚动条样式
+      &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: #f5f5f5;
+        border-radius: 4px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 4px;
+        
+        &:hover {
+          background: #9ca3af;
+        }
+      }
+    }
   }
 }
 </style>

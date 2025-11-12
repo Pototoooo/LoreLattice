@@ -164,19 +164,6 @@ func (e *AgentEngine) executeLoop(
 			Timestamp: time.Now(),
 		}
 
-		// Emit step event
-		e.eventBus.Emit(ctx, event.Event{
-			ID:        generateEventID("step"),
-			Type:      event.EventAgentStep,
-			SessionID: sessionID,
-			Data: event.AgentStepData{
-				Iteration: state.CurrentRound,
-				Thought:   response.Content,
-				ToolCalls: step.ToolCalls,
-				Duration:  time.Since(roundStart).Milliseconds(),
-			},
-		})
-
 		// 2. Check finish reason - if stop and no tool calls, agent is done
 		if response.FinishReason == "stop" && len(response.ToolCalls) == 0 {
 			logger.Infof(ctx, "[Agent][Round-%d] Agent finished - no more tool calls needed", state.CurrentRound+1)
@@ -195,6 +182,7 @@ func (e *AgentEngine) executeLoop(
 					Done:    true,
 				},
 			})
+			step.Duration = time.Since(roundStart).Milliseconds()
 			logger.Infof(ctx, "[Agent][Round-%d] Duration: %dms", state.CurrentRound+1, time.Since(roundStart).Milliseconds())
 			break
 		}
@@ -345,6 +333,7 @@ func (e *AgentEngine) executeLoop(
 			}
 		}
 
+		step.Duration = time.Since(roundStart).Milliseconds()
 		state.RoundSteps = append(state.RoundSteps, step)
 		// 4. Observe: Add tool results to messages and write to context
 		messages = e.appendToolResults(ctx, messages, step)
