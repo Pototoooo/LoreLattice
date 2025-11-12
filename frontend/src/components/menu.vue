@@ -39,21 +39,19 @@
                             {{ kb.name }}
                         </div>
                     </div>
-                    <t-popup overlayInnerClassName="upload-popup" class="placement top center" content="上传文档 / 在线编辑（支持拖拽上传）"
-                        placement="top" show-arrow destroy-on-close>
-                        <t-dropdown
-                            v-if="item.path === 'knowledge-bases' && $route.name === 'knowledgeBaseDetail'"
-                            trigger="click"
-                            :options="uploadActionOptions"
-                            placement="right"
-                            @click="handleUploadAction"
-                        >
-                            <div class="upload-file-wrap" variant="outline">
-                                <img class="upload-file-icon" :class="[item.path == currentpath ? 'active-upload' : '']"
-                                    :src="getImgSrc(fileAddIcon)" alt="">
-                            </div>
-                        </t-dropdown>
-                    </t-popup>
+                    <t-dropdown
+                        v-if="item.path === 'knowledge-bases' && $route.name === 'knowledgeBaseDetail'"
+                        trigger="hover"
+                        :options="uploadActionOptions"
+                        placement="right"
+                        @click="handleUploadAction"
+                        class="upload-action-dropdown-trigger"
+                    >
+                        <div class="upload-file-wrap" variant="outline">
+                            <img class="upload-file-icon" :class="[item.path == currentpath ? 'active-upload' : '']"
+                                :src="getImgSrc(fileAddIcon)" alt="">
+                        </div>
+                    </t-dropdown>
                 </div>
                 <div ref="submenuscrollContainer" @scroll="handleScroll" class="submenu" v-if="item.children">
                     <template v-for="(group, groupIndex) in groupedSessions" :key="groupIndex">
@@ -1099,20 +1097,45 @@ watch(() => route.params.kbId, () => {
 }
 </style>
 <style lang="less">
-.upload-popup {
-    background-color: rgba(0, 0, 0, 0.9);
-    color: #FFFFFF;
-    border-color: rgba(0, 0, 0, 0.9) !important;
-    box-shadow: none;
-    margin-bottom: 10px !important;
+// 上传操作下拉菜单样式 - 全局样式（因为 TDesign 的下拉菜单挂载到 body 上）
+// 使用更具体的选择器来匹配上传操作下拉菜单
+.t-popup[data-popper-placement^="right"] {
+    .t-popup__content {
+        .t-dropdown__menu {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 6px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+            padding: 4px !important;
+            min-width: 100px !important;
+        }
 
-    .t-popup__arrow::before {
-        border-color: rgba(0, 0, 0, 0.9) !important;
-        background-color: rgba(0, 0, 0, 0.9) !important;
-        box-shadow: none !important;
+        .t-dropdown__item {
+            padding: 8px 12px !important;
+            border-radius: 4px !important;
+            margin: 2px 0 !important;
+            transition: all 0.2s ease !important;
+            font-size: 14px !important;
+            color: #333333 !important;
+            min-width: auto !important;
+            max-width: none !important;
+            width: auto !important;
+            cursor: pointer !important;
+
+            &:hover {
+                background: #f5f7fa !important;
+                color: #07c05f !important;
+            }
+
+            .t-dropdown__item-text {
+                color: inherit !important;
+                font-size: 14px !important;
+                line-height: 20px !important;
+                white-space: nowrap !important;
+            }
+        }
     }
 }
-
 
 // 退出登录确认框样式
 :deep(.t-popconfirm) {
