@@ -1,11 +1,22 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+)
+
+const (
+	KnowledgeTypeManual = "manual"
+)
+
+const (
+	ManualKnowledgeFormatMarkdown = "markdown"
+	ManualKnowledgeStatusDraft    = "draft"
+	ManualKnowledgeStatusPublish  = "publish"
 )
 
 // Knowledge represents a knowledge entity in the system.
@@ -75,6 +86,118 @@ func (k *Knowledge) GetMetadata() map[string]string {
 func (k *Knowledge) BeforeCreate(tx *gorm.DB) (err error) {
 	k.ID = uuid.New().String()
 	return nil
+}
+
+// ManualKnowledgeMetadata stores metadata for manual Markdown knowledge content.
+type ManualKnowledgeMetadata struct {
+	Content   string `json:"content"`
+	Format    string `json:"format"`
+	Status    string `json:"status"`
+	Version   int    `json:"version"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+// ManualKnowledgePayload represents the payload for manual knowledge operations.
+type ManualKnowledgePayload struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	Status  string `json:"status"`
+}
+
+// NewManualKnowledgeMetadata creates a new ManualKnowledgeMetadata instance.
+func NewManualKnowledgeMetadata(content, status string, version int) *ManualKnowledgeMetadata {
+	if version <= 0 {
+		version = 1
+	}
+	return &ManualKnowledgeMetadata{
+		Content:   content,
+		Format:    ManualKnowledgeFormatMarkdown,
+		Status:    status,
+		Version:   version,
+		UpdatedAt: time.Now().UTC().Format(time.RFC3339),
+	}
+}
+
+// ToJSON converts the metadata to JSON type.
+func (m *ManualKnowledgeMetadata) ToJSON() (JSON, error) {
+	if m == nil {
+		return nil, nil
+	}
+	if m.Format == "" {
+		m.Format = ManualKnowledgeFormatMarkdown
+	}
+	if m.Status == "" {
+		m.Status = ManualKnowledgeStatusDraft
+	}
+	if m.Version <= 0 {
+		m.Version = 1
+	}
+	if m.UpdatedAt == "" {
+		m.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+	}
+	bytes, err := json.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	return JSON(bytes), nil
+}
+
+// ManualMetadata parses and returns manual knowledge metadata.
+func (k *Knowledge) ManualMetadata() (*ManualKnowledgeMetadata, error) {
+	if len(k.Metadata) == 0 {
+		return nil, nil
+	}
+	var metadata ManualKnowledgeMetadata
+	if err := json.Unmarshal(k.Metadata, &metadata); err != nil {
+		return nil, err
+	}
+	if metadata.Format == "" {
+		metadata.Format = ManualKnowledgeFormatMarkdown
+	}
+	if metadata.Version <= 0 {
+		metadata.Version = 1
+	}
+	return &metadata, nil
+}
+
+// SetManualMetadata sets manual knowledge metadata onto the knowledge instance.
+func (k *Knowledge) SetManualMetadata(meta *ManualKnowledgeMetadata) error {
+	if meta == nil {
+		k.Metadata = nil
+		return nil
+	}
+	jsonValue, err := meta.ToJSON()
+	if err != nil {
+		return err
+	}
+	k.Metadata = jsonValue
+	return nil
+}
+
+// IsManual returns true if the knowledge item is manual Markdown knowledge.
+func (k *Knowledge) IsManual() bool {
+	return k != nil && k.Type == KnowledgeTypeManual
+}
+
+// EnsureManualDefaults sets default values for manual knowledge entries.
+func (k *Knowledge) EnsureManualDefaults() {
+	if k == nil {
+		return
+	}
+	if k.Type == "" {
+		k.Type = KnowledgeTypeManual
+	}
+	if k.FileType == "" {
+		k.FileType = KnowledgeTypeManual
+	}
+	if k.Source == "" {
+		k.Source = KnowledgeTypeManual
+	}
+}
+
+// IsDraft returns whether the payload should be saved as draft.
+func (p ManualKnowledgePayload) IsDraft() bool {
+	return p.Status == "" || p.Status == ManualKnowledgeStatusDraft
 }
 
 // KnowledgeCheckParams defines parameters used to check if knowledge already exists.

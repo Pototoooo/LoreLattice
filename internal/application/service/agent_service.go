@@ -10,6 +10,7 @@ import (
 	"github.com/Tencent/WeKnora/internal/event"
 	"github.com/Tencent/WeKnora/internal/logger"
 	"github.com/Tencent/WeKnora/internal/mcp"
+	"github.com/Tencent/WeKnora/internal/models/chat"
 	"github.com/Tencent/WeKnora/internal/models/rerank"
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
@@ -97,7 +98,7 @@ func (s *agentService) CreateAgentEngine(
 	toolRegistry := tools.NewToolRegistry(s.knowledgeBaseService, s.knowledgeService, s.chunkService, s.db)
 
 	// Register tools
-	if err := s.registerTools(ctx, toolRegistry, config, rerankModel, sessionID, sessionService); err != nil {
+	if err := s.registerTools(ctx, toolRegistry, config, rerankModel, chatModel, sessionID, sessionService); err != nil {
 		return nil, fmt.Errorf("failed to register tools: %w", err)
 	}
 
@@ -147,8 +148,10 @@ func (s *agentService) CreateAgentEngine(
 		}
 	}
 
-	// Get system prompt template from config (use default if empty)
-	systemPromptTemplate := config.SystemPrompt
+	systemPromptTemplate := agent.DefaultSystemPromptTemplate
+	if config.UseCustomSystemPrompt && config.SystemPrompt != "" {
+		systemPromptTemplate = config.SystemPrompt
+	}
 
 	// Create engine with provided EventBus and contextManager
 	engine := agent.NewAgentEngine(
@@ -172,6 +175,7 @@ func (s *agentService) registerTools(
 	registry *tools.ToolRegistry,
 	config *types.AgentConfig,
 	rerankModel rerank.Reranker,
+	chatModel chat.Chat,
 	sessionID string,
 	sessionService interfaces.SessionService,
 ) error {
@@ -186,6 +190,7 @@ func (s *agentService) registerTools(
 	// If web search is enabled, add web_search to allowedTools
 	if config.WebSearchEnabled {
 		allowedTools = append(allowedTools, "web_search")
+		allowedTools = append(allowedTools, "web_fetch")
 	}
 
 	// Get tenant ID from context
@@ -199,7 +204,7 @@ func (s *agentService) registerTools(
 	for _, toolName := range allowedTools {
 		switch toolName {
 		case "thinking":
-			registry.RegisterTool(tools.NewThinkingTool())
+			registry.RegisterTool(tools.NewSequentialThinkingTool())
 		case "todo_write":
 			registry.RegisterTool(tools.NewTodoWriteTool())
 		case "knowledge_search":
@@ -222,6 +227,10 @@ func (s *agentService) registerTools(
 				config.WebSearchMaxResults,
 			))
 			logger.Infof(ctx, "Registered web_search tool for session: %s, maxResults: %d", sessionID, config.WebSearchMaxResults)
+
+		case "web_fetch":
+			registry.RegisterTool(tools.NewWebFetchTool(chatModel))
+			logger.Infof(ctx, "Registered web_fetch tool for session: %s", sessionID)
 
 		default:
 			logger.Warnf(ctx, "Unknown tool: %s", toolName)

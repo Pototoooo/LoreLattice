@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Tencent/WeKnora/internal/agent"
 	chatpipline "github.com/Tencent/WeKnora/internal/application/service/chat_pipline"
 	llmcontext "github.com/Tencent/WeKnora/internal/application/service/llmcontext"
 	"github.com/Tencent/WeKnora/internal/config"
@@ -803,6 +804,12 @@ func (s *sessionService) AgentQA(ctx context.Context, session *types.Session, qu
 		RerankModelID:     tenantInfo.AgentConfig.RerankModelID,
 		KnowledgeBases:    session.AgentConfig.KnowledgeBases,   // Use session's knowledge bases
 		WebSearchEnabled:  session.AgentConfig.WebSearchEnabled, // Web search enabled from session config
+	}
+
+	if tenantInfo.AgentConfig.UseCustomSystemPrompt {
+		agentConfig.SystemPrompt = tenantInfo.AgentConfig.SystemPrompt
+	} else {
+		agentConfig.SystemPrompt = agent.DefaultSystemPromptTemplate
 	}
 
 	// Set web search max results from tenant config (default: 5)

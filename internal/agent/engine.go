@@ -577,6 +577,8 @@ func (e *AgentEngine) streamThinkingToEventBus(
 	}
 	logger.Debug(context.Background(), "[Agent] streamLLM opts tool_choice=auto temperature=", e.config.Temperature)
 
+	pendingToolCalls := make(map[string]bool)
+
 	// Generate a single ID for this entire thinking stream
 	thinkingID := generateEventID("thinking")
 	logger.Debugf(ctx, "[Agent][Thinking][Iteration-%d] ThinkingID: %s", iteration+1, thinkingID)
@@ -586,6 +588,25 @@ func (e *AgentEngine) streamThinkingToEventBus(
 		messages,
 		opts,
 		func(chunk *types.StreamResponse, fullContent string) {
+			if chunk.ResponseType == types.ResponseTypeToolCall && chunk.Data != nil {
+				toolCallID, _ := chunk.Data["tool_call_id"].(string)
+				toolName, _ := chunk.Data["tool_name"].(string)
+
+				if toolCallID != "" && toolName != "" && !pendingToolCalls[toolCallID] {
+					pendingToolCalls[toolCallID] = true
+					e.eventBus.Emit(ctx, event.Event{
+						ID:        fmt.Sprintf("%s-tool-call-pending", toolCallID),
+						Type:      event.EventAgentToolCall,
+						SessionID: sessionID,
+						Data: event.AgentToolCallData{
+							ToolCallID: toolCallID,
+							ToolName:   toolName,
+							Iteration:  iteration,
+						},
+					})
+				}
+			}
+
 			if chunk.Content != "" {
 				// logger.Debugf(ctx, "[Agent][Thinking][Iteration-%d] Emitting thought chunk: %d chars",
 				// 	iteration+1, len(chunk.Content))

@@ -17,7 +17,8 @@ export type DisplayType =
     | 'thinking'
     | 'plan'
     | 'database_query'
-    | 'web_search_results';
+    | 'web_search_results'
+    | 'web_fetch_results';
 
 // Search result item
 export interface SearchResultItem {
@@ -156,6 +157,24 @@ export interface WebSearchResultsData {
     count: number;
 }
 
+// Web fetch result item
+export interface WebFetchResultItem {
+    url: string;
+    prompt?: string;
+    summary?: string;
+    raw_content?: string;
+    content_length?: number;
+    method?: string;
+    error?: string;
+}
+
+// Web fetch results data
+export interface WebFetchResultsData {
+    display_type: 'web_fetch_results';
+    results: WebFetchResultItem[];
+    count?: number;
+}
+
 // Union type for all tool result data
 export type ToolResultData =
     | SearchResultsData
@@ -167,7 +186,8 @@ export type ToolResultData =
     | ThinkingData
     | PlanData
     | DatabaseQueryData
-    | WebSearchResultsData;
+    | WebSearchResultsData
+    | WebFetchResultsData;
 
 // Action data (from index.vue)
 export interface ActionData {

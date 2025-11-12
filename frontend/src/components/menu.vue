@@ -39,13 +39,20 @@
                             {{ kb.name }}
                         </div>
                     </div>
-                    <t-popup overlayInnerClassName="upload-popup" class="placement top center" content="上传知识"
+                    <t-popup overlayInnerClassName="upload-popup" class="placement top center" content="上传文档 / 在线编辑（支持拖拽上传）"
                         placement="top" show-arrow destroy-on-close>
-                        <div class="upload-file-wrap" @click.stop="uploadFile" variant="outline"
-                             v-if="item.path === 'knowledge-bases' && $route.name === 'knowledgeBaseDetail'">
-                            <img class="upload-file-icon" :class="[item.path == currentpath ? 'active-upload' : '']"
-                                :src="getImgSrc(fileAddIcon)" alt="">
-                        </div>
+                        <t-dropdown
+                            v-if="item.path === 'knowledge-bases' && $route.name === 'knowledgeBaseDetail'"
+                            trigger="click"
+                            :options="uploadActionOptions"
+                            placement="right"
+                            @click="handleUploadAction"
+                        >
+                            <div class="upload-file-wrap" variant="outline">
+                                <img class="upload-file-icon" :class="[item.path == currentpath ? 'active-upload' : '']"
+                                    :src="getImgSrc(fileAddIcon)" alt="">
+                            </div>
+                        </t-dropdown>
                     </t-popup>
                 </div>
                 <div ref="submenuscrollContainer" @scroll="handleScroll" class="submenu" v-if="item.children">
@@ -262,6 +269,10 @@ const kbMenuItem = computed(() => {
 })
 
 const loading = ref(false)
+const uploadActionOptions = [
+    { content: '上传文档', value: 'upload' },
+    { content: '在线编辑', value: 'manual' },
+]
 const uploadFile = async () => {
     // 获取当前知识库ID
     const currentKbId = await getCurrentKbId();
@@ -286,6 +297,34 @@ const uploadFile = async () => {
     }
     
     uploadInput.value.click()
+}
+const openManualEditor = async () => {
+    const currentKbId = await getCurrentKbId();
+    if (!currentKbId) {
+        MessagePlugin.warning("请选择知识库");
+        return;
+    }
+    uiStore.openManualEditor({
+        mode: 'create',
+        kbId: currentKbId,
+        status: 'draft',
+        onSuccess: ({ kbId }) => {
+            if (kbId) {
+                window.dispatchEvent(new CustomEvent('knowledgeFileUploaded', {
+                    detail: { kbId }
+                }));
+            }
+        },
+    });
+}
+const handleUploadAction = async (data: { value: string }) => {
+    if (data.value === 'upload') {
+        uploadFile();
+        return;
+    }
+    if (data.value === 'manual') {
+        openManualEditor();
+    }
 }
 const upload = async (e: any) => {
     const file = e.target.files[0];

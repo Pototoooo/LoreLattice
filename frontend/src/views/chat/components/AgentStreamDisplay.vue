@@ -57,6 +57,12 @@
                  v-html="renderMarkdown(event.content)">
             </div>
           </div>
+          <div v-if="event.done" class="answer-toolbar">
+            <t-button size="small" variant="outline" shape="round" @click.stop="handleAddToKnowledge(event)">
+              <t-icon name="add" />
+              <span>添加到知识库</span>
+            </t-button>
+          </div>
         </div>
         
         <!-- Tool Call Event -->
@@ -190,8 +196,30 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import ToolResultRenderer from './ToolResultRenderer.vue';
 import { getChunkByIdOnly } from '@/api/knowledge-base';
+import { MessagePlugin } from 'tdesign-vue-next';
+import { useUIStore } from '@/stores/ui';
 
 const router = useRouter();
+const uiStore = useUIStore();
+
+const TOOL_NAME_I18N: Record<string, string> = {
+  search_knowledge: '知识库检索',
+  knowledge_search: '知识库检索',
+  web_search: '网络搜索',
+  web_fetch: '网页抓取',
+  get_document_info: '获取文档信息',
+  get_related_chunks: '查找相关片段',
+  get_related_documents: '查找相关文档',
+  get_document_content: '获取文档内容',
+  todo_write: '计划管理',
+  knowledge_graph_extract: '知识图谱抽取',
+  thinking: '思考',
+};
+
+const getLocalizedToolName = (toolName?: string | null): string => {
+  if (!toolName) return '工具';
+  return TOOL_NAME_I18N[toolName] || toolName;
+};
 
 // 根元素引用
 const rootElement = ref<HTMLElement | null>(null);
@@ -276,6 +304,7 @@ interface SessionData {
 
 const props = defineProps<{
   session: SessionData;
+  userQuery?: string;
 }>();
 
 // Configure marked for security
@@ -1164,7 +1193,8 @@ const getQueryText = (args: any): string => {
 // Get tool title - prefer summary over description, add query for search tools
 const getToolTitle = (event: any): string => {
   if (event.pending) {
-    return `正在调用 ${event.tool_name}...`;
+    const localizedName = getLocalizedToolName(event.tool_name);
+    return `正在调用 ${localizedName}...`;
   }
   
   const toolName = event.tool_name;
@@ -1207,7 +1237,8 @@ const getToolTitle = (event: any): string => {
 // Tool description
 const getToolDescription = (event: any): string => {
   if (event.pending) {
-    return `正在调用 ${event.tool_name}...`;
+    const localizedName = getLocalizedToolName(event.tool_name);
+    return `正在调用 ${localizedName}...`;
   }
   
   const success = event.success === true;
@@ -1224,7 +1255,8 @@ const getToolDescription = (event: any): string => {
   } else if (toolName === 'todo_write') {
     return success ? '更新任务列表' : '更新任务列表失败';
   } else {
-    return success ? `调用 ${toolName}` : `调用 ${toolName} 失败`;
+    const localizedName = getLocalizedToolName(toolName);
+    return success ? `调用 ${localizedName}` : `调用 ${localizedName} 失败`;
   }
 };
 
@@ -1254,6 +1286,44 @@ const formatJSON = (obj: any): string => {
   } catch {
     return String(obj);
   }
+};
+
+const buildManualMarkdown = (question: string, answer: string): string => {
+  const safeQuestion = question?.trim() || '（无提问内容）';
+  const safeAnswer = answer?.trim() || '（无回答内容）';
+  return `# 用户提问\n${safeQuestion}\n\n# 助手回答\n${safeAnswer}\n`;
+};
+
+const formatManualTitle = (question: string): string => {
+  if (!question) {
+    return '会话摘录';
+  }
+  const condensed = question.replace(/\s+/g, ' ').trim();
+  if (!condensed) {
+    return '会话摘录';
+  }
+  return condensed.length > 40 ? `${condensed.slice(0, 40)}...` : condensed;
+};
+
+const handleAddToKnowledge = (answerEvent: any) => {
+  const answerContent = (answerEvent?.content || '').trim();
+  if (!answerContent) {
+    MessagePlugin.warning('当前回答为空，无法保存到知识库');
+    return;
+  }
+
+  const question = (props.userQuery || '').trim();
+  const manualContent = buildManualMarkdown(question, answerContent);
+  const manualTitle = formatManualTitle(question);
+
+  uiStore.openManualEditor({
+    mode: 'create',
+    title: manualTitle,
+    content: manualContent,
+    status: 'draft',
+  });
+
+  MessagePlugin.info('已打开编辑器，请选择知识库后保存');
 };
 </script>
 
@@ -1549,6 +1619,18 @@ const formatJSON = (obj: any): string => {
       }
     }
   }
+
+  .answer-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+
+    :deep(.t-button) {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+  }
 }
 
 // Tool Event
@@ -1560,13 +1642,19 @@ const formatJSON = (obj: any): string => {
     border-radius: 8px;
     border: 1px solid #e5e7eb;
     overflow: hidden;
+    position: relative;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+    > * {
+      position: relative;
+      z-index: 1;
+    }
 
     &:hover {
       border-color: #07c05f;
       box-shadow: 0 2px 8px rgba(7, 192, 95, 0.12);
-      transform: translateY(-1px);
+      // transform: translateY(-1px);
     }
 
     &.action-error {
@@ -1575,8 +1663,27 @@ const formatJSON = (obj: any): string => {
     }
     
     &.action-pending {
-      opacity: 0.7;
+      opacity: 1;
       box-shadow: none;
+      border-color: rgba(7, 192, 95, 0.35);
+      background: linear-gradient(120deg, rgba(7, 192, 95, 0.04), rgba(255, 255, 255, 0.9));
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          120deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.8) 35%,
+          rgba(7, 192, 95, 0.15) 55%,
+          rgba(255, 255, 255, 0) 85%
+        );
+        transform: translateX(-100%);
+        animation: actionPendingShimmer 1.6s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 0;
+      }
     }
   }
   
@@ -1727,6 +1834,18 @@ const formatJSON = (obj: any): string => {
   }
   20%, 40%, 60%, 80% {
     transform: translateX(3px);
+  }
+}
+
+@keyframes actionPendingShimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  50% {
+    transform: translateX(-10%);
+  }
+  100% {
+    transform: translateX(120%);
   }
 }
 

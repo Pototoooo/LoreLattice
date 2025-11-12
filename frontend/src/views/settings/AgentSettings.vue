@@ -65,6 +65,10 @@
         <div class="setting-info">
           <label>思考模型</label>
           <p class="desc">用于 Agent 推理和规划的 LLM 模型</p>
+          <p class="hint-tip">
+            <t-icon name="info-circle" class="tip-icon" />
+            需要支持 Function call 的大尺寸模型，如 deepseek-v3.1-termius
+          </p>
         </div>
         <div class="setting-control">
         <t-select
@@ -208,6 +212,15 @@
         </div>
         <div class="setting-control full-width" style="position: relative;">
           <div class="prompt-header">
+            <div class="prompt-toggle">
+              <span class="prompt-toggle-label">自定义 Prompt</span>
+              <t-switch
+                v-model="localUseCustomSystemPrompt"
+                :label="['关闭', '开启']"
+                size="large"
+                @change="handleUseCustomPromptToggle"
+              />
+            </div>
             <t-button
               theme="default"
               variant="outline"
@@ -218,6 +231,9 @@
               恢复默认
             </t-button>
           </div>
+          <p v-if="!localUseCustomSystemPrompt" class="prompt-disabled-hint">
+            当前使用系统默认 Prompt，开启自定义后才会应用下方内容。
+          </p>
           <div class="prompt-textarea-wrapper">
             <t-textarea
               ref="promptTextareaRef"
@@ -227,6 +243,8 @@
               @blur="handleSystemPromptChange"
               @input="handlePromptInput"
               @keydown="handlePromptKeydown"
+              :readonly="!localUseCustomSystemPrompt"
+              :class="{ 'prompt-textarea-readonly': !localUseCustomSystemPrompt }"
               style="width: 100%; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px;"
             />
           </div>
@@ -274,6 +292,7 @@ const localThinkingModelId = ref('')
 const localRerankModelId = ref('')
 const localAllowedTools = ref<string[]>([])
 const localSystemPrompt = ref('')
+const localUseCustomSystemPrompt = ref(false)
 
 // 计算 Agent 是否就绪
 const isAgentReady = computed(() => {
@@ -321,6 +340,7 @@ const isInitializing = ref(true) // 标记是否正在初始化，防止初始�
 
 // 保存的 Prompt 值，用于比较是否变化
 let savedSystemPrompt = ''
+let savedUseCustomSystemPrompt = false
 
 // 恢复默认 Prompt 的加载状态
 const isResettingPrompt = ref(false)
@@ -450,6 +470,9 @@ onMounted(async () => {
     localAllowedTools.value = config.allowed_tools || []
     localSystemPrompt.value = config.system_prompt || ''
     savedSystemPrompt = config.system_prompt || '' // 记录已保存的值
+    const useCustomPrompt = config.use_custom_system_prompt ?? false
+    localUseCustomSystemPrompt.value = useCustomPrompt
+    savedUseCustomSystemPrompt = useCustomPrompt
     availableTools.value = config.available_tools || []
     availablePlaceholders.value = config.available_placeholders || []
     
@@ -556,14 +579,15 @@ const handleMaxIterationsChangeDebounced = (value: number) => {
   
   try {
     const config: AgentConfig = {
-        enabled: isAgentReady.value, // 自动根据配置状态设置
-        max_iterations: numValue, // 确保是数字类型
+      enabled: isAgentReady.value, // 自动根据配置状态设置
+      max_iterations: numValue, // 确保是数字类型
       reflection_enabled: false,
       allowed_tools: localAllowedTools.value,
       temperature: localTemperature.value,
       thinking_model_id: localThinkingModelId.value,
       rerank_model_id: localRerankModelId.value,
-      system_prompt: localSystemPrompt.value
+      system_prompt: localSystemPrompt.value,
+      use_custom_system_prompt: localUseCustomSystemPrompt.value
     }
     
     await updateAgentConfig(config)
@@ -627,7 +651,8 @@ const handleThinkingModelChange = async (value: string) => {
       temperature: localTemperature.value,
       thinking_model_id: value,
       rerank_model_id: localRerankModelId.value,
-      system_prompt: localSystemPrompt.value
+      system_prompt: localSystemPrompt.value,
+      use_custom_system_prompt: localUseCustomSystemPrompt.value
     }
     
     await updateAgentConfig(config)
@@ -661,7 +686,8 @@ const handleRerankModelChange = async (value: string) => {
       temperature: localTemperature.value,
       thinking_model_id: localThinkingModelId.value,
       rerank_model_id: value,
-      system_prompt: localSystemPrompt.value
+      system_prompt: localSystemPrompt.value,
+      use_custom_system_prompt: localUseCustomSystemPrompt.value
     }
     
     await updateAgentConfig(config)
@@ -742,7 +768,8 @@ const handleTemperatureChange = async (value: number) => {
       temperature: value,
       thinking_model_id: localThinkingModelId.value,
       rerank_model_id: localRerankModelId.value,
-      system_prompt: localSystemPrompt.value
+      system_prompt: localSystemPrompt.value,
+      use_custom_system_prompt: localUseCustomSystemPrompt.value
     }
     
     await updateAgentConfig(config)
@@ -768,7 +795,8 @@ const handleAllowedToolsChange = async (value: string[]) => {
       temperature: localTemperature.value,
       thinking_model_id: localThinkingModelId.value,
       rerank_model_id: localRerankModelId.value,
-      system_prompt: localSystemPrompt.value
+      system_prompt: localSystemPrompt.value,
+      use_custom_system_prompt: localUseCustomSystemPrompt.value
     }
     
     await updateAgentConfig(config)
@@ -779,6 +807,36 @@ const handleAllowedToolsChange = async (value: string[]) => {
     MessagePlugin.error(getErrorMessage(error))
     // 回滚
     localAllowedTools.value = settingsStore.agentConfig.allowedTools
+  }
+}
+
+// 切换是否启用自定义 Prompt
+const handleUseCustomPromptToggle = async (value: boolean) => {
+  if (isInitializing.value) return
+  if (value === savedUseCustomSystemPrompt) return
+
+  try {
+    const config: AgentConfig = {
+      enabled: isAgentReady.value,
+      max_iterations: localMaxIterations.value,
+      reflection_enabled: false,
+      allowed_tools: localAllowedTools.value,
+      temperature: localTemperature.value,
+      thinking_model_id: localThinkingModelId.value,
+      rerank_model_id: localRerankModelId.value,
+      system_prompt: localSystemPrompt.value,
+      use_custom_system_prompt: value
+    }
+
+    await updateAgentConfig(config)
+    savedUseCustomSystemPrompt = value
+
+    MessagePlugin.success(value ? '已启用自定义 Prompt' : '已切换为默认 Prompt')
+  } catch (error) {
+    console.error('切换自定义 Prompt 失败:', error)
+    MessagePlugin.error(getErrorMessage(error))
+    // 回滚开关状态
+    localUseCustomSystemPrompt.value = savedUseCustomSystemPrompt
   }
 }
 
@@ -994,7 +1052,8 @@ const handleResetToDefault = async () => {
           temperature: localTemperature.value,
           thinking_model_id: localThinkingModelId.value,
           rerank_model_id: localRerankModelId.value,
-          system_prompt: '' // 空字符串表示使用默认
+          system_prompt: '', // 空字符串表示使用默认
+          use_custom_system_prompt: false
         }
         
         await updateAgentConfig(tempConfig)
@@ -1002,10 +1061,13 @@ const handleResetToDefault = async () => {
         // 重新加载配置以获取默认 Prompt 的完整内容
         const res = await getAgentConfig()
         const defaultPrompt = res.data.system_prompt || ''
+        const useCustom = res.data.use_custom_system_prompt ?? false
         
         // 设置为默认 Prompt 的内容
         localSystemPrompt.value = defaultPrompt
         savedSystemPrompt = defaultPrompt
+        localUseCustomSystemPrompt.value = useCustom
+        savedUseCustomSystemPrompt = useCustom
         
         MessagePlugin.success('已恢复为默认 Prompt')
         confirmDialog.hide()
@@ -1057,7 +1119,8 @@ const handleSystemPromptChange = async (e?: FocusEvent) => {
       temperature: localTemperature.value,
       thinking_model_id: localThinkingModelId.value,
       rerank_model_id: localRerankModelId.value,
-      system_prompt: localSystemPrompt.value
+      system_prompt: localSystemPrompt.value,
+      use_custom_system_prompt: localUseCustomSystemPrompt.value
     }
     
     await updateAgentConfig(config)
@@ -1249,6 +1312,23 @@ watch(isAgentReady, (newValue, oldValue) => {
     margin: 0;
     line-height: 1.5;
   }
+
+  .hint-tip {
+    margin: 8px 0 0 0;
+    font-size: 12px;
+    color: #999999;
+    line-height: 1.5;
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+
+    .tip-icon {
+      font-size: 14px;
+      color: #999999;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+  }
 }
 
 .setting-control {
@@ -1306,9 +1386,47 @@ watch(isAgentReady, (newValue, oldValue) => {
 
 .prompt-header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
   width: 100%;
+}
+
+.prompt-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prompt-toggle-label {
+  font-size: 13px !important;
+  color: #555;
+}
+
+.prompt-toggle :deep(.t-switch) {
+  font-size: 0;
+}
+
+.prompt-toggle :deep(.t-switch__label),
+.prompt-toggle :deep(.t-switch__content) {
+  font-size: 12px !important;
+  line-height: 18px;
+  color: #666;
+}
+
+.prompt-toggle :deep(.t-switch__label--off),
+.prompt-toggle :deep(.t-switch__content) {
+  color: #fafafa !important;
+}
+
+.prompt-disabled-hint {
+  margin: 0 0 8px;
+  color: #666;
+  font-size: 12px;
+}
+
+.prompt-textarea-readonly {
+  background-color: #fafafa;
 }
 
 .prompt-textarea-wrapper {

@@ -364,7 +364,25 @@ func (c *RemoteAPIChat) ChatStream(ctx context.Context,
 		defer close(streamChan)
 		defer stream.Close()
 
-		var collectedToolCalls []types.LLMToolCall
+		toolCallMap := make(map[int]*types.LLMToolCall)
+		lastFunctionName := make(map[int]string)
+		nameNotified := make(map[int]bool)
+
+		buildOrderedToolCalls := func() []types.LLMToolCall {
+			if len(toolCallMap) == 0 {
+				return nil
+			}
+			result := make([]types.LLMToolCall, 0, len(toolCallMap))
+			for i := 0; i < len(toolCallMap); i++ {
+				if tc, ok := toolCallMap[i]; ok && tc != nil {
+					result = append(result, *tc)
+				}
+			}
+			if len(result) == 0 {
+				return nil
+			}
+			return result
+		}
 
 		for {
 			response, err := stream.Recv()
@@ -374,7 +392,7 @@ func (c *RemoteAPIChat) ChatStream(ctx context.Context,
 					ResponseType: types.ResponseTypeAnswer,
 					Content:      "",
 					Done:         true,
-					ToolCalls:    collectedToolCalls,
+					ToolCalls:    buildOrderedToolCalls(),
 				}
 				return
 			}
@@ -391,27 +409,57 @@ func (c *RemoteAPIChat) ChatStream(ctx context.Context,
 						if tc.Index != nil {
 							toolCallIndex = *tc.Index
 						}
-						if toolCallIndex >= len(collectedToolCalls) {
-							// 新建 tool call
-							collectedToolCalls = append(collectedToolCalls, types.LLMToolCall{
-								ID:   tc.ID,
+						toolCallEntry, exists := toolCallMap[toolCallIndex]
+						if !exists || toolCallEntry == nil {
+							toolCallEntry = &types.LLMToolCall{
 								Type: string(tc.Type),
 								Function: types.FunctionCall{
-									Name:      tc.Function.Name,
-									Arguments: tc.Function.Arguments,
+									Name:      "",
+									Arguments: "",
 								},
-							})
-						} else {
-							// 追加参数到已有的 tool call
-							collectedToolCalls[toolCallIndex].Function.Arguments += tc.Function.Arguments
-							// 更新 ID 和名称（如果提供了）
-							if tc.ID != "" {
-								collectedToolCalls[toolCallIndex].ID = tc.ID
 							}
-							if tc.Function.Name != "" {
-								collectedToolCalls[toolCallIndex].Function.Name = tc.Function.Name
-							}
+							toolCallMap[toolCallIndex] = toolCallEntry
 						}
+
+						// 更新 ID、类型
+						if tc.ID != "" {
+							toolCallEntry.ID = tc.ID
+						}
+						if tc.Type != "" {
+							toolCallEntry.Type = string(tc.Type)
+						}
+
+						// 累积函数名称（可能分多次返回）
+						if tc.Function.Name != "" {
+							toolCallEntry.Function.Name += tc.Function.Name
+						}
+
+						// 累积参数（可能为部分 JSON）
+						argsUpdated := false
+						if tc.Function.Arguments != "" {
+							toolCallEntry.Function.Arguments += tc.Function.Arguments
+							argsUpdated = true
+						}
+
+						currName := toolCallEntry.Function.Name
+						if currName != "" &&
+							currName == lastFunctionName[toolCallIndex] &&
+							argsUpdated &&
+							!nameNotified[toolCallIndex] &&
+							toolCallEntry.ID != "" {
+							streamChan <- types.StreamResponse{
+								ResponseType: types.ResponseTypeToolCall,
+								Content:      "",
+								Done:         false,
+								Data: map[string]interface{}{
+									"tool_name":    currName,
+									"tool_call_id": toolCallEntry.ID,
+								},
+							}
+							nameNotified[toolCallIndex] = true
+						}
+
+						lastFunctionName[toolCallIndex] = currName
 					}
 				}
 
@@ -421,17 +469,17 @@ func (c *RemoteAPIChat) ChatStream(ctx context.Context,
 						ResponseType: types.ResponseTypeAnswer,
 						Content:      delta.Content,
 						Done:         isDone,
-						ToolCalls:    collectedToolCalls,
+						ToolCalls:    buildOrderedToolCalls(),
 					}
 				}
 
 				// 如果是最后一次响应，确保发送包含所有 tool calls 的响应
-				if isDone && len(collectedToolCalls) > 0 {
+				if isDone && len(toolCallMap) > 0 {
 					streamChan <- types.StreamResponse{
 						ResponseType: types.ResponseTypeAnswer,
 						Content:      "",
 						Done:         true,
-						ToolCalls:    collectedToolCalls,
+						ToolCalls:    buildOrderedToolCalls(),
 					}
 				}
 			}

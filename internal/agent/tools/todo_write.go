@@ -25,172 +25,121 @@ type PlanStep struct {
 
 // NewTodoWriteTool creates a new todo_write tool instance
 func NewTodoWriteTool() *TodoWriteTool {
-	description := `Use this tool to create a structured, actionable plan for complex research tasks. This helps you organize multi-step investigations, track progress, and ensure comprehensive coverage.
-
-## Critical Thinking Integration
-**IMPORTANT**: When working with complex research questions, you should typically use the **think tool** for deep analysis BEFORE creating your plan. This ensures:
-
-- **Problem Analysis**: Use think tool to analyze the research question, identify key dimensions, and explore different angles
-- **Strategic Planning**: Use think tool to consider what information is needed, which knowledge bases to search, and potential challenges
-- **Scope Definition**: Use think tool to determine the depth and breadth of research required
-
-The think tool helps ensure your plan is comprehensive, well-structured, and addresses all aspects of the research question effectively.
+	description := `Use this tool to create and manage a structured task list for your current coding session. This helps you track progress, organize complex tasks, and demonstrate thoroughness to the user.
+It also helps the user understand the progress of the task and overall progress of their requests.
 
 ## When to Use This Tool
-
 Use this tool proactively in these scenarios:
 
-1. **Complex multi-dimensional questions** - Questions requiring investigation of multiple aspects or dimensions
-2. **Comparison tasks** - When you need to compare multiple systems, approaches, or solutions systematically
-3. **Deep research tasks** - Questions requiring exploration of multiple knowledge areas or documents
-4. **Architecture analysis** - Tasks involving system design, architecture review, or technical deep-dives
-5. **User requests explicit planning** - When users ask for structured analysis or step-by-step investigation
+1. Complex multi-step tasks - When a task requires 3 or more distinct steps or actions
+2. Non-trivial and complex tasks - Tasks that require careful planning or multiple operations
+3. User explicitly requests todo list - When the user directly asks you to use the todo list
+4. User provides multiple tasks - When users provide a list of things to be done (numbered or comma-separated)
+5. After receiving new instructions - Immediately capture user requirements as todos
+6. When you start working on a task - Mark it as in_progress BEFORE beginning work. Ideally you should only have one todo as in_progress at a time
+7. After completing a task - Mark it as completed and add any new follow-up tasks discovered during implementation
 
 ## When NOT to Use This Tool
 
 Skip using this tool when:
+1. There is only a single, straightforward task
+2. The task is trivial and tracking it provides no organizational benefit
+3. The task is purely conversational or informational
 
-1. **Simple, direct queries** - Questions with straightforward answers (e.g., "What is a vector database?")
-2. **Single-step searches** - When you already know exactly what to search for
-3. **Mid-execution** - Don't create plans after you've already started searching
-4. **Trivial lookups** - Simple fact-finding that requires one tool call
+NOTE that you should not use this tool if there is only one trivial task to do. In this case you are better off just doing the task directly.
 
-NOTE: If the question can be answered with 1-2 simple searches, skip planning and search directly.
-
-## Examples of When to Use
+## Examples of When to Use the Todo List
 
 <example>
-User: "如何设计一个高可用的微服务架构？需要考虑哪些方面？"
-Assistant: This is a complex, multi-dimensional question. Let me first think through the key aspects and then create a structured research plan.
-*Uses think tool to analyze: architecture patterns, reliability concerns, deployment strategies, monitoring needs*
-Assistant: Based on my analysis, let me create a research plan covering the main dimensions.
-*Creates plan with steps for:*
-1. Search microservices architecture patterns and best practices
-2. Investigate high availability strategies (load balancing, failover, redundancy)
-3. Research service mesh and communication patterns
-4. Explore monitoring and observability solutions
-5. Investigate deployment and scaling strategies
-*Begins executing the plan*
+User: I need to implement these features for my e-commerce site: user registration, product catalog, shopping cart, and checkout flow.
+Assistant: I'll help implement these features for your e-commerce site. Let me first think through the architecture and dependencies between these features to create an optimal implementation plan.
+*Uses think tool to analyze the e-commerce architecture, identify dependencies between features (user auth needed for cart, catalog needed for checkout), consider database design, security requirements, and implementation order*
+Assistant: After analyzing the system architecture and feature dependencies, let me create a strategic todo list that accounts for the interconnected nature of these features.
+*Creates a todo list breaking down each feature into specific tasks based on the project architecture and dependencies*
+Assistant: Let's start with user registration since it's foundational for the shopping cart and checkout features. This will involve creating database models, API endpoints, and frontend forms that integrate with your existing authentication system.
 
 <reasoning>
 The assistant used both think and todo_write tools because:
-1. First used think tool to analyze the multi-dimensional nature of the question
-2. Identified key areas: architecture, availability, communication, monitoring, deployment
-3. Created a structured plan to ensure systematic coverage
-4. The plan helps avoid missing critical aspects of high availability
+1. First used think tool to analyze the complex e-commerce architecture and feature dependencies
+2. Considered the interconnected nature of features (user auth → cart → checkout)
+3. Analyzed security requirements, database design, and optimal implementation order
+4. Then created a strategic todo list that accounts for these dependencies
+5. This approach ensures features are implemented in the correct order with proper foundations
 </reasoning>
 </example>
 
 <example>
-User: "对比Redis、Memcached和Hazelcast这三种缓存系统的性能、成本和适用场景"
-Assistant: This is a structured comparison task. Let me think through the comparison dimensions and create a systematic research plan.
-*Uses think tool to identify: performance metrics, cost factors, use case categories, comparison criteria*
-Assistant: I'll create a research plan to ensure fair, comprehensive comparison across all three systems.
-*Creates plan with steps:*
-1. Search Redis characteristics (performance, features, use cases)
-2. Search Memcached characteristics (performance, features, use cases)
-3. Search Hazelcast characteristics (performance, features, use cases)
-4. Search direct performance comparisons between these systems
-5. Investigate cost considerations and deployment complexity
-*Executes searches systematically*
+User: Can you help optimize my React application? It's rendering slowly and has performance issues.</user>
+Assistant: I'll help optimize your React application. First, let me examine your codebase to identify potential performance bottlenecks.
+*Reviews component structure, render patterns, state management, and data fetching*
+Assistant: After analyzing your codebase, I've identified several performance issues. Let me create a todo list to track our optimization efforts.
+*Creates todo list with items like: 1) Implement memoization for expensive calculations in ProductList, 2) Add virtualization for long lists in Dashboard, 3) Optimize image loading in Gallery component, 4) Fix state update loops in ShoppingCart, 5) Review bundle size and implement code splitting*
+Let's start by implementing memoization for the expensive calculations in your ProductList component.</assistant>
 
 <reasoning>
-The assistant used todo_write because:
-1. Comparison tasks benefit from structured, parallel research
-2. The plan ensures each system is investigated equally
-3. Structured approach prevents bias toward any particular system
-4. Makes it easier to synthesize structured comparison at the end
+The assistant used the todo list because:
+1. First, the assistant examined the codebase to identify specific performance issues
+2. Based on this analysis, it identified multiple optimization opportunities
+3. Performance optimization is a non-trivial task requiring multiple steps
+4. The todo list helps methodically track improvements across different components
+5. This systematic approach ensures all performance bottlenecks are addressed
 </reasoning>
 </example>
 
-## Examples of When NOT to Use
+## Examples of When NOT to Use the Todo List
 
 <example>
-User: "向量数据库的主要用途是什么？"
-Assistant: Let me search for information about vector database use cases.
-*Uses knowledge_search directly without planning*
+User: How do I print 'Hello World' in Python?
+Assistant: In Python, you can print "Hello World" with this simple code:
+
+print("Hello World")
+
+This will output the text "Hello World" to the console when executed.</assistant>
 
 <reasoning>
-The assistant skipped todo_write because:
-1. This is a simple, direct question
-2. One well-crafted search will likely provide the answer
-3. No need to organize multiple research steps
-4. Planning would add unnecessary overhead
+The assistant did not use the todo list because this is a single, trivial task that can be completed in one step. There's no need to track multiple tasks or steps for such a straightforward request.
 </reasoning>
 </example>
 
 <example>
-User: "Kubernetes是什么？"
-Assistant: Let me search for information about Kubernetes.
-*Uses knowledge_search directly*
+User: What does the git status command do?
+Assistant: The git status command shows the current state of your working directory and staging area. It displays which changes have been staged, which haven't, and which files aren't being tracked by Git. This is a fundamental command for understanding the current state of your repository before making commits.
 
 <reasoning>
-Simple definitional question - just search directly without planning.
+The assistant did not use the todo list because this is an informational request with no actual coding task to complete. The user is simply asking for an explanation, not for the assistant to perform multiple steps or tasks.
 </reasoning>
 </example>
 
-## Standard Workflow
+## Task States and Management
 
-The recommended workflow when using this tool:
+1. **Task States**: Use these states to track progress:
+  - pending: Task not yet started
+  - in_progress: Currently working on (limit to ONE task at a time)
+  - completed: Task finished successfully
 
-` + "```" + `
-Step 1: User asks complex question
-   ↓
-Step 2: Use think tool (analyze problem, identify dimensions, consider approaches)
-   ↓
-Step 3: Use todo_write tool (create structured plan with steps, tools, priorities) [OPTIONAL]
-   ↓
-Step 4: Execute plan steps (use search tools, mark progress)
-   ↓
-Step 5: Use think tool (evaluate results, identify gaps)
-   ↓
-Step 6: Adjust plan or execute remaining steps
-   ↓
-Step 7: Synthesize comprehensive answer with citations
-` + "```" + `
+2. **Task Management**:
+  - Update task status in real-time as you work
+  - Mark tasks complete IMMEDIATELY after finishing (don't batch completions)
+  - Only have ONE task in_progress at any time
+  - Complete current tasks before starting new ones
+  - Remove tasks that are no longer relevant from the list entirely
 
-## Plan Structure
+3. **Task Completion Requirements**:
+  - ONLY mark a task as completed when you have FULLY accomplished it
+  - If you encounter errors, blockers, or cannot finish, keep the task as in_progress
+  - When blocked, create a new task describing what needs to be resolved
+  - Never mark a task as completed if:
+    - Tests are failing
+    - Implementation is partial
+    - You encountered unresolved errors
+    - You couldn't find necessary files or dependencies
 
-Your plan should include steps with:
-- **ID**: Unique identifier for each step (e.g., "step1", "step2")
-- **Description**: Clear description of what to investigate
-- **Tools to Use**: Which tools to use (e.g., "knowledge_search", "get_related_chunks")
-- **Status**: Current status (pending, in_progress, completed, skipped)
+4. **Task Breakdown**:
+  - Create specific, actionable items
+  - Break complex tasks into smaller, manageable steps
+  - Use clear, descriptive task names
 
-## Step Status Management
-
-1. **Status Values**:
-   - **pending**: Step not yet started (default for new steps)
-   - **in_progress**: Currently executing this step
-   - **completed**: Step finished successfully with results
-   - **skipped**: Step determined to be unnecessary based on findings
-
-2. **Status Management Best Practices**:
-   - Start with all steps as "pending"
-   - Mark one step as "in_progress" before executing it
-   - Update to "completed" immediately after finishing
-   - Mark as "skipped" if findings make a step unnecessary
-
-## Parameters
-
-- **task** (required): The complex task or question you need to create a plan for
-  - Be specific about what needs to be accomplished
-  - Include the user's actual question or research goal
-
-- **steps** (required): Array of plan steps, each containing:
-  - **id**: Unique identifier (e.g., "step1", "step2")
-  - **description**: What to investigate or accomplish
-  - **tools_to_use**: Suggested tools for this step
-  - **status**: Current status (pending, in_progress, completed, skipped)
-
-## Best Practices
-
-1. **Think First**: Always use think tool before creating a plan to ensure thorough analysis
-2. **Be Specific**: Each step should have a clear, actionable objective
-3. **Stay Flexible**: Adjust the plan based on findings - some steps may become unnecessary
-4. **Track Progress**: Update step status as you work through the plan
-5. **Don't Over-plan**: 3-7 steps is usually sufficient; more suggests over-complexity
-`
+When in doubt, use this tool. Being proactive with task management demonstrates attentiveness and ensures you complete all requirements successfully.`
 
 	return &TodoWriteTool{
 		BaseTool: NewBaseTool("todo_write", description),
@@ -229,8 +178,8 @@ func (t *TodoWriteTool) Parameters() map[string]interface{} {
 						},
 						"status": map[string]interface{}{
 							"type":        "string",
-							"enum":        []string{"pending", "in_progress", "completed", "skipped"},
-							"description": "Current status: pending (not started), in_progress (executing), completed (finished), skipped (unnecessary)",
+							"enum":        []string{"pending", "in_progress", "completed"},
+							"description": "Current status: pending (not started), in_progress (executing), completed (finished)",
 						},
 					},
 					"required": []string{"id", "description", "status"},

@@ -67,6 +67,11 @@ type knowledgeService struct {
 	graphEngine     interfaces.RetrieveGraphRepository
 }
 
+const (
+	manualContentMaxLength = 200000
+	manualFileExtension    = ".md"
+)
+
 // NewKnowledgeService creates a new knowledge service instance
 func NewKnowledgeService(
 	config *config.Config,
@@ -362,6 +367,91 @@ func (s *knowledgeService) CreateKnowledgeFromPassageSync(ctx context.Context,
 	kbID string, passage []string,
 ) (*types.Knowledge, error) {
 	return s.createKnowledgeFromPassageInternal(ctx, kbID, passage, true)
+}
+
+// CreateKnowledgeFromManual creates or saves manual Markdown knowledge content.
+func (s *knowledgeService) CreateKnowledgeFromManual(ctx context.Context,
+	kbID string, payload *types.ManualKnowledgePayload,
+) (*types.Knowledge, error) {
+	logger.Info(ctx, "Start creating manual knowledge entry")
+
+	if payload == nil {
+		return nil, werrors.NewBadRequestError("请求内容不能为空")
+	}
+
+	cleanContent := secutils.CleanMarkdown(payload.Content)
+	if strings.TrimSpace(cleanContent) == "" {
+		return nil, werrors.NewValidationError("内容不能为空")
+	}
+	if len([]rune(cleanContent)) > manualContentMaxLength {
+		return nil, werrors.NewValidationError(fmt.Sprintf("内容长度超出限制（最多%d个字符）", manualContentMaxLength))
+	}
+
+	safeTitle, ok := secutils.ValidateInput(payload.Title)
+	if !ok {
+		return nil, werrors.NewValidationError("标题包含非法字符或超出长度限制")
+	}
+
+	status := strings.ToLower(strings.TrimSpace(payload.Status))
+	if status == "" {
+		status = types.ManualKnowledgeStatusDraft
+	}
+	if status != types.ManualKnowledgeStatusDraft && status != types.ManualKnowledgeStatusPublish {
+		return nil, werrors.NewValidationError("状态仅支持 draft 或 publish")
+	}
+
+	kb, err := s.kbService.GetKnowledgeBaseByID(ctx, kbID)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to get knowledge base: %v", err)
+		return nil, err
+	}
+
+	tenantID := ctx.Value(types.TenantIDContextKey).(uint)
+	now := time.Now()
+	title := safeTitle
+	if title == "" {
+		title = fmt.Sprintf("手工知识-%s", now.Format("20060102-150405"))
+	}
+
+	fileName := ensureManualFileName(title)
+	meta := types.NewManualKnowledgeMetadata(cleanContent, status, 1)
+
+	knowledge := &types.Knowledge{
+		TenantID:         tenantID,
+		KnowledgeBaseID:  kbID,
+		Type:             types.KnowledgeTypeManual,
+		Title:            title,
+		Description:      "",
+		Source:           types.KnowledgeTypeManual,
+		ParseStatus:      types.ManualKnowledgeStatusDraft,
+		EnableStatus:     "disabled",
+		CreatedAt:        now,
+		UpdatedAt:        now,
+		EmbeddingModelID: kb.EmbeddingModelID,
+		FileName:         fileName,
+		FileType:         types.KnowledgeTypeManual,
+	}
+	if err := knowledge.SetManualMetadata(meta); err != nil {
+		logger.Errorf(ctx, "Failed to set manual metadata: %v", err)
+		return nil, err
+	}
+	knowledge.EnsureManualDefaults()
+
+	if status == types.ManualKnowledgeStatusPublish {
+		knowledge.ParseStatus = "pending"
+	}
+
+	if err := s.repo.CreateKnowledge(ctx, knowledge); err != nil {
+		logger.Errorf(ctx, "Failed to create manual knowledge record: %v", err)
+		return nil, err
+	}
+
+	if status == types.ManualKnowledgeStatusPublish {
+		logger.Infof(ctx, "Manual knowledge created, scheduling indexing, ID: %s", knowledge.ID)
+		s.triggerManualProcessing(ctx, kb, knowledge, cleanContent, false)
+	}
+
+	return knowledge, nil
 }
 
 // createKnowledgeFromPassageInternal consolidates the common logic for creating knowledge from passages.
@@ -1381,6 +1471,112 @@ func (s *knowledgeService) UpdateKnowledge(ctx context.Context, knowledge *types
 	return nil
 }
 
+// UpdateManualKnowledge updates manual Markdown knowledge content.
+func (s *knowledgeService) UpdateManualKnowledge(ctx context.Context,
+	knowledgeID string, payload *types.ManualKnowledgePayload,
+) (*types.Knowledge, error) {
+	logger.Info(ctx, "Start updating manual knowledge entry")
+	if payload == nil {
+		return nil, werrors.NewBadRequestError("请求内容不能为空")
+	}
+
+	cleanContent := secutils.CleanMarkdown(payload.Content)
+	if strings.TrimSpace(cleanContent) == "" {
+		return nil, werrors.NewValidationError("内容不能为空")
+	}
+	if len([]rune(cleanContent)) > manualContentMaxLength {
+		return nil, werrors.NewValidationError(fmt.Sprintf("内容长度超出限制（最多%d个字符）", manualContentMaxLength))
+	}
+
+	safeTitle, ok := secutils.ValidateInput(payload.Title)
+	if !ok {
+		return nil, werrors.NewValidationError("标题包含非法字符或超出长度限制")
+	}
+
+	status := strings.ToLower(strings.TrimSpace(payload.Status))
+	if status == "" {
+		status = types.ManualKnowledgeStatusDraft
+	}
+	if status != types.ManualKnowledgeStatusDraft && status != types.ManualKnowledgeStatusPublish {
+		return nil, werrors.NewValidationError("状态仅支持 draft 或 publish")
+	}
+
+	tenantID := ctx.Value(types.TenantIDContextKey).(uint)
+	existing, err := s.repo.GetKnowledgeByID(ctx, tenantID, knowledgeID)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to load knowledge: %v", err)
+		return nil, err
+	}
+	if !existing.IsManual() {
+		return nil, werrors.NewBadRequestError("仅支持手工知识的在线编辑")
+	}
+
+	kb, err := s.kbService.GetKnowledgeBaseByID(ctx, existing.KnowledgeBaseID)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to get knowledge base for manual update: %v", err)
+		return nil, err
+	}
+
+	var version int
+	if meta, err := existing.ManualMetadata(); err == nil && meta != nil {
+		version = meta.Version + 1
+	} else {
+		version = 1
+	}
+
+	meta := types.NewManualKnowledgeMetadata(cleanContent, status, version)
+	if err := existing.SetManualMetadata(meta); err != nil {
+		logger.Errorf(ctx, "Failed to set manual metadata during update: %v", err)
+		return nil, err
+	}
+
+	if safeTitle != "" {
+		existing.Title = safeTitle
+	} else if existing.Title == "" {
+		existing.Title = fmt.Sprintf("手工知识-%s", time.Now().Format("20060102-150405"))
+	}
+	existing.FileName = ensureManualFileName(existing.Title)
+	existing.FileType = types.KnowledgeTypeManual
+	existing.Type = types.KnowledgeTypeManual
+	existing.Source = types.KnowledgeTypeManual
+	existing.EnableStatus = "disabled"
+	existing.UpdatedAt = time.Now()
+
+	if err := s.cleanupKnowledgeResources(ctx, existing); err != nil {
+		logger.ErrorWithFields(ctx, err, map[string]interface{}{
+			"knowledge_id": knowledgeID,
+		})
+		return nil, err
+	}
+
+	existing.EmbeddingModelID = kb.EmbeddingModelID
+
+	if status == types.ManualKnowledgeStatusDraft {
+		existing.ParseStatus = types.ManualKnowledgeStatusDraft
+		existing.Description = ""
+		existing.ProcessedAt = nil
+
+		if err := s.repo.UpdateKnowledge(ctx, existing); err != nil {
+			logger.Errorf(ctx, "Failed to persist manual draft: %v", err)
+			return nil, err
+		}
+		return existing, nil
+	}
+
+	existing.ParseStatus = "pending"
+	existing.Description = ""
+	existing.ProcessedAt = nil
+
+	if err := s.repo.UpdateKnowledge(ctx, existing); err != nil {
+		logger.Errorf(ctx, "Failed to persist manual knowledge before indexing: %v", err)
+		return nil, err
+	}
+
+	logger.Infof(ctx, "Manual knowledge updated, scheduling indexing, ID: %s", existing.ID)
+	s.triggerManualProcessing(ctx, kb, existing, cleanContent, false)
+	return existing, nil
+}
+
 // isValidFileType checks if a file type is supported
 func isValidFileType(filename string) bool {
 	switch strings.ToLower(getFileType(filename)) {
@@ -1823,6 +2019,110 @@ func (s *knowledgeService) CloneChunk(ctx context.Context, src, dst *types.Knowl
 		return err
 	}
 	return nil
+}
+
+func ensureManualFileName(title string) string {
+	if title == "" {
+		return fmt.Sprintf("manual-%s%s", time.Now().Format("20060102-150405"), manualFileExtension)
+	}
+	trimmed := strings.TrimSpace(title)
+	if strings.HasSuffix(strings.ToLower(trimmed), manualFileExtension) {
+		return trimmed
+	}
+	return trimmed + manualFileExtension
+}
+
+func splitManualContent(content string) []string {
+	clean := strings.TrimSpace(content)
+	if clean == "" {
+		return []string{}
+	}
+	normalized := strings.ReplaceAll(clean, "\r\n", "\n")
+	segments := strings.Split(normalized, "\n\n")
+	results := make([]string, 0, len(segments))
+	for _, seg := range segments {
+		part := strings.TrimSpace(seg)
+		if part != "" {
+			results = append(results, part)
+		}
+	}
+	if len(results) == 0 {
+		results = append(results, clean)
+	}
+	return results
+}
+
+func (s *knowledgeService) triggerManualProcessing(ctx context.Context,
+	kb *types.KnowledgeBase, knowledge *types.Knowledge, content string, sync bool,
+) {
+	passages := splitManualContent(content)
+	if len(passages) == 0 {
+		passages = []string{content}
+	}
+
+	if sync {
+		s.processDocumentFromPassage(ctx, kb, knowledge, passages)
+		return
+	}
+
+	newCtx := logger.CloneContext(ctx)
+	go s.processDocumentFromPassage(newCtx, kb, knowledge, passages)
+}
+
+func (s *knowledgeService) cleanupKnowledgeResources(ctx context.Context, knowledge *types.Knowledge) error {
+	logger.GetLogger(ctx).Infof("Cleaning knowledge resources before manual update, knowledge ID: %s", knowledge.ID)
+
+	var cleanupErr error
+
+	if knowledge.ParseStatus == types.ManualKnowledgeStatusDraft && knowledge.StorageSize == 0 {
+		// Draft without indexed data, skip cleanup.
+		return nil
+	}
+
+	tenantInfo := ctx.Value(types.TenantInfoContextKey).(*types.Tenant)
+	if knowledge.EmbeddingModelID != "" {
+		retrieveEngine, err := retriever.NewCompositeRetrieveEngine(s.retrieveEngine, tenantInfo.RetrieverEngines.Engines)
+		if err != nil {
+			logger.GetLogger(ctx).WithField("error", err).Error("Failed to init retrieve engine during cleanup")
+			cleanupErr = errors.Join(cleanupErr, err)
+		} else {
+			embeddingModel, modelErr := s.modelService.GetEmbeddingModel(ctx, knowledge.EmbeddingModelID)
+			if modelErr != nil {
+				logger.GetLogger(ctx).WithField("error", modelErr).Error("Failed to get embedding model during cleanup")
+				cleanupErr = errors.Join(cleanupErr, modelErr)
+			} else {
+				if err := retrieveEngine.DeleteByKnowledgeIDList(ctx, []string{knowledge.ID}, embeddingModel.GetDimensions()); err != nil {
+					logger.GetLogger(ctx).WithField("error", err).Error("Failed to delete manual knowledge index")
+					cleanupErr = errors.Join(cleanupErr, err)
+				}
+			}
+		}
+	}
+
+	if err := s.chunkService.DeleteChunksByKnowledgeID(ctx, knowledge.ID); err != nil {
+		logger.GetLogger(ctx).WithField("error", err).Error("Failed to delete manual knowledge chunks")
+		cleanupErr = errors.Join(cleanupErr, err)
+	}
+
+	namespace := types.NameSpace{KnowledgeBase: knowledge.KnowledgeBaseID, Knowledge: knowledge.ID}
+	if err := s.graphEngine.DelGraph(ctx, []types.NameSpace{namespace}); err != nil {
+		logger.GetLogger(ctx).WithField("error", err).Error("Failed to delete manual knowledge graph data")
+		cleanupErr = errors.Join(cleanupErr, err)
+	}
+
+	if knowledge.StorageSize > 0 {
+		tenantInfo.StorageUsed -= knowledge.StorageSize
+		if tenantInfo.StorageUsed < 0 {
+			tenantInfo.StorageUsed = 0
+		}
+		if err := s.tenantRepo.AdjustStorageUsed(ctx, tenantInfo.ID, -knowledge.StorageSize); err != nil {
+			logger.GetLogger(ctx).WithField("error", err).Error("Failed to adjust storage usage during manual cleanup")
+			cleanupErr = errors.Join(cleanupErr, err)
+		}
+		knowledge.StorageSize = 0
+	}
+
+	return cleanupErr
 }
 
 func IsImageType(fileType string) bool {

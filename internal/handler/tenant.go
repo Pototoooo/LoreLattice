@@ -237,6 +237,7 @@ type AgentConfigRequest struct {
 	ThinkingModelID   string   `json:"thinking_model_id"`
 	RerankModelID     string   `json:"rerank_model_id"`
 	SystemPrompt      string   `json:"system_prompt,omitempty"` // System prompt template with placeholders (optional)
+	UseCustomPrompt   *bool    `json:"use_custom_system_prompt"`
 }
 
 // GetTenantAgentConfig retrieves the agent configuration for a tenant
@@ -277,15 +278,16 @@ func (h *TenantHandler) GetTenantAgentConfig(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
 			"data": gin.H{
-				"max_iterations":         agent.DefaultAgentMaxIterations,
-				"reflection_enabled":     agent.DefaultAgentReflectionEnabled,
-				"allowed_tools":          agenttools.DefaultAllowedTools(),
-				"temperature":            agent.DefaultAgentTemperature,
-				"thinking_model_id":      "",
-				"rerank_model_id":        "",
-				"system_prompt":          agent.DefaultSystemPromptTemplate,
-				"available_tools":        availableTools,
-				"available_placeholders": availablePlaceholders,
+				"max_iterations":           agent.DefaultAgentMaxIterations,
+				"reflection_enabled":       agent.DefaultAgentReflectionEnabled,
+				"allowed_tools":            agenttools.DefaultAllowedTools(),
+				"temperature":              agent.DefaultAgentTemperature,
+				"thinking_model_id":        "",
+				"rerank_model_id":          "",
+				"system_prompt":            agent.DefaultSystemPromptTemplate,
+				"use_custom_system_prompt": false,
+				"available_tools":          availableTools,
+				"available_placeholders":   availablePlaceholders,
 			},
 		})
 		return
@@ -293,6 +295,10 @@ func (h *TenantHandler) GetTenantAgentConfig(c *gin.Context) {
 
 	// Get system prompt, use default if empty
 	systemPrompt := tenant.AgentConfig.SystemPrompt
+	useCustomPrompt := tenant.AgentConfig.UseCustomSystemPrompt
+	if !useCustomPrompt && systemPrompt != "" && systemPrompt != agent.DefaultSystemPromptTemplate {
+		useCustomPrompt = true
+	}
 	if systemPrompt == "" {
 		systemPrompt = agent.DefaultSystemPromptTemplate
 	}
@@ -301,16 +307,17 @@ func (h *TenantHandler) GetTenantAgentConfig(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"data": gin.H{
-			"enabled":                tenant.AgentConfig.Enabled,
-			"max_iterations":         tenant.AgentConfig.MaxIterations,
-			"reflection_enabled":     tenant.AgentConfig.ReflectionEnabled,
-			"allowed_tools":          tenant.AgentConfig.AllowedTools,
-			"temperature":            tenant.AgentConfig.Temperature,
-			"thinking_model_id":      tenant.AgentConfig.ThinkingModelID,
-			"rerank_model_id":        tenant.AgentConfig.RerankModelID,
-			"system_prompt":          systemPrompt,
-			"available_tools":        availableTools,
-			"available_placeholders": availablePlaceholders,
+			"enabled":                  tenant.AgentConfig.Enabled,
+			"max_iterations":           tenant.AgentConfig.MaxIterations,
+			"reflection_enabled":       tenant.AgentConfig.ReflectionEnabled,
+			"allowed_tools":            tenant.AgentConfig.AllowedTools,
+			"temperature":              tenant.AgentConfig.Temperature,
+			"thinking_model_id":        tenant.AgentConfig.ThinkingModelID,
+			"rerank_model_id":          tenant.AgentConfig.RerankModelID,
+			"system_prompt":            systemPrompt,
+			"use_custom_system_prompt": useCustomPrompt,
+			"available_tools":          availableTools,
+			"available_placeholders":   availablePlaceholders,
 		},
 	})
 }
@@ -354,15 +361,21 @@ func (h *TenantHandler) updateTenantAgentConfigInternal(c *gin.Context) {
 	}
 
 	// Update agent configuration
+	useCustomPrompt := tenant.AgentConfig.UseCustomSystemPrompt
+	if req.UseCustomPrompt != nil {
+		useCustomPrompt = *req.UseCustomPrompt
+	}
+
 	tenant.AgentConfig = &types.AgentConfig{
-		Enabled:           req.Enabled,
-		MaxIterations:     req.MaxIterations,
-		ReflectionEnabled: req.ReflectionEnabled,
-		AllowedTools:      req.AllowedTools,
-		Temperature:       req.Temperature,
-		ThinkingModelID:   req.ThinkingModelID,
-		RerankModelID:     req.RerankModelID,
-		SystemPrompt:      req.SystemPrompt,
+		Enabled:               req.Enabled,
+		MaxIterations:         req.MaxIterations,
+		ReflectionEnabled:     req.ReflectionEnabled,
+		AllowedTools:          req.AllowedTools,
+		Temperature:           req.Temperature,
+		ThinkingModelID:       req.ThinkingModelID,
+		RerankModelID:         req.RerankModelID,
+		SystemPrompt:          req.SystemPrompt,
+		UseCustomSystemPrompt: useCustomPrompt,
 	}
 
 	updatedTenant, err := h.service.UpdateTenant(ctx, tenant)

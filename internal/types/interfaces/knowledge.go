@@ -24,6 +24,8 @@ type KnowledgeService interface {
 	CreateKnowledgeFromPassage(ctx context.Context, kbID string, passage []string) (*types.Knowledge, error)
 	// CreateKnowledgeFromPassageSync creates knowledge from text passages and waits until chunks are indexed.
 	CreateKnowledgeFromPassageSync(ctx context.Context, kbID string, passage []string) (*types.Knowledge, error)
+	// CreateKnowledgeFromManual creates or saves manual Markdown knowledge content.
+	CreateKnowledgeFromManual(ctx context.Context, kbID string, payload *types.ManualKnowledgePayload) (*types.Knowledge, error)
 	// GetKnowledgeByID retrieves knowledge by ID.
 	GetKnowledgeByID(ctx context.Context, id string) (*types.Knowledge, error)
 	// GetKnowledgeBatch retrieves a batch of knowledge by IDs.
@@ -42,6 +44,8 @@ type KnowledgeService interface {
 	GetKnowledgeFile(ctx context.Context, id string) (io.ReadCloser, string, error)
 	// UpdateKnowledge updates knowledge information.
 	UpdateKnowledge(ctx context.Context, knowledge *types.Knowledge) error
+	// UpdateManualKnowledge updates manual Markdown knowledge content.
+	UpdateManualKnowledge(ctx context.Context, knowledgeID string, payload *types.ManualKnowledgePayload) (*types.Knowledge, error)
 	// CloneKnowledgeBase clones knowledge to another knowledge base.
 	CloneKnowledgeBase(ctx context.Context, srcID, dstID string) error
 	// UpdateImageInfo updates image information for a knowledge chunk.

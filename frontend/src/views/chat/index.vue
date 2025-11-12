@@ -7,7 +7,7 @@
                         <usermsg :content="session.content"></usermsg>
                     </div>
                     <div v-if="session.role == 'assistant'">
-                        <botmsg :content="session.content" :session="session" @scroll-bottom="scrollToBottom"
+                        <botmsg :content="session.content" :session="session" :user-query="getUserQuery(id)" @scroll-bottom="scrollToBottom"
                             :isFirstEnter="isFirstEnter"></botmsg>
                     </div>
                 </div>
@@ -60,6 +60,17 @@ const loading = ref(false);
 let fullContent = ref('')
 let userquery = ref('')
 const scrollContainer = ref(null)
+
+const getUserQuery = (index) => {
+    if (index <= 0) {
+        return '';
+    }
+    const previous = messagesList[index - 1];
+    if (previous && previous.role === 'user') {
+        return previous.content || '';
+    }
+    return '';
+};
 watch([() => route.params], (newvalue) => {
     isFirstEnter.value = true;
     if (newvalue[0].chatid) {
@@ -538,28 +549,53 @@ const handleAgentChunk = (data) => {
             break;
             
         case 'tool_call':
-            // Store pending tool call to pair with result later
-            if (data.data && data.data.tool_name) {
-                console.log('[Tool Call]', data.data.tool_name);
+            // Store or update pending tool call to pair with result later
+            if (data.data && (data.data.tool_name || data.data.tool_call_id)) {
+                const incomingToolName = data.data.tool_name;
+                const incomingArguments = data.data.arguments;
                 
                 if (!message.agentEventStream) message.agentEventStream = [];
                 if (!message._pendingToolCalls) message._pendingToolCalls = new Map();
                 
-                const toolCallId = data.data.tool_call_id || (data.data.tool_name + '_' + Date.now());
+                const toolCallId = data.data.tool_call_id || (incomingToolName ? (incomingToolName + '_' + Date.now()) : null);
+                if (!toolCallId) {
+                    console.warn('[Tool Call] Received event without identifiable tool_call_id:', data.data);
+                    break;
+                }
                 
-                // Create tool call event
-                const toolCallEvent = {
-                    type: 'tool_call',
+                console.log('[Tool Call]', {
                     tool_call_id: toolCallId,
-                    tool_name: data.data.tool_name,
-                    arguments: data.data.arguments,
-                    timestamp: Date.now(),
-                    pending: true
-                };
+                    tool_name: incomingToolName,
+                    has_arguments: Boolean(incomingArguments)
+                });
                 
-                // Add to event stream
-                message.agentEventStream.push(toolCallEvent);
-                message._pendingToolCalls.set(toolCallId, toolCallEvent);
+                let toolCallEvent = message._pendingToolCalls.get(toolCallId);
+                if (!toolCallEvent) {
+                    toolCallEvent = message.agentEventStream.find(
+                        (event) => event.type === 'tool_call' && event.tool_call_id === toolCallId
+                    );
+                }
+                
+                if (toolCallEvent) {
+                    if (incomingToolName) toolCallEvent.tool_name = incomingToolName;
+                    if (incomingArguments) toolCallEvent.arguments = incomingArguments;
+                    toolCallEvent.pending = true;
+                    if (!toolCallEvent.timestamp) {
+                        toolCallEvent.timestamp = Date.now();
+                    }
+                    message._pendingToolCalls.set(toolCallId, toolCallEvent);
+                } else {
+                    const newToolCallEvent = {
+                        type: 'tool_call',
+                        tool_call_id: toolCallId,
+                        tool_name: incomingToolName,
+                        arguments: incomingArguments,
+                        timestamp: Date.now(),
+                        pending: true
+                    };
+                    message.agentEventStream.push(newToolCallEvent);
+                    message._pendingToolCalls.set(toolCallId, newToolCallEvent);
+                }
             }
             break;
             

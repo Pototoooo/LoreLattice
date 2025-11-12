@@ -52,16 +52,6 @@ func NewKnowledgeSearchTool(
 - Need semantic (vector) or exact keyword searches
 - Want to search only specific documents within KBs
 
-**Parameters**:
-- knowledge_base_ids (optional): Array of KB IDs to search (1-10). If omitted, searches all allowed KBs.
-- query (optional): Single search query (for simple hybrid search)
-- vector_queries (optional): Array of semantic queries for vector search (1-5 queries)
-- keyword_queries (optional): Array of keyword queries for keyword search (1-5 queries)
-- top_k (optional): Results per KB per query (default: 5, max: 20)
-- vector_threshold (optional): Minimum score for vector results (default: 0.6, 0.0-1.0)
-- keyword_threshold (optional): Minimum score for keyword results (default: 0.5, 0.0-1.0)
-- knowledge_ids (optional): Array of document IDs to filter results (only return results from these documents)
-- min_score (optional): Absolute minimum score to include results (default: 0.3, filters very low quality chunks)
 
 **Search Modes**:
 - Simple: Provide single query parameter (hybrid search)
@@ -110,11 +100,7 @@ func NewKnowledgeSearchTool(
 - Reranked scores are in 0-1 range and directly comparable
 - Results are merged, deduplicated and sorted by relevance
 - Use vector_queries for semantic/conceptual searches
-- Use keyword_queries for exact term matching
-- Results below threshold are automatically filtered
-- High relevance (>=0.8): directly usable
-- Medium relevance (0.6-0.8): reference only
-- Low relevance (<0.6): use with caution`
+- Use keyword_queries for exact term matching`
 
 	return &KnowledgeSearchTool{
 		BaseTool:         NewBaseTool("knowledge_search", description),

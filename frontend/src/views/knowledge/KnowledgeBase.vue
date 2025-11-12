@@ -8,7 +8,6 @@ import EmptyKnowledge from '@/components/empty-knowledge.vue';
 import { getSessionsList, createSessions, generateSessionsTitle } from "@/api/chat/index";
 import { useMenuStore } from '@/stores/menu';
 import { useUIStore } from '@/stores/ui';
-import { MessagePlugin } from 'tdesign-vue-next';
 import KnowledgeBaseEditorModal from './KnowledgeBaseEditorModal.vue';
 const usemenuStore = useMenuStore();
 const uiStore = useUIStore();
@@ -53,15 +52,18 @@ const loadKnowledgeFiles = async (kbIdValue: string) => {
     }
     
     const cardList_ = data.map((item: any) => {
-      item["file_name"] = item.file_name.substring(
-        0,
-        item.file_name.lastIndexOf(".")
-      );
+      const rawName = item.file_name || item.title || item.source || '未命名文档'
+      const dotIndex = rawName.lastIndexOf('.')
+      const displayName = dotIndex > 0 ? rawName.substring(0, dotIndex) : rawName
+      const fileTypeSource = item.file_type || (item.type === 'manual' ? 'MANUAL' : '')
       return {
         ...item,
+        original_file_name: item.file_name,
+        display_name: displayName,
+        file_name: displayName,
         updated_at: formatStringDate(new Date(item.updated_at)),
         isMore: false,
-        file_type: item.file_type.toLocaleUpperCase(),
+        file_type: fileTypeSource ? String(fileTypeSource).toLocaleUpperCase() : '',
       };
     });
     
@@ -113,7 +115,22 @@ watch(() => cardList.value, (newValue) => {
     updateStatus(analyzeList)
   }
 }, { deep: true })
-type KnowledgeCard = { id: string; parse_status: string; description?: string; file_name?: string; updated_at?: string; file_type?: string; isMore?: boolean };
+type KnowledgeCard = {
+  id: string;
+  knowledge_base_id?: string;
+  parse_status: string;
+  description?: string;
+  file_name?: string;
+  original_file_name?: string;
+  display_name?: string;
+  title?: string;
+  type?: string;
+  updated_at?: string;
+  file_type?: string;
+  isMore?: boolean;
+  metadata?: any;
+  error_message?: string;
+};
 const updateStatus = (analyzeList: KnowledgeCard[]) => {
   let query = ``;
   for (let i = 0; i < analyzeList.length; i++) {
@@ -150,6 +167,24 @@ const delCard = (index: number, item: KnowledgeCard) => {
   knowledgeIndex.value = index;
   knowledge.value = item;
   delDialog.value = true;
+};
+
+const manualEditorSuccess = ({ kbId: savedKbId }: { kbId: string; knowledgeId: string; status: 'draft' | 'publish' }) => {
+  if (savedKbId === kbId.value) {
+    loadKnowledgeFiles(savedKbId);
+  }
+};
+
+const handleManualEdit = (index: number, item: KnowledgeCard) => {
+  if (cardList.value[index]) {
+    cardList.value[index].isMore = false;
+  }
+  uiStore.openManualEditor({
+    mode: 'edit',
+    kbId: item.knowledge_base_id || kbId.value,
+    knowledgeId: item.id,
+    onSuccess: manualEditorSuccess,
+  });
 };
 
 const handleScroll = () => {
@@ -225,26 +260,52 @@ async function createNewSession(value: string): Promise<void> {
         <div class="card-content">
           <div class="card-content-nav">
             <span class="card-content-title">{{ item.file_name }}</span>
-            <t-popup v-model="item.isMore" @overlay-click="delCard(index, item)" overlayClassName="card-more"
+            <t-popup v-model="item.isMore" overlayClassName="card-more"
               :on-visible-change="onVisibleChange" trigger="click" destroy-on-close placement="bottom-right">
               <div variant="outline" class="more-wrap" @click.stop="openMore(index)"
                 :class="[moreIndex == index ? 'active-more' : '']">
                 <img class="more" src="@/assets/img/more.png" alt="" />
               </div>
               <template #content>
-                <t-icon class="icon svg-icon del-card" name="delete" />
-                <span class="del-card" style="margin-left: 8px">删除文档</span>
+                <div class="card-menu">
+                  <div
+                    v-if="item.type === 'manual'"
+                    class="card-menu-item"
+                    @click.stop="handleManualEdit(index, item)"
+                  >
+                    <t-icon class="icon" name="edit" />
+                    <span>编辑文档</span>
+                  </div>
+                  <div
+                    class="card-menu-item danger"
+                    @click.stop="delCard(index, item)"
+                  >
+                    <t-icon class="icon" name="delete" />
+                    <span>删除文档</span>
+                  </div>
+                </div>
               </template>
             </t-popup>
           </div>
-          <div class="card-analyze" v-show="item.parse_status != 'completed'">
-            <t-icon :name="item.parse_status == 'failed' ? 'close-circle' : 'loading'" class="card-analyze-loading"
-              :class="[item.parse_status == 'failed' ? 'failure' : '']"></t-icon>
-            <span class="card-analyze-txt" :class="[item.parse_status == 'failed' ? 'failure' : '']">{{
-              item.parse_status == "failed" ? "解析失败" : "解析中..."
-            }}</span>
+          <div
+            v-if="item.parse_status === 'processing' || item.parse_status === 'pending'"
+            class="card-analyze"
+          >
+            <t-icon name="loading" class="card-analyze-loading"></t-icon>
+            <span class="card-analyze-txt">解析中...</span>
           </div>
-          <div v-show="item.parse_status == 'completed'" class="card-content-txt">
+          <div
+            v-else-if="item.parse_status === 'failed'"
+            class="card-analyze failure"
+          >
+            <t-icon name="close-circle" class="card-analyze-loading failure"></t-icon>
+            <span class="card-analyze-txt failure">解析失败</span>
+          </div>
+          <div v-else-if="item.parse_status === 'draft'" class="card-draft">
+            <t-tag size="small" theme="warning" variant="light-outline">草稿</t-tag>
+            <span class="card-draft-tip">暂存内容，未参与检索</span>
+          </div>
+          <div v-else-if="item.parse_status === 'completed'" class="card-content-txt">
             {{ item.description }}
           </div>
         </div>
@@ -292,16 +353,13 @@ async function createNewSession(value: string): Promise<void> {
 }
 
 .card-more .t-popup__content {
-  width: 160px;
-  height: 40px;
-  line-height: 30px;
-  padding-left: 14px;
-  cursor: pointer;
+  width: 180px;
+  padding: 6px 0;
   margin-top: 4px !important;
   color: #000000e6;
 }
 .card-more .t-popup__content:hover {
-  color: #FA5151 !important;
+  color: inherit !important;
 }
 </style>
 <style scoped lang="less">
@@ -435,6 +493,44 @@ async function createNewSession(value: string): Promise<void> {
   }
 }
 
+.card-menu {
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+}
+
+.card-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  color: #000000e6;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+
+  .icon {
+    font-size: 16px;
+  }
+
+  &.danger {
+    color: #fa5151;
+  }
+}
+
+.card-draft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.card-draft-tip {
+  color: #b05b00;
+  font-size: 12px;
+}
 
 .knowledge-card {
   border: 2px solid #fbfbfb;

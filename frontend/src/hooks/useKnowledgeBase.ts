@@ -31,13 +31,21 @@ export default function (knowledgeBaseId?: string) {
     listKnowledgeFiles(targetKbId, query)
       .then((result: any) => {
         const { data, total: totalResult } = result;
-        const cardList_ = data.map((item: any) => ({
-          ...item,
-          file_name: item.file_name.substring(0, item.file_name.lastIndexOf(".")),
-          updated_at: formatStringDate(new Date(item.updated_at)),
-          isMore: false,
-          file_type: item.file_type.toLocaleUpperCase(),
-        }));
+    const cardList_ = data.map((item: any) => {
+      const rawName = item.file_name || item.title || item.source || '未命名文档'
+      const dotIndex = rawName.lastIndexOf('.')
+      const displayName = dotIndex > 0 ? rawName.substring(0, dotIndex) : rawName
+      const fileTypeSource = item.file_type || (item.type === 'manual' ? 'MANUAL' : '')
+      return {
+        ...item,
+        original_file_name: item.file_name,
+        display_name: displayName,
+        file_name: displayName,
+        updated_at: formatStringDate(new Date(item.updated_at)),
+        isMore: false,
+        file_type: fileTypeSource ? String(fileTypeSource).toLocaleUpperCase() : '',
+      }
+    });
         
         if (query.page === 1) {
           cardList.value = cardList_;

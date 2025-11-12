@@ -29,6 +29,7 @@ export interface AgentConfig {
   rerank_model_id: string
   knowledge_bases?: string[]
   system_prompt?: string  // System prompt template with placeholders (optional)
+  use_custom_system_prompt?: boolean
   available_tools?: ToolDefinition[]  // GET 响应中包含，POST/PUT 不需要
   available_placeholders?: PlaceholderDefinition[]  // GET 响应中包含，POST/PUT 不需要
 }

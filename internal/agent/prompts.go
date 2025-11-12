@@ -3,6 +3,7 @@ package agent
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 // formatFileSize formats file size in human-readable format
@@ -21,6 +22,23 @@ func formatFileSize(size int64) string {
 		return fmt.Sprintf("%.2f MB", float64(size)/MB)
 	}
 	return fmt.Sprintf("%.2f GB", float64(size)/GB)
+}
+
+// formatDocSummary cleans and truncates document summaries for table display
+func formatDocSummary(summary string, maxLen int) string {
+	cleaned := strings.TrimSpace(summary)
+	if cleaned == "" {
+		return "-"
+	}
+	cleaned = strings.ReplaceAll(cleaned, "\n", " ")
+	cleaned = strings.ReplaceAll(cleaned, "\r", " ")
+	cleaned = strings.Join(strings.Fields(cleaned), " ")
+
+	runes := []rune(cleaned)
+	if len(runes) <= maxLen {
+		return cleaned
+	}
+	return strings.TrimSpace(string(runes[:maxLen])) + "..."
 }
 
 // RecentDocInfo contains brief information about a recently added document
@@ -63,6 +81,11 @@ func AvailablePlaceholders() []PlaceholderDefinition {
 			Label:       "网络检索模式开关状态",
 			Description: "网络检索（web_search）工具是否启用的状态说明，值为 Enabled 或 Disabled",
 		},
+		{
+			Name:        "current_time",
+			Label:       "当前系统时间",
+			Description: "格式为 RFC3339 的当前系统时间，用于帮助模型感知实时性",
+		},
 	}
 }
 
@@ -84,8 +107,8 @@ func formatKnowledgeBaseList(kbInfos []*KnowledgeBaseInfo) string {
 		// Display recent documents if available
 		if len(kb.RecentDocs) > 0 {
 			builder.WriteString("   - Recently added documents:\n\n")
-			builder.WriteString("     | # | Document Name | Type | Created At | Knowledge ID | File Size |\n")
-			builder.WriteString("     |---|---------------|------|------------|--------------|----------|\n")
+			builder.WriteString("     | # | Document Name | Type | Created At | Knowledge ID | File Size | Summary |\n")
+			builder.WriteString("     |---|---------------|------|------------|--------------|----------|---------|\n")
 			for j, doc := range kb.RecentDocs {
 				if j >= 10 { // Limit to 10 documents
 					break
@@ -96,8 +119,9 @@ func formatKnowledgeBaseList(kbInfos []*KnowledgeBaseInfo) string {
 				}
 				// Format file size
 				fileSize := formatFileSize(doc.FileSize)
-				builder.WriteString(fmt.Sprintf("     | %d | %s | %s | %s | `%s` | %s |\n",
-					j+1, docName, doc.Type, doc.CreatedAt, doc.KnowledgeID, fileSize))
+				summary := formatDocSummary(doc.Description, 120)
+				builder.WriteString(fmt.Sprintf("     | %d | %s | %s | %s | `%s` | %s | %s |\n",
+					j+1, docName, doc.Type, doc.CreatedAt, doc.KnowledgeID, fileSize, summary))
 			}
 			builder.WriteString("\n")
 		}
@@ -125,7 +149,8 @@ func renderPromptPlaceholders(template string, knowledgeBases []*KnowledgeBaseIn
 // Supported placeholders:
 //   - {{knowledge_bases}}
 //   - {{web_search_status}} -> "Enabled" or "Disabled"
-func renderPromptPlaceholdersWithStatus(template string, knowledgeBases []*KnowledgeBaseInfo, webSearchEnabled bool) string {
+//   - {{current_time}} -> current time string
+func renderPromptPlaceholdersWithStatus(template string, knowledgeBases []*KnowledgeBaseInfo, webSearchEnabled bool, currentTime string) string {
 	result := renderPromptPlaceholders(template, knowledgeBases)
 	status := "Disabled"
 	if webSearchEnabled {
@@ -133,6 +158,9 @@ func renderPromptPlaceholdersWithStatus(template string, knowledgeBases []*Knowl
 	}
 	if strings.Contains(result, "{{web_search_status}}") {
 		result = strings.ReplaceAll(result, "{{web_search_status}}", status)
+	}
+	if strings.Contains(result, "{{current_time}}") {
+		result = strings.ReplaceAll(result, "{{current_time}}", currentTime)
 	}
 	return result
 }
@@ -145,7 +173,8 @@ func BuildReActSystemPromptWithStatus(knowledgeBases []*KnowledgeBaseInfo, webSe
 	} else {
 		template = DefaultSystemPromptTemplate
 	}
-	return renderPromptPlaceholdersWithStatus(template, knowledgeBases, webSearchEnabled)
+	currentTime := time.Now().Format(time.RFC3339)
+	return renderPromptPlaceholdersWithStatus(template, knowledgeBases, webSearchEnabled, currentTime)
 }
 
 // DefaultSystemPromptTemplate returns the default system prompt template
@@ -165,24 +194,26 @@ Your pretraining data may be outdated or incorrect. Do NOT rely on any internal 
 # Status
 
 - Web Search: {{web_search_status}}
+- Current Time: {{current_time}}
 
 # Rules
 
 <Thinking_and_Planning>
-- Record your KB-first compliance in the thinking step: briefly list the attempted KB strategies and why they were insufficient before you switch to web_search.
-- Write thinking in a natural, concise way; do not restate these rules verbatim or output rigid numbered lists.
+- IMPORTANT: Unless the user question is trivially simple (e.g., directly confirming visible information), you MUST use the thinking tool to break down complex problems, track thinking progress iteratively, and adjust the approach when retrieved content changes or exceptions block the original workflow.
+- IMPORTANT: Record your KB-first compliance in the thinking step: briefly list the attempted KB strategies and why they were insufficient before you switch to web_search.
+- For multi-turn conversations, examine prior retrieved evidence first; if it cannot answer the new question, plan and execute fresh retrieval before responding.
 - After obtaining any new content from any tool, immediately use the thinking tool to reflect on sufficiency, trustworthiness, and completeness.
-- For complex tasks: use the todo_write tool to plan multi-step tasks, update progress iteratively, and promptly adjust the plan when retrieved content changes or exceptions block the original workflow.
 - Before producing any Answer or Final Answer, you MUST invoke the thinking tool to briefly validate evidence sufficiency, note key citations to use, and outline the response. Do not emit the Answer until this thinking step is completed.
 </Thinking_and_Planning>
 
 
 <KB_and_Web_Retrieval>
-- Mandatory KB-first policy: ALWAYS attempt knowledge base retrieval before any web_search (even if web_search is enabled).
+- Mandatory KB-first policy: ALWAYS attempt knowledge base retrieval before any web_search (even if web_search is enabled, or the user explicitly requests “real-time” answers).
   - Try multiple KB strategies before the first web_search (choose those that fit the query), e.g., reformulated keywords/synonyms, adjusting KB/doc scope/filters, using related/context retrieval or checking chunk details. Avoid mechanically enumerating “1), 2)” or stating counts.
   - It is FORBIDDEN to skip KB attempts because "KB is small/only a test doc" or based on assumptions.
   - Only after these KB attempts fail to yield sufficient evidence may you consider web_search.
-- Do not assume “no results” unless you have executed the above attempts and verified insufficiency.
+- Do not assume “no results” in knowledge bases unless you have executed the above attempts and verified insufficiency.
+  - Never rely solely on knowledge base or document titles to infer coverage; always execute retrieval to inspect actual content before concluding relevance.
 - When web_search is enabled: you may call it multiple times; if one round is insufficient, refine queries (synonyms, narrower/wider scope, time filters) and search again before answering.
 - When web_search is disabled: use the thinking tool to deeply plan alternative strategies, try knowledge-base tools iteratively (query reformulation, scope changes, related/context retrieval) until suitable content is found or confidently conclude absence.
 </KB_and_Web_Retrieval>
@@ -212,16 +243,15 @@ Your pretraining data may be outdated or incorrect. Do NOT rely on any internal 
 - Within the Answer section (not in intermediate tool steps), place citations inline near the content they support. Citations must appear within the same line as the supported sentence, preferably immediately after the relevant clause or at the end of the sentence; do NOT place citations on a separate line. Do NOT aggregate all citations at the end of the answer.
     Include only sources actually used in the answer.
     Item formats (compact attributes for easy parsing):
-    	- Knowledge Base: <kb kb_id="<kb_id>" doc="<doc_name>" chunk_id="<chunk_id>" />
+    	- Knowledge Base: <kb doc="<doc_name>" chunk_id="<chunk_id>" />
         - Web Page: <web url="<url>" title="<title>" />
     Good Example:
         Paragraph explaining concept A... <kb kb_id="kb_123" doc="spec.md" chunk_id="c_42" />...
-        Statement supported by multiple sources... <kb kb_id="kb_456" doc="design.md" chunk_id="c_7" /> <web url="https://example.com" title="Example" />
+        Statement supported by multiple sources... <kb doc="design.md" chunk_id="c_7" /> <web url="https://example.com" title="Example" />
 	
     Bad Example:
         Paragraph explaining concept A...
-        <kb kb_id="kb_123" doc="spec.md" chunk_id="c_42" />
+        <kb doc="spec.md" chunk_id="c_42" />
         Paragraph summarizing current news...
-        <web url="https://example.com" title="Example" />
 </Citations_and_Evidence>
 `

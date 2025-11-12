@@ -2,7 +2,7 @@
     <div class="bot_msg">
         <div style="display: flex;flex-direction: column; gap:8px">
             <docInfo :session="session"></docInfo>
-            <AgentStreamDisplay :session="session" v-if="session.isAgentMode"></AgentStreamDisplay>
+            <AgentStreamDisplay :session="session" :user-query="userQuery" v-if="session.isAgentMode"></AgentStreamDisplay>
             <deepThink :deepSession="session" v-if="session.showThink && !session.isAgentMode"></deepThink>
         </div>
         <!-- 非 Agent 模式下才显示传统的 markdown 渲染 -->
@@ -48,6 +48,11 @@ const props = defineProps({
     session: {
         type: Object,
         required: false
+    },
+    userQuery: {
+        type: String,
+        required: false,
+        default: ''
     },
     isFirstEnter: {
         type: Boolean,

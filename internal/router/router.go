@@ -121,6 +121,8 @@ func RegisterKnowledgeRoutes(r *gin.RouterGroup, handler *handler.KnowledgeHandl
 		kb.POST("/file", handler.CreateKnowledgeFromFile)
 		// 从URL创建知识
 		kb.POST("/url", handler.CreateKnowledgeFromURL)
+		// 手工 Markdown 录入
+		kb.POST("/manual", handler.CreateManualKnowledge)
 		// 获取知识库下的知识列表
 		kb.GET("", handler.ListKnowledge)
 	}
@@ -136,6 +138,8 @@ func RegisterKnowledgeRoutes(r *gin.RouterGroup, handler *handler.KnowledgeHandl
 		k.DELETE("/:id", handler.DeleteKnowledge)
 		// 更新知识
 		k.PUT("/:id", handler.UpdateKnowledge)
+		// 更新手工 Markdown 知识
+		k.PUT("/manual/:id", handler.UpdateManualKnowledge)
 		// 获取知识文件
 		k.GET("/:id/download", handler.DownloadKnowledgeFile)
 		// 更新图像分块信息

@@ -41,12 +41,20 @@ export function uploadKnowledgeFile(kbId: string, data = {}) {
   return postUpload(`/api/v1/knowledge-bases/${kbId}/knowledge/file`, data);
 }
 
+export function createManualKnowledge(kbId: string, data: { title: string; content: string; status: string }) {
+  return post(`/api/v1/knowledge-bases/${kbId}/knowledge/manual`, data);
+}
+
 export function listKnowledgeFiles(kbId: string, { page, page_size }: { page: number; page_size: number }) {
   return get(`/api/v1/knowledge-bases/${kbId}/knowledge?page=${page}&page_size=${page_size}`);
 }
 
 export function getKnowledgeDetails(id: string) {
   return get(`/api/v1/knowledge/${id}`);
+}
+
+export function updateManualKnowledge(id: string, data: { title: string; content: string; status: string }) {
+  return put(`/api/v1/knowledge/manual/${id}`, data);
 }
 
 export function delKnowledgeDetails(id: string) {

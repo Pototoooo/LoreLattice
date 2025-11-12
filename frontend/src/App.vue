@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import ManualKnowledgeEditor from '@/components/manual-knowledge-editor.vue'
 </script>
 <template>
   <div id="app">
     <RouterView />
+    <ManualKnowledgeEditor />
   </div>
 </template>
 <style>

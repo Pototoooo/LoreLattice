@@ -196,6 +196,44 @@ func (h *KnowledgeHandler) CreateKnowledgeFromURL(c *gin.Context) {
 	})
 }
 
+// CreateManualKnowledge handles manual Markdown knowledge creation
+func (h *KnowledgeHandler) CreateManualKnowledge(c *gin.Context) {
+	ctx := c.Request.Context()
+	logger.Info(ctx, "Start creating manual knowledge")
+
+	_, kbID, err := h.validateKnowledgeBaseAccess(c)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	var req types.ManualKnowledgePayload
+	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Error(ctx, "Failed to parse manual knowledge request", err)
+		c.Error(errors.NewBadRequestError(err.Error()))
+		return
+	}
+
+	knowledge, err := h.kgService.CreateKnowledgeFromManual(ctx, kbID, &req)
+	if err != nil {
+		if appErr, ok := errors.IsAppError(err); ok {
+			c.Error(appErr)
+			return
+		}
+		logger.ErrorWithFields(ctx, err, map[string]interface{}{
+			"kb_id": kbID,
+		})
+		c.Error(errors.NewInternalServerError(err.Error()))
+		return
+	}
+
+	logger.Infof(ctx, "Manual knowledge created successfully, knowledge ID: %s", knowledge.ID)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    knowledge,
+	})
+}
+
 // GetKnowledge retrieves a knowledge entry by its ID
 func (h *KnowledgeHandler) GetKnowledge(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -427,6 +465,45 @@ func (h *KnowledgeHandler) UpdateKnowledge(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Knowledge chunk updated successfully",
+	})
+}
+
+// UpdateManualKnowledge handles manual Markdown knowledge updates
+func (h *KnowledgeHandler) UpdateManualKnowledge(c *gin.Context) {
+	ctx := c.Request.Context()
+	logger.Info(ctx, "Start updating manual knowledge")
+
+	knowledgeID := c.Param("id")
+	if knowledgeID == "" {
+		logger.Error(ctx, "Knowledge ID is empty")
+		c.Error(errors.NewBadRequestError("Knowledge ID cannot be empty"))
+		return
+	}
+
+	var req types.ManualKnowledgePayload
+	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Error(ctx, "Failed to parse manual knowledge update request", err)
+		c.Error(errors.NewBadRequestError(err.Error()))
+		return
+	}
+
+	knowledge, err := h.kgService.UpdateManualKnowledge(ctx, knowledgeID, &req)
+	if err != nil {
+		if appErr, ok := errors.IsAppError(err); ok {
+			c.Error(appErr)
+			return
+		}
+		logger.ErrorWithFields(ctx, err, map[string]interface{}{
+			"knowledge_id": knowledgeID,
+		})
+		c.Error(errors.NewInternalServerError(err.Error()))
+		return
+	}
+
+	logger.Infof(ctx, "Manual knowledge updated successfully, knowledge ID: %s", knowledge.ID)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    knowledge,
 	})
 }
 

@@ -11,8 +11,8 @@ type AvailableTool struct {
 // Keep this in sync with registered tools in this package.
 func AvailableToolDefinitions() []AvailableTool {
 	return []AvailableTool{
-		{Name: "thinking", Label: "思考", Description: "AI 进行深度思考和推理"},
-		{Name: "todo_write", Label: "制定计划", Description: "为复杂任务制定执行计划"},
+		{Name: "thinking", Label: "思考", Description: "动态和反思性的问题解决思考工具"},
+		{Name: "todo_write", Label: "制定计划", Description: "创建结构化的研究计划"},
 		{Name: "knowledge_search", Label: "知识搜索", Description: "在知识库中搜索相关信息"},
 		{Name: "get_related_chunks", Label: "获取相关片段", Description: "查找相关的知识片段"},
 		{Name: "query_knowledge_graph", Label: "查询知识图谱", Description: "从知识图谱中查询关系"},

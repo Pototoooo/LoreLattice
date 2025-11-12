@@ -61,6 +61,12 @@
       :data="toolData as WebSearchResultsData" 
     />
     
+    <!-- Web Fetch Results Display -->
+    <WebFetchResults
+      v-else-if="displayType === 'web_fetch_results'"
+      :data="toolData as WebFetchResultsData"
+    />
+    
     <!-- Fallback: Display raw output -->
     <div v-else class="fallback-output">
       <div class="fallback-header">
@@ -86,7 +92,8 @@ import type {
   ThinkingData,
   PlanData,
   DatabaseQueryData,
-  WebSearchResultsData
+  WebSearchResultsData,
+  WebFetchResultsData
 } from '@/types/tool-results';
 
 import SearchResults from './tool-results/SearchResults.vue';
@@ -99,6 +106,7 @@ import ThinkingDisplay from './tool-results/ThinkingDisplay.vue';
 import PlanDisplay from './tool-results/PlanDisplay.vue';
 import DatabaseQuery from './tool-results/DatabaseQuery.vue';
 import WebSearchResults from './tool-results/WebSearchResults.vue';
+import WebFetchResults from './tool-results/WebFetchResults.vue';
 
 interface Props {
   displayType?: DisplayType;
