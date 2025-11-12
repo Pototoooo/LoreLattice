@@ -208,7 +208,7 @@ func (s *agentService) registerTools(
 		case "todo_write":
 			registry.RegisterTool(tools.NewTodoWriteTool())
 		case "knowledge_search":
-			registry.RegisterTool(tools.NewKnowledgeSearchTool(s.knowledgeBaseService, tenantID, config.KnowledgeBases, rerankModel))
+			registry.RegisterTool(tools.NewKnowledgeSearchTool(s.knowledgeBaseService, tenantID, config.KnowledgeBases, rerankModel, chatModel))
 		case "get_related_chunks":
 			registry.RegisterTool(tools.NewGetRelatedChunksTool(s.chunkService, s.knowledgeBaseService))
 		case "query_knowledge_graph":

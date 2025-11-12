@@ -1,6 +1,18 @@
 #!/bin/bash
 set -e
 
+# Get the script directory and project root
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
+
+# Load .env file if it exists (for development mode)
+if [ -f "$PROJECT_ROOT/.env" ]; then
+    echo "Loading .env file from $PROJECT_ROOT/.env"
+    set -a
+    source "$PROJECT_ROOT/.env"
+    set +a
+fi
+
 # Database connection details (can be overridden by environment variables)
 DB_HOST=${DB_HOST:-localhost}
 DB_PORT=${DB_PORT:-5432}
@@ -19,7 +31,33 @@ if ! command -v migrate &> /dev/null; then
 fi
 
 # Construct the database URL
-DB_URL="postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable"
+# If DB_URL is already set in .env, use it but ensure sslmode=disable is set
+# Otherwise, construct it from individual components
+if [ -n "$DB_URL" ]; then
+    # If DB_URL already exists, ensure sslmode=disable is set (unless sslmode is already specified)
+    if [[ "$DB_URL" != *"sslmode="* ]]; then
+        # Add sslmode=disable if not present
+        if [[ "$DB_URL" == *"?"* ]]; then
+            DB_URL="${DB_URL}&sslmode=disable"
+        else
+            DB_URL="${DB_URL}?sslmode=disable"
+        fi
+    elif [[ "$DB_URL" == *"sslmode=require"* ]] || [[ "$DB_URL" == *"sslmode=prefer"* ]]; then
+        # Replace sslmode=require/prefer with sslmode=disable for local dev
+        DB_URL="${DB_URL//sslmode=require/sslmode=disable}"
+        DB_URL="${DB_URL//sslmode=prefer/sslmode=disable}"
+    fi
+else
+    # Use Python to properly URL encode password if it contains special characters
+    # This handles special characters in passwords correctly
+    if command -v python3 &> /dev/null; then
+        ENCODED_PASSWORD=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$DB_PASSWORD', safe=''))")
+    else
+        # Fallback: try to use printf for basic encoding (may not work for all special chars)
+        ENCODED_PASSWORD="$DB_PASSWORD"
+    fi
+    DB_URL="postgres://${DB_USER}:${ENCODED_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable"
+fi
 
 # Execute migration based on command
 case "$1" in

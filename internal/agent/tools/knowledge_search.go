@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Tencent/WeKnora/internal/models/chat"
 	"github.com/Tencent/WeKnora/internal/models/rerank"
 	"github.com/Tencent/WeKnora/internal/types"
 	"github.com/Tencent/WeKnora/internal/types/interfaces"
@@ -27,6 +30,7 @@ type KnowledgeSearchTool struct {
 	tenantID         uint
 	allowedKBs       []string
 	rerankModel      rerank.Reranker
+	chatModel        chat.Chat // Optional chat model for LLM-based reranking
 }
 
 // NewKnowledgeSearchTool creates a new knowledge search tool
@@ -35,6 +39,7 @@ func NewKnowledgeSearchTool(
 	tenantID uint,
 	allowedKBs []string,
 	rerankModel rerank.Reranker,
+	chatModel chat.Chat,
 ) *KnowledgeSearchTool {
 	description := `Search within knowledge bases with flexible query modes. Unified tool that supports both targeted and broad searches.
 
@@ -108,6 +113,7 @@ func NewKnowledgeSearchTool(
 		tenantID:         tenantID,
 		allowedKBs:       allowedKBs,
 		rerankModel:      rerankModel,
+		chatModel:        chatModel,
 	}
 }
 
@@ -346,7 +352,29 @@ func (t *KnowledgeSearchTool) Execute(ctx context.Context, args map[string]inter
 		len(filteredResults), len(allResults))
 
 	// Apply ReRank if model is configured
-	if t.rerankModel != nil && len(filteredResults) > 0 {
+	// Prefer chatModel (LLM-based reranking) over rerankModel if both are available
+	if t.chatModel != nil && len(filteredResults) > 0 {
+		logger.Infof(ctx, "[Tool][KnowledgeSearch] Applying LLM-based rerank with model: %s, input: %d results",
+			t.chatModel.GetModelName(), len(filteredResults))
+		rerankQuery := singleQuery
+		if rerankQuery == "" && len(vectorQueries) > 0 {
+			rerankQuery = vectorQueries[0] // Use first vector query as rerank query
+		} else if rerankQuery == "" && len(keywordQueries) > 0 {
+			rerankQuery = keywordQueries[0] // Use first keyword query as fallback
+		}
+
+		if rerankQuery != "" {
+			logger.Debugf(ctx, "[Tool][KnowledgeSearch] Rerank query: %s", rerankQuery)
+			rerankedResults, err := t.rerankResults(ctx, rerankQuery, filteredResults)
+			if err != nil {
+				logger.Warnf(ctx, "[Tool][KnowledgeSearch] LLM rerank failed, using original results: %v", err)
+			} else {
+				filteredResults = rerankedResults
+				logger.Infof(ctx, "[Tool][KnowledgeSearch] LLM rerank completed successfully: %d results",
+					len(filteredResults))
+			}
+		}
+	} else if t.rerankModel != nil && len(filteredResults) > 0 {
 		logger.Infof(ctx, "[Tool][KnowledgeSearch] Applying rerank with model: %s, input: %d results",
 			t.rerankModel.GetModelName(), len(filteredResults))
 		rerankQuery := singleQuery
@@ -560,8 +588,177 @@ func (t *KnowledgeSearchTool) filterByThreshold(
 	return filtered
 }
 
-// rerankResults applies reranking to search results using the configured rerank model
+// rerankResults applies reranking to search results using LLM prompt scoring or rerank model
 func (t *KnowledgeSearchTool) rerankResults(
+	ctx context.Context,
+	query string,
+	results []*searchResultWithMeta,
+) ([]*searchResultWithMeta, error) {
+	// If chatModel is available, use LLM-based prompt scoring
+	if t.chatModel != nil {
+		return t.rerankWithLLM(ctx, query, results)
+	}
+
+	// Fallback to rerank model if available
+	if t.rerankModel != nil {
+		return t.rerankWithModel(ctx, query, results)
+	}
+
+	// No reranking available, return original results
+	return results, nil
+}
+
+// rerankWithLLM uses LLM prompt to score and rerank search results
+func (t *KnowledgeSearchTool) rerankWithLLM(
+	ctx context.Context,
+	query string,
+	results []*searchResultWithMeta,
+) ([]*searchResultWithMeta, error) {
+	logger.Infof(ctx, "[Tool][KnowledgeSearch] Using LLM for reranking %d results", len(results))
+
+	// Build prompt with query and all passages
+	var passagesBuilder strings.Builder
+	for i, result := range results {
+		passagesBuilder.WriteString(fmt.Sprintf("Passage %d:\n%s\n\n", i+1, result.Content))
+	}
+
+	prompt := fmt.Sprintf(`你是一个相关性评分专家。请根据查询问题，对以下每个段落进行相关性评分。
+
+查询问题：%s
+
+评分要求：
+1. 评分范围：0.0 到 1.0 之间的小数
+2. 1.0 表示完全相关，0.0 表示完全不相关
+3. 考虑语义相关性、信息完整性、准确性等因素
+4. 必须为每个段落返回一个评分
+5. 输出格式：每行一个评分，格式为 "Passage N: X.XX"（N 是段落编号，X.XX 是 0.0-1.0 之间的分数）
+
+段落列表：
+%s
+
+请严格按照以下格式返回每个段落的评分（每行一个，共 %d 个）：
+Passage 1: X.XX
+Passage 2: X.XX
+...
+Passage %d: X.XX`, query, passagesBuilder.String(), len(results), len(results))
+
+	messages := []chat.Message{
+		{
+			Role:    "system",
+			Content: "你是一个专业的文本相关性评分专家，能够准确评估文本与查询问题的相关性。",
+		},
+		{
+			Role:    "user",
+			Content: prompt,
+		},
+	}
+
+	response, err := t.chatModel.Chat(ctx, messages, &chat.ChatOptions{
+		Temperature: 0.1, // Low temperature for consistent scoring
+		MaxTokens:   1024,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("LLM rerank call failed: %w", err)
+	}
+
+	// Parse scores from response
+	scores, err := t.parseScoresFromResponse(response.Content, len(results))
+	if err != nil {
+		logger.Warnf(ctx, "[Tool][KnowledgeSearch] Failed to parse LLM scores: %v, using original scores", err)
+		return results, nil // Return original results if parsing fails
+	}
+
+	// Create reranked results with new scores
+	reranked := make([]*searchResultWithMeta, 0, len(results))
+	for i, result := range results {
+		newResult := *result
+		if i < len(scores) {
+			newResult.Score = scores[i]
+		}
+		reranked = append(reranked, &newResult)
+	}
+
+	// Sort by new scores (descending)
+	sort.Slice(reranked, func(i, j int) bool {
+		return reranked[i].Score > reranked[j].Score
+	})
+
+	logger.Infof(ctx, "[Tool][KnowledgeSearch] LLM reranked %d results from %d original results", len(reranked), len(results))
+	return reranked, nil
+}
+
+// parseScoresFromResponse parses scores from LLM response text
+func (t *KnowledgeSearchTool) parseScoresFromResponse(responseText string, expectedCount int) ([]float64, error) {
+	lines := strings.Split(strings.TrimSpace(responseText), "\n")
+	scores := make([]float64, 0, expectedCount)
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		// Try to extract score from various formats:
+		// "Passage 1: 0.85"
+		// "1: 0.85"
+		// "0.85"
+		// etc.
+		parts := strings.Split(line, ":")
+		var scoreStr string
+		if len(parts) >= 2 {
+			scoreStr = strings.TrimSpace(parts[len(parts)-1])
+		} else {
+			scoreStr = strings.TrimSpace(line)
+		}
+
+		// Remove any non-numeric characters except decimal point
+		scoreStr = strings.TrimFunc(scoreStr, func(r rune) bool {
+			return (r < '0' || r > '9') && r != '.'
+		})
+
+		if scoreStr == "" {
+			continue
+		}
+
+		score, err := strconv.ParseFloat(scoreStr, 64)
+		if err != nil {
+			continue // Skip invalid scores
+		}
+
+		// Clamp score to [0.0, 1.0]
+		if score < 0.0 {
+			score = 0.0
+		}
+		if score > 1.0 {
+			score = 1.0
+		}
+
+		scores = append(scores, score)
+	}
+
+	if len(scores) == 0 {
+		return nil, fmt.Errorf("no valid scores found in response")
+	}
+
+	// If we got fewer scores than expected, pad with last score or 0.5
+	for len(scores) < expectedCount {
+		if len(scores) > 0 {
+			scores = append(scores, scores[len(scores)-1])
+		} else {
+			scores = append(scores, 0.5)
+		}
+	}
+
+	// Truncate if we got more scores than expected
+	if len(scores) > expectedCount {
+		scores = scores[:expectedCount]
+	}
+
+	return scores, nil
+}
+
+// rerankWithModel uses the rerank model for reranking (fallback)
+func (t *KnowledgeSearchTool) rerankWithModel(
 	ctx context.Context,
 	query string,
 	results []*searchResultWithMeta,
@@ -589,7 +786,7 @@ func (t *KnowledgeSearchTool) rerankResults(
 		}
 	}
 
-	logger.Infof(ctx, "Reranked %d results from %d original results", len(reranked), len(results))
+	logger.Infof(ctx, "[Tool][KnowledgeSearch] Reranked %d results from %d original results", len(reranked), len(results))
 	return reranked, nil
 }
 
