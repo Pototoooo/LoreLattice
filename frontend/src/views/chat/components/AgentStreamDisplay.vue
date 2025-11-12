@@ -916,6 +916,23 @@ onBeforeUnmount(() => {
   }
 });
 
+const ATTRIBUTE_REGEX = /([\w-]+)\s*=\s*"([^"]*)"/g;
+
+const parseTagAttributes = (attrString: string): Record<string, string> => {
+  const attributes: Record<string, string> = {};
+  if (!attrString) return attributes;
+
+  ATTRIBUTE_REGEX.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = ATTRIBUTE_REGEX.exec(attrString)) !== null) {
+    const key = match[1];
+    const value = match[2];
+    attributes[key] = value;
+  }
+
+  return attributes;
+};
+
 // Markdown rendering function
 const renderMarkdown = (content: any): string => {
   if (!content) return '';
@@ -932,8 +949,16 @@ const renderMarkdown = (content: any): string => {
     const processed = contentStr
       // Web citations -> compact clickable badges with domain text; hover shows title via native tooltip
       .replace(
-        /<web\s+url="([^"]+)"\s+title="([^"]+)"\s*\/>/g,
-        (_m: string, url: string, title: string) => {
+        /<web\b([^>]*)\/>/g,
+        (_m: string, attrString: string) => {
+          const attrs = parseTagAttributes(attrString);
+          const url = attrs.url || '';
+          const title = attrs.title || '';
+
+          if (!url) {
+            return '';
+          }
+
           // Extract domain for compact display
           let domain = url;
           try {
@@ -961,8 +986,17 @@ const renderMarkdown = (content: any): string => {
       )
       // KB citations -> inline badges with simplified display
       .replace(
-        /<kb\s+kb_id="([^"]+)"\s+doc="([^"]+)"\s+chunk_id="([^"]+)"\s*\/>/g,
-        (_m, kbId, doc, chunkId) => {
+        /<kb\b([^>]*)\/>/g,
+        (_m, attrString: string) => {
+          const attrs = parseTagAttributes(attrString);
+          const doc = attrs.doc || '';
+          const chunkId = attrs.chunk_id || attrs.chunkId || '';
+          const kbId = attrs.kb_id || attrs.kbId || '';
+
+          if (!doc || !chunkId) {
+            return '';
+          }
+
           // Escape doc name for safety
           const safeDoc = String(doc || '').replace(/"/g, '&quot;');
           const safeKbId = String(kbId || '').replace(/"/g, '&quot;');
