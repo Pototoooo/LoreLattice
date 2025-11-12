@@ -131,7 +131,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { MessagePlugin } from 'tdesign-vue-next'
 import { getWebSearchProviders, getTenantWebSearchConfig, updateTenantWebSearchConfig, type WebSearchProviderConfig, type WebSearchConfig } from '@/api/web-search'
 
@@ -144,6 +144,8 @@ const localMaxResults = ref<number>(5)
 const localIncludeDate = ref<boolean>(true)
 const localCompressionMethod = ref<string>('none')
 const localBlacklistText = ref<string>('')
+const isInitializing = ref(true) // 标记是否正在初始化，初始化期间不触发自动保存
+const initialConfig = ref<WebSearchConfig | null>(null) // 保存初始配置，用于比较是否有变化
 
 // 计算属性：当前选中的提供商
 const selectedProvider = computed(() => {
@@ -178,22 +180,113 @@ const loadTenantConfig = async () => {
     // request拦截器已经处理了响应，直接使用data字段
     if (response.data) {
       const config = response.data
+      // 在设置初始值时，禁用自动保存
+      isInitializing.value = true
+      
+      // 保存初始配置的副本（用于后续比较）
+      const blacklist = (config.blacklist || []).join('\n')
+      initialConfig.value = {
+        provider: config.provider || '',
+        api_key: config.api_key === '***' ? '***' : config.api_key || '',
+        max_results: config.max_results || 5,
+        include_date: config.include_date !== undefined ? config.include_date : true,
+        compression_method: config.compression_method || 'none',
+        blacklist: config.blacklist || []
+      }
+      
+      // 设置本地状态值
       localProvider.value = config.provider || ''
       // API key 在响应中被隐藏，如果是 "***"，说明已配置但未返回实际值
       localAPIKey.value = config.api_key === '***' ? '***' : config.api_key || ''
       localMaxResults.value = config.max_results || 5
       localIncludeDate.value = config.include_date !== undefined ? config.include_date : true
       localCompressionMethod.value = config.compression_method || 'none'
-      localBlacklistText.value = (config.blacklist || []).join('\n')
+      localBlacklistText.value = blacklist
+      
+      // 等待所有响应式更新完成后再启用自动保存
+      await nextTick()
+      await nextTick()
+      // 使用 setTimeout 确保所有事件都已处理完毕
+      setTimeout(() => {
+        isInitializing.value = false
+      }, 100)
+    } else {
+      // 如果没有配置数据，保存默认配置
+      initialConfig.value = {
+        provider: '',
+        api_key: '',
+        max_results: 5,
+        include_date: true,
+        compression_method: 'none',
+        blacklist: []
+      }
+      await nextTick()
+      setTimeout(() => {
+        isInitializing.value = false
+      }, 100)
     }
   } catch (error: any) {
     console.error('Failed to load tenant web search config:', error)
     // 如果配置不存在，使用默认值（不显示错误）
+    initialConfig.value = {
+      provider: '',
+      api_key: '',
+      max_results: 5,
+      include_date: true,
+      compression_method: 'none',
+      blacklist: []
+    }
+    await nextTick()
+    setTimeout(() => {
+      isInitializing.value = false
+    }, 100)
   }
+}
+
+// 检查配置是否有变化
+const hasConfigChanged = (): boolean => {
+  if (!initialConfig.value) {
+    return true // 如果没有初始配置，认为有变化
+  }
+  
+  const blacklist = localBlacklistText.value
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+  
+  const currentConfig: WebSearchConfig = {
+    provider: localProvider.value,
+    api_key: localAPIKey.value,
+    max_results: localMaxResults.value,
+    include_date: localIncludeDate.value,
+    compression_method: localCompressionMethod.value,
+    blacklist: blacklist
+  }
+  
+  // 比较配置是否有变化（忽略 API key 的 '***' 占位符）
+  const initial = initialConfig.value
+  if (currentConfig.provider !== initial.provider) return true
+  if (currentConfig.api_key !== initial.api_key && 
+      !(currentConfig.api_key === '***' && initial.api_key === '***')) return true
+  if (currentConfig.max_results !== initial.max_results) return true
+  if (currentConfig.include_date !== initial.include_date) return true
+  if (currentConfig.compression_method !== initial.compression_method) return true
+  
+  // 比较黑名单数组
+  const currentBlacklist = blacklist.sort().join(',')
+  const initialBlacklist = (initial.blacklist || []).sort().join(',')
+  if (currentBlacklist !== initialBlacklist) return true
+  
+  return false
 }
 
 // 保存配置
 const saveConfig = async () => {
+  // 如果配置没有变化，不保存
+  if (!hasConfigChanged()) {
+    return
+  }
+  
   try {
     const blacklist = localBlacklistText.value
       .split('\n')
@@ -210,6 +303,17 @@ const saveConfig = async () => {
     }
     
     await updateTenantWebSearchConfig(config)
+    
+    // 更新初始配置，避免重复保存
+    initialConfig.value = {
+      provider: config.provider,
+      api_key: config.api_key,
+      max_results: config.max_results,
+      include_date: config.include_date,
+      compression_method: config.compression_method,
+      blacklist: [...config.blacklist]
+    }
+    
     MessagePlugin.success('网络搜索配置已保存')
   } catch (error: any) {
     console.error('Failed to save web search config:', error)
@@ -221,6 +325,10 @@ const saveConfig = async () => {
 // 防抖保存
 let saveTimer: number | null = null
 const debouncedSave = () => {
+  // 初始化期间不触发自动保存
+  if (isInitializing.value) {
+    return
+  }
   if (saveTimer) {
     clearTimeout(saveTimer)
   }
@@ -258,8 +366,10 @@ const handleBlacklistChange = () => {
 
 // 初始化
 onMounted(async () => {
+  isInitializing.value = true
   await loadProviders()
   await loadTenantConfig()
+  // loadTenantConfig 内部已经处理了 isInitializing，这里不需要再设置
 })
 </script>
 
