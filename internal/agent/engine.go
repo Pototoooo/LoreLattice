@@ -182,7 +182,6 @@ func (e *AgentEngine) executeLoop(
 					Done:    true,
 				},
 			})
-			step.Duration = time.Since(roundStart).Milliseconds()
 			logger.Infof(ctx, "[Agent][Round-%d] Duration: %dms", state.CurrentRound+1, time.Since(roundStart).Milliseconds())
 			break
 		}
@@ -333,7 +332,6 @@ func (e *AgentEngine) executeLoop(
 			}
 		}
 
-		step.Duration = time.Since(roundStart).Milliseconds()
 		state.RoundSteps = append(state.RoundSteps, step)
 		// 4. Observe: Add tool results to messages and write to context
 		messages = e.appendToolResults(ctx, messages, step)
