@@ -5,9 +5,9 @@ import (
 	"errors"
 	"slices"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 )
 
 // Sentinel errors returned by factory functions. Callers may use errors.Is to

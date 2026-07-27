@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 const defaultHitPreviewLimit = 25
@@ -184,13 +184,13 @@ func SummarizePassagePreviews(
 	for i := 0; i < n; i++ {
 		sr := candidates[i]
 		out = append(out, map[string]interface{}{
-			"index":             i,
-			"chunk_id":          sr.ID,
-			"knowledge_id":      sr.KnowledgeID,
-			"knowledge_title":   sr.KnowledgeTitle,
-			"retrieval_score":   fmt.Sprintf("%.4f", sr.Score),
-			"match_type":        sr.MatchType,
-			"preview":           TruncateRunes(passages[i], 160),
+			"index":           i,
+			"chunk_id":        sr.ID,
+			"knowledge_id":    sr.KnowledgeID,
+			"knowledge_title": sr.KnowledgeTitle,
+			"retrieval_score": fmt.Sprintf("%.4f", sr.Score),
+			"match_type":      sr.MatchType,
+			"preview":         TruncateRunes(passages[i], 160),
 		})
 	}
 	return out

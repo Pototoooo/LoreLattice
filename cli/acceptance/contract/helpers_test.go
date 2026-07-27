@@ -10,12 +10,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Tencent/WeKnora/cli/cmd"
-	"github.com/Tencent/WeKnora/cli/cmd/doctor"
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/secrets"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/cmd"
+	"github.com/Pototoooo/lorelattice/cli/cmd/doctor"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/secrets"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // TestMain pins the doctor credential-storage outcome for the whole suite.
@@ -40,7 +40,7 @@ var update = flag.Bool("update", false, "update golden files")
 // newTestFactory builds a Factory whose Client returns mockClient.
 // Caller must NOT use t.Parallel() - see iostreams.SetForTest contract.
 //
-// WEKNORA_BASE_URL is set when mockServer is non-nil. buildClient does not
+// LORELATTICE_BASE_URL is set when mockServer is non-nil. buildClient does not
 // currently honor this env var (it reads from config.Host); commands that
 // need the mock URL rely on the mockClient injection above. The env is set
 // anyway for any direct net/http callers (e.g. doctor's HEAD /health).
@@ -49,7 +49,7 @@ func newTestFactory(t *testing.T, mockServer *httptest.Server, mockClient *sdk.C
 	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 	t.Setenv("XDG_CACHE_HOME", t.TempDir())
 	if mockServer != nil {
-		t.Setenv("WEKNORA_BASE_URL", mockServer.URL)
+		t.Setenv("LORELATTICE_BASE_URL", mockServer.URL)
 	}
 	f := cmdutil.New()
 	if mockClient != nil {

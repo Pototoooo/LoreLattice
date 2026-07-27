@@ -7,7 +7,7 @@ source: RBAC说明.md
 
 # 空间 RBAC 说明
 
-本文档介绍 WeKnora 的**空间内权限控制（Workspace RBAC）**，包括角色矩阵、资源归属模型，以及它与 [共享空间](./共享空间说明.md) 的关系。
+本文档介绍 LoreLattice 的**空间内权限控制（Workspace RBAC）**，包括角色矩阵、资源归属模型，以及它与 [共享空间](./共享空间说明.md) 的关系。
 
 > 状态：已发布；由配置项 `tenant.enable_rbac` 控制，默认 `true`（强制鉴权）。
 > 完整说明、灰度方案、Schema、路由守卫等参见 [`docs/RBAC说明.md`](../../RBAC说明.md)。
@@ -86,7 +86,7 @@ audit:
   retention_days: 90              # 0 表示不清理
 ```
 
-环境变量 `WEKNORA_TENANT_ENABLE_RBAC` / `WEKNORA_AUDIT_RETENTION_DAYS` 覆盖 YAML。`DISABLE_REGISTRATION=true` 等价于把 `registration_mode` 强制设为 `invite_only`。
+环境变量 `LORELATTICE_TENANT_ENABLE_RBAC` / `LORELATTICE_AUDIT_RETENTION_DAYS` 覆盖 YAML。`DISABLE_REGISTRATION=true` 等价于把 `registration_mode` 强制设为 `invite_only`。
 
 ## 审计
 

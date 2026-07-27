@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 )
 
 // wikiLogEntryService persists the detailed Wiki feed and projects a bounded

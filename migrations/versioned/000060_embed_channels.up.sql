@@ -58,6 +58,6 @@ COMMENT ON COLUMN embed_channels.allow_file_upload IS
 COMMENT ON COLUMN embed_channels.default_locale IS
     'Default visitor UI locale (zh-CN, en-US, ko-KR, ru-RU); empty follows browser';
 COMMENT ON COLUMN embed_channels.webhook_url IS 'HTTPS endpoint for outbound message_sent / message_received events';
-COMMENT ON COLUMN embed_channels.webhook_secret IS 'Optional HMAC-SHA256 secret for X-WeKnora-Signature header';
+COMMENT ON COLUMN embed_channels.webhook_secret IS 'Optional HMAC-SHA256 secret for X-LoreLattice-Signature header';
 
 DO $$ BEGIN RAISE NOTICE '[Migration 000060] embed_channels created'; END $$;

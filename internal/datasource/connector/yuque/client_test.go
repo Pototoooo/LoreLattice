@@ -14,8 +14,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/datasource"
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/datasource"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 )
 
 // fakeYuque sets up an httptest server emulating Yuque API endpoints.

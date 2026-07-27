@@ -1,6 +1,6 @@
-// Package notion implements the Notion data source connector for WeKnora.
+// Package notion implements the Notion data source connector for LoreLattice.
 //
-// It syncs pages, databases, and attachments from Notion workspaces into WeKnora knowledge bases.
+// It syncs pages, databases, and attachments from Notion workspaces into LoreLattice knowledge bases.
 //
 // Notion API docs:
 //   - Authentication: https://developers.notion.com/docs/authorization
@@ -15,8 +15,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/datasource"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/datasource"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // NotionAPIVersion is the Notion API version used by this connector.
@@ -270,4 +270,3 @@ type paginatedResponse struct {
 	HasMore    bool            `json:"has_more"`
 	NextCursor string          `json:"next_cursor,omitempty"`
 }
-

@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	apperrors "github.com/Tencent/WeKnora/internal/errors"
-	"github.com/Tencent/WeKnora/internal/types"
+	apperrors "github.com/Pototoooo/lorelattice/internal/errors"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

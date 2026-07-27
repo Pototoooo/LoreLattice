@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 type ConfigSetOptions struct {
@@ -28,7 +28,7 @@ type ConfigSetService interface {
 }
 
 // newKBModelWriteCmd builds the `kb config set` model-binding write command.
-// head is the argv prefix used for the risk action and retry_argv (weknora kb
+// head is the argv prefix used for the risk action and retry_argv (lorelattice kb
 // config set).
 func newKBModelWriteCmd(f *cmdutil.Factory, use string, head []string) *cobra.Command {
 	opts := &ConfigSetOptions{}
@@ -39,7 +39,7 @@ func newKBModelWriteCmd(f *cmdutil.Factory, use string, head []string) *cobra.Co
 		Long: `Bind already-registered models to a knowledge base so it can embed, retrieve,
 and generate. Both --chat-model (LLM, used for generation/summary) and
 --embedding-model (used for retrieval) are required; register models first with
-'weknora model create' and discover ids with 'weknora model list'.
+'lorelattice model create' and discover ids with 'lorelattice model list'.
 
 High-risk write: changing a KB's embedding model affects how its content is
 indexed and searched (the server refuses to CHANGE it once the KB has
@@ -87,16 +87,16 @@ applying the change.`,
 			return runConfigSet(c.Context(), opts, fopts, cli, kbID)
 		},
 	}
-	cmd.Flags().StringVar(&opts.ChatModel, "chat-model", "", "Chat / LLM model id or name for generation & summary (required) — see `weknora model list`")
-	cmd.Flags().StringVar(&opts.EmbeddingModel, "embedding-model", "", "Embedding model id or name for retrieval (required) — see `weknora model list`")
+	cmd.Flags().StringVar(&opts.ChatModel, "chat-model", "", "Chat / LLM model id or name for generation & summary (required) — see `lorelattice model list`")
+	cmd.Flags().StringVar(&opts.EmbeddingModel, "embedding-model", "", "Embedding model id or name for retrieval (required) — see `lorelattice model list`")
 	cmdutil.AddFormatFlag(cmd, kbConfigFields...)
 	cmdutil.AddDryRunFlag(cmd, &opts.DryRun)
 	cmdutil.SetRisk(cmd, action)
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
-		UsedFor:       "bind models to a KB so it becomes retrieval-ready. --chat-model and --embedding-model are required and accept a model id or name; discover them with `weknora model list`. Read the result back with `weknora kb config`.",
+		UsedFor:       "bind models to a KB so it becomes retrieval-ready. --chat-model and --embedding-model are required and accept a model id or name; discover them with `lorelattice model list`. Read the result back with `lorelattice kb config`.",
 		RequiredFlags: []string{"<kb-id> (positional)", "--chat-model", "--embedding-model"},
 		Examples: []string{
-			"weknora kb config set kb_abc --chat-model model_llm --embedding-model model_emb -y",
+			"lorelattice kb config set kb_abc --chat-model model_llm --embedding-model model_emb -y",
 		},
 		Output: "envelope.data is the resulting secret-free config view {retrieval_ready, embedding, llm, rerank, multimodal}",
 		Warnings: []string{
@@ -121,7 +121,7 @@ func validateConfigSetFlags(opts *ConfigSetOptions) error {
 	return &cmdutil.Error{
 		Code:    cmdutil.CodeInputMissingFlag,
 		Message: "kb config set requires " + strings.Join(missing, " and "),
-		Hint:    "discover model ids with `weknora model list` (or register one with `weknora model create`), then pass --chat-model <id> --embedding-model <id>",
+		Hint:    "discover model ids with `lorelattice model list` (or register one with `lorelattice model create`), then pass --chat-model <id> --embedding-model <id>",
 	}
 }
 

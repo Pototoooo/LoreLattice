@@ -1,4 +1,4 @@
-// Package client provides the implementation for interacting with the WeKnora API
+// Package client provides the implementation for interacting with the LoreLattice API
 // The Agent related interfaces are used to manage agent-based question-answering
 package client
 

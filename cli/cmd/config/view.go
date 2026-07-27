@@ -8,13 +8,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/config"
-	"github.com/Tencent/WeKnora/cli/internal/format"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/projectlink"
-	"github.com/Tencent/WeKnora/cli/internal/secrets"
-	"github.com/Tencent/WeKnora/cli/internal/xdg"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/config"
+	"github.com/Pototoooo/lorelattice/cli/internal/format"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/projectlink"
+	"github.com/Pototoooo/lorelattice/cli/internal/secrets"
+	"github.com/Pototoooo/lorelattice/cli/internal/xdg"
 )
 
 // viewFields enumerates the fields surfaced for `--format json` discovery on
@@ -46,7 +46,7 @@ type viewData struct {
 	ProjectLink    string `json:"project_link"`
 }
 
-// NewCmdView builds `weknora config view`. Read-only inspection of the
+// NewCmdView builds `lorelattice config view`. Read-only inspection of the
 // resolved config and resolution chain. Never builds the SDK client and
 // never issues a network request: KB resolution uses ResolveKBLocal, secrets
 // storage is detected from the store type, and everything else is read from
@@ -77,11 +77,11 @@ even when no profile or KB is configured (sources report "(none)" /
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
 		UsedFor: "inspect the resolved CLI config and resolution chain (active profile, host, kb, log level, default format, file paths) without mutating or hitting the network",
 		Examples: []string{
-			"weknora config view",
-			"weknora config view --format json",
-			"weknora config view --jq '.data.active_profile'",
+			"lorelattice config view",
+			"lorelattice config view --format json",
+			"lorelattice config view --jq '.data.active_profile'",
 		},
-		Output: "envelope.data is {active_profile, profile_source, auth_source, host, kb_id, kb_source, log_level, log_level_source, format_default, config_file, cache_dir, secrets, project_link}. auth_source reports whether the active credential is the profile+keyring or a stateless WEKNORA_TOKEN/WEKNORA_API_KEY env override.",
+		Output: "envelope.data is {active_profile, profile_source, auth_source, host, kb_id, kb_source, log_level, log_level_source, format_default, config_file, cache_dir, secrets, project_link}. auth_source reports whether the active credential is the profile+keyring or a stateless LORELATTICE_TOKEN/LORELATTICE_API_KEY env override.",
 	})
 	return cmd
 }
@@ -129,14 +129,14 @@ func resolveView(cmd *cobra.Command, f *cmdutil.Factory) viewData {
 		}
 	}
 
-	// Auth source: stateless env credentials (WEKNORA_TOKEN/WEKNORA_API_KEY)
+	// Auth source: stateless env credentials (LORELATTICE_TOKEN/LORELATTICE_API_KEY)
 	// override the profile + keyring for the actual client, so report that —
 	// otherwise host/profile above would silently describe a profile the env
-	// credential bypassed. WEKNORA_HOST (when set) is the host that env cred
+	// credential bypassed. LORELATTICE_HOST (when set) is the host that env cred
 	// authenticates against.
 	if active, kind := cmdutil.EnvCredential(); active {
 		d.AuthSource = kind + " env (stateless; bypasses profile + keyring)"
-		if h := strings.TrimSpace(os.Getenv("WEKNORA_HOST")); h != "" {
+		if h := strings.TrimSpace(os.Getenv("LORELATTICE_HOST")); h != "" {
 			d.Host = h
 		}
 	} else if d.ActiveProfile != "" {
@@ -173,8 +173,8 @@ func resolveProfile(f *cmdutil.Factory) (name, source string) {
 	if f.ProfileOverride != "" {
 		return f.ProfileOverride, "--profile flag"
 	}
-	if v := os.Getenv("WEKNORA_PROFILE"); v != "" {
-		return v, "WEKNORA_PROFILE env"
+	if v := os.Getenv("LORELATTICE_PROFILE"); v != "" {
+		return v, "LORELATTICE_PROFILE env"
 	}
 	if f.Config != nil {
 		if cfg, err := f.Config(); err == nil && cfg != nil && cfg.CurrentProfile != "" {
@@ -196,8 +196,8 @@ func resolveKB(cmd *cobra.Command, f *cmdutil.Factory) (id, source string) {
 	if v, _ := cmd.Flags().GetString("kb"); v != "" {
 		return id, "--kb flag"
 	}
-	if v := os.Getenv("WEKNORA_KB_ID"); v != "" {
-		return id, "WEKNORA_KB_ID env"
+	if v := os.Getenv("LORELATTICE_KB_ID"); v != "" {
+		return id, "LORELATTICE_KB_ID env"
 	}
 	if cwd, werr := os.Getwd(); werr == nil {
 		if path, found, derr := projectlink.Discover(cwd); derr == nil && found {
@@ -216,14 +216,14 @@ func resolveLogLevel(cmd *cobra.Command) (level, source string) {
 			return level, "--log-level flag"
 		}
 	}
-	if v := os.Getenv("WEKNORA_LOG_LEVEL"); v != "" && cmdutil.IsValidLogLevel(v) {
-		return level, "WEKNORA_LOG_LEVEL env"
+	if v := os.Getenv("LORELATTICE_LOG_LEVEL"); v != "" && cmdutil.IsValidLogLevel(v) {
+		return level, "LORELATTICE_LOG_LEVEL env"
 	}
 	return level, "default"
 }
 
 // resolveFormatDefault reports the configured default output format: the
-// config.yaml defaults.format value, else WEKNORA_FORMAT, else the hard
+// config.yaml defaults.format value, else LORELATTICE_FORMAT, else the hard
 // default. This is the *default* used when --format is unset — not the
 // per-invocation --format flag value.
 func resolveFormatDefault() string {
@@ -231,7 +231,7 @@ func resolveFormatDefault() string {
 	if err == nil && cfg != nil && cfg.Defaults.Format != "" {
 		return cfg.Defaults.Format
 	}
-	if v := os.Getenv("WEKNORA_FORMAT"); v == "text" || v == "json" || v == "ndjson" {
+	if v := os.Getenv("LORELATTICE_FORMAT"); v == "text" || v == "json" || v == "ndjson" {
 		return v
 	}
 	return string(cmdutil.DefaultFormatMode)
@@ -261,7 +261,7 @@ func resolveSecrets(f *cmdutil.Factory) string {
 	return "file"
 }
 
-// resolveProjectLink reports the discovered .weknora/project.yaml path or
+// resolveProjectLink reports the discovered .lorelattice/project.yaml path or
 // "(none)". Walks up from cwd like ResolveKBLocal does.
 func resolveProjectLink() string {
 	cwd, err := os.Getwd()

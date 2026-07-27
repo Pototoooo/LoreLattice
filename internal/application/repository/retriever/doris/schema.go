@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 )
 
 // 默认的桶数 / 副本数。Doris 在 PROPERTIES 不指定时会用集群默认值，
@@ -126,7 +126,7 @@ func (r *dorisRepository) createTable(ctx context.Context, tableName string, dim
 //
 // 关键点：
 //   - DUPLICATE KEY(id)：兼容当前 Doris/SelectDB 对 ANN 索引的表模型要求。
-//     WeKnora 在 Go 端用 delete + insert 保持按 id 替换的写入语义。
+//     LoreLattice 在 Go 端用 delete + insert 保持按 id 替换的写入语义。
 //   - INVERTED 索引覆盖所有过滤字段 + 中文分词的 content 全文索引。
 //   - ANN 索引使用 HNSW + inner_product；Doris 写入/查询前会对向量单位化，
 //     因此整体仍保持与其他向量库一致的 cosine 相似度语义。

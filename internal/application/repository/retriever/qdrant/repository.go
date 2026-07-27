@@ -6,16 +6,16 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 	"github.com/google/uuid"
 	"github.com/qdrant/go-client/qdrant"
 )
 
 const (
 	envQdrantCollection   = "QDRANT_COLLECTION"
-	defaultCollectionName = "weknora_embeddings"
+	defaultCollectionName = "lorelattice_embeddings"
 	fieldContent          = "content"
 	fieldSourceID         = "source_id"
 	fieldSourceType       = "source_type"

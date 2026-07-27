@@ -3,10 +3,10 @@ package interfaces
 import (
 	"context"
 
-	"github.com/Tencent/WeKnora/internal/event"
-	"github.com/Tencent/WeKnora/internal/models/chat"
-	"github.com/Tencent/WeKnora/internal/models/rerank"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/event"
+	"github.com/Pototoooo/lorelattice/internal/models/chat"
+	"github.com/Pototoooo/lorelattice/internal/models/rerank"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // AgentStreamEvent represents a streaming event from the agent

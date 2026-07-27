@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	sdk "github.com/Tencent/WeKnora/client"
+	sdk "github.com/Pototoooo/lorelattice/client"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
 )
 
 func TestWaitCmd_Shape(t *testing.T) {

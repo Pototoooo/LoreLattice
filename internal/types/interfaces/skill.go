@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/Tencent/WeKnora/internal/agent/skills"
+	"github.com/Pototoooo/lorelattice/internal/agent/skills"
 )
 
 // SkillService defines the interface for skill business logic

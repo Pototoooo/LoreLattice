@@ -10,11 +10,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
 )
 
 // DuckDuckGoProvider implements web search using DuckDuckGo (HTML first, API fallback)
@@ -149,7 +149,7 @@ func (p *DuckDuckGoProvider) searchAPI(
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
-	req.Header.Set("User-Agent", "WeKnora/1.0")
+	req.Header.Set("User-Agent", "LoreLattice/1.0")
 
 	resp, err := p.client.Do(req)
 	if err != nil {

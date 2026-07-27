@@ -41,7 +41,7 @@ func signPayload(key []byte, filePath string, tenantID uint64, expires int64) st
 }
 
 // SignFileURL generates a presigned HTTP URL for accessing a storage file.
-// baseURL is the external URL of the WeKnora instance (e.g. "https://weknora.example.com").
+// baseURL is the external URL of the LoreLattice instance (e.g. "https://lorelattice.example.com").
 // filePath is the provider:// storage path (e.g. "local://1/abc/img.png").
 // tenantID identifies the tenant that owns the file.
 // ttl is how long the URL remains valid (0 uses the default presignDefaultTTL).

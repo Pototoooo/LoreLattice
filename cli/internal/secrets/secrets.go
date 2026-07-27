@@ -1,9 +1,9 @@
 // Package secrets stores and retrieves credentials. Production wires
 // KeyringStore (OS keychain, primary) with FileStore (0600 plaintext under
-// $XDG_CONFIG_HOME/weknora/secrets/, used as a fallback when no keyring
+// $XDG_CONFIG_HOME/lorelattice/secrets/, used as a fallback when no keyring
 // backend is available).
 //
-// Namespace convention: "weknora:<profile>:<key>" where key is "access",
+// Namespace convention: "lorelattice:<profile>:<key>" where key is "access",
 // "refresh", or "api_key".
 package secrets
 
@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Tencent/WeKnora/cli/internal/xdg"
+	"github.com/Pototoooo/lorelattice/cli/internal/xdg"
 )
 
 // ErrNotFound is returned when the requested secret does not exist.
@@ -23,7 +23,7 @@ var ErrNotFound = errors.New("secret: not found")
 // Store is the abstraction CLI commands depend on; tests inject in-memory impls.
 //
 // Ref returns a stable URI (e.g. file://<profile>/<key> or
-// keychain://weknora/<profile>/<key>) describing where a saved secret lives.
+// keychain://lorelattice/<profile>/<key>) describing where a saved secret lives.
 // Backends own their scheme so commands never need to type-assert the
 // concrete implementation.
 type Store interface {
@@ -33,14 +33,14 @@ type Store interface {
 	Ref(profile, key string) string
 }
 
-// FileStore writes 0600 plain-text files under $XDG_CONFIG_HOME/weknora/secrets/<profile>.
+// FileStore writes 0600 plain-text files under $XDG_CONFIG_HOME/lorelattice/secrets/<profile>.
 // It is the headless / CI default and the keychain fallback.
 type FileStore struct {
 	root string
 }
 
-// NewFileStore returns a FileStore rooted at $XDG_CONFIG_HOME/weknora/secrets
-// (or ~/.config/weknora/secrets if XDG_CONFIG_HOME is unset). Same convention
+// NewFileStore returns a FileStore rooted at $XDG_CONFIG_HOME/lorelattice/secrets
+// (or ~/.config/lorelattice/secrets if XDG_CONFIG_HOME is unset). Same convention
 // as config.Path - see that file for the rationale (CLI convention).
 func NewFileStore() (*FileStore, error) {
 	root, err := defaultRoot()

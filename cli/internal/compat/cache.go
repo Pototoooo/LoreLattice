@@ -8,7 +8,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/Tencent/WeKnora/cli/internal/xdg"
+	"github.com/Pototoooo/lorelattice/cli/internal/xdg"
 )
 
 const ttl = 24 * time.Hour

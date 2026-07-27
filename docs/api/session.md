@@ -209,8 +209,8 @@ curl --location --request PUT 'http://localhost:8080/api/v1/sessions/411d6b70-9a
 --header 'X-API-Key: sk-xxxxx' \
 --header 'Content-Type: application/json' \
 --data '{
-    "title": "WeKnora 技术讨论",
-    "description": "关于 WeKnora 架构的讨论"
+    "title": "LoreLattice 技术讨论",
+    "description": "关于 LoreLattice 架构的讨论"
 }'
 ```
 
@@ -234,8 +234,8 @@ curl --location --request PUT 'http://localhost:8080/api/v1/sessions/411d6b70-9a
     "success": true,
     "data": {
         "id": "411d6b70-9a85-4d03-bb74-aab0fd8bd12f",
-        "title": "WeKnora 技术讨论",
-        "description": "关于 WeKnora 架构的讨论",
+        "title": "LoreLattice 技术讨论",
+        "description": "关于 LoreLattice 架构的讨论",
         "tenant_id": 1,
         "user_id": "u-001",
         "is_pinned": false,

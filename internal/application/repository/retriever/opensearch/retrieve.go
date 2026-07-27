@@ -9,8 +9,8 @@ import (
 
 	osapi "github.com/opensearch-project/opensearch-go/v4/opensearchapi"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // Retrieve dispatches to vectorRetrieve or keywordsRetrieve based on
@@ -140,7 +140,7 @@ func (r *Repository) search(ctx context.Context, indexPattern string, body []byt
 // Field-by-field decode (vs map[string]any) keeps the JSON shape
 // pinned at compile time.
 type hit struct {
-	ID     string  `json:"_id"`   // equals chunk_id per the indexing invariant
+	ID     string  `json:"_id"` // equals chunk_id per the indexing invariant
 	Score  float64 `json:"_score"`
 	Source struct {
 		Content         string `json:"content"`

@@ -3,7 +3,7 @@ package provider
 import (
 	"fmt"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // GenericProvider 实现通用 OpenAI 兼容的 Provider 接口

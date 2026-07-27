@@ -9,11 +9,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Tencent/WeKnora/internal/config"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/models/chat"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/config"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/models/chat"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 )
 
 // PluginExtractEntity is a plugin for extracting entities from user queries

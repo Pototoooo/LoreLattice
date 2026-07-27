@@ -6,7 +6,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // Yuque's runtime API returns the doc `status` field as an integer (0 or 1),

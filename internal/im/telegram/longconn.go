@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/im"
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/im"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 )
 
 // MessageHandler is called when an IM message is received via long polling.

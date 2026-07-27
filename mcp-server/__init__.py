@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-WeKnora MCP Server Package
+LoreLattice MCP Server Package
 
-A Model Context Protocol server that provides access to the WeKnora knowledge management API.
+A Model Context Protocol server that provides access to the LoreLattice knowledge management API.
 """
 
 __version__ = "1.0.0"
-__author__ = "WeKnora Team"
-__description__ = "WeKnora MCP Server - Model Context Protocol server for WeKnora API"
+__author__ = "Pototoooo"
+__description__ = "LoreLattice MCP Server - Model Context Protocol server for LoreLattice API"
 
-from .weknora_mcp_server import WeKnoraClient, run
+from .lorelattice_mcp_server import LoreLatticeClient, run
 
-__all__ = ["WeKnoraClient", "run"]
+__all__ = ["LoreLatticeClient", "run"]

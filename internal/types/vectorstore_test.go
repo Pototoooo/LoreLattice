@@ -53,15 +53,15 @@ func TestBuildEnvVectorStores(t *testing.T) {
 		"TENCENT_VECTORDB_ADDR":       "http://tencent-vdb",
 		"TENCENT_VECTORDB_USERNAME":   "root",
 		"TENCENT_VECTORDB_API_KEY":    "vdb-key",
-		"TENCENT_VECTORDB_DATABASE":   "weknora",
-		"TENCENT_VECTORDB_COLLECTION": "weknora_embeddings",
+		"TENCENT_VECTORDB_DATABASE":   "lorelattice",
+		"TENCENT_VECTORDB_COLLECTION": "lorelattice_embeddings",
 		"WEAVIATE_HOST":               "weaviate:8080",
 		"DORIS_ADDR":                  "doris-fe:9030",
 		"DORIS_HTTP_PORT":             "8030",
-		"DORIS_DATABASE":              "weknora",
+		"DORIS_DATABASE":              "lorelattice",
 		"DORIS_USERNAME":              "root",
 		"DORIS_PASSWORD":              "doris-pass",
-		"DORIS_TABLE_PREFIX":          "weknora_embeddings",
+		"DORIS_TABLE_PREFIX":          "lorelattice_embeddings",
 	}
 	lookup := mockEnvLookup(envMap)
 
@@ -145,8 +145,8 @@ func TestBuildEnvVectorStores(t *testing.T) {
 		assert.Equal(t, "http://tencent-vdb", stores[0].ConnectionConfig.Addr)
 		assert.Equal(t, "root", stores[0].ConnectionConfig.Username)
 		assert.Equal(t, "vdb-key", stores[0].ConnectionConfig.APIKey)
-		assert.Equal(t, "weknora", stores[0].ConnectionConfig.Database)
-		assert.Equal(t, "weknora_embeddings", stores[0].IndexConfig.CollectionName)
+		assert.Equal(t, "lorelattice", stores[0].ConnectionConfig.Database)
+		assert.Equal(t, "lorelattice_embeddings", stores[0].IndexConfig.CollectionName)
 	})
 
 	t.Run("weaviate env store", func(t *testing.T) {
@@ -162,17 +162,17 @@ func TestBuildEnvVectorStores(t *testing.T) {
 		assert.Equal(t, DorisRetrieverEngineType, stores[0].EngineType)
 		assert.Equal(t, "doris-fe:9030", stores[0].ConnectionConfig.Addr)
 		assert.Equal(t, 8030, stores[0].ConnectionConfig.HTTPPort)
-		assert.Equal(t, "weknora", stores[0].ConnectionConfig.Database)
+		assert.Equal(t, "lorelattice", stores[0].ConnectionConfig.Database)
 		assert.Equal(t, "root", stores[0].ConnectionConfig.Username)
 		assert.Equal(t, "doris-pass", stores[0].ConnectionConfig.Password)
-		assert.Equal(t, "weknora_embeddings", stores[0].IndexConfig.CollectionPrefix)
+		assert.Equal(t, "lorelattice_embeddings", stores[0].IndexConfig.CollectionPrefix)
 	})
 
 	t.Run("doris env store handles invalid http port gracefully", func(t *testing.T) {
 		bad := mockEnvLookup(map[string]string{
 			"DORIS_ADDR":      "doris-fe:9030",
 			"DORIS_HTTP_PORT": "not-a-number",
-			"DORIS_DATABASE":  "weknora",
+			"DORIS_DATABASE":  "lorelattice",
 		})
 		stores := BuildEnvVectorStores("doris", bad)
 		require.Len(t, stores, 1)
@@ -743,7 +743,7 @@ func TestIndexConfig_GetIndexNameOrDefault(t *testing.T) {
 			name:       "qdrant default",
 			config:     IndexConfig{},
 			engineType: QdrantRetrieverEngineType,
-			expected:   "weknora_embeddings",
+			expected:   "lorelattice_embeddings",
 		},
 		// Milvus
 		{
@@ -756,7 +756,7 @@ func TestIndexConfig_GetIndexNameOrDefault(t *testing.T) {
 			name:       "milvus default",
 			config:     IndexConfig{},
 			engineType: MilvusRetrieverEngineType,
-			expected:   "weknora_embeddings",
+			expected:   "lorelattice_embeddings",
 		},
 		// Tencent VectorDB
 		{
@@ -769,7 +769,7 @@ func TestIndexConfig_GetIndexNameOrDefault(t *testing.T) {
 			name:       "tencent vectordb default",
 			config:     IndexConfig{},
 			engineType: TencentVectorDBRetrieverEngineType,
-			expected:   "weknora_embeddings",
+			expected:   "lorelattice_embeddings",
 		},
 		// Weaviate
 		{
@@ -782,7 +782,7 @@ func TestIndexConfig_GetIndexNameOrDefault(t *testing.T) {
 			name:       "weaviate default",
 			config:     IndexConfig{},
 			engineType: WeaviateRetrieverEngineType,
-			expected:   "Weknora_embeddings",
+			expected:   "LoreLattice_embeddings",
 		},
 		// Postgres (no index config)
 		{
@@ -919,7 +919,7 @@ func TestResolveCollectionName(t *testing.T) {
 	t.Run("empty IndexConfig falls back to default", func(t *testing.T) {
 		t.Setenv("QDRANT_COLLECTION", "")
 		ic := &IndexConfig{}
-		assert.Equal(t, "weknora_embeddings", ResolveCollectionName(ic, "QDRANT_COLLECTION", "weknora_embeddings"))
+		assert.Equal(t, "lorelattice_embeddings", ResolveCollectionName(ic, "QDRANT_COLLECTION", "lorelattice_embeddings"))
 	})
 }
 
@@ -1005,7 +1005,7 @@ func TestValidateIndexConfig(t *testing.T) {
 	t.Run("valid names with underscore and hyphen", func(t *testing.T) {
 		ic := IndexConfig{
 			IndexName:        "my_index-v2",
-			CollectionPrefix: "Weknora_embeddings",
+			CollectionPrefix: "LoreLattice_embeddings",
 			CollectionName:   "custom-collection-name",
 		}
 		assert.NoError(t, ValidateIndexConfig(ic))
@@ -1085,7 +1085,7 @@ func TestValidateIndexConfig(t *testing.T) {
 
 	t.Run("doris GetIndexNameOrDefault falls back when prefix empty", func(t *testing.T) {
 		ic := IndexConfig{}
-		assert.Equal(t, "weknora_embeddings", ic.GetIndexNameOrDefault(DorisRetrieverEngineType))
+		assert.Equal(t, "lorelattice_embeddings", ic.GetIndexNameOrDefault(DorisRetrieverEngineType))
 	})
 
 	t.Run("doris GetIndexNameOrDefault honors collection_prefix", func(t *testing.T) {

@@ -1,5 +1,5 @@
 {{/*
-Copyright 2025 Tencent
+Copyright 2025-2026 Pototoooo
 SPDX-License-Identifier: MIT
 
 PostgreSQL (ParadeDB) Deployment and Service.
@@ -9,32 +9,32 @@ ParadeDB provides vector search and BM25 full-text search capabilities.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "weknora.fullname" . }}-postgres
+  name: {{ include "lorelattice.fullname" . }}-postgres
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "database" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "database" "context" .) | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "weknora.componentSelectorLabels" (dict "component" "database" "context" .) | nindent 6 }}
+      {{- include "lorelattice.componentSelectorLabels" (dict "component" "database" "context" .) | nindent 6 }}
   # Use Recreate strategy for database to avoid data corruption
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        {{- include "weknora.componentSelectorLabels" (dict "component" "database" "context" .) | nindent 8 }}
+        {{- include "lorelattice.componentSelectorLabels" (dict "component" "database" "context" .) | nindent 8 }}
     spec:
-      {{- include "weknora.imagePullSecrets" . | nindent 6 }}
-      serviceAccountName: {{ include "weknora.serviceAccountName" . }}
+      {{- include "lorelattice.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "lorelattice.serviceAccountName" . }}
       {{- with .Values.global.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: postgres
-          image: {{ include "weknora.postgresql.image" . }}
+          image: {{ include "lorelattice.postgresql.image" . }}
           imagePullPolicy: IfNotPresent
           {{- with .Values.postgresql.securityContext }}
           securityContext:
@@ -48,17 +48,17 @@ spec:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: DB_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: DB_PASSWORD
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: DB_NAME
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
@@ -91,7 +91,7 @@ spec:
         - name: postgres-data
           {{- if .Values.postgresql.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.postgresql.persistence.existingClaim | default (printf "%s-postgres" (include "weknora.fullname" .)) }}
+            claimName: {{ .Values.postgresql.persistence.existingClaim | default (printf "%s-postgres" (include "lorelattice.fullname" .)) }}
           {{- else }}
           emptyDir: {}
           {{- end }}
@@ -115,11 +115,11 @@ metadata:
   name: postgres
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "database" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "database" "context" .) | nindent 4 }}
 spec:
   type: ClusterIP
   selector:
-    {{- include "weknora.componentSelectorLabels" (dict "component" "database" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentSelectorLabels" (dict "component" "database" "context" .) | nindent 4 }}
   ports:
     - name: postgresql
       port: 5432

@@ -213,8 +213,8 @@ func TestCheckFormatFlag_TextAccepted(t *testing.T) {
 	}
 }
 
-func TestFromEnv_AppliesWEKNORA_FORMAT(t *testing.T) {
-	t.Setenv("WEKNORA_FORMAT", "ndjson")
+func TestFromEnv_AppliesLORELATTICE_FORMAT(t *testing.T) {
+	t.Setenv("LORELATTICE_FORMAT", "ndjson")
 	o := &FormatOptions{}
 	o.FromEnv()
 	if o.Mode != FormatNDJSON {
@@ -223,7 +223,7 @@ func TestFromEnv_AppliesWEKNORA_FORMAT(t *testing.T) {
 }
 
 func TestFromEnv_PrecedenceFlagOverridesEnv(t *testing.T) {
-	t.Setenv("WEKNORA_FORMAT", "ndjson")
+	t.Setenv("LORELATTICE_FORMAT", "ndjson")
 	o := &FormatOptions{Mode: FormatJSON}
 	o.FromEnv()
 	if o.Mode != FormatJSON {
@@ -232,7 +232,7 @@ func TestFromEnv_PrecedenceFlagOverridesEnv(t *testing.T) {
 }
 
 func TestFromEnv_InvalidValueIgnored(t *testing.T) {
-	t.Setenv("WEKNORA_FORMAT", "yaml")
+	t.Setenv("LORELATTICE_FORMAT", "yaml")
 	o := &FormatOptions{}
 	o.FromEnv()
 	if o.Mode != "" {
@@ -241,33 +241,33 @@ func TestFromEnv_InvalidValueIgnored(t *testing.T) {
 }
 
 // TestResolveDefault_AppliesEnv pins that ResolveDefault honours
-// WEKNORA_FORMAT. Regression: commands call CheckFormatFlag + ResolveDefault
+// LORELATTICE_FORMAT. Regression: commands call CheckFormatFlag + ResolveDefault
 // but (nearly) none called FromEnv, so the documented env var was silently
 // ignored on success output across the whole CLI until ResolveDefault folded
 // it in. This is the path every command's RunE actually takes.
 func TestResolveDefault_AppliesEnv(t *testing.T) {
-	t.Setenv("WEKNORA_FORMAT", "text")
+	t.Setenv("LORELATTICE_FORMAT", "text")
 	o := &FormatOptions{} // no --format → Mode empty, as after CheckFormatFlag
 	o.ResolveDefault(false)
 	if o.Mode != FormatText {
-		t.Errorf("WEKNORA_FORMAT=text must drive ResolveDefault to text; got %v", o.Mode)
+		t.Errorf("LORELATTICE_FORMAT=text must drive ResolveDefault to text; got %v", o.Mode)
 	}
 }
 
 // TestResolveDefault_FlagBeatsEnv pins precedence: an explicit --format
-// (Mode already set) wins over WEKNORA_FORMAT.
+// (Mode already set) wins over LORELATTICE_FORMAT.
 func TestResolveDefault_FlagBeatsEnv(t *testing.T) {
-	t.Setenv("WEKNORA_FORMAT", "text")
+	t.Setenv("LORELATTICE_FORMAT", "text")
 	o := &FormatOptions{Mode: FormatJSON} // --format json supplied
 	o.ResolveDefault(false)
 	if o.Mode != FormatJSON {
-		t.Errorf("explicit --format json must beat WEKNORA_FORMAT=text; got %v", o.Mode)
+		t.Errorf("explicit --format json must beat LORELATTICE_FORMAT=text; got %v", o.Mode)
 	}
 }
 
 // TestResolveDefault_NoEnvNoFlag_UsesDefault pins the fallback.
 func TestResolveDefault_NoEnvNoFlag_UsesDefault(t *testing.T) {
-	t.Setenv("WEKNORA_FORMAT", "")
+	t.Setenv("LORELATTICE_FORMAT", "")
 	o := &FormatOptions{}
 	o.ResolveDefault(false)
 	if o.Mode != DefaultFormatMode {

@@ -9,19 +9,19 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
 )
 
 // TestLeafCommandsDeclareRequiredPositional guards the agent-first contract: a
 // command whose Use string carries a <...> positional placeholder (it takes a
 // required positional arg, enforced by cobra.ExactArgs/MinimumNArgs) MUST also
 // declare that positional in its agent-help RequiredFlags. Otherwise
-// `weknora schema <cmd>` under-reports the requirement, and an agent that builds
+// `lorelattice schema <cmd>` under-reports the requirement, and an agent that builds
 // a call from schema omits the positional and hits "accepts N arg(s), received 0".
 //
 // Sibling of TestEveryLeafCommandHasAgentHelp / the dry-run coverage guard.
 func TestLeafCommandsDeclareRequiredPositional(t *testing.T) {
-	t.Setenv("WEKNORA_AGENT_HELP", "1")
+	t.Setenv("LORELATTICE_AGENT_HELP", "1")
 	root := NewRootCmd(cmdutil.New())
 
 	var missing []string
@@ -54,7 +54,7 @@ func TestLeafCommandsDeclareRequiredPositional(t *testing.T) {
 	sort.Strings(missing)
 	if len(missing) > 0 {
 		t.Errorf("leaf commands take a required positional but don't declare it in agent-help RequiredFlags "+
-			"(so `weknora schema <cmd>` under-reports the requirement). Add a \"<name> (positional)\" entry "+
+			"(so `lorelattice schema <cmd>` under-reports the requirement). Add a \"<name> (positional)\" entry "+
 			"to each SetAgentHelp RequiredFlags:\n  %s\n(%d commands)",
 			strings.Join(missing, "\n  "), len(missing))
 	}

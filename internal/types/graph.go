@@ -1,4 +1,4 @@
-// Package types defines the core data structures and interfaces used throughout the WeKnora system.
+// Package types defines the core data structures and interfaces used throughout the LoreLattice system.
 package types
 
 import "context"

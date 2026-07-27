@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/testutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/testutil"
 )
 
 // The confirmation message verb must match the actual operation: an `edit`

@@ -4,10 +4,11 @@
 // env vars) so it never runs in the normal suite or CI.
 //
 // It WRITES to your Feishu tenant: it creates a handful of docx documents under
-// the given wiki space, each titled "WeKnora sync test doc N" so you can find
+// the given wiki space, each titled "LoreLattice sync test doc N" so you can find
 // and delete them afterwards. Requires app write scopes:
 //   - wiki:wiki           (create wiki nodes)
 //   - docx:document       (write docx content)
+//
 // plus the app being a member of the space.
 //
 // Run:
@@ -25,7 +26,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/utils"
 )
 
 // wikiNodeCreateResp is the subset of POST /wiki/v2/spaces/:id/nodes we need.
@@ -66,7 +67,7 @@ func TestRealAPI_CreateSpace(t *testing.T) {
 	}
 	err := client.doRequest(context.Background(), "POST", "/open-apis/wiki/v2/spaces",
 		map[string]interface{}{
-			"name":        "WeKnora Resilience Test KB",
+			"name":        "LoreLattice Resilience Test KB",
 			"description": "Auto-created for connector resilience testing (#2136). Safe to delete.",
 		}, &resp)
 	if err != nil {
@@ -99,7 +100,7 @@ func TestRealAPI_SeedDocs(t *testing.T) {
 	ctx := context.Background()
 
 	for i := 1; i <= count; i++ {
-		title := fmt.Sprintf("WeKnora sync test doc %d", i)
+		title := fmt.Sprintf("LoreLattice sync test doc %d", i)
 
 		// 1) Create a docx wiki node.
 		var created wikiNodeCreateResp
@@ -132,7 +133,7 @@ func TestRealAPI_SeedDocs(t *testing.T) {
 					"text": map[string]interface{}{
 						"elements": []map[string]interface{}{{
 							"text_run": map[string]interface{}{
-								"content": fmt.Sprintf("This is WeKnora sync test document number %d. It exists to validate connector resilience (issue #2136).", i),
+								"content": fmt.Sprintf("This is LoreLattice sync test document number %d. It exists to validate connector resilience (issue #2136).", i),
 							},
 						}},
 					},

@@ -10,12 +10,12 @@ import (
 	"testing"
 	"time"
 
-	apprepo "github.com/Tencent/WeKnora/internal/application/repository"
-	"github.com/Tencent/WeKnora/internal/application/service"
-	"github.com/Tencent/WeKnora/internal/config"
-	"github.com/Tencent/WeKnora/internal/middleware"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	apprepo "github.com/Pototoooo/lorelattice/internal/application/repository"
+	"github.com/Pototoooo/lorelattice/internal/application/service"
+	"github.com/Pototoooo/lorelattice/internal/config"
+	"github.com/Pototoooo/lorelattice/internal/middleware"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 	"github.com/gin-gonic/gin"
 )
 
@@ -166,10 +166,10 @@ const defaultTestTenantID uint64 = 1
 // stuffed into the request context. The zero value matches the common
 // case ("authenticated, active in tenant 1, no superuser flag").
 type memberCtxOpts struct {
-	callerID    string
-	tenantID    uint64
-	user        *types.User
-	skipTenant  bool // when true, do NOT set TenantIDContextKey at all
+	callerID   string
+	tenantID   uint64
+	user       *types.User
+	skipTenant bool // when true, do NOT set TenantIDContextKey at all
 }
 
 // withMemberCtx installs the auth-middleware-equivalent values on req's

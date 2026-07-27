@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/prompt"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/prompt"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // kbDryRunFactory builds a Factory whose Client closure panics if invoked —
@@ -37,7 +37,7 @@ func kbDryRunFactory(t *testing.T) *cmdutil.Factory {
 // cmd/root.go). Required because kb subcommands inherit --yes / --format /
 // --jq from root in production.
 func withRootHarness(sub *cobra.Command, args ...string) *cobra.Command {
-	root := &cobra.Command{Use: "weknora"}
+	root := &cobra.Command{Use: "lorelattice"}
 	pf := root.PersistentFlags()
 	pf.BoolP("yes", "y", false, "")
 	pf.String("format", "", "")

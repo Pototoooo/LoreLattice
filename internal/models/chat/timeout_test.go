@@ -50,7 +50,7 @@ func TestWithLLMTimeout_LongerParentDeadline_NotTruncated(t *testing.T) {
 }
 
 func TestEnvDurationSeconds(t *testing.T) {
-	const key = "WEKNORA_TEST_TIMEOUT_SECONDS"
+	const key = "LORELATTICE_TEST_TIMEOUT_SECONDS"
 
 	t.Run("unset returns fallback", func(t *testing.T) {
 		os.Unsetenv(key)

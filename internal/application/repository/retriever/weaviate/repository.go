@@ -8,9 +8,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 	"github.com/go-openapi/strfmt"
 	"github.com/google/uuid"
 	"github.com/weaviate/weaviate-go-client/v5/weaviate"
@@ -21,7 +21,7 @@ import (
 
 const (
 	envWeaviateCollection = "WEAVIATE_COLLECTION"
-	defaultCollectionName = "Weknora_embeddings"
+	defaultCollectionName = "LoreLattice_embeddings"
 	fieldContent          = "content"
 	fieldSourceID         = "source_id"
 	fieldSourceType       = "source_type"
@@ -80,7 +80,7 @@ func (w *weaviateRepository) ensureCollection(ctx context.Context, dimension int
 		//定义class结构
 		classObj := models.Class{
 			Class:       collectionName,
-			Description: fmt.Sprintf("WeKnora embeddings collection with dimension %d", dimension),
+			Description: fmt.Sprintf("LoreLattice embeddings collection with dimension %d", dimension),
 			VectorConfig: map[string]models.VectorConfig{
 				fieldEmbedding: {
 					VectorIndexType: "hnsw",

@@ -4,18 +4,18 @@ import (
 	"context"
 	"strings"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/gin-gonic/gin"
 )
 
 // Language extracts the user's language preference and injects it into the request context.
 //
 // Priority (highest to lowest):
-//  1. WEKNORA_LANGUAGE environment variable (deployment-level override for document processing language)
+//  1. LORELATTICE_LANGUAGE environment variable (deployment-level override for document processing language)
 //  2. Accept-Language HTTP header (first tag, e.g. "zh-CN,zh;q=0.9" → "zh-CN")
 //  3. "zh-CN" hardcoded fallback
 //
-// WEKNORA_LANGUAGE takes precedence over Accept-Language because the UI locale (menu language)
+// LORELATTICE_LANGUAGE takes precedence over Accept-Language because the UI locale (menu language)
 // and the document processing language (question/summary generation) are separate concerns.
 // A user may prefer English UI while processing Korean documents.
 func Language() gin.HandlerFunc {
@@ -23,7 +23,7 @@ func Language() gin.HandlerFunc {
 	envLang := types.EnvLanguage()
 
 	return func(c *gin.Context) {
-		// 1. WEKNORA_LANGUAGE env takes precedence (deployment-level document language)
+		// 1. LORELATTICE_LANGUAGE env takes precedence (deployment-level document language)
 		if envLang != "" {
 			c.Set(types.LanguageContextKey.String(), envLang)
 			ctx := context.WithValue(c.Request.Context(), types.LanguageContextKey, envLang)

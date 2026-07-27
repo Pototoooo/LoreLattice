@@ -3,7 +3,7 @@ package searchutil
 import (
 	"sort"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // 这里实现 chunk 内容的「重叠拼接」公共逻辑，供文档重建（reconstructContent）、

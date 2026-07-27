@@ -6,14 +6,14 @@ import (
 	"strings"
 	"time"
 
-	agenttools "github.com/Tencent/WeKnora/internal/agent/tools"
-	"github.com/Tencent/WeKnora/internal/common"
-	"github.com/Tencent/WeKnora/internal/event"
-	"github.com/Tencent/WeKnora/internal/llmreference"
-	"github.com/Tencent/WeKnora/internal/llmresource"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/models/chat"
-	"github.com/Tencent/WeKnora/internal/types"
+	agenttools "github.com/Pototoooo/lorelattice/internal/agent/tools"
+	"github.com/Pototoooo/lorelattice/internal/common"
+	"github.com/Pototoooo/lorelattice/internal/event"
+	"github.com/Pototoooo/lorelattice/internal/llmreference"
+	"github.com/Pototoooo/lorelattice/internal/llmresource"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/models/chat"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // streamLLMResult holds accumulated output from a streaming LLM call.

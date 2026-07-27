@@ -19,8 +19,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/Tencent/WeKnora/internal/im"
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/im"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 )
 
 // textMessageType is the Yunzhijia message type value for plain text messages.
@@ -291,7 +291,7 @@ func (a *Adapter) SendReply(ctx context.Context, incoming *im.IncomingMessage, r
 	payload := sendMessagePayload{
 		MsgType: textMessageType,
 		Content: reply.Content,
-		// WeKnora replies are authored in Markdown by default (see im.ReplyMessage.Content),
+		// LoreLattice replies are authored in Markdown by default (see im.ReplyMessage.Content),
 		// so request Markdown rendering from Yunzhijia unless explicitly overridden via
 		// reply.Extra["yunzhijia_format_type"] (empty string disables the param entirely).
 		Param: &sendMessageParam{FormatType: markdownFormatType},

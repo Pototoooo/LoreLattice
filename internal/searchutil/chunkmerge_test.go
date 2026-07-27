@@ -3,7 +3,7 @@ package searchutil
 import (
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 func TestAppendWithOverlap_ContiguousNoTrim(t *testing.T) {

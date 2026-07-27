@@ -3,7 +3,7 @@ package im
 import (
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // Files uploaded through an IM channel are tagged with a knowledge Channel.

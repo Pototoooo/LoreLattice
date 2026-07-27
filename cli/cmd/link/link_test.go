@@ -13,11 +13,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/config"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/projectlink"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/config"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/projectlink"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 func chdir(t *testing.T, dir string) {
@@ -67,7 +67,7 @@ func TestLink_ByID(t *testing.T) {
 	opts := &Options{KB: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"}
 	require.NoError(t, runLink(context.Background(), opts, &cmdutil.FormatOptions{Mode: cmdutil.FormatText}, f))
 
-	linkPath := filepath.Join(dir, ".weknora", "project.yaml")
+	linkPath := filepath.Join(dir, ".lorelattice", "project.yaml")
 	p, err := projectlink.Load(linkPath)
 	require.NoError(t, err)
 	assert.Equal(t, "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", p.KBID)
@@ -89,7 +89,7 @@ func TestLink_ByName(t *testing.T) {
 	opts := &Options{KB: "foo"}
 	require.NoError(t, runLink(context.Background(), opts, &cmdutil.FormatOptions{Mode: cmdutil.FormatText}, f))
 
-	p, err := projectlink.Load(filepath.Join(dir, ".weknora", "project.yaml"))
+	p, err := projectlink.Load(filepath.Join(dir, ".lorelattice", "project.yaml"))
 	require.NoError(t, err)
 	assert.Equal(t, "kb_a", p.KBID)
 }
@@ -116,7 +116,7 @@ func TestLink_OverwritesExisting(t *testing.T) {
 	_, _ = iostreams.SetForTest(t)
 
 	// Pre-existing link.
-	linkPath := filepath.Join(dir, ".weknora", "project.yaml")
+	linkPath := filepath.Join(dir, ".lorelattice", "project.yaml")
 	require.NoError(t, projectlink.Save(linkPath, &projectlink.Project{
 		Profile: "default", KBID: "11111111-1111-4111-8111-111111111111",
 	}))

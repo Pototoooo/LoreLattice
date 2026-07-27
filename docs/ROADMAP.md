@@ -1,11 +1,11 @@
-# WeKnora Roadmap
+# LoreLattice Roadmap
 
-本文档描述 WeKnora 的产品规划与计划方向，会随项目进展持续更新。
+本文档描述 LoreLattice 的产品规划与计划方向，会随项目进展持续更新。
 
 ## 轻量化部署
-- [ ] WeKnora 官方提供原子化调用接口（Embedding、ReRank、LLM、文档解析等），并提供一定免费使用额度
-- [ ] WeKnora 官方提供完整云端服务，用户可在平台上直接体验 WeKnora 能力
-- [ ] 推出 WeKnora Lite 版本，供私有化部署需求不强的用户快速体验产品能力
+- [ ] LoreLattice 官方提供原子化调用接口（Embedding、ReRank、LLM、文档解析等），并提供一定免费使用额度
+- [ ] LoreLattice 官方提供完整云端服务，用户可在平台上直接体验 LoreLattice 能力
+- [ ] 推出 LoreLattice Lite 版本，供私有化部署需求不强的用户快速体验产品能力
 
 ## 知识理解
 - [x] 抽象整体文档解析模块，支持切换内置解析、MinerU 或其它解析方式
@@ -28,7 +28,7 @@
 - [ ] 探索知识库与 Memory 结合的应用场景
 
 ## IM 集成
-- [x] 支持与企微、飞书等 IM 系统集成，在 IM 内使用 WeKnora 能力
+- [x] 支持与企微、飞书等 IM 系统集成，在 IM 内使用 LoreLattice 能力
 
 ## 组件与扩展
 - [ ] 鼓励社区维护各厂商的模型服务、网络搜索服务等组件
@@ -37,10 +37,10 @@
 ## 周边生态建设
 - [ ] 提供 Chrome 扩展，支持类似「剪藏」功能，将网页内容保存至知识库并支持检索、总结、问答
 - [ ] 提供小程序插件（具体形态待定）
-- [ ] 提供 JS SDK，便于在网页中集成 WeKnora 能力
+- [ ] 提供 JS SDK，便于在网页中集成 LoreLattice 能力
 - [ ] 鼓励社区提供 VSCode、Cursor、Claude Code 等编辑器/IDE 插件
 
 ## 文档建设
 - [ ] 完善官方文档（使用说明、API、部署等）
 - [ ] 鼓励用户贡献文档、博客、视频等，形成社区化文档体系
-- [ ] 在知乎平台建设 WeKnora 内容合集
+- [ ] 在知乎平台建设 LoreLattice 内容合集

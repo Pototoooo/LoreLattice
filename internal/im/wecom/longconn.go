@@ -20,8 +20,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/im"
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/im"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 	ws "github.com/gorilla/websocket"
 )
 
@@ -737,7 +737,7 @@ func stripAtMentionBasic(content string) string {
 }
 
 // stripAtMention removes the leading "@BotName" prefix from group chat messages.
-// Bot names may contain spaces (e.g., "WeKnora Bot"), so this adds two strategies
+// Bot names may contain spaces (e.g., "LoreLattice Bot"), so this adds two strategies
 // on top of stripAtMentionBasic: (1) double-space split with bot-name learning,
 // (2) cached/configured bot name prefix match.
 // Concurrent calls are safe; atomic.Value races are benign (same bot name).

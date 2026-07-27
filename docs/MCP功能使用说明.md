@@ -1,7 +1,7 @@
 ## MCP 功能使用说明
 
 ### 功能概述
-- MCP（Model Context Protocol）让 WeKnora 可以安全地连接外部工具或数据源，扩展 Agent 在推理时可调用的能力。
+- MCP（Model Context Protocol）让 LoreLattice 可以安全地连接外部工具或数据源，扩展 Agent 在推理时可调用的能力。
 - 在前端 `设置 > MCP 服务`（`frontend/src/views/settings/McpSettings.vue`）中集中管理所有服务，无需手动改配置文件。
 - 每个服务都包含名称、传输方式（SSE / HTTP Streamable / Stdio）、连接地址或命令、认证信息以及高级超时与重试策略。
 

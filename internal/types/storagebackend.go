@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/errors"
-	"github.com/Tencent/WeKnora/internal/storageallowlist"
-	"github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/errors"
+	"github.com/Pototoooo/lorelattice/internal/storageallowlist"
+	"github.com/Pototoooo/lorelattice/internal/utils"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )

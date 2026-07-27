@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/prompt"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/prompt"
 )
 
 // agentDeleteFields enumerates the JSON discovery fields for `agent delete`.
@@ -51,11 +51,11 @@ and writes input.confirmation_required to stderr. NEVER auto-pass -y
 without the user's explicit go-ahead — the exit-10 protocol exists
 exactly to guard against unintended deletes.`
 
-const agentDeleteExample = `  weknora agent delete ag_abc           # interactive confirm
-  weknora agent delete ag_abc -y        # no prompt
-  weknora agent delete ag_abc -y --format json # bare {id, deleted:true} JSON`
+const agentDeleteExample = `  lorelattice agent delete ag_abc           # interactive confirm
+  lorelattice agent delete ag_abc -y        # no prompt
+  lorelattice agent delete ag_abc -y --format json # bare {id, deleted:true} JSON`
 
-// NewCmdDelete builds `weknora agent delete <agent-id>`.
+// NewCmdDelete builds `lorelattice agent delete <agent-id>`.
 func NewCmdDelete(f *cmdutil.Factory) *cobra.Command {
 	opts := &DeleteOptions{}
 	cmd := &cobra.Command{
@@ -95,8 +95,8 @@ func NewCmdDelete(f *cmdutil.Factory) *cobra.Command {
 		RequiredFlags: []string{"<agent-id> (positional)"},
 		Output:        "envelope.data is {id, deleted:true}",
 		Examples: []string{
-			"weknora agent delete ag_abc -y",
-			"weknora agent delete ag_abc -y --format json",
+			"lorelattice agent delete ag_abc -y",
+			"lorelattice agent delete ag_abc -y --format json",
 		},
 		Warnings: []string{
 			"Requires explicit user approval (exit 10 / input.confirmation_required); never auto-add -y.",
@@ -107,7 +107,7 @@ func NewCmdDelete(f *cmdutil.Factory) *cobra.Command {
 }
 
 func runDelete(ctx context.Context, opts *DeleteOptions, fopts *cmdutil.FormatOptions, svc DeleteService, p prompt.Prompter) error {
-	if err := cmdutil.ConfirmDestructive(p, opts.Yes, fopts.WantsJSON(), "delete", "agent", opts.AgentID, "agent.delete", []string{"weknora", "agent", "delete", opts.AgentID, "-y"}); err != nil {
+	if err := cmdutil.ConfirmDestructive(p, opts.Yes, fopts.WantsJSON(), "delete", "agent", opts.AgentID, "agent.delete", []string{"lorelattice", "agent", "delete", opts.AgentID, "-y"}); err != nil {
 		return err
 	}
 	if err := svc.DeleteAgent(ctx, opts.AgentID); err != nil {

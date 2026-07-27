@@ -1,4 +1,4 @@
-// Package client provides the implementation for interacting with the WeKnora API
+// Package client provides the implementation for interacting with the LoreLattice API
 // The Model related interfaces are used to manage models for different tasks
 // Models can be created, retrieved, updated, deleted, and queried
 package client

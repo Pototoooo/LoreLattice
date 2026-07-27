@@ -1,4 +1,4 @@
-// Package client provides the implementation for interacting with the WeKnora API
+// Package client provides the implementation for interacting with the LoreLattice API
 // The Evaluation related interfaces are used for starting and retrieving model evaluation task results
 // Evaluation tasks can be used to measure model performance and
 // compare different embedding models, chat models, and reranking models

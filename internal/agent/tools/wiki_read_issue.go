@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 )
 
 type wikiReadIssueTool struct {
@@ -68,7 +68,7 @@ func (t *wikiReadIssueTool) Execute(ctx context.Context, args json.RawMessage) (
 		if err != nil {
 			return &types.ToolResult{Success: false, Error: "Failed to list issues: " + err.Error()}, nil
 		}
-		
+
 		for _, issue := range issues {
 			if issue.ID == issueID {
 				out, _ := json.MarshalIndent(issue, "", "  ")

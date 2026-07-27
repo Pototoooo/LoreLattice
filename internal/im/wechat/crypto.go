@@ -1,4 +1,4 @@
-// Package wechat implements the WeChat personal account IM adapter for WeKnora
+// Package wechat implements the WeChat personal account IM adapter for LoreLattice
 // via the Tencent iLink Bot API (ilinkai.weixin.qq.com).
 package wechat
 

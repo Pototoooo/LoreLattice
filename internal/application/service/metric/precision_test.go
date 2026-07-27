@@ -3,7 +3,7 @@ package metric
 import (
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 func TestPrecisionMetric_Compute(t *testing.T) {

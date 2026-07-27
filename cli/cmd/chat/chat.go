@@ -1,4 +1,4 @@
-// Package chat implements `weknora chat <text>` - the streaming RAG answer
+// Package chat implements `lorelattice chat <text>` - the streaming RAG answer
 // entry point.
 //
 // Three output modes share a single SDK call:
@@ -28,11 +28,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/output"
-	"github.com/Tencent/WeKnora/cli/internal/sse"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
+	"github.com/Pototoooo/lorelattice/cli/internal/sse"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // chatFields enumerates the fields surfaced for `--jq` projection discovery
@@ -64,13 +64,13 @@ type ChatService interface {
 	KnowledgeQAStream(ctx context.Context, sessionID string, req *sdk.KnowledgeQARequest, cb func(*sdk.StreamResponse) error) error
 }
 
-// NewCmd builds `weknora chat <text>`.
+// NewCmd builds `lorelattice chat <text>`.
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
 	opts := &Options{}
 	cmd := &cobra.Command{
 		Use:   `chat "<text>"`,
 		Short: "Ask a streaming RAG question against a knowledge base",
-		Long: `Send a query to the WeKnora knowledge-chat endpoint and stream the
+		Long: `Send a query to the LoreLattice knowledge-chat endpoint and stream the
 answer back. By default a fresh session is created on first invocation; pass
 --session to continue an existing conversation.
 
@@ -83,9 +83,9 @@ Modes:
 Pass --reference to include bounded kb_id/chunk_id reference indexes. Pass
 --verbose to include reasoning, tool activity, and lifecycle frames. Combine
 both flags for the complete projected stream.`,
-		Example: `  weknora chat "What is RRF?" --kb a32a63ff-fb36-4874-bcaa-30f48570a694
-  weknora chat "Summarise this design doc" --kb my-kb --format json
-  weknora chat "Continue?" --session sess_abc`,
+		Example: `  lorelattice chat "What is RRF?" --kb a32a63ff-fb36-4874-bcaa-30f48570a694
+  lorelattice chat "Summarise this design doc" --kb my-kb --format json
+  lorelattice chat "Continue?" --session sess_abc`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			opts.Query = strings.TrimSpace(args[0])
@@ -118,8 +118,8 @@ both flags for the complete projected stream.`,
 		UsedFor:       "Ask a RAG question against a knowledge base. Default JSON returns a bounded answer-event projection. --reference adds indexed citations; --verbose adds reasoning, tools, and lifecycle events. --format ndjson streams raw SDK events; --format text renders the selected events live.",
 		RequiredFlags: []string{"<text> (positional)", "--kb"},
 		Examples: []string{
-			`weknora chat "What is RRF?" --kb kb_abc`,
-			`weknora chat "What is RRF?" --kb kb_abc --jq '[.data.events[].content] | join("")'`,
+			`lorelattice chat "What is RRF?" --kb kb_abc`,
+			`lorelattice chat "What is RRF?" --kb kb_abc --jq '[.data.events[].content] | join("")'`,
 		},
 		Output: "Default --format json: {ok,data:{events:[answer...],session_id,kb_id,query}}. --reference adds kb_id/chunk_id reference events; --verbose adds execution events. --format ndjson remains raw.",
 	})
@@ -146,7 +146,7 @@ func runChat(ctx context.Context, opts *Options, fopts *cmdutil.FormatOptions, s
 	sessionID := opts.SessionID
 	autoCreated := false
 	if sessionID == "" {
-		sess, err := svc.CreateSession(ctx, &sdk.CreateSessionRequest{Title: "weknora chat"})
+		sess, err := svc.CreateSession(ctx, &sdk.CreateSessionRequest{Title: "lorelattice chat"})
 		if err != nil {
 			// Ctrl-C during session creation: classify as cancelled so the
 			// hint nudges the user toward retry-with-signal-clean, not

@@ -9,7 +9,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/im"
+	"github.com/Pototoooo/lorelattice/internal/im"
 )
 
 // testRegion returns a Lark-shaped region pointed at a fake Open Platform, so

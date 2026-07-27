@@ -3,7 +3,7 @@ package opensearch
 import (
 	"context"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // TestConnection verifies an OpenSearch cluster is reachable, runs a

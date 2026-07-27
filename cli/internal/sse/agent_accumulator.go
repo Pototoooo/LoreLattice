@@ -3,7 +3,7 @@ package sse
 import (
 	"strings"
 
-	sdk "github.com/Tencent/WeKnora/client"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // AgentToolEvent captures one tool_call / tool_result event from an

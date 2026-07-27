@@ -7,9 +7,9 @@ import (
 
 	mcpsdk "github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/output"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // TestToolErrorResult_TypedError_PopulatesStructuredContent verifies the
@@ -30,8 +30,8 @@ func TestToolErrorResult_TypedError_PopulatesStructuredContent(t *testing.T) {
 	if sc.Type != "auth.unauthenticated" {
 		t.Errorf("type: got %v want auth.unauthenticated", sc.Type)
 	}
-	// retry_argv should fall back to ["weknora","auth","login"] via cmdutil default
-	if !reflect.DeepEqual(sc.RetryArgv, []string{"weknora", "auth", "login"}) {
+	// retry_argv should fall back to ["lorelattice","auth","login"] via cmdutil default
+	if !reflect.DeepEqual(sc.RetryArgv, []string{"lorelattice", "auth", "login"}) {
 		t.Errorf("retry_argv: got %v", sc.RetryArgv)
 	}
 }

@@ -5,7 +5,7 @@ description: 将 RAG 检索结果、文档块或知识图谱概念转换为 Open
 
 # OpenMAIC Classroom Generator
 
-将 WeKnora 知识库中的 RAG 检索结果或文档内容转换为 OpenMAIC 互动课程。
+将 LoreLattice 知识库中的 RAG 检索结果或文档内容转换为 OpenMAIC 互动课程。
 
 ## 核心能力
 
@@ -16,13 +16,13 @@ description: 将 RAG 检索结果、文档块或知识图谱概念转换为 Open
 
 ## 能力边界
 
-> **通过 WeKnora 注册的 mcp_api_requester MCP 工具，你可以直接调用 OpenMAIC API**（HTTP POST/GET 请求）。
-> 该工具在 WeKnora agent 中注册为 `mcp_{service_name}_{tool_name}` 格式（如 `mcp_mcp_api_requester_make_request`）。
+> **通过 LoreLattice 注册的 mcp_api_requester MCP 工具，你可以直接调用 OpenMAIC API**（HTTP POST/GET 请求）。
+> 该工具在 LoreLattice agent 中注册为 `mcp_{service_name}_{tool_name}` 格式（如 `mcp_mcp_api_requester_make_request`）。
 > **必须**使用该 MCP 工具调用 API。如果 MCP 工具未配置或不可用，引导用户先部署 mcp-api-requester，不提供 curl 命令。
 
 > **⚠️ MCP 可用性检查（每次读取此文件后必须执行）：**
 > 在开始工作前，检查可用的 MCP 工具列表中是否存在名称包含 `mcp_api_requester` 的工具。
-> - **如果未找到**：必须提醒用户："未检测到 `mcp_api_requester` MCP 服务。请先从 https://github.com/yryuu/mcp-api-requester 下载代码并部署，然后在 WeKnora 中注册该 MCP 服务。"
+> - **如果未找到**：必须提醒用户："未检测到 `mcp_api_requester` MCP 服务。请先从 https://github.com/yryuu/mcp-api-requester 下载代码并部署，然后在 LoreLattice 中注册该 MCP 服务。"
 > - **如果已找到**：继续后续流程，使用该 MCP 工具调用 API。
 
 ## 模式选择
@@ -46,7 +46,7 @@ OpenMAIC 有两种使用模式，**根据用户场景选择**：
    - 将地址中的 `localhost` 替换为 `host.docker.internal`
    - 其他地址保持不变
 
-> ⚠️ WeKnora 运行在 Docker 容器内，`localhost` 和 `127.0.0.1` 指向容器自身，无法访问宿主机服务。必须使用 `host.docker.internal` 作为容器访问宿主机的桥接地址。
+> ⚠️ LoreLattice 运行在 Docker 容器内，`localhost` 和 `127.0.0.1` 指向容器自身，无法访问宿主机服务。必须使用 `host.docker.internal` 作为容器访问宿主机的桥接地址。
 
 ## 前置条件
 
@@ -204,7 +204,7 @@ execute_skill_script(
 
 ### Phase 3: 调用 OpenMAIC API
 
-**优先方式**：通过 WeKnora 注册的 MCP 工具直接调用 API。
+**优先方式**：通过 LoreLattice 注册的 MCP 工具直接调用 API。
 
 **第一步：识别 HTTP 请求工具**
 - 在你可用的 MCP 工具中，找到用于 HTTP 请求的工具
@@ -276,7 +276,7 @@ execute_skill_script(
 
 告知用户：
 
-> 未检测到 `mcp_api_requester` MCP 服务。请先从 https://github.com/yryuu/mcp-api-requester 下载代码并部署，然后在 WeKnora 中注册该 MCP 服务。
+> 未检测到 `mcp_api_requester` MCP 服务。请先从 https://github.com/yryuu/mcp-api-requester 下载代码并部署，然后在 LoreLattice 中注册该 MCP 服务。
 
 ### Phase 4: 查询任务进度
 
@@ -362,9 +362,9 @@ Classroom URL:
 ## 注意事项
 
 - 脚本在 Docker 沙箱中执行，**沙箱默认禁用网络访问**
-- **必须通过 WeKnora MCP 工具调用 OpenMAIC API**——不提供 curl 命令作为降级方案
+- **必须通过 LoreLattice MCP 工具调用 OpenMAIC API**——不提供 curl 命令作为降级方案
 - MCP 工具名称格式为 `mcp_{service_name}_{tool_name}`，根据描述识别 HTTP 请求工具
-- 如果 MCP 工具未启用或不可用，告知用户先从 https://github.com/yryuu/mcp-api-requester 下载代码并部署，然后在 WeKnora 中注册该 MCP 服务
+- 如果 MCP 工具未启用或不可用，告知用户先从 https://github.com/yryuu/mcp-api-requester 下载代码并部署，然后在 LoreLattice 中注册该 MCP 服务
 - 单次生成任务预计 2-10 分钟，取决于内容复杂度和可选功能
 - 托管模式（open.maic.chat）每天最多 10 次生成配额，独立于 Web UI 配额
 - 如果用户在同一个 job 仍在运行时要求生成新课程，不要重复提交——先检查已有 job 状态

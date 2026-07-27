@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/agent/approval"
-	"github.com/Tencent/WeKnora/internal/event"
-	"github.com/Tencent/WeKnora/internal/mcp"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/agent/approval"
+	"github.com/Pototoooo/lorelattice/internal/event"
+	"github.com/Pototoooo/lorelattice/internal/mcp"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	mcpclient "github.com/mark3labs/mcp-go/client"
 )
 

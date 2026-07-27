@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -47,8 +47,8 @@ func newTestRepo(t *testing.T) (*dorisRepository, sqlmock.Sqlmock, *httptest.Ser
 		feHTTPBase:    srv.URL,
 		username:      "u",
 		password:      "p",
-		database:      "weknora",
-		tableBaseName: "weknora_embeddings",
+		database:      "lorelattice",
+		tableBaseName: "lorelattice_embeddings",
 	}
 
 	cleanup := func() {
@@ -189,11 +189,11 @@ func TestPartialUpdateRows_HappyPath(t *testing.T) {
 		{"id": "id2", "is_enabled": false},
 	}
 	require.NoError(t, repo.partialUpdateRows(context.Background(),
-		"weknora_embeddings_768", []string{"id", "is_enabled"}, rows))
+		"lorelattice_embeddings_768", []string{"id", "is_enabled"}, rows))
 
 	require.NotNil(t, captured)
 	assert.Equal(t, http.MethodPut, captured.Method)
-	assert.Equal(t, "/api/weknora/weknora_embeddings_768/_stream_load", captured.URL.Path)
+	assert.Equal(t, "/api/lorelattice/lorelattice_embeddings_768/_stream_load", captured.URL.Path)
 
 	assert.Equal(t, "true", captured.Header.Get("partial_columns"))
 	assert.Equal(t, "true", captured.Header.Get("strip_outer_array"))
@@ -239,7 +239,7 @@ func TestDeleteByChunkIDList_SQLShape(t *testing.T) {
 	repo, mock, _, cleanup := newTestRepo(t)
 	defer cleanup()
 
-	mock.ExpectExec(`DELETE FROM .*weknora_embeddings_768.* WHERE chunk_id IN \(\?, \?\)`).
+	mock.ExpectExec(`DELETE FROM .*lorelattice_embeddings_768.* WHERE chunk_id IN \(\?, \?\)`).
 		WithArgs("c1", "c2").
 		WillReturnResult(sqlmock.NewResult(0, 2))
 
@@ -262,7 +262,7 @@ func TestVectorRetrieve_SQLShape(t *testing.T) {
 	defer cleanup()
 
 	mock.ExpectQuery(`SELECT COUNT\(1\) FROM information_schema.tables`).
-		WithArgs("weknora", "weknora_embeddings_3").
+		WithArgs("lorelattice", "lorelattice_embeddings_3").
 		WillReturnRows(sqlmock.NewRows([]string{"c"}).AddRow(1))
 
 	// Doris does not support placeholders for LIMIT, so TopK is inlined as a
@@ -297,7 +297,7 @@ func TestVectorRetrieve_SQLShape_LegacyMode(t *testing.T) {
 	primeCompatMode(repo, dorisCompatModeLegacy, nil)
 
 	mock.ExpectQuery(`SELECT COUNT\(1\) FROM information_schema.tables`).
-		WithArgs("weknora", "weknora_embeddings_3").
+		WithArgs("lorelattice", "lorelattice_embeddings_3").
 		WillReturnRows(sqlmock.NewRows([]string{"c"}).AddRow(1))
 
 	mock.ExpectQuery(`SELECT id, content, .*cosine_distance_approximate.*HAVING score >= \? ORDER BY score DESC LIMIT \d+`).
@@ -343,9 +343,9 @@ func TestKeywordsRetrieve_SQLShape(t *testing.T) {
 	defer cleanup()
 
 	mock.ExpectQuery(`SELECT TABLE_NAME FROM information_schema.tables`).
-		WithArgs("weknora", "weknora_embeddings\\_%").
+		WithArgs("lorelattice", "lorelattice_embeddings\\_%").
 		WillReturnRows(sqlmock.NewRows([]string{"TABLE_NAME"}).
-			AddRow("weknora_embeddings_768"))
+			AddRow("lorelattice_embeddings_768"))
 
 	// LIMIT is inlined (see VectorRetrieve), so only is_enabled and the
 	// MATCH_ANY query string are bound arguments.
@@ -379,25 +379,25 @@ func TestBatchUpdateChunkEnabledStatus_RewritesRows(t *testing.T) {
 
 	repo := &dorisRepository{
 		db:            db,
-		database:      "weknora",
-		tableBaseName: "weknora_embeddings",
+		database:      "lorelattice",
+		tableBaseName: "lorelattice_embeddings",
 	}
 	primeCompatMode(repo, dorisCompatModeInnerProductDuplicate, nil)
 
 	mock.ExpectQuery(`SELECT TABLE_NAME FROM information_schema.tables`).
-		WithArgs("weknora", "weknora_embeddings\\_%").
-		WillReturnRows(sqlmock.NewRows([]string{"TABLE_NAME"}).AddRow("weknora_embeddings_768"))
-	mock.ExpectQuery(`SELECT id, content, source_id, source_type, chunk_id, knowledge_id, knowledge_base_id, tag_id, is_enabled, embedding FROM .*weknora_embeddings_768.* WHERE chunk_id IN`).
+		WithArgs("lorelattice", "lorelattice_embeddings\\_%").
+		WillReturnRows(sqlmock.NewRows([]string{"TABLE_NAME"}).AddRow("lorelattice_embeddings_768"))
+	mock.ExpectQuery(`SELECT id, content, source_id, source_type, chunk_id, knowledge_id, knowledge_base_id, tag_id, is_enabled, embedding FROM .*lorelattice_embeddings_768.* WHERE chunk_id IN`).
 		WithArgs("c1").
 		WillReturnRows(sqlmock.NewRows([]string{
 			"id", "content", "source_id", "source_type",
 			"chunk_id", "knowledge_id", "knowledge_base_id", "tag_id",
 			"is_enabled", "embedding",
 		}).AddRow("row-1", "hello", "src1", 0, "c1", "k1", "kb1", "t1", true, "[1,2,3]"))
-	mock.ExpectExec(`DELETE FROM .*weknora_embeddings_768.* WHERE id IN \(\?\)`).
+	mock.ExpectExec(`DELETE FROM .*lorelattice_embeddings_768.* WHERE id IN \(\?\)`).
 		WithArgs("row-1").
 		WillReturnResult(sqlmock.NewResult(0, 1))
-	mock.ExpectExec(`INSERT INTO .*weknora_embeddings_768.*VALUES \(\?, \?, \?, \?, \?, \?, \?, \?, \?, \[`).
+	mock.ExpectExec(`INSERT INTO .*lorelattice_embeddings_768.*VALUES \(\?, \?, \?, \?, \?, \?, \?, \?, \?, \[`).
 		WithArgs("row-1", "hello", "src1", 0, "c1", "k1", "kb1", "t1", false).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
@@ -412,9 +412,9 @@ func TestBatchUpdateChunkEnabledStatus_LegacyModeUsesPartialUpdate(t *testing.T)
 	primeCompatMode(repo, dorisCompatModeLegacy, nil)
 
 	mock.ExpectQuery(`SELECT TABLE_NAME FROM information_schema.tables`).
-		WithArgs("weknora", "weknora_embeddings\\_%").
-		WillReturnRows(sqlmock.NewRows([]string{"TABLE_NAME"}).AddRow("weknora_embeddings_768"))
-	mock.ExpectQuery(`SELECT id, chunk_id FROM .*weknora_embeddings_768.* WHERE chunk_id IN`).
+		WithArgs("lorelattice", "lorelattice_embeddings\\_%").
+		WillReturnRows(sqlmock.NewRows([]string{"TABLE_NAME"}).AddRow("lorelattice_embeddings_768"))
+	mock.ExpectQuery(`SELECT id, chunk_id FROM .*lorelattice_embeddings_768.* WHERE chunk_id IN`).
 		WithArgs("c1").
 		WillReturnRows(sqlmock.NewRows([]string{"id", "chunk_id"}).AddRow("row-1", "c1"))
 
@@ -430,8 +430,8 @@ func TestEnsureTable_DDLShape(t *testing.T) {
 
 	repo := &dorisRepository{
 		db:             db,
-		database:       "weknora",
-		tableBaseName:  "weknora_embeddings",
+		database:       "lorelattice",
+		tableBaseName:  "lorelattice_embeddings",
 		bucketsNum:     5,
 		replicationNum: 2,
 	}
@@ -439,16 +439,16 @@ func TestEnsureTable_DDLShape(t *testing.T) {
 
 	// 表不存在
 	mock.ExpectQuery(`SELECT COUNT\(1\) FROM information_schema.tables`).
-		WithArgs("weknora", "weknora_embeddings_768").
+		WithArgs("lorelattice", "lorelattice_embeddings_768").
 		WillReturnRows(sqlmock.NewRows([]string{"c"}).AddRow(0))
 	// CREATE TABLE 应包含关键属性和 Doris 支持的 inner_product ANN metric
-	mock.ExpectExec(`CREATE TABLE IF NOT EXISTS .*weknora_embeddings_768.*metric_type"="inner_product".*DUPLICATE KEY\(id\).*BUCKETS 5.*replication_num.*=.*2`).
+	mock.ExpectExec(`CREATE TABLE IF NOT EXISTS .*lorelattice_embeddings_768.*metric_type"="inner_product".*DUPLICATE KEY\(id\).*BUCKETS 5.*replication_num.*=.*2`).
 		WillReturnResult(sqlmock.NewResult(0, 0))
 	// SHOW INDEX 一次即返回 ANN 已 FINISHED
-	mock.ExpectQuery(`SHOW INDEX FROM .*weknora_embeddings_768.*`).
+	mock.ExpectQuery(`SHOW INDEX FROM .*lorelattice_embeddings_768.*`).
 		WillReturnRows(
 			sqlmock.NewRows([]string{"Table", "Key_name", "State"}).
-				AddRow("weknora_embeddings_768", "idx_emb", "FINISHED"),
+				AddRow("lorelattice_embeddings_768", "idx_emb", "FINISHED"),
 		)
 
 	require.NoError(t, repo.ensureTable(context.Background(), 768))
@@ -465,22 +465,22 @@ func TestEnsureTable_DDLShape_LegacyMode(t *testing.T) {
 
 	repo := &dorisRepository{
 		db:             db,
-		database:       "weknora",
-		tableBaseName:  "weknora_embeddings",
+		database:       "lorelattice",
+		tableBaseName:  "lorelattice_embeddings",
 		bucketsNum:     5,
 		replicationNum: 2,
 	}
 	primeCompatMode(repo, dorisCompatModeLegacy, nil)
 
 	mock.ExpectQuery(`SELECT COUNT\(1\) FROM information_schema.tables`).
-		WithArgs("weknora", "weknora_embeddings_768").
+		WithArgs("lorelattice", "lorelattice_embeddings_768").
 		WillReturnRows(sqlmock.NewRows([]string{"c"}).AddRow(0))
-	mock.ExpectExec(`CREATE TABLE IF NOT EXISTS .*weknora_embeddings_768.*metric_type"="cosine_distance".*UNIQUE KEY\(id\).*enable_unique_key_merge_on_write.*true`).
+	mock.ExpectExec(`CREATE TABLE IF NOT EXISTS .*lorelattice_embeddings_768.*metric_type"="cosine_distance".*UNIQUE KEY\(id\).*enable_unique_key_merge_on_write.*true`).
 		WillReturnResult(sqlmock.NewResult(0, 0))
-	mock.ExpectQuery(`SHOW INDEX FROM .*weknora_embeddings_768.*`).
+	mock.ExpectQuery(`SHOW INDEX FROM .*lorelattice_embeddings_768.*`).
 		WillReturnRows(
 			sqlmock.NewRows([]string{"Table", "Key_name", "State"}).
-				AddRow("weknora_embeddings_768", "idx_emb", "FINISHED"),
+				AddRow("lorelattice_embeddings_768", "idx_emb", "FINISHED"),
 		)
 
 	require.NoError(t, repo.ensureTable(context.Background(), 768))
@@ -496,16 +496,16 @@ func TestBatchSave_SQLShape(t *testing.T) {
 
 	repo := &dorisRepository{
 		db:            db,
-		database:      "weknora",
-		tableBaseName: "weknora_embeddings",
+		database:      "lorelattice",
+		tableBaseName: "lorelattice_embeddings",
 	}
 	primeCompatMode(repo, dorisCompatModeInnerProductDuplicate, nil)
 	repo.initializedTables.Store(3, true) // 跳过 ensureTable
 
-	mock.ExpectExec(`DELETE FROM .*weknora_embeddings_3.* WHERE id IN \(\?\)`).
+	mock.ExpectExec(`DELETE FROM .*lorelattice_embeddings_3.* WHERE id IN \(\?\)`).
 		WithArgs("src1").
 		WillReturnResult(sqlmock.NewResult(0, 0))
-	mock.ExpectExec(`INSERT INTO .*weknora_embeddings_3.*VALUES \(\?, \?, \?, \?, \?, \?, \?, \?, \?, \[`).
+	mock.ExpectExec(`INSERT INTO .*lorelattice_embeddings_3.*VALUES \(\?, \?, \?, \?, \?, \?, \?, \?, \?, \[`).
 		WithArgs(
 			"src1", "hello", "src1", 0,
 			"c1", "k1", "kb1", "",
@@ -539,13 +539,13 @@ func TestBatchSave_SQLShape_LegacyMode(t *testing.T) {
 
 	repo := &dorisRepository{
 		db:            db,
-		database:      "weknora",
-		tableBaseName: "weknora_embeddings",
+		database:      "lorelattice",
+		tableBaseName: "lorelattice_embeddings",
 	}
 	primeCompatMode(repo, dorisCompatModeLegacy, nil)
 	repo.initializedTables.Store(3, true)
 
-	mock.ExpectExec(`INSERT INTO .*weknora_embeddings_3.*VALUES \(\?, \?, \?, \?, \?, \?, \?, \?, \?, \[`).
+	mock.ExpectExec(`INSERT INTO .*lorelattice_embeddings_3.*VALUES \(\?, \?, \?, \?, \?, \?, \?, \?, \?, \[`).
 		WithArgs(
 			"src1", "hello", "src1", 0,
 			"c1", "k1", "kb1", "",
@@ -578,17 +578,17 @@ func TestResolveCompatMode_RejectsExistingModeSwitch(t *testing.T) {
 	repo.compatModeRequested = dorisCompatModeLegacy
 
 	mock.ExpectQuery(`SELECT TABLE_NAME FROM information_schema.tables`).
-		WithArgs("weknora", "weknora_embeddings\\_%").
-		WillReturnRows(sqlmock.NewRows([]string{"TABLE_NAME"}).AddRow("weknora_embeddings_768"))
-	mock.ExpectQuery(`SHOW CREATE TABLE .*weknora_embeddings_768.*`).
+		WithArgs("lorelattice", "lorelattice_embeddings\\_%").
+		WillReturnRows(sqlmock.NewRows([]string{"TABLE_NAME"}).AddRow("lorelattice_embeddings_768"))
+	mock.ExpectQuery(`SHOW CREATE TABLE .*lorelattice_embeddings_768.*`).
 		WillReturnRows(sqlmock.NewRows([]string{"Table", "Create Table"}).AddRow(
-			"weknora_embeddings_768",
-			"CREATE TABLE `weknora_embeddings_768` (id VARCHAR(64)) ENGINE=OLAP DUPLICATE KEY(id) DISTRIBUTED BY HASH(id) BUCKETS 10 PROPERTIES(\"replication_num\"=\"1\")",
+			"lorelattice_embeddings_768",
+			"CREATE TABLE `lorelattice_embeddings_768` (id VARCHAR(64)) ENGINE=OLAP DUPLICATE KEY(id) DISTRIBUTED BY HASH(id) BUCKETS 10 PROPERTIES(\"replication_num\"=\"1\")",
 		))
 
 	_, err := repo.resolveCompatMode(context.Background())
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "not interchangeable after weknora_embeddings_*")
+	assert.Contains(t, err.Error(), "not interchangeable after lorelattice_embeddings_*")
 	assert.Contains(t, err.Error(), string(dorisCompatModeInnerProductDuplicate))
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
@@ -599,7 +599,7 @@ func TestResolveCompatMode_AutoPrefersInnerProductDuplicate(t *testing.T) {
 	repo.compatModeRequested = dorisCompatModeAuto
 
 	mock.ExpectQuery(`SELECT TABLE_NAME FROM information_schema.tables`).
-		WithArgs("weknora", "weknora_embeddings\\_%").
+		WithArgs("lorelattice", "lorelattice_embeddings\\_%").
 		WillReturnRows(sqlmock.NewRows([]string{"TABLE_NAME"}))
 	mock.ExpectQuery(`SELECT inner_product_approximate\(\[1.0\],\[1.0\]\)`).
 		WillReturnRows(sqlmock.NewRows([]string{"v"}).AddRow(1.0))

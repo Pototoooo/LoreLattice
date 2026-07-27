@@ -3,12 +3,12 @@ package handler
 import (
 	"net/http"
 
-	"github.com/Tencent/WeKnora/internal/application/service"
-	"github.com/Tencent/WeKnora/internal/errors"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/application/service"
+	"github.com/Pototoooo/lorelattice/internal/errors"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 

@@ -3,7 +3,7 @@ package datasource
 import (
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 func TestFeishuMetadataDoesNotAdvertiseWebhook(t *testing.T) {

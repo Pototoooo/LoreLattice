@@ -9,9 +9,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // EditService is the narrow SDK surface this command depends on. The fetch
@@ -92,13 +92,13 @@ with input.confirmation_required. Surface the prompt to the user and only
 retry with -y after explicit approval. Other failure codes: resource.not_found
 (agent id or KB id), auth.forbidden, input.invalid_argument (no flags, bad file).`
 
-const agentEditExample = `  weknora agent update ag_abc --name "Renamed" -y
-  weknora agent update ag_abc --description "" -y              # clear description
-  weknora agent update ag_abc --add-kb kb_new --remove-kb kb_old -y
-  weknora agent update ag_abc --system-prompt-file ./prompt.md -y
-  weknora agent update ag_abc --config-file ./tuned.yaml --temperature 0.9 -y`
+const agentEditExample = `  lorelattice agent update ag_abc --name "Renamed" -y
+  lorelattice agent update ag_abc --description "" -y              # clear description
+  lorelattice agent update ag_abc --add-kb kb_new --remove-kb kb_old -y
+  lorelattice agent update ag_abc --system-prompt-file ./prompt.md -y
+  lorelattice agent update ag_abc --config-file ./tuned.yaml --temperature 0.9 -y`
 
-// NewCmdEdit builds `weknora agent update <agent-id>`.
+// NewCmdEdit builds `lorelattice agent update <agent-id>`.
 func NewCmdEdit(f *cmdutil.Factory) *cobra.Command {
 	opts := &EditOptions{}
 	var systemPromptFile, configFile string
@@ -219,7 +219,7 @@ func NewCmdEdit(f *cmdutil.Factory) *cobra.Command {
 			// Build the retry command from the flags the user actually passed.
 			// --add-kb/--remove-kb/--system-prompt-file/--config-file are excluded
 			// (multi-value / file-based — a precise single argv is impractical).
-			retryCmd := cmdutil.BuildRetryArgv(cmd, []string{"weknora", "agent", "update", opts.AgentID},
+			retryCmd := cmdutil.BuildRetryArgv(cmd, []string{"lorelattice", "agent", "update", opts.AgentID},
 				"name", "description", "model", "system-prompt", "agent-mode",
 				"rerank-model", "temperature", "kb-selection-mode", "format")
 			if err := cmdutil.ConfirmWrite(f.Prompter(), yes, fopts.WantsJSON(), "update", "agent", opts.AgentID, "agent.update", retryCmd); err != nil {
@@ -271,9 +271,9 @@ func NewCmdEdit(f *cmdutil.Factory) *cobra.Command {
 		UsedFor:       "surgically update a custom agent's configuration",
 		RequiredFlags: []string{"<agent-id> (positional)", "at least one update flag (--name, --add-kb, etc.)"},
 		Examples: []string{
-			"weknora agent update ag_abc --name \"Renamed\"",
-			"weknora agent update ag_abc --add-kb kb_new --remove-kb kb_old",
-			"weknora agent update ag_abc --config-file ./tuned.yaml",
+			"lorelattice agent update ag_abc --name \"Renamed\"",
+			"lorelattice agent update ag_abc --add-kb kb_new --remove-kb kb_old",
+			"lorelattice agent update ag_abc --config-file ./tuned.yaml",
 		},
 		Output: "envelope.data is the updated Agent object (id, name, config) after the update is applied",
 		Warnings: []string{
@@ -283,7 +283,6 @@ func NewCmdEdit(f *cmdutil.Factory) *cobra.Command {
 	})
 	return cmd
 }
-
 
 // editHasAnyFlag reports whether opts carries at least one surgical update
 // signal. Required-flag validation lives in runEdit (not PreRunE) so unit

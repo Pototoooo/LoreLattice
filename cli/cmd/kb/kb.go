@@ -1,16 +1,16 @@
-// Package kb holds the `weknora kb` command tree: list / view / create /
+// Package kb holds the `lorelattice kb` command tree: list / view / create /
 // update / delete / pin / unpin. Verb set follows common CRUD vocabulary
 // (list/view/create/update/delete) plus pin/unpin. Bulk content deletion
-// is exposed via `weknora doc delete --all --kb=<id>`.
+// is exposed via `lorelattice doc delete --all --kb=<id>`.
 package kb
 
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
 )
 
-// NewCmd builds the `weknora kb` parent command.
+// NewCmd builds the `lorelattice kb` parent command.
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "kb",

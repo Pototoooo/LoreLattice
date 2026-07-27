@@ -9,7 +9,7 @@
 //   - The api command additionally rejects --dry-run on GET (FlagError).
 //
 // Side-effect suppression: the dry-run path must NOT call the SDK, write
-// the keyring, write .weknora/project.yaml, or write download files.
+// the keyring, write .lorelattice/project.yaml, or write download files.
 package cmdutil
 
 import (
@@ -19,8 +19,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/output"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
 )
 
 // DryRunPlan describes the would-be action for envelope meta.plan.

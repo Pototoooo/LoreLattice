@@ -11,11 +11,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/application/service/retriever"
-	werrors "github.com/Tencent/WeKnora/internal/errors"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/application/service/retriever"
+	werrors "github.com/Pototoooo/lorelattice/internal/errors"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 	"github.com/google/uuid"
 )
 

@@ -6,10 +6,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/config"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/secrets"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/config"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/secrets"
 )
 
 type LogoutOptions struct {
@@ -28,7 +28,7 @@ type logoutResult struct {
 	Removed []string `json:"removed"`
 }
 
-// NewCmdLogout builds `weknora auth logout`. Clears stored credentials
+// NewCmdLogout builds `lorelattice auth logout`. Clears stored credentials
 // (keyring + file fallback) and removes the profile entry from config.yaml.
 // No server-side revocation - local-only credential clear.
 func NewCmdLogout(f *cmdutil.Factory) *cobra.Command {
@@ -37,14 +37,14 @@ func NewCmdLogout(f *cmdutil.Factory) *cobra.Command {
 		Use:   "logout",
 		Short: "Remove stored credentials for a profile",
 		Long: `Clear keyring + file-fallback secrets for one profile (or all of
-them with --all) and drop the profile entry from ~/.config/weknora/config.yaml.
+them with --all) and drop the profile entry from ~/.config/lorelattice/config.yaml.
 
 Note: this does NOT revoke the credential server-side - for API keys, you
 must rotate them in the server UI; for JWT, the token will continue to be
 accepted until it expires.`,
-		Example: `  weknora auth logout                       # active profile
-  weknora --profile staging auth logout     # specific profile
-  weknora auth logout --all`,
+		Example: `  lorelattice auth logout                       # active profile
+  lorelattice --profile staging auth logout     # specific profile
+  lorelattice auth logout --all`,
 		Args: cobra.NoArgs,
 		RunE: func(c *cobra.Command, _ []string) error {
 			fopts, err := cmdutil.CheckFormatFlag(c)
@@ -92,9 +92,9 @@ accepted until it expires.`,
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
 		UsedFor: "clear stored credentials for the active profile (or --all); the profile itself stays registered (host preserved) so `auth login` can re-auth it — use `profile remove` to delete the profile entirely",
 		Examples: []string{
-			"weknora auth logout",
-			"weknora --profile staging auth logout",
-			"weknora auth logout --all",
+			"lorelattice auth logout",
+			"lorelattice --profile staging auth logout",
+			"lorelattice auth logout --all",
 		},
 		Output: "envelope.data is {removed: [profile names cleared]}",
 		Warnings: []string{
@@ -125,9 +125,9 @@ func runLogout(opts *LogoutOptions, fopts *cmdutil.FormatOptions, f *cmdutil.Fac
 
 	// Destructive-write protocol: confirm before clearing credentials.
 	scope := fmt.Sprintf("%d profile(s) [%s]", len(targets), strings.Join(targets, ", "))
-	retryCmd := []string{"weknora", "auth", "logout", "-y"}
+	retryCmd := []string{"lorelattice", "auth", "logout", "-y"}
 	if opts.All {
-		retryCmd = []string{"weknora", "auth", "logout", "--all", "-y"}
+		retryCmd = []string{"lorelattice", "auth", "logout", "--all", "-y"}
 	}
 	if err := cmdutil.ConfirmDestructive(f.Prompter(), opts.Yes, fopts.WantsJSON(), "delete", "auth credentials", scope, "auth.logout", retryCmd); err != nil {
 		return err

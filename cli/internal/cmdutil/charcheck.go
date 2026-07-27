@@ -89,12 +89,12 @@ func CheckSafeArgs(args []string, flags *pflag.FlagSet) error {
 // any command logic runs — including the dry-run and exit-10 confirmation gates.
 // Every positional in this CLI is an id, name, query, or path; none is
 // meaningfully empty. The common agent trigger is capturing an id from a failed
-// prior step (KB=$(weknora kb create … --jq .data.id) when the create failed →
+// prior step (KB=$(lorelattice kb create … --jq .data.id) when the create failed →
 // ""), which otherwise reaches the server as an empty path segment: GET/DELETE
 // /resource/ falls through to the LIST route, the array response fails to
 // unmarshal into a single-object struct, and the failure is mis-reported as
 // network.error ("check base URL"). Worse, an empty-id delete reaches the
-// confirmation gate with a malformed `weknora kb delete  -y` retry_argv.
+// confirmation gate with a malformed `lorelattice kb delete  -y` retry_argv.
 // Caught here as a clear input.invalid_argument (exit 5) instead.
 //
 // This is intentionally a global invariant (no command exempts itself); flag

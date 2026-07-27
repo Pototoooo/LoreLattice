@@ -1,4 +1,4 @@
-// Package doctor implements `weknora doctor` - 4-item self-check.
+// Package doctor implements `lorelattice doctor` - 4-item self-check.
 //
 // Status semantics (4-tier):
 //
@@ -29,13 +29,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/build"
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/compat"
-	"github.com/Tencent/WeKnora/cli/internal/config"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/secrets"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/build"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/compat"
+	"github.com/Pototoooo/lorelattice/cli/internal/config"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/secrets"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // doctorFields enumerates the fields surfaced for `--format json` discovery on
@@ -94,7 +94,7 @@ type Services interface {
 	GetSystemInfo(ctx context.Context) (*sdk.SystemInfo, error)
 }
 
-// NewCmd builds `weknora doctor`.
+// NewCmd builds `lorelattice doctor`.
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
 	opts := &Options{}
 	cmd := &cobra.Command{
@@ -124,15 +124,15 @@ func NewCmd(f *cmdutil.Factory) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().BoolVar(&opts.NoCache, "no-cache", false, "Bypass server-info cache (located at $XDG_CACHE_HOME/weknora/server-info.yaml); force re-probe")
+	cmd.Flags().BoolVar(&opts.NoCache, "no-cache", false, "Bypass server-info cache (located at $XDG_CACHE_HOME/lorelattice/server-info.yaml); force re-probe")
 	cmd.Flags().BoolVar(&opts.Offline, "offline", false, "Skip network checks; only verify local keyring/file storage (credential_storage check still runs)")
 	cmdutil.AddFormatFlag(cmd, doctorFields...)
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
 		UsedFor: "run self-checks: base-url reachability, auth credential, server version, credential storage",
 		Examples: []string{
-			"weknora doctor",
-			"weknora doctor --offline",
-			"weknora doctor --no-cache --format json",
+			"lorelattice doctor",
+			"lorelattice doctor --offline",
+			"lorelattice doctor --no-cache --format json",
 		},
 		Output: "envelope.data is {summary:{all_passed,passed,warned,failed,skipped}, checks:[{name,status,details,hint?}]}",
 	})
@@ -175,7 +175,7 @@ func runChecks(ctx context.Context, opts *Options, svc Services, cliVer string) 
 		t0 := time.Now()
 		if err := svc.PingBaseURL(ctx); err != nil {
 			checks[0].Status = StatusFail
-			checks[0].Hint = "verify the host configured for the active profile (run `weknora profile list` / `weknora profile add <n> --host=...`) and network reachability"
+			checks[0].Hint = "verify the host configured for the active profile (run `lorelattice profile list` / `lorelattice profile add <n> --host=...`) and network reachability"
 			checks[0].Details = err.Error()
 		} else {
 			checks[0].Status = StatusOK
@@ -187,7 +187,7 @@ func runChecks(ctx context.Context, opts *Options, svc Services, cliVer string) 
 	if !cascade(&checks[1], opts.Offline, &checks[0]) {
 		if _, err := svc.GetCurrentUser(ctx); err != nil {
 			checks[1].Status = StatusFail
-			checks[1].Hint = "run `weknora auth login`"
+			checks[1].Hint = "run `lorelattice auth login`"
 			checks[1].Details = err.Error()
 		} else {
 			checks[1].Status = StatusOK
@@ -297,7 +297,7 @@ func fillCredentialStorageCheck(c *Check) {
 	if _, isFile := store.(*secrets.FileStore); isFile {
 		c.Status = StatusWarn
 		c.Details = "falling back to file store: keychain unavailable"
-		c.Hint = "secrets persist at 0600 under $XDG_CONFIG_HOME/weknora/secrets/; install / unlock keyring for OS-backed storage"
+		c.Hint = "secrets persist at 0600 under $XDG_CONFIG_HOME/lorelattice/secrets/; install / unlock keyring for OS-backed storage"
 		return
 	}
 	c.Status = StatusOK
@@ -389,7 +389,7 @@ func marker(s Status) string {
 //
 // Critically: this does NOT pre-resolve f.Client(). doctor's package promise
 // (top comment) is that credential_storage runs even when no auth is set up -
-// e.g. first-time `weknora doctor` to diagnose setup. Pre-resolving Client
+// e.g. first-time `lorelattice doctor` to diagnose setup. Pre-resolving Client
 // here would early-exit with auth.unauthenticated before any check runs,
 // contradicting the docs. Instead, GetCurrentUser / GetSystemInfo lazily
 // resolve and surface their own failure as a per-check StatusFail.
@@ -405,12 +405,12 @@ func buildServices(f *cmdutil.Factory) (Services, error) {
 // mirror the client builder (buildClientFromEnv) so doctor probes the host the
 // real commands actually connect to; tier 1 is a doctor-local test/dev knob:
 //
-//  1. WEKNORA_BASE_URL — doctor-only probe override (used by tests); NOT read
+//  1. LORELATTICE_BASE_URL — doctor-only probe override (used by tests); NOT read
 //     by the client builder, so setting it points doctor at a host no real
 //     command uses. Kept for test/dev harnesses; leave unset in normal use.
-//  2. WEKNORA_HOST — when stateless env credentials (WEKNORA_TOKEN /
-//     WEKNORA_API_KEY) are in effect, i.e. the headless agent path. Without
-//     this, `WEKNORA_API_KEY=… WEKNORA_HOST=… weknora doctor` falsely reported
+//  2. LORELATTICE_HOST — when stateless env credentials (LORELATTICE_TOKEN /
+//     LORELATTICE_API_KEY) are in effect, i.e. the headless agent path. Without
+//     this, `LORELATTICE_API_KEY=… LORELATTICE_HOST=… lorelattice doctor` falsely reported
 //     "no host configured" and exited 1 while every other command worked.
 //  3. active profile host — the configured default.
 func resolveDoctorHost(cfg *config.Config) string {
@@ -418,15 +418,15 @@ func resolveDoctorHost(cfg *config.Config) string {
 	if ctx, ok := cfg.Profiles[cfg.CurrentProfile]; ok {
 		host = ctx.Host
 	}
-	// Env credentials authenticate via WEKNORA_HOST, bypassing the profile.
+	// Env credentials authenticate via LORELATTICE_HOST, bypassing the profile.
 	// Honor it only when such creds are actually set, matching the client
-	// builder (a bare WEKNORA_HOST without creds is ignored there too).
+	// builder (a bare LORELATTICE_HOST without creds is ignored there too).
 	if envActive, _ := cmdutil.EnvCredential(); envActive {
-		if v := strings.TrimSpace(os.Getenv("WEKNORA_HOST")); v != "" {
+		if v := strings.TrimSpace(os.Getenv("LORELATTICE_HOST")); v != "" {
 			host = v
 		}
 	}
-	if v := os.Getenv("WEKNORA_BASE_URL"); v != "" {
+	if v := os.Getenv("LORELATTICE_BASE_URL"); v != "" {
 		host = v
 	}
 	return host

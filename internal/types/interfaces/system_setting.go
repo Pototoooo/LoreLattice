@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // SystemSettingRepository is the storage layer for the platform-wide
@@ -85,7 +85,7 @@ type SystemSettingService interface {
 	Reset(ctx context.Context, key string) error
 
 	// SubscribeRedis is a P2 hook: when implemented, it will subscribe
-	// to a "weknora:system_settings:changed" channel and invalidate any
+	// to a "lorelattice:system_settings:changed" channel and invalidate any
 	// in-memory cache on receipt. P1 implementations may return a no-op
 	// because there is no cache yet. Keeping the method in the interface
 	// now means P2 can drop in a real implementation without changing

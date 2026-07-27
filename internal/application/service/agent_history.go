@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	agenttools "github.com/Tencent/WeKnora/internal/agent/tools"
-	"github.com/Tencent/WeKnora/internal/models/chat"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	agenttools "github.com/Pototoooo/lorelattice/internal/agent/tools"
+	"github.com/Pototoooo/lorelattice/internal/models/chat"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 )
 
 // agentHistoryFetchMultiplier controls how many raw DB messages to fetch

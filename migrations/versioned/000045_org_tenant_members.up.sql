@@ -23,7 +23,7 @@
 -- The old `organization_members` table is RENAMEd to
 -- `organization_members_pre_plan3` so a `down.sql` rollback can restore
 -- it. A future destructive migration (gated on
--- `weknora.allow_destructive_migration`) will DROP it once the new model
+-- `lorelattice.allow_destructive_migration`) will DROP it once the new model
 -- is settled.
 
 DO $$ BEGIN RAISE NOTICE '[Migration 000045] Starting Plan 3: org members → org tenant members'; END $$;

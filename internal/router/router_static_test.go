@@ -15,7 +15,7 @@ func TestFrontendStaticDoesNotInterceptResourceGrant(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	webDir := t.TempDir()
 	require.NoError(t, os.WriteFile(filepath.Join(webDir, "index.html"), []byte("spa"), 0o600))
-	t.Setenv("WEKNORA_WEB_DIR", webDir)
+	t.Setenv("LORELATTICE_WEB_DIR", webDir)
 
 	r := gin.New()
 	serveFrontendStatic(r)

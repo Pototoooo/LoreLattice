@@ -11,7 +11,7 @@ import (
 
 // XDGTempDir creates a fresh temp dir and points XDG_CONFIG_HOME at it for the
 // duration of t. Use whenever a test exercises code that reads
-// $XDG_CONFIG_HOME/weknora/* (config.Load, secrets.NewFileStore, ...).
+// $XDG_CONFIG_HOME/lorelattice/* (config.Load, secrets.NewFileStore, ...).
 func XDGTempDir(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()

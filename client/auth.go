@@ -110,7 +110,7 @@ type RefreshTokenResponse struct {
 // Login authenticates with email + password and returns the JWT access token,
 // refresh token, and principal info. Maps to POST /api/v1/auth/login.
 //
-// Used by `weknora auth login`.
+// Used by `lorelattice auth login`.
 func (c *Client) Login(ctx context.Context, req LoginRequest) (*LoginResponse, error) {
 	resp, err := c.doRequest(ctx, http.MethodPost, "/api/v1/auth/login", req, nil)
 	if err != nil {
@@ -130,7 +130,7 @@ func (c *Client) Login(ctx context.Context, req LoginRequest) (*LoginResponse, e
 // tenant projection. Maps to GET /api/v1/auth/me; the bearer token must
 // already be set on the client (use WithBearerToken).
 //
-// Used by `weknora auth status` and `weknora whoami`.
+// Used by `lorelattice auth status` and `lorelattice whoami`.
 func (c *Client) GetCurrentUser(ctx context.Context) (*CurrentUserResponse, error) {
 	resp, err := c.doRequest(ctx, http.MethodGet, "/api/v1/auth/me", nil, nil)
 	if err != nil {
@@ -146,7 +146,7 @@ func (c *Client) GetCurrentUser(ctx context.Context) (*CurrentUserResponse, erro
 // RefreshToken renews the JWT access token using a refresh token.
 // Maps to POST /api/v1/auth/refresh.
 //
-// Callers (`weknora auth refresh`) read the refresh token from secrets,
+// Callers (`lorelattice auth refresh`) read the refresh token from secrets,
 // invoke this method, and persist both new tokens. The SDK does not touch
 // the secrets store directly — it stays a transport-only layer.
 func (c *Client) RefreshToken(ctx context.Context, refreshToken string) (*RefreshTokenResponse, error) {

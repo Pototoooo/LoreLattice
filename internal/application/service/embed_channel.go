@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"strings"
 
-	apperrors "github.com/Tencent/WeKnora/internal/errors"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	apperrors "github.com/Pototoooo/lorelattice/internal/errors"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 	"github.com/redis/go-redis/v9"
 )
 

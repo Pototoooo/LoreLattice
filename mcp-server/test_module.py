@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-WeKnora MCP Server 模组测试脚本
+LoreLattice MCP Server 模组测试脚本
 
 测试模组的各种启动方式和功能
 """
@@ -26,14 +26,14 @@ def test_imports():
         print("✓ requests 模块导入成功")
 
         # 测试主模块
-        import weknora_mcp_server
+        import lorelattice_mcp_server
 
-        print("✓ weknora_mcp_server 模块导入成功")
+        print("✓ lorelattice_mcp_server 模块导入成功")
 
         # 测试包导入
-        from weknora_mcp_server import WeKnoraClient, run
+        from lorelattice_mcp_server import LoreLatticeClient, run
 
-        print("✓ WeKnoraClient 和 run 函数导入成功")
+        print("✓ LoreLatticeClient 和 run 函数导入成功")
 
         # 测试主入口点
         import main
@@ -51,17 +51,17 @@ def test_environment():
     """测试环境配置"""
     print("\n=== 测试环境配置 ===")
 
-    base_url = os.getenv("WEKNORA_BASE_URL")
-    api_key = os.getenv("WEKNORA_API_KEY")
+    base_url = os.getenv("LORELATTICE_BASE_URL")
+    api_key = os.getenv("LORELATTICE_API_KEY")
 
-    print(f"WEKNORA_BASE_URL: {base_url or '未设置 (将使用默认值)'}")
-    print(f"WEKNORA_API_KEY: {'已设置' if api_key else '未设置'}")
+    print(f"LORELATTICE_BASE_URL: {base_url or '未设置 (将使用默认值)'}")
+    print(f"LORELATTICE_API_KEY: {'已设置' if api_key else '未设置'}")
 
     if not base_url:
-        print("提示: 可以设置环境变量 WEKNORA_BASE_URL")
+        print("提示: 可以设置环境变量 LORELATTICE_BASE_URL")
 
     if not api_key:
-        print("提示: 建议设置环境变量 WEKNORA_API_KEY")
+        print("提示: 建议设置环境变量 LORELATTICE_API_KEY")
 
     return True
 
@@ -71,13 +71,13 @@ def test_client_creation():
     print("\n=== 测试客户端创建 ===")
 
     try:
-        from weknora_mcp_server import WeKnoraClient
+        from lorelattice_mcp_server import LoreLatticeClient
 
-        base_url = os.getenv("WEKNORA_BASE_URL", "http://localhost:8080/api/v1")
-        api_key = os.getenv("WEKNORA_API_KEY", "test_key")
+        base_url = os.getenv("LORELATTICE_BASE_URL", "http://localhost:8080/api/v1")
+        api_key = os.getenv("LORELATTICE_API_KEY", "test_key")
 
-        client = WeKnoraClient(base_url, api_key)
-        print("✓ WeKnoraClient 创建成功")
+        client = LoreLatticeClient(base_url, api_key)
+        print("✓ LoreLatticeClient 创建成功")
 
         # 检查客户端属性
         assert client.base_url == base_url
@@ -99,7 +99,7 @@ def test_file_structure():
         "__init__.py",
         "main.py",
         "run_server.py",
-        "weknora_mcp_server.py",
+        "lorelattice_mcp_server.py",
         "requirements.txt",
         "setup.py",
         "pyproject.toml",
@@ -177,14 +177,14 @@ def test_wiki_tools():
     print("\n=== 测试 Wiki 工具 ===")
 
     try:
-        import weknora_mcp_server
+        import lorelattice_mcp_server
 
         # 验证 Client 方法存在
-        client = weknora_mcp_server.WeKnoraClient("http://localhost:8080/api/v1", "test")
+        client = lorelattice_mcp_server.LoreLatticeClient("http://localhost:8080/api/v1", "test")
         for method in ["wiki_search", "wiki_read_page", "wiki_index_view"]:
-            assert hasattr(client, method), f"WeKnoraClient 缺少方法: {method}"
+            assert hasattr(client, method), f"LoreLatticeClient 缺少方法: {method}"
             assert callable(getattr(client, method)), f"{method} 不可调用"
-            print(f"✓ WeKnoraClient.{method} 存在")
+            print(f"✓ LoreLatticeClient.{method} 存在")
 
         return True
 
@@ -224,7 +224,7 @@ def test_package_installation():
 
 def main():
     """运行所有测试"""
-    print("WeKnora MCP Server 模组测试")
+    print("LoreLattice MCP Server 模组测试")
     print("=" * 50)
 
     tests = [

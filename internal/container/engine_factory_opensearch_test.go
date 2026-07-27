@@ -9,8 +9,8 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
-	"github.com/Tencent/WeKnora/internal/config"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/config"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // osClusterHandler simulates an OpenSearch cluster for the driver's

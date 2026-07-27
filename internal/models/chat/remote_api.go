@@ -9,10 +9,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/models/provider"
-	"github.com/Tencent/WeKnora/internal/types"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/models/provider"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -87,12 +87,12 @@ func NewRemoteAPIChat(chatConfig *ChatConfig) (*RemoteAPIChat, error) {
 			modelName = override
 		}
 	}
-	if providerName == provider.ProviderWeKnoraCloud {
+	if providerName == provider.ProviderLoreLatticeCloud {
 		if chatConfig.AppID == "" {
-			return nil, fmt.Errorf("WeKnoraCloud provider: AppID is required")
+			return nil, fmt.Errorf("LoreLatticeCloud provider: AppID is required")
 		}
 		if chatConfig.AppSecret == "" {
-			return nil, fmt.Errorf("WeKnoraCloud provider: AppSecret is required")
+			return nil, fmt.Errorf("LoreLatticeCloud provider: AppSecret is required")
 		}
 	}
 

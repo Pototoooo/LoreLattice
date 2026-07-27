@@ -12,13 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 
-	"github.com/Tencent/WeKnora/internal/config"
-	"github.com/Tencent/WeKnora/internal/errors"
-	"github.com/Tencent/WeKnora/internal/handler/dto"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/config"
+	"github.com/Pototoooo/lorelattice/internal/errors"
+	"github.com/Pototoooo/lorelattice/internal/handler/dto"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 )
 
 // TenantHandler implements HTTP request handlers for tenant management
@@ -181,7 +181,7 @@ const (
 const defaultMaxOwnedTenantsPerUser = 10
 
 // resolveMaxOwnedTenantsPerUser returns the current cap, walking the
-// 3-tier resolver: system_settings DB row > WEKNORA_TENANT_MAX_OWNED_PER_USER
+// 3-tier resolver: system_settings DB row > LORELATTICE_TENANT_MAX_OWNED_PER_USER
 // env > config.Tenant.MaxOwnedPerUser (yaml) > defaultMaxOwnedTenantsPerUser.
 // We pre-compute the cfg-derived fallback so the SystemSettingService
 // receives a single int64 default — its 3-tier resolver layers DB and
@@ -194,7 +194,7 @@ func (h *TenantHandler) resolveMaxOwnedTenantsPerUser(ctx context.Context) int {
 	return int(h.systemSettingSvc.GetInt(
 		ctx,
 		"tenant.max_owned_per_user",
-		"WEKNORA_TENANT_MAX_OWNED_PER_USER",
+		"LORELATTICE_TENANT_MAX_OWNED_PER_USER",
 		fallback,
 	))
 }
@@ -204,7 +204,7 @@ func (h *TenantHandler) resolveMaxOwnedTenantsPerUser(ctx context.Context) int {
 // @Description  创建新的空间。任意已登录用户均可调用以建立自己的新工作区，
 // @Description  调用方会被自动设为该空间的 Owner。跨空间超管仍可像以前一样
 // @Description  通过本接口创建任意空间。
-// @Description  当 tenant.auto_create_api_key（或 WEKNORA_TENANT_AUTO_CREATE_API_KEY）
+// @Description  当 tenant.auto_create_api_key（或 LORELATTICE_TENANT_AUTO_CREATE_API_KEY）
 // @Description  开启时，会自动创建一个 full_access API Key，并在响应体的 data.api_key 字段返回其明文 token。
 // @Tags         空间管理
 // @Accept       json
@@ -324,7 +324,7 @@ func (h *TenantHandler) CreateTenant(c *gin.Context) {
 		gb := h.systemSettingSvc.GetInt(
 			ctx,
 			"tenant.default_storage_quota_gb",
-			"WEKNORA_TENANT_DEFAULT_STORAGE_QUOTA_GB",
+			"LORELATTICE_TENANT_DEFAULT_STORAGE_QUOTA_GB",
 			10,
 		)
 		if gb <= 0 {
@@ -449,7 +449,7 @@ func (h *TenantHandler) CreateTenant(c *gin.Context) {
 
 	// Optional legacy compatibility: mint a full-access API key on tenant
 	// creation and return its plaintext token, gated by the
-	// tenant.auto_create_api_key setting (env WEKNORA_TENANT_AUTO_CREATE_API_KEY).
+	// tenant.auto_create_api_key setting (env LORELATTICE_TENANT_AUTO_CREATE_API_KEY).
 	// Default off — modern deployments create keys explicitly via
 	// tenant_api_keys. Failing to create the convenience key must NOT fail
 	// the whole tenant creation (the tenant is fully usable without a key);
@@ -503,7 +503,7 @@ func tenantWithAPIKey(tenant *types.Tenant, token string) (map[string]any, error
 
 // autoCreateTenantAPIKey resolves whether tenant creation should also mint a
 // full-access API key (legacy compatibility). 3-tier resolver:
-// system_settings DB row > WEKNORA_TENANT_AUTO_CREATE_API_KEY env > false.
+// system_settings DB row > LORELATTICE_TENANT_AUTO_CREATE_API_KEY env > false.
 func (h *TenantHandler) autoCreateTenantAPIKey(ctx context.Context) bool {
 	if h.systemSettingSvc == nil {
 		return false
@@ -511,7 +511,7 @@ func (h *TenantHandler) autoCreateTenantAPIKey(ctx context.Context) bool {
 	return h.systemSettingSvc.GetBool(
 		ctx,
 		"tenant.auto_create_api_key",
-		"WEKNORA_TENANT_AUTO_CREATE_API_KEY",
+		"LORELATTICE_TENANT_AUTO_CREATE_API_KEY",
 		false,
 	)
 }
@@ -997,7 +997,7 @@ func (h *TenantHandler) CreateAPIPrincipalTestToken(c *gin.Context) {
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":       externalUserID,
 		"tenant_id": strconv.FormatUint(id, 10),
-		"aud":       "weknora",
+		"aud":       "lorelattice",
 		"iat":       now.Unix(),
 		"exp":       expiresAt.Unix(),
 	}).SignedString([]byte(secret))

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/tracing/langfuse"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/tracing/langfuse"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // langfuseChat wraps a Chat implementation and emits a Langfuse generation

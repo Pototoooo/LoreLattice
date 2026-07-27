@@ -1,6 +1,6 @@
-# WeKnora OIDC 认证调用流程
+# LoreLattice OIDC 认证调用流程
 
-本文档说明 WeKnora 当前 OIDC 登录能力的实际调用过程，覆盖：
+本文档说明 LoreLattice 当前 OIDC 登录能力的实际调用过程，覆盖：
 
 - 前端如何判断是否展示 OIDC 登录入口
 - 用户点击 OIDC 登录后的前后端调用链路
@@ -25,20 +25,20 @@
 
 本项目的 OIDC 登录采用的是 **后端发起授权参数生成、后端接收回调并完成 code 换 token、前端通过 URL hash 接收最终登录结果** 的模式。
 
-和常见的纯前端 OIDC SDK 不同，WeKnora 的特点是：
+和常见的纯前端 OIDC SDK 不同，LoreLattice 的特点是：
 
 1. **前端只负责发起跳转**，不直接和 OIDC Provider 交换 token。
 2. **后端负责用授权码 `code` 向 OIDC Provider 换取 token**。
 3. 后端拿到 OIDC 用户信息后，会：
    - 查找本地用户；
    - 若用户不存在，则自动创建本地账号和默认空间；
-   - 最终签发 WeKnora 自己的本地 JWT（`token` / `refresh_token`）。
+   - 最终签发 LoreLattice 自己的本地 JWT（`token` / `refresh_token`）。
 4. 后端不会直接把登录结果放在 query string 中，而是：
    - 将登录结果 JSON（ `success`、`token`、`refresh_token` 等字段）序列化后再做 base64url 编码；
    - 以 `#oidc_result=...` 的形式重定向回前端；
    - 前端在 `App.vue` 中统一解析 hash，再调用 `/api/v1/auth/me` 补全用户和空间信息。
 
-因此，**OIDC Provider 的 token 只用于后端换取用户身份，本项目真正的业务访问凭证仍然是 WeKnora 自己签发的 JWT**。
+因此，**OIDC Provider 的 token 只用于后端换取用户身份，本项目真正的业务访问凭证仍然是 LoreLattice 自己签发的 JWT**。
 
 ---
 
@@ -71,7 +71,7 @@ sequenceDiagram
     autonumber
     participant U as 用户浏览器
     participant FE as 前端(Login/App)
-    participant BE as WeKnora 后端
+    participant BE as LoreLattice 后端
     participant OP as OIDC Provider
 
     FE->>BE: GET /api/v1/auth/oidc/config
@@ -120,7 +120,7 @@ flowchart TD
     L --> M{本地用户是否存在}
     M -- 否 --> N[自动注册新用户并创建默认空间]
     M -- 是 --> O[使用现有用户]
-    N --> P[签发 WeKnora JWT]
+    N --> P[签发 LoreLattice JWT]
     O --> P
     P --> Q[编码最小必要登录结果为 oidc_result]
     Q --> R[302 重定向到前端首页 hash]
@@ -188,7 +188,7 @@ GET /api/v1/auth/oidc/url?redirect_uri=...
 window.location.href = authorizationURL
 ```
 
-浏览器随后离开 WeKnora 页面，跳转到 OIDC Provider 的授权页。
+浏览器随后离开 LoreLattice 页面，跳转到 OIDC Provider 的授权页。
 
 ---
 
@@ -319,7 +319,7 @@ LoginWithOIDC(ctx, code, decodedState.RedirectURI, h.resolveDefaultTenantMode(ct
 
 注意这里传入的是 **state 中保存的 redirect_uri**，而不是重新拼接的地址，这样保证了 code 交换时使用的 `redirect_uri` 和授权时完全一致。
 
-第四个参数是首次自动开户时的默认空间策略，由 `resolveDefaultTenantMode` 从 `auth.default_tenant_mode`（SystemSetting，DB > `WEKNORA_AUTH_DEFAULT_TENANT_MODE` > 配置文件）解析，与本地密码注册共用同一开关；OIDC 不再有独立的 `OIDC_AUTH_DEFAULT_TENANT_MODE`。
+第四个参数是首次自动开户时的默认空间策略，由 `resolveDefaultTenantMode` 从 `auth.default_tenant_mode`（SystemSetting，DB > `LORELATTICE_AUTH_DEFAULT_TENANT_MODE` > 配置文件）解析，与本地密码注册共用同一开关；OIDC 不再有独立的 `OIDC_AUTH_DEFAULT_TENANT_MODE`。
 
 ---
 
@@ -399,7 +399,7 @@ userRepo.GetUserByEmail(ctx, userInfo.Email)
 4. 调用现有 `Register()` 流程创建用户；
 5. `Register()` 内部还会自动创建默认空间。
 
-因此，**首次使用 OIDC 登录的用户，不需要提前在 WeKnora 中手工建号**。
+因此，**首次使用 OIDC 登录的用户，不需要提前在 LoreLattice 中手工建号**。
 
 ### 8.3 用户禁用处理
 
@@ -411,7 +411,7 @@ Account is disabled
 
 ---
 
-## 9. 生成 WeKnora 本地登录态
+## 9. 生成 LoreLattice 本地登录态
 
 OIDC 登录成功后，后端不会直接把 OIDC token 交给前端使用，而是继续执行：
 
@@ -436,7 +436,7 @@ GenerateTokens(ctx, user)
 
 这一步意味着：
 
-> OIDC 只负责“确认你是谁”，WeKnora 自己负责“签发系统内可用的业务令牌”。
+> OIDC 只负责“确认你是谁”，LoreLattice 自己负责“签发系统内可用的业务令牌”。
 
 ---
 
@@ -562,11 +562,11 @@ OIDC 配置定义位于 `internal/config/config.go`，环境变量示例见 `.en
 
 ```yaml
 staticClients:
-  - id: weknora
+  - id: lorelattice
     redirectURIs:
       - 'http://127.0.0.1:5173/api/v1/auth/oidc/callback'
       - 'http://127.0.0.1/api/v1/auth/oidc/callback'
-    name: 'WeKnora'
+    name: 'LoreLattice'
     # secret: <YOUR_SECRET_HERE>
 ```
 
@@ -603,7 +603,7 @@ Provider 必须提前把这些地址加入白名单。
 
 ### 阶段三：后端完成身份兑换
 
-Provider 回调后端 `/auth/oidc/callback`，后端用 `code` 换 token、拉取用户信息、关联或创建本地用户，并签发 WeKnora JWT。
+Provider 回调后端 `/auth/oidc/callback`，后端用 `code` 换 token、拉取用户信息、关联或创建本地用户，并签发 LoreLattice JWT。
 
 ### 阶段四：前端接收最终结果
 
@@ -620,7 +620,7 @@ Provider 回调后端 `/auth/oidc/callback`，后端用 `code` 换 token、拉�
 3. **邮箱是本地账号关联主键**。
    - 若 Provider 没返回 email，将无法完成登录。
 4. **首次 OIDC 登录会自动创建用户和默认空间**。
-5. **真正用于访问 WeKnora API 的仍是本地 JWT**，不是 OIDC access token。
+5. **真正用于访问 LoreLattice API 的仍是本地 JWT**，不是 OIDC access token。
 6. 当前实现对 `state` 做了编码封装，但 **没有服务端持久化 state/nonce 校验**；它主要用于传递上下文和基本防错，而不是完整的防重放机制。
 
 ---

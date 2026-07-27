@@ -11,8 +11,8 @@ import (
 	"github.com/google/uuid"
 	osapi "github.com/opensearch-project/opensearch-go/v4/opensearchapi"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // copyBatchSize is the pagination size for the source scan. Kept under the

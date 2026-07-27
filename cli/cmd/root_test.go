@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
 )
 
 func TestRoot_Help(t *testing.T) {
@@ -21,7 +21,7 @@ func TestRoot_Help(t *testing.T) {
 	root.SetOut(&out)
 	require.NoError(t, root.Execute())
 	got := out.String()
-	assert.Contains(t, got, "weknora")
+	assert.Contains(t, got, "lorelattice")
 	assert.Contains(t, got, "version")
 }
 
@@ -112,7 +112,7 @@ func TestMapCobraError(t *testing.T) {
 		assert.Equal(t, assert.AnError, err)
 	})
 	t.Run("unknown command wraps as FlagError", func(t *testing.T) {
-		err := MapCobraError(errors.New(`unknown command "bogus" for "weknora"`))
+		err := MapCobraError(errors.New(`unknown command "bogus" for "lorelattice"`))
 		var fe *cmdutil.FlagError
 		assert.True(t, errors.As(err, &fe))
 	})

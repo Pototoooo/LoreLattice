@@ -12,7 +12,7 @@ import (
 
 func TestBackendScopedLocalURLRetainsBackendID(t *testing.T) {
 	t.Setenv("SYSTEM_AES_KEY", "0123456789abcdef0123456789abcdef")
-	inner := NewLocalFileService(t.TempDir(), "https://weknora.example.com/base")
+	inner := NewLocalFileService(t.TempDir(), "https://lorelattice.example.com/base")
 	svc := NewBackendScopedFileService("backend-local-a", inner)
 
 	path, err := svc.SaveBytes(context.Background(), []byte("hello"), 7, "exports/image.txt", false)

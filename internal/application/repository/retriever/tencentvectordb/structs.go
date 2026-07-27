@@ -11,8 +11,8 @@ const (
 	envTencentVectorDBDatabase   = "TENCENT_VECTORDB_DATABASE"
 	envTencentVectorDBCollection = "TENCENT_VECTORDB_COLLECTION"
 	envTencentVectorDBReplicaNum = "TENCENT_VECTORDB_REPLICA_NUMBER"
-	defaultDatabaseName          = "weknora"
-	defaultCollectionName        = "weknora_embeddings"
+	defaultDatabaseName          = "lorelattice"
+	defaultCollectionName        = "lorelattice_embeddings"
 	defaultReplicaNumber         = 1
 
 	fieldID              = "id"

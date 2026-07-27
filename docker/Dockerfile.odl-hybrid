@@ -9,7 +9,7 @@ FROM python:3.10.18-bookworm
 
 # Docling table/layout models import cv2 (OpenCV), which needs libGL at runtime
 # even when hybrid runs with --no-ocr.
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get -o Acquire::Check-Date=false update && apt-get install -y --no-install-recommends \
     curl \
     libgl1 \
     libglib2.0-0 \

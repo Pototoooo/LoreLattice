@@ -13,8 +13,8 @@ import (
 
 	"go.uber.org/dig"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 )
 
 // bootstrapEnvVar is the env var that names the email of the user who
@@ -30,7 +30,7 @@ import (
 //   - Safe to leave set: once at least one system admin exists, the env
 //     var stops granting privileges. That prevents a UI revoke from being
 //     silently undone on the next restart.
-const bootstrapEnvVar = "WEKNORA_BOOTSTRAP_SYSTEM_ADMIN_EMAIL"
+const bootstrapEnvVar = "LORELATTICE_BOOTSTRAP_SYSTEM_ADMIN_EMAIL"
 
 // runStartupBootstrap consults the env and applies any one-shot
 // bootstrap actions. Currently it only handles system-admin promotion;

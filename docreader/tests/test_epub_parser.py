@@ -13,7 +13,7 @@ def _minimal_epub_bytes() -> bytes:
     book.set_identifier("test-epub")
     book.set_title("Tiny EPUB")
     book.set_language("en")
-    book.add_author("WeKnora")
+    book.add_author("LoreLattice")
 
     chapter = epub.EpubHtml(
         title="Chapter One", file_name="text/chapter_01.xhtml", lang="en"

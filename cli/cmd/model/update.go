@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // UpdateOptions captures the surgical flag state for `model update`. Per-flag
@@ -36,7 +36,7 @@ type UpdateService interface {
 	UpdateModel(ctx context.Context, id string, req *sdk.UpdateModelRequest) (*sdk.Model, error)
 }
 
-// NewCmdUpdate builds `weknora model update <model-id>` — update a registered
+// NewCmdUpdate builds `lorelattice model update <model-id>` — update a registered
 // model in place (id preserved), so KBs / agents referencing it keep working.
 func NewCmdUpdate(f *cmdutil.Factory) *cobra.Command {
 	opts := &UpdateOptions{}
@@ -83,7 +83,7 @@ Reversible write: without -y/--yes in a non-TTY / JSON context it exits 10
 			yes, _ := c.Flags().GetBool("yes")
 			// --api-key-stdin / --param excluded from retry_argv (stdin secret /
 			// repeatable), matching agent update's multi-value exclusions.
-			retry := cmdutil.BuildRetryArgv(c, []string{"weknora", "model", "update", id},
+			retry := cmdutil.BuildRetryArgv(c, []string{"lorelattice", "model", "update", id},
 				"display-name", "description", "base-url", "default", "format")
 			if err := cmdutil.ConfirmWrite(f.Prompter(), yes, fopts.WantsJSON(), "update", "model", id, "model.update", retry); err != nil {
 				return err
@@ -111,9 +111,9 @@ Reversible write: without -y/--yes in a non-TTY / JSON context it exits 10
 		UsedFor:       "update a registered model IN PLACE (id preserved, so KB/agent references keep working): rotate --api-key-stdin, change --base-url / --display-name / --description / --param, or set --default. Type and source are immutable.",
 		RequiredFlags: []string{"<model-id> (positional)", "at least one update flag"},
 		Examples: []string{
-			`printf '%s' "$NEW_KEY" | weknora model update mdl_abc --api-key-stdin -y`,
-			`weknora model update mdl_abc --base-url https://api.example.com/v1 -y`,
-			`weknora model update mdl_abc --default -y`,
+			`printf '%s' "$NEW_KEY" | lorelattice model update mdl_abc --api-key-stdin -y`,
+			`lorelattice model update mdl_abc --base-url https://api.example.com/v1 -y`,
+			`lorelattice model update mdl_abc --default -y`,
 		},
 		Output: "envelope.data is the updated Model object (id preserved; provider api key never echoed)",
 		Warnings: []string{

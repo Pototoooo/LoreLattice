@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 )
 
 // localFileService implements the FileService interface for local file system storage
@@ -36,7 +36,7 @@ func (s *localFileService) CheckConnectivity(ctx context.Context) error {
 }
 
 // NewLocalFileService creates a new local file service instance.
-// externalURL is the externally-reachable base URL (e.g. "https://weknora.example.com");
+// externalURL is the externally-reachable base URL (e.g. "https://lorelattice.example.com");
 // when set, GetFileURL returns presigned HTTP URLs instead of local:// paths.
 func NewLocalFileService(baseDir, externalURL string) interfaces.FileService {
 	return &localFileService{

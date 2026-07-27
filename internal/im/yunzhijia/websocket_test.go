@@ -11,19 +11,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/im"
+	"github.com/Pototoooo/lorelattice/internal/im"
 	ws "github.com/gorilla/websocket"
 )
 
 const testBusinessMessage = `{
   "type": 2,
   "robotId": "bot-1",
-  "robotName": "WeKnora",
+  "robotName": "LoreLattice",
   "operatorOpenid": "user-1",
   "operatorName": "User",
   "time": 1719648000000,
   "msgId": "msg-1",
-  "content": "@WeKnora hello",
+  "content": "@LoreLattice hello",
   "groupType": 1
 }`
 

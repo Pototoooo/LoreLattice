@@ -24,8 +24,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/utils"
 )
 
 // collectHandler records everything a real FetchStream emits so the test can

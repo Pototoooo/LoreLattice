@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
@@ -208,7 +208,7 @@ type TenantConfig struct {
 	//                   by applyAuthAndTenantDefaults.
 	//   pointer false — operators opted into the logging-only rollout
 	//                   window (set via config.yaml `enable_rbac: false`
-	//                   or env `WEKNORA_TENANT_ENABLE_RBAC=false`).
+	//                   or env `LORELATTICE_TENANT_ENABLE_RBAC=false`).
 	//   pointer true  — enforcement on (the new default).
 	// Read through IsRBACEnforced so callers stay nil-safe.
 	EnableRBAC *bool `yaml:"enable_rbac" json:"enable_rbac"`
@@ -221,7 +221,7 @@ type TenantConfig struct {
 	//   = 0 — fall back to defaultMaxOwnedTenantsPerUser in the handler.
 	//   < 0 — disable the cap entirely (not recommended in shared deployments).
 	//
-	// Env override: WEKNORA_TENANT_MAX_OWNED_PER_USER (integer). When set
+	// Env override: LORELATTICE_TENANT_MAX_OWNED_PER_USER (integer). When set
 	// and parseable it always wins over config.yaml so operators can
 	// loosen / tighten the quota without a redeploy. See
 	// applyAuthAndTenantDefaults for the semantics of <0 / 0 / >0.
@@ -589,7 +589,7 @@ func LoadConfig() (*Config, error) {
 
 	// Surface RBAC enforcement state at startup. air's hot-reload only
 	// rebuilds the binary on Go-source changes; it does NOT re-source
-	// .env, so a `WEKNORA_TENANT_ENABLE_RBAC=true` flip while the dev
+	// .env, so a `LORELATTICE_TENANT_ENABLE_RBAC=true` flip while the dev
 	// loop is already running silently has no effect until the dev
 	// script restarts. Logging this once at startup makes the
 	// "I edited .env but the gates still aren't firing" trap obvious
@@ -599,10 +599,10 @@ func LoadConfig() (*Config, error) {
 	xtAccess := cfg.Tenant != nil && cfg.Tenant.EnableCrossTenantAccess
 	fmt.Printf(
 		"[config] tenant RBAC enforcement: enable_rbac=%v cross_tenant_access=%v "+
-			"(env: WEKNORA_TENANT_ENABLE_RBAC=%q WEKNORA_TENANT_ENABLE_CROSS_TENANT_ACCESS=%q)\n",
+			"(env: LORELATTICE_TENANT_ENABLE_RBAC=%q LORELATTICE_TENANT_ENABLE_CROSS_TENANT_ACCESS=%q)\n",
 		rbacOn, xtAccess,
-		os.Getenv("WEKNORA_TENANT_ENABLE_RBAC"),
-		os.Getenv("WEKNORA_TENANT_ENABLE_CROSS_TENANT_ACCESS"),
+		os.Getenv("LORELATTICE_TENANT_ENABLE_RBAC"),
+		os.Getenv("LORELATTICE_TENANT_ENABLE_CROSS_TENANT_ACCESS"),
 	)
 
 	return &cfg, nil
@@ -752,7 +752,7 @@ func applyKnowledgeBaseEnvOverrides(cfg *Config) {
 	if cfg.KnowledgeBase.DocumentProcessTimeout <= 0 {
 		cfg.KnowledgeBase.DocumentProcessTimeout = DefaultDocumentProcessTimeout
 	}
-	if value := strings.TrimSpace(os.Getenv("WEKNORA_DOCUMENT_PROCESS_TIMEOUT")); value != "" {
+	if value := strings.TrimSpace(os.Getenv("LORELATTICE_DOCUMENT_PROCESS_TIMEOUT")); value != "" {
 		if d, err := time.ParseDuration(value); err == nil {
 			cfg.KnowledgeBase.DocumentProcessTimeout = d
 		}
@@ -760,7 +760,7 @@ func applyKnowledgeBaseEnvOverrides(cfg *Config) {
 	if cfg.KnowledgeBase.DocReaderCallTimeout <= 0 {
 		cfg.KnowledgeBase.DocReaderCallTimeout = 30 * time.Minute
 	}
-	if value := strings.TrimSpace(os.Getenv("WEKNORA_DOCREADER_CALL_TIMEOUT")); value != "" {
+	if value := strings.TrimSpace(os.Getenv("LORELATTICE_DOCREADER_CALL_TIMEOUT")); value != "" {
 		if d, err := time.ParseDuration(value); err == nil && d > 0 {
 			cfg.KnowledgeBase.DocReaderCallTimeout = d
 		}
@@ -771,7 +771,7 @@ func applyAgentEnvOverrides(cfg *Config) {
 	if cfg.Agent == nil {
 		cfg.Agent = &AgentConfig{}
 	}
-	if value := strings.TrimSpace(os.Getenv("WEKNORA_AGENT_LLM_TIMEOUT")); value != "" {
+	if value := strings.TrimSpace(os.Getenv("LORELATTICE_AGENT_LLM_TIMEOUT")); value != "" {
 		if timeout, err := time.ParseDuration(value); err == nil {
 			cfg.Agent.LLMCallTimeout = int(timeout.Seconds())
 		} else if sec, err := time.ParseDuration(value + "s"); err == nil {
@@ -781,7 +781,7 @@ func applyAgentEnvOverrides(cfg *Config) {
 	}
 	// MCP tool human-approval wait timeout (issue #1173). Accepts Go duration
 	// (e.g. "10m", "30s") or a bare number interpreted as seconds.
-	if value := strings.TrimSpace(os.Getenv("WEKNORA_AGENT_TOOL_APPROVAL_TIMEOUT")); value != "" {
+	if value := strings.TrimSpace(os.Getenv("LORELATTICE_AGENT_TOOL_APPROVAL_TIMEOUT")); value != "" {
 		if d, err := time.ParseDuration(value); err == nil {
 			cfg.Agent.ToolApprovalTimeoutSeconds = int(d.Seconds())
 		} else if d, err := time.ParseDuration(value + "s"); err == nil {
@@ -800,15 +800,15 @@ func applyAgentEnvOverrides(cfg *Config) {
 //     historical registration behaviour)
 //   - tenant.enable_rbac      -> true (enforce role checks unless an
 //     operator explicitly opts into the logging-only rollout window via
-//     config.yaml `enable_rbac: false` or `WEKNORA_TENANT_ENABLE_RBAC=false`).
+//     config.yaml `enable_rbac: false` or `LORELATTICE_TENANT_ENABLE_RBAC=false`).
 //   - tenant.self_service_creation_enabled -> true (preserves ordinary
 //     authenticated users' ability to create workspaces).
 //
 // Env overrides (when set and non-empty):
-//   - WEKNORA_AUTH_DEFAULT_TENANT_MODE ("create_personal"/"tenantless")
-//   - WEKNORA_TENANT_SELF_SERVICE_CREATION_ENABLED (boolean)
-//   - WEKNORA_TENANT_ENABLE_RBAC      ("true"/"false", case-insensitive)
-//   - WEKNORA_TENANT_MAX_OWNED_PER_USER (integer; <0 disables the cap,
+//   - LORELATTICE_AUTH_DEFAULT_TENANT_MODE ("create_personal"/"tenantless")
+//   - LORELATTICE_TENANT_SELF_SERVICE_CREATION_ENABLED (boolean)
+//   - LORELATTICE_TENANT_ENABLE_RBAC      ("true"/"false", case-insensitive)
+//   - LORELATTICE_TENANT_MAX_OWNED_PER_USER (integer; <0 disables the cap,
 //     0 falls back to the handler default, >0 enforces that exact cap).
 //     Unparseable / empty values are ignored so a stale shell variable
 //     can't silently disable the quota for a future deployment.
@@ -841,14 +841,14 @@ func applyAuthAndTenantDefaults(cfg *Config) {
 	if strings.TrimSpace(cfg.Auth.RegistrationMode) == "" {
 		cfg.Auth.RegistrationMode = AuthRegistrationModeSelfServe
 	}
-	if value := strings.TrimSpace(os.Getenv("WEKNORA_AUTH_DEFAULT_TENANT_MODE")); value != "" {
+	if value := strings.TrimSpace(os.Getenv("LORELATTICE_AUTH_DEFAULT_TENANT_MODE")); value != "" {
 		cfg.Auth.DefaultTenantMode = value
 	}
 	if strings.TrimSpace(cfg.Auth.DefaultTenantMode) == "" {
 		cfg.Auth.DefaultTenantMode = AuthDefaultTenantModeCreatePersonal
 	}
 
-	if value := strings.TrimSpace(os.Getenv("WEKNORA_TENANT_ENABLE_RBAC")); value != "" {
+	if value := strings.TrimSpace(os.Getenv("LORELATTICE_TENANT_ENABLE_RBAC")); value != "" {
 		v := strings.EqualFold(value, "true")
 		cfg.Tenant.EnableRBAC = &v
 	}
@@ -859,12 +859,12 @@ func applyAuthAndTenantDefaults(cfg *Config) {
 		cfg.Tenant.EnableRBAC = &on
 	}
 
-	if value := strings.TrimSpace(os.Getenv("WEKNORA_TENANT_SELF_SERVICE_CREATION_ENABLED")); value != "" {
+	if value := strings.TrimSpace(os.Getenv("LORELATTICE_TENANT_SELF_SERVICE_CREATION_ENABLED")); value != "" {
 		if enabled, err := strconv.ParseBool(value); err == nil {
 			cfg.Tenant.SelfServiceCreationEnabled = &enabled
 		} else {
 			fmt.Printf(
-				"[config] WEKNORA_TENANT_SELF_SERVICE_CREATION_ENABLED=%q is not a boolean, ignoring\n",
+				"[config] LORELATTICE_TENANT_SELF_SERVICE_CREATION_ENABLED=%q is not a boolean, ignoring\n",
 				value,
 			)
 		}
@@ -874,12 +874,12 @@ func applyAuthAndTenantDefaults(cfg *Config) {
 		cfg.Tenant.SelfServiceCreationEnabled = &on
 	}
 
-	if value := strings.TrimSpace(os.Getenv("WEKNORA_TENANT_MAX_OWNED_PER_USER")); value != "" {
+	if value := strings.TrimSpace(os.Getenv("LORELATTICE_TENANT_MAX_OWNED_PER_USER")); value != "" {
 		if n, err := strconv.Atoi(value); err == nil {
 			cfg.Tenant.MaxOwnedPerUser = n
 		} else {
 			fmt.Printf(
-				"[config] WEKNORA_TENANT_MAX_OWNED_PER_USER=%q is not an integer, ignoring\n",
+				"[config] LORELATTICE_TENANT_MAX_OWNED_PER_USER=%q is not an integer, ignoring\n",
 				value,
 			)
 		}
@@ -900,7 +900,7 @@ func applyAuthAndTenantDefaults(cfg *Config) {
 // off-database.
 //
 // Env overrides (when set and parseable; out-of-range is ignored):
-//   - WEKNORA_AUDIT_RETENTION_DAYS (non-negative integer)
+//   - LORELATTICE_AUDIT_RETENTION_DAYS (non-negative integer)
 func applyAuditDefaults(cfg *Config) {
 	// Section omitted entirely -> apply the default and no env wiring
 	// is needed for the most common path.
@@ -911,7 +911,7 @@ func applyAuditDefaults(cfg *Config) {
 	// Env override always wins, but only when explicitly set so a
 	// stale shell variable doesn't suddenly disable the purge for a
 	// future deployment that committed a real value.
-	if value := strings.TrimSpace(os.Getenv("WEKNORA_AUDIT_RETENTION_DAYS")); value != "" {
+	if value := strings.TrimSpace(os.Getenv("LORELATTICE_AUDIT_RETENTION_DAYS")); value != "" {
 		if n, err := strconv.Atoi(value); err == nil && n >= 0 {
 			cfg.Audit.RetentionDays = n
 		}

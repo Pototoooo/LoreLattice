@@ -1,6 +1,6 @@
-# WeKnora MCP Server 使用示例
+# LoreLattice MCP Server 使用示例
 
-本文档提供了 WeKnora MCP Server 的详细使用示例。
+本文档提供了 LoreLattice MCP Server 的详细使用示例。
 
 ## 基本使用
 
@@ -21,12 +21,12 @@ python main.py --verbose
 
 ```bash
 # 设置环境变量
-export WEKNORA_BASE_URL="http://localhost:8080/api/v1"
-export WEKNORA_API_KEY="your_api_key_here"
+export LORELATTICE_BASE_URL="http://localhost:8080/api/v1"
+export LORELATTICE_API_KEY="your_api_key_here"
 
 # 或者在 .env 文件中设置
-echo "WEKNORA_BASE_URL=http://localhost:8080/api/v1" > .env
-echo "WEKNORA_API_KEY=your_api_key_here" >> .env
+echo "LORELATTICE_BASE_URL=http://localhost:8080/api/v1" > .env
+echo "LORELATTICE_API_KEY=your_api_key_here" >> .env
 ```
 
 ## MCP 工具使用示例
@@ -322,7 +322,7 @@ python main.py --verbose
 ```json
 {
   "error": "Connection refused",
-  "solution": "检查 WEKNORA_BASE_URL 是否正确，确认服务正在运行"
+  "solution": "检查 LORELATTICE_BASE_URL 是否正确，确认服务正在运行"
 }
 ```
 
@@ -330,7 +330,7 @@ python main.py --verbose
 ```json
 {
   "error": "Unauthorized",
-  "solution": "检查 WEKNORA_API_KEY 是否设置正确"
+  "solution": "检查 LORELATTICE_API_KEY 是否设置正确"
 }
 ```
 
@@ -385,19 +385,19 @@ python main.py --verbose
 ```json
 {
   "mcpServers": {
-    "weknora": {
+    "lorelattice": {
       "command": "python",
       "args": ["path/to/main.py"],
       "env": {
-        "WEKNORA_BASE_URL": "http://localhost:8080/api/v1",
-        "WEKNORA_API_KEY": "your_api_key"
+        "LORELATTICE_BASE_URL": "http://localhost:8080/api/v1",
+        "LORELATTICE_API_KEY": "your_api_key"
       }
     }
   }
 }
 ```
 
-项目仓库: https://github.com/NannaOlympicBroadcast/WeKnoraMCP
+项目仓库: https://github.com/Pototoooo/lorelattice/tree/main/mcp-server
 
 ### 与其他 MCP 客户端集成
 参考各客户端的文档，配置服务器启动命令和环境变量。
@@ -407,5 +407,5 @@ python main.py --verbose
 如果遇到问题：
 1. 运行 `python main.py --check-only` 检查环境
 2. 使用 `python main.py --verbose` 查看详细日志
-3. 检查 WeKnora 服务是否正常运行
+3. 检查 LoreLattice 服务是否正常运行
 4. 验证网络连接和防火墙设置

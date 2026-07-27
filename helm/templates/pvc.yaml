@@ -1,5 +1,5 @@
 {{/*
-Copyright 2025 Tencent
+Copyright 2025-2026 Pototoooo
 SPDX-License-Identifier: MIT
 
 Persistent Volume Claims for stateful components.
@@ -10,17 +10,17 @@ Persistent Volume Claims for stateful components.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "weknora.fullname" . }}-postgres
+  name: {{ include "lorelattice.fullname" . }}-postgres
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "database" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "database" "context" .) | nindent 4 }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: {{ .Values.postgresql.persistence.size }}
-  {{- include "weknora.storageClass" . | nindent 2 }}
+  {{- include "lorelattice.storageClass" . | nindent 2 }}
 ---
 {{- end }}
 
@@ -29,17 +29,17 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "weknora.fullname" . }}-redis
+  name: {{ include "lorelattice.fullname" . }}-redis
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "cache" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "cache" "context" .) | nindent 4 }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: {{ .Values.redis.persistence.size }}
-  {{- include "weknora.storageClass" . | nindent 2 }}
+  {{- include "lorelattice.storageClass" . | nindent 2 }}
 ---
 {{- end }}
 
@@ -48,17 +48,17 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "weknora.fullname" . }}-neo4j
+  name: {{ include "lorelattice.fullname" . }}-neo4j
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "graph" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "graph" "context" .) | nindent 4 }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: {{ .Values.neo4j.persistence.size }}
-  {{- include "weknora.storageClass" . | nindent 2 }}
+  {{- include "lorelattice.storageClass" . | nindent 2 }}
 ---
 {{- end }}
 
@@ -67,15 +67,15 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "weknora.fullname" . }}-data-files
+  name: {{ include "lorelattice.fullname" . }}-data-files
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "storage" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "storage" "context" .) | nindent 4 }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: {{ .Values.dataFiles.persistence.size }}
-  {{- include "weknora.storageClass" . | nindent 2 }}
+  {{- include "lorelattice.storageClass" . | nindent 2 }}
 {{- end }}

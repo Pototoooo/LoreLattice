@@ -7,11 +7,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/config"
-	"github.com/Tencent/WeKnora/cli/internal/format"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/output"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/config"
+	"github.com/Pototoooo/lorelattice/cli/internal/format"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
 )
 
 type ListOptions struct{}
@@ -29,18 +29,18 @@ type listEntry struct {
 	Current bool   `json:"current"`
 }
 
-// NewCmdList builds `weknora profile list`. Per-host enumeration with an
+// NewCmdList builds `lorelattice profile list`. Per-host enumeration with an
 // active marker. Reads only config.yaml - no network, no keyring touch.
 func NewCmdList(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "List configured profiles",
-		Long: `Show every profile registered in ~/.config/weknora/config.yaml. The
+		Long: `Show every profile registered in ~/.config/lorelattice/config.yaml. The
 active profile (used by subsequent commands when --profile is unset) is
 marked with a leading "*". No network requests are issued.
 
 The credential mode (api-key vs password) is intentionally not shown here -
-run "weknora auth list" for that. "profile list" is the catalog of *where*
+run "lorelattice auth list" for that. "profile list" is the catalog of *where*
 the CLI can talk to; "auth list" is the catalog of *how*.`,
 		Args: cobra.NoArgs,
 		RunE: func(c *cobra.Command, _ []string) error {
@@ -55,7 +55,7 @@ the CLI can talk to; "auth list" is the catalog of *how*.`,
 	cmdutil.AddFormatFlag(cmd, profileListFields...)
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
 		UsedFor:  "list configured connection profiles (name, host, which is active)",
-		Examples: []string{"weknora profile list", "weknora profile list --jq '.data[].name'"},
+		Examples: []string{"lorelattice profile list", "lorelattice profile list --jq '.data[].name'"},
 		Output:   "envelope.data is an array of {name, host, user, current}",
 	})
 	return cmd
@@ -82,7 +82,7 @@ func runList(fopts *cmdutil.FormatOptions) error {
 		return fopts.Emit(iostreams.IO.Out, entries, meta)
 	}
 	if len(entries) == 0 {
-		fmt.Fprintln(iostreams.IO.Out, "No profiles configured. Run `weknora auth login` (or `weknora profile add`) to create one.")
+		fmt.Fprintln(iostreams.IO.Out, "No profiles configured. Run `lorelattice auth login` (or `lorelattice profile add`) to create one.")
 		return nil
 	}
 	tw := tabwriter.NewWriter(iostreams.IO.Out, 0, 0, 2, ' ', 0)

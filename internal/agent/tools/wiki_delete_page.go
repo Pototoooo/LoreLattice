@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 )
 
 type wikiDeletePageTool struct {
@@ -115,11 +115,11 @@ func (t *wikiDeletePageTool) Execute(ctx context.Context, args json.RawMessage) 
 		Success: true,
 		Output:  outputMsg,
 		Data: map[string]interface{}{
-			"display_type":    "wiki_delete_page",
-			"slug":            params.Slug,
-			"title":           existingPage.Title,
-			"updated_count":   updatedCount,
-			"affected_pages":  updatedSlugs,
+			"display_type":   "wiki_delete_page",
+			"slug":           params.Slug,
+			"title":          existingPage.Title,
+			"updated_count":  updatedCount,
+			"affected_pages": updatedSlugs,
 		},
 	}, nil
 }

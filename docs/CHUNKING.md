@@ -1,6 +1,6 @@
 # Chunking Guide
 
-How WeKnora splits uploaded documents before embedding, why the defaults
+How LoreLattice splits uploaded documents before embedding, why the defaults
 are what they are, and when to change them.
 
 ## Why chunking matters
@@ -14,7 +14,7 @@ quality of the answers your LLM produces.
 Empirically (Vecta Feb-2026 benchmark across 50 academic papers):
 recursive splitting at ~512 tokens with ~15% overlap is the strongest
 single-knob baseline at 69% end-to-end accuracy, beating semantic
-chunking and over-engineered hybrids. WeKnora uses that as the
+chunking and over-engineered hybrids. LoreLattice uses that as the
 foundation and layers smarter strategies on top when the document gives
 us structural cues.
 

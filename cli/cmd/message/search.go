@@ -7,11 +7,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/output"
-	"github.com/Tencent/WeKnora/cli/internal/text"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
+	"github.com/Pototoooo/lorelattice/cli/internal/text"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // messageSearchFields enumerates the projectable fields of MessageSearchGroupItem.
@@ -37,7 +37,7 @@ type SearchService interface {
 	SearchMessages(ctx context.Context, req *sdk.SearchMessagesRequest) (*sdk.MessageSearchResult, error)
 }
 
-// NewCmdSearch builds `weknora message search "<query>"`.
+// NewCmdSearch builds `lorelattice message search "<query>"`.
 func NewCmdSearch(f *cmdutil.Factory) *cobra.Command {
 	opts := &SearchOptions{}
 	cmd := &cobra.Command{
@@ -70,11 +70,11 @@ func NewCmdSearch(f *cmdutil.Factory) *cobra.Command {
 	cmd.Flags().StringArrayVar(&opts.SessionIDs, "session", nil, "Restrict search to these session ids (repeatable)")
 	cmdutil.AddFormatFlag(cmd, messageSearchFields...)
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
-		UsedFor:       "Search past Q&A pairs across chat history. This searches conversation messages — for RAG retrieval over documents use `weknora search chunks` instead.",
+		UsedFor:       "Search past Q&A pairs across chat history. This searches conversation messages — for RAG retrieval over documents use `lorelattice search chunks` instead.",
 		RequiredFlags: []string{"<query> (positional)"},
 		Examples: []string{
-			`weknora message search "deploy steps"`,
-			`weknora message search "deploy steps" --session sess_abc --limit 5`,
+			`lorelattice message search "deploy steps"`,
+			`lorelattice message search "deploy steps" --session sess_abc --limit 5`,
 		},
 		Output: "envelope.data is an array of grouped results (request_id, session_id, query_content, answer_content, score); meta.count is the returned count, meta.total_count is the server-side total. --mode accepts keyword | vector | hybrid (server default: hybrid)",
 	})

@@ -3,16 +3,16 @@ package slack
 import (
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/im"
+	"github.com/Pototoooo/lorelattice/internal/im"
 	slacklib "github.com/slack-go/slack"
 )
 
 func TestParseIncomingMessage_ThreadID(t *testing.T) {
 	tests := []struct {
-		name           string
-		ts             string
-		wantThreadID   string
-		wantMessageID  string
+		name          string
+		ts            string
+		wantThreadID  string
+		wantMessageID string
 	}{
 		{
 			name:          "top-level message uses own timestamp",

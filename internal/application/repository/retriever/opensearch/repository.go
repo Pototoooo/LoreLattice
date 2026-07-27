@@ -15,9 +15,9 @@ import (
 	"github.com/opensearch-project/opensearch-go/v4"
 	osapi "github.com/opensearch-project/opensearch-go/v4/opensearchapi"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 )
 
 // EngineAwareNormalizer applies the documented per-engine cosine-score
@@ -42,7 +42,7 @@ import (
 // caller reads zero before the first caller persists.
 type Repository struct {
 	client    *osapi.Client
-	baseIndex string      // pre-suffix base name, e.g. "weknora_abcdef012345"
+	baseIndex string      // pre-suffix base name, e.g. "lorelattice_abcdef012345"
 	cfg       internalCfg // immutable after construction (value, not pointer)
 
 	// Per-dimension lazy initialization. ensureReady(ctx, dim) inserts an
@@ -84,13 +84,13 @@ var _ interfaces.RetrieveEngineRepository = (*Repository)(nil)
 // storeID is the VectorStore.ID owning this repository instance. It is
 // folded into the base index name so multiple OpenSearch VectorStores
 // pointing at the same cluster do not collide:
-//   - storeID == ""       — env-path; no prefix, base index = "weknora".
+//   - storeID == ""       — env-path; no prefix, base index = "lorelattice".
 //   - len(storeID) >= 16  — DB-store path; prefix = storeID[:12]
 //     (48-bit collision space).
 //   - 1..15 chars         — rejected with ErrConfigInvalid.
 //
 // indexCfg is optional — pass nil to use env var (OPENSEARCH_INDEX) or
-// default ("weknora") values.
+// default ("lorelattice") values.
 //
 // Optional behavior is configured via functional options (e.g.
 // WithAuditSink). Passing no options keeps audit emission as a no-op, so the
@@ -114,7 +114,7 @@ func NewRepository(
 		)
 	}
 
-	base := types.ResolveIndexName(indexCfg, "OPENSEARCH_INDEX", "weknora")
+	base := types.ResolveIndexName(indexCfg, "OPENSEARCH_INDEX", "lorelattice")
 	if storeID != "" {
 		// 12 hex chars → 48-bit collision space (UUID is 32 chars; using
 		// half gives strong-enough collision avoidance for the realistic

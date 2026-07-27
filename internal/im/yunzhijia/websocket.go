@@ -10,8 +10,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/im"
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/im"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 	ws "github.com/gorilla/websocket"
 )
 

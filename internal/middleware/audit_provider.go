@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,7 +10,7 @@ import (
 // middleware functions (rbac.go's RequireRole / RequireOwnershipOrRole)
 // can pull it out without needing the service threaded into their
 // signatures. Same pattern as the langfuse gin middleware.
-const auditServiceContextKey = "weknora.audit_service"
+const auditServiceContextKey = "lorelattice.audit_service"
 
 // AuditServiceProvider returns a gin middleware that injects the audit
 // service into every request's gin.Context. Wiring is centralised in

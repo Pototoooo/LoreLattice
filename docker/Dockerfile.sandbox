@@ -1,4 +1,4 @@
-# WeKnora Sandbox Image
+# LoreLattice Sandbox Image
 # Pre-built environment for executing agent skill scripts in Docker sandbox
 # Multi-stage build, minimal dependencies
 
@@ -15,7 +15,7 @@ RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
     ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 
 # Install minimal CLI tools (bash/grep/sed/coreutils already in slim image)
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get -o Acquire::Check-Date=false update && apt-get install -y --no-install-recommends \
     jq \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 

@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
-	"github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/utils"
 )
 
 var dataSchemaTool = BaseTool{
@@ -73,10 +73,10 @@ func (t *DataSchemaTool) Execute(ctx context.Context, args json.RawMessage) (*ty
 		page,
 		chunkTypes,
 		nil, // tagIDs
-		"", // keyword
-		"", // searchField
-		"", // sortOrder
-		"", // knowledgeType
+		"",  // keyword
+		"",  // searchField
+		"",  // sortOrder
+		"",  // knowledgeType
 	)
 	if err != nil {
 		return &types.ToolResult{

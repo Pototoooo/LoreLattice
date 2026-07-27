@@ -53,7 +53,7 @@ func Compat(serverVer, cliVer string) (Level, string) {
 }
 
 // parseSemver extracts (major, minor) from "X.Y.Z" or "X.Y.Z-suffix".
-// Accepts the leading "v" common in `git describe` output and Tencent/WeKnora
+// Accepts the leading "v" common in `git describe` output and Pototoooo/lorelattice
 // tag conventions ("v0.1.0"), since both server `/system/info.version` and
 // the CLI's own ldflags-injected build.Version may carry it.
 // Returns ok=false when the string is unrecognizable (empty / "(unknown)" / non-numeric).
@@ -61,7 +61,7 @@ func parseSemver(s string) (major, minor int, ok bool) {
 	if s == "" || s == "(unknown)" {
 		return 0, 0, false
 	}
-	// Accept the "v" prefix; both `git describe` output and Tencent/WeKnora tags carry it.
+	// Accept the "v" prefix; both `git describe` output and Pototoooo/lorelattice tags carry it.
 	s = strings.TrimPrefix(s, "v")
 	// Strip prerelease/build metadata.
 	if i := strings.IndexAny(s, "-+"); i >= 0 {

@@ -1,7 +1,7 @@
 package session
 
 import (
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // CreateSessionRequest represents a request to create a new session

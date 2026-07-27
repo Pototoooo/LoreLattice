@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 )
 
 func withMattermostSSRFWhitelist(t *testing.T, whitelist string) {

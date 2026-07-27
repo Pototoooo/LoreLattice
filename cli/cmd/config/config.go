@@ -1,4 +1,4 @@
-// Package configcmd holds the `weknora config` command tree.
+// Package configcmd holds the `lorelattice config` command tree.
 //
 // Currently a single read-only `view` subcommand that prints the resolved
 // CLI configuration and its resolution chain. No mutation, no network.
@@ -11,10 +11,10 @@ package configcmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
 )
 
-// NewCmd builds the `weknora config` parent command.
+// NewCmd builds the `lorelattice config` parent command.
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",

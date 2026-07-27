@@ -18,7 +18,7 @@ ENV GOSUMDB=${GOSUMDB_ARG}
 RUN if [ -n "$APK_MIRROR_ARG" ]; then \
         sed -i "s@deb.debian.org@${APK_MIRROR_ARG}@g" /etc/apt/sources.list.d/debian.sources; \
     fi && \
-    apt-get update && \
+    apt-get -o Acquire::Check-Date=false update && \
     apt-get install -y git build-essential libsqlite3-dev
 
 # Install migrate tool
@@ -58,7 +58,7 @@ ARG APK_MIRROR_ARG
 RUN useradd -m -s /bin/bash appuser
 
 # First, install ca-certificates without mirror to ensure HTTPS works
-RUN apt-get update && \
+RUN apt-get -o Acquire::Check-Date=false update && \
     apt-get install -y --no-install-recommends ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
@@ -66,7 +66,7 @@ RUN apt-get update && \
 RUN if [ -n "$APK_MIRROR_ARG" ]; then \
         sed -i "s@deb.debian.org@${APK_MIRROR_ARG}@g" /etc/apt/sources.list.d/debian.sources; \
     fi && \
-    apt-get update && \
+    apt-get -o Acquire::Check-Date=false update && \
     apt-get install -y --no-install-recommends \
         build-essential postgresql-client default-mysql-client tzdata sed curl bash vim wget \
         libsqlite3-0 \
@@ -100,7 +100,7 @@ COPY --from=builder /app/skills/preloaded ./skills/preloaded
 # Keep a read-only backup so bind-mount cannot erase built-in skills
 COPY --from=builder /app/skills/preloaded ./skills/_builtin
 COPY --from=builder /root/.duckdb /home/appuser/.duckdb
-COPY --from=builder /app/WeKnora .
+COPY --from=builder /app/LoreLattice .
 
 # Copy and make entrypoint script executable
 COPY --from=builder /app/scripts/docker-entrypoint.sh ./scripts/docker-entrypoint.sh
@@ -113,4 +113,4 @@ EXPOSE 8080
 
 
 ENTRYPOINT ["./scripts/docker-entrypoint.sh"]
-CMD ["./WeKnora"]
+CMD ["./LoreLattice"]

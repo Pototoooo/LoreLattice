@@ -1,13 +1,13 @@
 {{/*
-Copyright 2025 Tencent
+Copyright 2025-2026 Pototoooo
 SPDX-License-Identifier: MIT
 
-Post-installation notes for WeKnora Helm chart.
+Post-installation notes for LoreLattice Helm chart.
 Ref: https://github.com/argoproj/argo-helm/blob/main/charts/argo-cd/templates/NOTES.txt
 */}}
 
 ================================================================================
-  WeKnora has been installed successfully!
+  LoreLattice has been installed successfully!
 ================================================================================
 
 Release: {{ .Release.Name }}
@@ -15,17 +15,17 @@ Namespace: {{ .Release.Namespace }}
 Version: {{ .Chart.AppVersion }}
 
 --------------------------------------------------------------------------------
-  ACCESSING WEKNORA
+  ACCESSING LORELATTICE
 --------------------------------------------------------------------------------
 
 {{- if .Values.ingress.enabled }}
-WeKnora is accessible via Ingress:
+LoreLattice is accessible via Ingress:
 
   URL: {{ if .Values.ingress.tls.enabled }}https{{ else }}http{{ end }}://{{ .Values.ingress.host }}
 
 {{- else }}
 
-To access WeKnora, use port-forwarding:
+To access LoreLattice, use port-forwarding:
 
   # Frontend (Web UI)
   kubectl port-forward svc/frontend -n {{ .Release.Namespace }} 8080:80
@@ -36,11 +36,11 @@ To access WeKnora, use port-forwarding:
 
 {{- if not .Values.ingress.enabled }}
 
-To expose WeKnora externally, enable Ingress:
+To expose LoreLattice externally, enable Ingress:
 
   helm upgrade {{ .Release.Name }} ./helm \
     --set ingress.enabled=true \
-    --set ingress.host=weknora.example.com
+    --set ingress.host=lorelattice.example.com
 
 {{- end }}
 
@@ -50,19 +50,19 @@ To expose WeKnora externally, enable Ingress:
 
 Components deployed:
 {{- if .Values.app.enabled }}
-  - Backend API ({{ include "weknora.app.image" . }})
+  - Backend API ({{ include "lorelattice.app.image" . }})
 {{- end }}
 {{- if .Values.frontend.enabled }}
-  - Frontend UI ({{ include "weknora.frontend.image" . }})
+  - Frontend UI ({{ include "lorelattice.frontend.image" . }})
 {{- end }}
 {{- if .Values.docreader.enabled }}
-  - Document Reader ({{ include "weknora.docreader.image" . }})
+  - Document Reader ({{ include "lorelattice.docreader.image" . }})
 {{- end }}
 {{- if .Values.postgresql.enabled }}
-  - PostgreSQL/ParadeDB ({{ include "weknora.postgresql.image" . }})
+  - PostgreSQL/ParadeDB ({{ include "lorelattice.postgresql.image" . }})
 {{- end }}
 {{- if .Values.redis.enabled }}
-  - Redis ({{ include "weknora.redis.image" . }})
+  - Redis ({{ include "lorelattice.redis.image" . }})
 {{- end }}
 
 {{- if or .Values.minio.enabled .Values.neo4j.enabled .Values.qdrant.enabled }}
@@ -83,7 +83,7 @@ Optional components enabled:
   CONNECTING TO LLM
 --------------------------------------------------------------------------------
 
-WeKnora requires an LLM backend. Configure via environment variables:
+LoreLattice requires an LLM backend. Configure via environment variables:
 
   helm upgrade {{ .Release.Name }} ./helm \
     --set app.extraEnv[0].name=OLLAMA_BASE_URL \
@@ -122,9 +122,9 @@ Access Neo4j Browser:
   DOCUMENTATION
 --------------------------------------------------------------------------------
 
-  GitHub:  https://github.com/Tencent/WeKnora
-  API Docs: https://github.com/Tencent/WeKnora/blob/main/docs/api/README.md
-  FAQ:     https://github.com/Tencent/WeKnora/blob/main/docs/QA.md
+  GitHub:  https://github.com/Pototoooo/lorelattice
+  API Docs: https://github.com/Pototoooo/lorelattice/blob/main/docs/api/README.md
+  FAQ:     https://github.com/Pototoooo/lorelattice/blob/main/docs/QA.md
 
 --------------------------------------------------------------------------------
   TROUBLESHOOTING

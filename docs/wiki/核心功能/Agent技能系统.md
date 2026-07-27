@@ -82,7 +82,7 @@ my-skill/
 | `local` | 本地进程执行（基础安全限制） |
 | `disabled` | 禁用脚本执行 |
 
-通过环境变量 `WEKNORA_SANDBOX_MODE` 配置。
+通过环境变量 `LORELATTICE_SANDBOX_MODE` 配置。
 
 ## 配置示例
 

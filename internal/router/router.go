@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	filesvc "github.com/Tencent/WeKnora/internal/application/service/file"
+	filesvc "github.com/Pototoooo/lorelattice/internal/application/service/file"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
@@ -18,17 +18,17 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/dig"
 
-	"github.com/Tencent/WeKnora/internal/config"
-	"github.com/Tencent/WeKnora/internal/handler"
-	"github.com/Tencent/WeKnora/internal/handler/session"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/middleware"
-	"github.com/Tencent/WeKnora/internal/tracing/langfuse"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/config"
+	"github.com/Pototoooo/lorelattice/internal/handler"
+	"github.com/Pototoooo/lorelattice/internal/handler/session"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/middleware"
+	"github.com/Pototoooo/lorelattice/internal/tracing/langfuse"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 
-	_ "github.com/Tencent/WeKnora/docs" // swagger docs
+	_ "github.com/Pototoooo/lorelattice/docs" // swagger docs
 )
 
 // RouterParams 路由参数
@@ -89,7 +89,7 @@ type RouterParams struct {
 	RedisClient                  *redis.Client
 	DataSourceHandler            *handler.DataSourceHandler
 	DataSourceCredentialsHandler *handler.DataSourceCredentialsHandler
-	WeKnoraCloudHandler          *handler.WeKnoraCloudHandler
+	LoreLatticeCloudHandler      *handler.LoreLatticeCloudHandler
 	WikiPageHandler              *handler.WikiPageHandler
 }
 
@@ -103,7 +103,7 @@ func NewRouter(params RouterParams) *gin.Engine {
 	// embed endpoints rate-limit per (channel, ClientIP), so a spoofed XFF would
 	// trivially bypass the limiter. Restrict to the fronting proxy network so
 	// only the real client IP (appended by nginx) is returned. Configurable via
-	// WEKNORA_TRUSTED_PROXIES (comma-separated CIDRs/IPs).
+	// LORELATTICE_TRUSTED_PROXIES (comma-separated CIDRs/IPs).
 	if err := r.SetTrustedProxies(trustedProxies()); err != nil {
 		logger.Errorf(context.Background(), "[Router] failed to set trusted proxies: %v", err)
 	}
@@ -171,7 +171,7 @@ func NewRouter(params RouterParams) *gin.Engine {
 	)
 
 	// Short-lived capability URLs for IM and other clients that cannot attach
-	// WeKnora authentication headers.
+	// LoreLattice authentication headers.
 	serveResourceGrants(r, params.ResourceCatalog, params.TenantService, params.FileService, params.StorageBackendResolver)
 
 	// 认证中间件
@@ -266,7 +266,7 @@ func NewRouter(params RouterParams) *gin.Engine {
 		RegisterIMChannelRoutes(v1, params.IMHandler, rbacGuards)
 		RegisterEmbedChannelRoutes(v1, params.EmbedChannelHandler, rbacGuards)
 		RegisterDataSourceRoutes(v1, params.DataSourceHandler, params.DataSourceCredentialsHandler, rbacGuards)
-		RegisterWeKnoraCloudRoutes(v1, params.WeKnoraCloudHandler, rbacGuards)
+		RegisterLoreLatticeCloudRoutes(v1, params.LoreLatticeCloudHandler, rbacGuards)
 		RegisterWikiPageRoutes(v1, params.WikiPageHandler, rbacGuards)
 		RegisterChunkerDebugRoutes(v1, rbacGuards)
 
@@ -1030,7 +1030,7 @@ func RegisterMCPServiceRoutes(
 	// MCP OAuth provider redirect. Registered OUTSIDE the /mcp-services group
 	// to avoid a static-vs-":id" route conflict, and left unauthenticated
 	// (allow-listed in middleware/auth.go) because the third-party browser
-	// redirect carries no WeKnora bearer — the single-use state authenticates.
+	// redirect carries no LoreLattice bearer — the single-use state authenticates.
 	r.GET("/mcp-oauth/callback", oauthHandler.Callback)
 
 	mcpServices := g.apiKeyGroup(r.Group("/mcp-services"), apiKeyManageMCPServices(apiKeyFullAccess()))
@@ -1463,10 +1463,10 @@ func RegisterIMChannelRoutes(r *gin.RouterGroup, imHandler *handler.IMHandler, g
 // trustedProxies returns the proxy CIDRs/IPs whose X-Forwarded-For headers
 // gin should trust when resolving the client IP. Defaults to loopback and
 // private ranges (covers the bundled nginx in a container network); override
-// with WEKNORA_TRUSTED_PROXIES (comma-separated). An explicit empty value
+// with LORELATTICE_TRUSTED_PROXIES (comma-separated). An explicit empty value
 // disables proxy trust entirely so ClientIP() returns the direct peer.
 func trustedProxies() []string {
-	raw, ok := os.LookupEnv("WEKNORA_TRUSTED_PROXIES")
+	raw, ok := os.LookupEnv("LORELATTICE_TRUSTED_PROXIES")
 	if !ok {
 		return []string{
 			"127.0.0.0/8",
@@ -1550,7 +1550,7 @@ func embedFrameAncestorsMiddleware(svc interfaces.EmbedChannelService) gin.Handl
 // from the ./web directory if it exists. Must be called BEFORE auth middleware
 // so static files are served without authentication.
 func serveFrontendStatic(r *gin.Engine) {
-	webDir := os.Getenv("WEKNORA_WEB_DIR")
+	webDir := os.Getenv("LORELATTICE_WEB_DIR")
 	if webDir == "" {
 		webDir = "./web"
 	}
@@ -1770,7 +1770,7 @@ func serveFilesWithResources(
 }
 
 // serveResourceGrants exposes short, revocable capability URLs for clients
-// such as IM platforms that cannot attach a WeKnora bearer/embed token.
+// such as IM platforms that cannot attach a LoreLattice bearer/embed token.
 func serveResourceGrants(
 	r *gin.Engine,
 	resourceCatalog interfaces.ResourceCatalog,
@@ -2325,13 +2325,13 @@ func RegisterDataSourceRoutes(
 	}
 }
 
-// RegisterWeKnoraCloudRoutes 注册 WeKnoraCloud 初始化路由
-// RegisterWeKnoraCloudRoutes registers the WeKnoraCloud credential
+// RegisterLoreLatticeCloudRoutes 注册 LoreLatticeCloud 初始化路由
+// RegisterLoreLatticeCloudRoutes registers the LoreLatticeCloud credential
 // management endpoints. SaveCredentials persists external SaaS keys
 // for the tenant (Admin+), Status is a low-risk readiness probe (Viewer+).
-func RegisterWeKnoraCloudRoutes(r *gin.RouterGroup, handler *handler.WeKnoraCloudHandler, g *rbacGuards) {
-	g.apiKeyRoute(r, http.MethodPost, "/weknoracloud/credentials", apiKeyManageModels(apiKeyFullAccess()), g.Admin(), handler.SaveCredentials)
-	g.apiKeyRoute(r, http.MethodGet, "/models/weknoracloud/status", apiKeyManageModels(apiKeyFullAccess()), g.Viewer(), handler.Status)
+func RegisterLoreLatticeCloudRoutes(r *gin.RouterGroup, handler *handler.LoreLatticeCloudHandler, g *rbacGuards) {
+	g.apiKeyRoute(r, http.MethodPost, "/lorelatticecloud/credentials", apiKeyManageModels(apiKeyFullAccess()), g.Admin(), handler.SaveCredentials)
+	g.apiKeyRoute(r, http.MethodGet, "/models/lorelatticecloud/status", apiKeyManageModels(apiKeyFullAccess()), g.Viewer(), handler.Status)
 }
 
 // RegisterWikiPageRoutes registers wiki page related routes.

@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -80,11 +80,11 @@ func newOAuthStateStore(rdb *redis.Client) *oauthStateStore {
 }
 
 func (s *oauthStateStore) key(state string) string {
-	ns := strings.TrimSpace(os.Getenv("WEKNORA_REDIS_NAMESPACE"))
+	ns := strings.TrimSpace(os.Getenv("LORELATTICE_REDIS_NAMESPACE"))
 	if ns != "" {
-		return "weknora:mcp_oauth_state:" + ns + ":" + state
+		return "lorelattice:mcp_oauth_state:" + ns + ":" + state
 	}
-	return "weknora:mcp_oauth_state:" + state
+	return "lorelattice:mcp_oauth_state:" + state
 }
 
 func (s *oauthStateStore) attemptKey(state string) string {

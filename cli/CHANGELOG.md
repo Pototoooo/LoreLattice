@@ -1,11 +1,11 @@
-# Changelog — `weknora` CLI
+# Changelog — `lorelattice` CLI
 
-All notable changes to the `weknora` CLI (the binary under `cli/` in this
+All notable changes to the `lorelattice` CLI (the binary under `cli/` in this
 repository) will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and the CLI follows [Semantic Versioning](https://semver.org/) independently
-of the WeKnora server / frontend release cadence.
+of the LoreLattice server / frontend release cadence.
 
 CLI history before v0.3 is recorded in the project root
 [CHANGELOG.md](../CHANGELOG.md) under the release that introduced the CLI.
@@ -38,8 +38,8 @@ CLI history before v0.3 is recorded in the project root
   embedding model is bound); `kb create` hints the fix when it is false.
 - `model create` / `model update` / `model delete` (`update` rotates key /
   base-url in place, preserving the id).
-- Stateless env-credential auth: `WEKNORA_API_KEY` / `WEKNORA_TOKEN` +
-  `WEKNORA_HOST`, a zero-disk path for headless / agent use. `auth logout` now
+- Stateless env-credential auth: `LORELATTICE_API_KEY` / `LORELATTICE_TOKEN` +
+  `LORELATTICE_HOST`, a zero-disk path for headless / agent use. `auth logout` now
   keeps the profile registered (use `profile remove` to delete it entirely).
 - `meta.total_count` on paginated list / search output (full result size before
   client-side `--limit` truncation).
@@ -70,7 +70,7 @@ CLI history before v0.3 is recorded in the project root
 ### v0.9 — auth/profile model harmonization + flag cleanup
 
 #### Added
-- `weknora session stop <session-id>` command to abort an in-flight agent run.
+- `lorelattice session stop <session-id>` command to abort an in-flight agent run.
 - `profile add --use`: switch to the newly-added profile immediately (instead of only auto-selecting the first profile added).
 - `-L` shorthand on `session view` (alias for `--limit`).
 - `doc download --format json` now emits a success envelope (was bare).
@@ -83,7 +83,7 @@ CLI history before v0.3 is recorded in the project root
 - **`--kb` now accepts a knowledge-base name *or* id** on `doc delete --all` and `search chunks` / `search docs`; it stays required (no silent project-link fallback on these commands).
 - **`agent create --kb` renamed to `--attach-kb`** to disambiguate from the global `--kb` scope flag.
 - **MCP tool `agent_invoke` renamed to `session_ask`** (clean rename — external MCP clients must update cached tool schemas).
-- **`auth login` drops `--host` and `--name`.** It authenticates the active profile; create it first with `weknora profile add <name> --host <h> --use`. Target a non-active profile with the global `weknora --profile <name> auth login`.
+- **`auth login` drops `--host` and `--name`.** It authenticates the active profile; create it first with `lorelattice profile add <name> --host <h> --use`. Target a non-active profile with the global `lorelattice --profile <name> auth login`.
 - **`auth logout` and `auth refresh` drop `--name`.** They act on the active profile; target another with the global `--profile <name>`.
 
 #### Removed
@@ -94,9 +94,9 @@ CLI history before v0.3 is recorded in the project root
 ### v0.8 — Agent safety nets + MCP annotations
 
 #### Added
-- `--dry-run` flag on every mutation cobra command (`kb create/edit/delete`, `agent create/edit/delete`, `doc create/upload/fetch/delete`, `chunk delete`, `session delete`, `auth refresh/logout`, `link/unlink`, `profile add/remove`) and on `weknora api` (POST/PUT/PATCH/DELETE only; GET returns FlagError exit 2).
+- `--dry-run` flag on every mutation cobra command (`kb create/edit/delete`, `agent create/edit/delete`, `doc create/upload/fetch/delete`, `chunk delete`, `session delete`, `auth refresh/logout`, `link/unlink`, `profile add/remove`) and on `lorelattice api` (POST/PUT/PATCH/DELETE only; GET returns FlagError exit 2).
 - envelope `meta.dry_run: true` + `meta.plan: {action, args | method+path+body}` open-map fields (omitempty in non-dry-run envelopes).
-- `weknora session continue-stream <session-id> --message <msg-id>` command for SSE event stream replay/recovery.
+- `lorelattice session continue-stream <session-id> --message <msg-id>` command for SSE event stream replay/recovery.
 - MCP `Tool.Annotations` on all 10 MCP serve tools (`destructiveHint` / `readOnlyHint` / `idempotentHint` / `openWorldHint` + `Title`) per MCP spec 2025-06-18.
 - `cli/internal/cmdutil/risk.go`: `SetRisk(cmd, action)` helper + `RiskDestructive` const + `GetRisk(cmd)` reader.
 - Help output "Risk: <action> (<level>)" line at top of 9 destructive commands' `--help` (via modified `SetAgentHelp` wrapper).
@@ -104,7 +104,7 @@ CLI history before v0.3 is recorded in the project root
 - `cli/README.md` sections: Dry-run preview / Resuming streams.
 
 #### Changed
-- `SetAgentHelp` wrapper in `cli/internal/cmdutil/agenthelp.go` now prepends "Risk:" line in default (non-JSON) help branch when `cmd.Annotations["risk.action"]` is set. WEKNORA_AGENT_HELP=1 JSON path unchanged.
+- `SetAgentHelp` wrapper in `cli/internal/cmdutil/agenthelp.go` now prepends "Risk:" line in default (non-JSON) help branch when `cmd.Annotations["risk.action"]` is set. LORELATTICE_AGENT_HELP=1 JSON path unchanged.
 - 9 destructive commands' `SetAgentHelp` Warnings standardized: line 1 is a verbatim exit-10 / `-y` reminder; line 2 carries per-command destructive context.
 - `cli/cmd/api/api.go` now has `SetAgentHelp` with runtime exit-10 note for `-X DELETE/PUT/PATCH`.
 - `cli/cmd/doc/delete.go` Warnings adds a 3rd line describing `--all` blast radius.
@@ -134,7 +134,7 @@ CLI history before v0.3 is recorded in the project root
   - v0.7: always json; TTY only affects indent (compact in pipe). Enum
     `text | json | ndjson` unchanged.
   - Migration: humans on a TTY pass `--format text` (or set
-    `WEKNORA_FORMAT=text` env) for the prior auto-text behavior.
+    `LORELATTICE_FORMAT=text` env) for the prior auto-text behavior.
 - **`chat` / `session ask` default to NDJSON event-stream (SDK passthrough).**
   - v0.6: TTY rendered a live SSE animation; `--format json` produced a buffered
     object; NDJSON was opt-in.
@@ -144,47 +144,47 @@ CLI history before v0.3 is recorded in the project root
     `tool_call` / `tool_result` / `references` / `thinking` / `reflection` /
     `error` / `complete` for chat; agent vocab is a subset).
   - For prose rendering: `--format text`.
-- **`weknora context` command group renamed to `weknora profile`.**
+- **`lorelattice context` command group renamed to `lorelattice profile`.**
   - Subcommands `context list/add/remove/use` → `profile list/add/remove/use`.
   - Global flag `--context` → `--profile`.
-  - On-disk config `~/.config/weknora/config.yaml` keys `current_context:` /
+  - On-disk config `~/.config/lorelattice/config.yaml` keys `current_context:` /
     `contexts:` → `current_profile:` / `profiles:` (no backwards-compat
     alias; delete the file or rename the keys by hand to migrate).
-  - Binding file `.weknora/project.yaml` field `context:` → `profile:`
-    (re-run `weknora link` to regenerate).
+  - Binding file `.lorelattice/project.yaml` field `context:` → `profile:`
+    (re-run `lorelattice link` to regenerate).
   - `profile use` JSON fields `current_context` / `previous_context` →
     `current_profile` / `previous_profile`.
-  - `weknora link` JSON field `context` → `profile`.
+  - `lorelattice link` JSON field `context` → `profile`.
   - Rationale: `context` collided with LLM "context window" / RAG "context" /
     Go `context.Context`. Mainstream multi-credential CLIs (AWS, Stripe,
     OpenAI, Anthropic) settle on `profile` as the term of art.
-- **`weknora agent invoke` removed; use `weknora session ask --agent <id>`.**
+- **`lorelattice agent invoke` removed; use `lorelattice session ask --agent <id>`.**
   - Server route is `POST /sessions/{session_id}/agent-qa` — session-anchored.
-  - `weknora agent` keeps CRUD only (list / view / create / edit / delete /
+  - `lorelattice agent` keeps CRUD only (list / view / create / edit / delete /
     status / check).
-  - Migration: `weknora agent invoke ag_x "Q"` →
-    `weknora session ask --agent ag_x "Q"` (auto-creates session if none given).
-- **`weknora doc upload` split into three commands.**
-  - `weknora doc upload <file>` — local file only.
-  - `weknora doc fetch <url>` — server-side remote fetch (was `upload --from-url`).
-  - `weknora doc create --text "..."` — direct text knowledge.
+  - Migration: `lorelattice agent invoke ag_x "Q"` →
+    `lorelattice session ask --agent ag_x "Q"` (auto-creates session if none given).
+- **`lorelattice doc upload` split into three commands.**
+  - `lorelattice doc upload <file>` — local file only.
+  - `lorelattice doc fetch <url>` — server-side remote fetch (was `upload --from-url`).
+  - `lorelattice doc create --text "..."` — direct text knowledge.
   - URL-only flags (`--title`, `--file-type`, `--tag-id`) moved to `doc fetch`.
   - Rationale: `upload --from-url` mixed semantics ("send out" vs "pull in");
     the three-verb split matches the server's three endpoints and gives each
     one a single unambiguous shape.
-- **`weknora kb empty` removed; use `weknora doc delete --all --kb=<id>`.**
+- **`lorelattice kb empty` removed; use `lorelattice doc delete --all --kb=<id>`.**
   - Atomic server `ClearKnowledgeBaseContents` (no list-then-delete race).
   - Same exit-10 `-y/--yes` guard as `kb delete`.
-  - Migration: `weknora kb empty kb_x -y` →
-    `weknora doc delete --all --kb=kb_x -y`.
-- **`weknora api -d/--data` flag removed; use `--input <file>` or `--input -`
+  - Migration: `lorelattice kb empty kb_x -y` →
+    `lorelattice doc delete --all --kb=kb_x -y`.
+- **`lorelattice api -d/--data` flag removed; use `--input <file>` or `--input -`
   (stdin).**
-  - `weknora api` now accepts any non-empty HTTP method (whitelist removed)
+  - `lorelattice api` now accepts any non-empty HTTP method (whitelist removed)
     so the escape hatch can hit endpoints the CLI doesn't natively model.
-  - Migration: `weknora api -d '{"foo":1}' /endpoint` →
-    `echo '{"foo":1}' | weknora api --input - /endpoint`.
+  - Migration: `lorelattice api -d '{"foo":1}' /endpoint` →
+    `echo '{"foo":1}' | lorelattice api --input - /endpoint`.
 - **Batch operations envelope shape — per-item `ok` pattern.**
-  - `weknora doc delete id1,id2,id3` and similar multi-id mutations now emit:
+  - `lorelattice doc delete id1,id2,id3` and similar multi-id mutations now emit:
     `{ok, data:[{id, ok, result?|error?}, ...], meta:{count, successes, failures}}`.
   - Top-level `ok` = AND-aggregate of per-item `ok` (false on partial failure).
   - All-fail stays in batch shape (not error envelope) — agents can iterate
@@ -197,24 +197,24 @@ CLI history before v0.3 is recorded in the project root
 - **Unknown subcommand emits typed envelope.**
   - `input.unknown_subcommand` with `detail.{unknown, command_path, available[]}`
     + `retry_command: "<parent> --help"`. Replaces v0.6's free-form
-    `"unknown command \"x\" for \"weknora\""` prose.
-- **`weknora chat` requires the query as a single quoted argument.**
-  - v0.6: `MinimumNArgs(1)` silently joined `weknora chat hello world` into
+    `"unknown command \"x\" for \"lorelattice\""` prose.
+- **`lorelattice chat` requires the query as a single quoted argument.**
+  - v0.6: `MinimumNArgs(1)` silently joined `lorelattice chat hello world` into
     `"hello world"`.
   - v0.7: `ExactArgs(1)` rejects multi-arg with exit 2; matches
-    `weknora session ask`. Quote the query: `weknora chat "hello world"`.
+    `lorelattice session ask`. Quote the query: `lorelattice chat "hello world"`.
 
 #### Added
-- **`WEKNORA_PROFILE` env var** selects the active profile for a single
+- **`LORELATTICE_PROFILE` env var** selects the active profile for a single
   invocation (equivalent to `--profile <name>` global flag). Overridden by
   explicit `--profile`. Useful for CI scripts that cannot pass global flags.
-- **`WEKNORA_FORMAT` env var** sets the default `--format`. Values:
+- **`LORELATTICE_FORMAT` env var** sets the default `--format`. Values:
   `text | json | ndjson`. Overridden by explicit `--format`. Invalid values
   ignored.
 - **`error.retry_command`** — directly-executable retry argv, distinct from
   prose `hint`. Agents read `retry_command` without regex-parsing `hint`.
 - **`error.retry_after_seconds`** — `server.rate_limited` / `server.timeout`
-  surface server `Retry-After` header verbatim. CLI-direct (`weknora api`)
+  surface server `Retry-After` header verbatim. CLI-direct (`lorelattice api`)
   parses HTTP `Retry-After` headers; SDK-mediated paths will gain coverage
   as the SDK exposes typed transport errors.
 - **`error.risk.{level, action}`** — destructive writes carry
@@ -227,11 +227,11 @@ CLI history before v0.3 is recorded in the project root
 - **`meta.count` / `meta.has_more`** on list commands. `meta.next_cursor` /
   `meta.total_count` / `meta.request_id` reserved — populated when the SDK
   exposes them (planned for v0.8).
-- **`weknora doc fetch <url>`** — new command (see split above).
-- **`weknora doc create --text "..."`** — new command (see split above).
-- **`weknora session ask --agent <id> "..."`** — new command (replaces
+- **`lorelattice doc fetch <url>`** — new command (see split above).
+- **`lorelattice doc create --text "..."`** — new command (see split above).
+- **`lorelattice session ask --agent <id> "..."`** — new command (replaces
   `agent invoke`).
-- **`weknora doc delete --all --kb=<id>`** — new mode of `doc delete`
+- **`lorelattice doc delete --all --kb=<id>`** — new mode of `doc delete`
   (replaces `kb empty`).
 - **NDJSON `init` event** at stream head for `chat` / `session ask` —
   carries `session_id` + optional `kb_id` / `agent_id` / `model` / `profile`.
@@ -266,7 +266,7 @@ CLI history before v0.3 is recorded in the project root
 - **`--no-stream` flag removed** on `chat` / `agent invoke` → use
   **`--format json`** to buffer the full answer before printing. The bare
   text-accumulate use case (TTY but no streaming) is dropped.
-- **`WEKNORA_SDK_DEBUG=1` env removed** → use **`WEKNORA_LOG_LEVEL=debug`**.
+- **`LORELATTICE_SDK_DEBUG=1` env removed** → use **`LORELATTICE_LOG_LEVEL=debug`**.
 - **`kb create --name <name>` flag removed** → use positional
   **`kb create <name>`** (consistent with `agent create <name>`).
 
@@ -278,13 +278,13 @@ CLI history before v0.3 is recorded in the project root
   flag to a persistent global and made the default always `json`).
 - **`--jq '<expr>'`** flag pairs with `--format json|ndjson` to filter or
   project the JSON output via a jq expression.
-- **`weknora doc wait <id> [<id>...]`** — block until every document reaches a
+- **`lorelattice doc wait <id> [<id>...]`** — block until every document reaches a
   terminal `parse_status`. Always wait-all — use shell composition
   (`wait id1 && wait id2`) for fail-fast.
   - `--timeout DURATION` (default 10m; exit 124 on hit)
   - `--interval DURATION` (default 2s; exponential backoff to 15s + jitter)
   - Multi-id concurrent (max 5 parallel); exit code priority 1 > 124 > 0
-- **`--log-level error|warn|info|debug`** persistent flag + `WEKNORA_LOG_LEVEL`
+- **`--log-level error|warn|info|debug`** persistent flag + `LORELATTICE_LOG_LEVEL`
   env. Wires into the SDK's debug logger via the additive
   `client.SetDebugLevel(level string)` function.
 - **`kb create --storage-provider <local|minio|cos|tos|s3|oss|ks3>`** —
@@ -292,25 +292,25 @@ CLI history before v0.3 is recorded in the project root
   (server only accepts it on create, not update). Required on self-hosted
   deployments where the server-side default doesn't pre-populate a
   provider — without it, subsequent `doc upload` returns `kb not found`.
-- **`weknora kb status <id>`** — fast health snapshot (1 HTTP). Returns
+- **`lorelattice kb status <id>`** — fast health snapshot (1 HTTP). Returns
   reachable / counts / is_processing.
-- **`weknora kb check <id>`** — deep verification: status fields + `failed_count`
+- **`lorelattice kb check <id>`** — deep verification: status fields + `failed_count`
   aggregated via doc list page-walk (1 + N HTTP). The verb split between
   `status` (read state cheaply) and `check` (actively verify) communicates
   cost to the caller.
-- **`weknora agent status <id>`** — fast health snapshot (1 HTTP):
+- **`lorelattice agent status <id>`** — fast health snapshot (1 HTTP):
   reachable / model_id.
-- **`weknora agent check <id>`** — deep verification: status fields +
+- **`lorelattice agent check <id>`** — deep verification: status fields +
   `kb_scope_all_reachable` from probing each KB in scope (1 + N HTTP). Same
   status/check verb split as kb status/check.
-- **`weknora doc delete <doc-id> [<doc-id>...]`** — positional multi-id.
+- **`lorelattice doc delete <doc-id> [<doc-id>...]`** — positional multi-id.
   Default keep-going on failure. Single `-y/--yes` confirms the entire
   batch; non-TTY without `-y` still exits 10.
-- **`weknora session delete <session-id> [<session-id>...]`** — positional
+- **`lorelattice session delete <session-id> [<session-id>...]`** — positional
   multi-id with the same keep-going semantics as `doc delete`.
-- **`weknora chunk delete <chunk-id> [<chunk-id>...] --doc <doc-id>`** — positional
+- **`lorelattice chunk delete <chunk-id> [<chunk-id>...] --doc <doc-id>`** — positional
   multi-id, all chunks share the same `--doc` parent (server route requires it).
-- **`weknora api <path> --paginate`** — follows weknora's offset-based
+- **`lorelattice api <path> --paginate`** — follows lorelattice's offset-based
   pagination (`?page=N&page_size=M`) and merges all pages into a single
   `{data, total}` JSON response.
 - **MCP `chat` and `agent_invoke` tools** output schemas extended with
@@ -319,7 +319,7 @@ CLI history before v0.3 is recorded in the project root
   no standard partial-response).
 - **`SetAgentHelp` pattern** — `cmdutil.SetAgentHelp(cmd, AgentHelp{...})`
   exposes a stable JSON used_for / required_flags / examples / output
-  shape, activated by `WEKNORA_AGENT_HELP=1` at `--help` time. Applied
+  shape, activated by `LORELATTICE_AGENT_HELP=1` at `--help` time. Applied
   to `chat` and `kb list` as proof-of-pattern; extending to another
   command requires touching only that command's `NewCmd`.
 - **`cli/AGENTS.md`** gains an "Error code reference" section (35 typed
@@ -392,40 +392,40 @@ CLI history before v0.3 is recorded in the project root
 ### v0.5 — agent CRUD, chunk subtree, MCP chunk_list, audit-driven cleanup
 
 #### Added
-- `weknora agent create <name> --model <id>` / `agent edit <id>` /
+- `lorelattice agent create <name> --model <id>` / `agent edit <id>` /
   `agent delete <id>` — hybrid surface (hot-path flags for the common
   fields + `--config-file` YAML/JSON for the long tail +
   `--generate-skeleton` template emit). `--from <agent-id>` copies
   from an existing agent.
-- `weknora chunk list --doc <doc-id>` / `chunk view <chunk-id>` /
+- `lorelattice chunk list --doc <doc-id>` / `chunk view <chunk-id>` /
   `chunk delete <chunk-id> --doc <doc-id>` — new subtree for RAG retrieval
   debug. Paginated with v0.4 `--limit` / `--page-size` / `--all-pages` canon.
-- `weknora mcp serve` adds `chunk_list` as the 10th curated tool.
-- `weknora agent view <id>` human output now renders all 34 AgentConfig
+- `lorelattice mcp serve` adds `chunk_list` as the 10th curated tool.
+- `lorelattice agent view <id>` human output now renders all 34 AgentConfig
   fields (previously 7), grouped into 10 presentation sections.
 - `--all-pages` / `--page-size` on `search docs` and `search sessions`
   (catching up with `session list` / `doc list` canon from v0.3+v0.4).
-- `weknora doc list` gains `--keyword` / `--file-type` / `--source` /
+- `lorelattice doc list` gains `--keyword` / `--file-type` / `--source` /
   `--tag-id` / `--start-time` / `--end-time` (RFC3339) — matches the
   SDK's `KnowledgeListFilter` surface. Time flags reject malformed
   input with `input.invalid_argument`.
 - MCP `doc_list` tool gains the same 6 filter fields (`keyword`,
   `file_type`, `source`, `tag_id`, `start_time`, `end_time`) so agents
   have parity with the CLI.
-- `weknora session view --full` (with `--limit`, default 50, bounds
+- `lorelattice session view --full` (with `--limit`, default 50, bounds
   1..1000) loads chat history via `LoadMessages` and renders messages
   inline after session metadata. JSON mode projects messages into a
   `messages` array. `--limit` without `--full` errors with
   `input.invalid_argument`.
-- `weknora kb view` human render now includes `TYPE`, `PINNED` (badge,
+- `lorelattice kb view` human render now includes `TYPE`, `PINNED` (badge,
   only when set), `TEMPORARY` (badge), `PROCESSING` (with doc count,
   only when active), `SUMMARY MODEL`, and `CREATED`. Nested config
   structs stay JSON-only.
-- `weknora doc view` human render expands to include `TITLE` (when
+- `lorelattice doc view` human render expands to include `TITLE` (when
   distinct from filename), `DESC`, `SOURCE`, `CHANNEL`, `TAG`,
   `STORAGE` (human-readable bytes), `SUMMARY`, `ENABLED`, and `HASH`
   (12-char prefix). All omit-empty.
-- `weknora doc upload` gains `--enable-multimodel` (tri-state:
+- `lorelattice doc upload` gains `--enable-multimodel` (tri-state:
   unset/true/false), repeatable `--metadata key=value`, and
   `--channel` flags. `--enable-multimodel` and `--channel` apply to
   file / `--recursive` / `--from-url`; `--metadata` is file /
@@ -454,14 +454,14 @@ CLI history before v0.3 is recorded in the project root
   symmetric `ErrDuplicateURL` correctly.
 
 #### Breaking changes
-- `weknora search docs` now applies the keyword filter server-side via
+- `lorelattice search docs` now applies the keyword filter server-side via
   `ListKnowledgeWithFilter` (was: page through every doc and
   substring-match client-side). Smaller wire payload on large KBs.
   **The match is now case-sensitive** (server uses `LIKE %keyword%`),
   whereas the previous client-side path lowered both sides. Callers
   that relied on case-insensitive matching (e.g. `search docs Q3`
   finding `q3 retro`) must lower-case the query themselves, or fall
-  back to `weknora api` with a custom filter.
+  back to `lorelattice api` with a custom filter.
 
 #### Changed
 - `cli/AGENTS.md` MCP curation rationale rewritten: curated read-only
@@ -473,7 +473,7 @@ CLI history before v0.3 is recorded in the project root
   section includes a step reminding contributors to decide
   flag-vs-escape-hatch per field rather than trying to flag-mirror
   every SDK capability.
-- `cli/README.md` now documents the `weknora api` raw HTTP passthrough
+- `cli/README.md` now documents the `lorelattice api` raw HTTP passthrough
   as the canonical escape hatch for deep KB config, per-request `chat`
   / `agent invoke` overrides, and operations without a CLI verb.
 
@@ -494,15 +494,15 @@ CLI history before v0.3 is recorded in the project root
   tool descriptions.
 
 #### Added
-- `weknora mcp serve` — curated read-only stdio MCP server exposing 9
+- `lorelattice mcp serve` — curated read-only stdio MCP server exposing 9
   tools (`kb_list`, `kb_view`, `doc_list`, `doc_view`, `doc_download`,
   `search_chunks`, `chat`, `agent_list`, `agent_invoke`). Destructive
   verbs are intentionally excluded.
-- `weknora agent list` / `agent view` / `agent invoke` — manage and
-  call WeKnora's server-side Custom Agent resources.
-- `weknora auth token` — print the active credential to `stdout` for
+- `lorelattice agent list` / `agent view` / `agent invoke` — manage and
+  call LoreLattice's server-side Custom Agent resources.
+- `lorelattice auth token` — print the active credential to `stdout` for
   scripting (raw secret by default; `--json` emits `{token, mode, context}`).
-- `weknora doc upload --from-url` — ingest a remote URL.
+- `lorelattice doc upload --from-url` — ingest a remote URL.
 - `--json=fields,...` field projection and `--jq <expr>` filtering on
   every command that emits JSON.
 - `--limit` and `--all-pages` on list / search commands for bounded
@@ -515,7 +515,7 @@ CLI history before v0.3 is recorded in the project root
 - `auth login --with-token` validates the supplied key against
   `/auth/me` before persisting, and prints an advisory if the keyring
   is unavailable and credentials fall back to a 0600 file under
-  `$XDG_CONFIG_HOME/weknora/secrets/`.
+  `$XDG_CONFIG_HOME/lorelattice/secrets/`.
 - AGENTS.md rewritten as a developer guide (~170 lines, 6 H2 sections).
 
 ### v0.3 — extended management surface and a `session` subtree
@@ -556,7 +556,7 @@ CLI history before v0.3 is recorded in the project root
   management.
 - `api --input FILE` / `api --input -` — body source for raw HTTP
   passthrough (file or stdin); mutually exclusive with `--data`.
-- `unlink` — remove the cwd's `.weknora/project.yaml` so subsequent
+- `unlink` — remove the cwd's `.lorelattice/project.yaml` so subsequent
   commands stop auto-resolving `--kb` from it. Walks up from cwd so a
   user in a subdirectory can unlink without cd-ing to the project root.
 - Completion smoke test guards against cobra bumps silently breaking

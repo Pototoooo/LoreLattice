@@ -31,11 +31,11 @@ CREATE INDEX IF NOT EXISTS idx_im_channel_session ON im_channel_sessions (sessio
 -- Partial index for soft deletes (only index deleted rows)
 CREATE INDEX IF NOT EXISTS idx_im_channel_deleted ON im_channel_sessions (deleted_at) WHERE deleted_at IS NOT NULL;
 
-COMMENT ON TABLE im_channel_sessions IS 'Maps IM platform channels to WeKnora conversation sessions';
+COMMENT ON TABLE im_channel_sessions IS 'Maps IM platform channels to LoreLattice conversation sessions';
 COMMENT ON COLUMN im_channel_sessions.platform IS 'IM platform identifier: wecom, feishu, etc.';
 COMMENT ON COLUMN im_channel_sessions.user_id IS 'Platform-specific user identifier';
 COMMENT ON COLUMN im_channel_sessions.chat_id IS 'Platform-specific chat/group identifier, empty for direct messages';
-COMMENT ON COLUMN im_channel_sessions.session_id IS 'Associated WeKnora session ID';
+COMMENT ON COLUMN im_channel_sessions.session_id IS 'Associated LoreLattice session ID';
 COMMENT ON COLUMN im_channel_sessions.tenant_id IS 'Tenant that owns this channel mapping';
 COMMENT ON COLUMN im_channel_sessions.agent_id IS 'Custom agent ID used for this channel, empty for default';
 COMMENT ON COLUMN im_channel_sessions.status IS 'Channel status: active, paused, expired';

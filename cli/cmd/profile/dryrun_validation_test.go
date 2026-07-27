@@ -14,12 +14,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/config"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/prompt"
-	"github.com/Tencent/WeKnora/cli/internal/secrets"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/config"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/prompt"
+	"github.com/Pototoooo/lorelattice/cli/internal/secrets"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // profileDryRunFactory builds a Factory whose Client closure panics if
@@ -42,7 +42,7 @@ func profileDryRunFactory(t *testing.T) *cmdutil.Factory {
 // withRootHarnessProfile wraps a profile subcommand under a synthetic root
 // cmd that registers the global persistent flags.
 func withRootHarnessProfile(sub *cobra.Command, args ...string) *cobra.Command {
-	root := &cobra.Command{Use: "weknora"}
+	root := &cobra.Command{Use: "lorelattice"}
 	pf := root.PersistentFlags()
 	pf.BoolP("yes", "y", false, "")
 	pf.String("format", "", "")

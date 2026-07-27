@@ -3,7 +3,7 @@ package chat
 import (
 	"strings"
 
-	"github.com/Tencent/WeKnora/internal/models/provider"
+	"github.com/Pototoooo/lorelattice/internal/models/provider"
 	"github.com/sashabaranov/go-openai"
 )
 

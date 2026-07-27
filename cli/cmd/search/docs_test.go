@@ -10,9 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // fakeDocsSearchSvc scripts paginated ListKnowledgeWithFilter responses.
@@ -267,7 +267,7 @@ func TestDocsSearch_HasMore(t *testing.T) {
 // to resolve it reports the typed local.kb_id_required, not a usage error.
 func TestNewCmdDocs_NoKBUsesResolver(t *testing.T) {
 	iostreams.SetForTest(t)
-	t.Setenv("WEKNORA_KB_ID", "")
+	t.Setenv("LORELATTICE_KB_ID", "")
 	t.Chdir(t.TempDir())
 	cmd := NewCmdDocs(&cmdutil.Factory{
 		Client: func() (*sdk.Client, error) { return nil, errors.New("client should not be built") },
@@ -286,7 +286,7 @@ func TestNewCmdDocs_NoKBUsesResolver(t *testing.T) {
 // TestNewCmdDocs_HonorsKBEnv proves the env fallback is wired for search docs.
 func TestNewCmdDocs_HonorsKBEnv(t *testing.T) {
 	iostreams.SetForTest(t)
-	t.Setenv("WEKNORA_KB_ID", "kb_from_env")
+	t.Setenv("LORELATTICE_KB_ID", "kb_from_env")
 	cmd := NewCmdDocs(&cmdutil.Factory{
 		Client: func() (*sdk.Client, error) { return nil, errors.New("client boom") },
 	})

@@ -59,7 +59,7 @@ function tenantSegmentForKey(): string {
 }
 
 function recentsKey(): string {
-  return `WeKnora_${readUserId()}_${tenantSegmentForKey()}${RECENTS_SUFFIX}`
+  return `LoreLattice_${readUserId()}_${tenantSegmentForKey()}${RECENTS_SUFFIX}`
 }
 
 function readRecents(): PinEntry[] {

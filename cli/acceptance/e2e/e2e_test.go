@@ -1,6 +1,6 @@
 //go:build acceptance_e2e
 
-// Package e2e_test drives the WeKnora CLI binary against a real running
+// Package e2e_test drives the LoreLattice CLI binary against a real running
 // server to validate the RAG closing loop end-to-end.
 //
 // Build tag isolation: //go:build acceptance_e2e excludes this file from
@@ -8,11 +8,11 @@
 // requested. To run:
 //
 //	cd cli
-//	WEKNORA_E2E_HOST=https://kb.example.com \
-//	WEKNORA_E2E_TOKEN=eyJhbGc... \
+//	LORELATTICE_E2E_HOST=https://kb.example.com \
+//	LORELATTICE_E2E_TOKEN=eyJhbGc... \
 //	go test -tags=acceptance_e2e -v ./acceptance/e2e/...
 //
-// Optional WEKNORA_E2E_KB_NAME_PREFIX customizes the throwaway KB name (default
+// Optional LORELATTICE_E2E_KB_NAME_PREFIX customizes the throwaway KB name (default
 // "cli-e2e-"). Cleanup runs even on test failure via t.Cleanup so the server
 // doesn't accumulate test debris.
 package e2e_test
@@ -34,14 +34,14 @@ import (
 // step parses the CLI's bare JSON to extract IDs for the next step -
 // validating both functional behavior and wire-contract stability.
 func TestRAGFullLoop(t *testing.T) {
-	host := mustEnv(t, "WEKNORA_E2E_HOST")
-	token := mustEnv(t, "WEKNORA_E2E_TOKEN")
-	prefix := envOr("WEKNORA_E2E_KB_NAME_PREFIX", "cli-e2e-")
+	host := mustEnv(t, "LORELATTICE_E2E_HOST")
+	token := mustEnv(t, "LORELATTICE_E2E_TOKEN")
+	prefix := envOr("LORELATTICE_E2E_KB_NAME_PREFIX", "cli-e2e-")
 
 	bin := buildBinary(t)
 	xdg := t.TempDir()
 
-	// Inject host + token as WEKNORA_HOST / WEKNORA_TOKEN env vars. The
+	// Inject host + token as LORELATTICE_HOST / LORELATTICE_TOKEN env vars. The
 	// CLI's env-credential path (buildClientFromEnv) takes precedence
 	// over profile config, so this bypasses the secrets-store dance
 	// entirely — no keychain access, no file:// ref plumbing. This is
@@ -49,18 +49,18 @@ func TestRAGFullLoop(t *testing.T) {
 	env := append(os.Environ(),
 		"XDG_CONFIG_HOME="+xdg,
 		"XDG_CACHE_HOME="+filepath.Join(xdg, "cache"),
-		"WEKNORA_HOST="+host,
-		"WEKNORA_TOKEN="+token,
+		"LORELATTICE_HOST="+host,
+		"LORELATTICE_TOKEN="+token,
 		// SDK debug off - explicit so the CI run isn't noisy.
-		"WEKNORA_LOG_LEVEL=error",
+		"LORELATTICE_LOG_LEVEL=error",
 	)
 
 	// 1. kb create → KnowledgeBase object (envelope-wrapped: {ok, data})
 	// The CLI now requires explicit model binding so uploaded docs are
 	// immediately searchable. Use the server's builtin model IDs (they
 	// exist on every deployment that configures builtin_models.yaml).
-	embeddingModel := envOr("WEKNORA_E2E_EMBEDDING_MODEL", "Qwen/Qwen3-Embedding-8B")
-	chatModel := envOr("WEKNORA_E2E_CHAT_MODEL", "deepseek-ai/DeepSeek-V3.2")
+	embeddingModel := envOr("LORELATTICE_E2E_EMBEDDING_MODEL", "Qwen/Qwen3-Embedding-8B")
+	chatModel := envOr("LORELATTICE_E2E_CHAT_MODEL", "deepseek-ai/DeepSeek-V3.2")
 	kbName := prefix + fmt.Sprintf("%d", time.Now().UnixNano())
 	var created struct {
 		OK   bool `json:"ok"`
@@ -105,7 +105,7 @@ func TestRAGFullLoop(t *testing.T) {
 
 	// 4. search chunks → SearchResult list (envelope-wrapped: {ok, data})
 	var searchResp struct {
-		OK   bool              `json:"ok"`
+		OK   bool             `json:"ok"`
 		Data []map[string]any `json:"data"`
 	}
 	runJSONInto(t, bin, env, &searchResp, "search", "chunks", "sample", "--kb", created.Data.ID, "--limit", "5", "--format", "json")
@@ -174,7 +174,7 @@ func envOr(key, fallback string) string {
 func buildBinary(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()
-	out := filepath.Join(dir, "weknora")
+	out := filepath.Join(dir, "lorelattice")
 	// Repo layout: this test sits at cli/acceptance/e2e/, so cli/ is two levels up.
 	cmd := exec.Command("go", "build", "-o", out, ".")
 	cmd.Dir = filepath.Join("..", "..")
@@ -191,13 +191,13 @@ func buildBinary(t *testing.T) string {
 // window.
 func writeSampleDoc(t *testing.T) string {
 	t.Helper()
-	content := `WeKnora E2E Sample Document
+	content := `LoreLattice E2E Sample Document
 
-This sample document is used by the WeKnora CLI acceptance test suite to
+This sample document is used by the LoreLattice CLI acceptance test suite to
 validate the end-to-end retrieval-augmented generation pipeline.
 
 向量检索的核心思想是把文本通过 embedding 模型映射到高维向量空间,然后通过余弦相似度
-等度量找出语义最接近的内容片段。WeKnora 支持 vector + keyword 的混合检索模式。
+等度量找出语义最接近的内容片段。LoreLattice 支持 vector + keyword 的混合检索模式。
 
 The hybrid search mode combines vector similarity (semantic) with keyword
 matching (lexical) to balance recall and precision.
@@ -211,7 +211,7 @@ matching (lexical) to balance recall and precision.
 }
 
 // waitDocReady polls `doc list` until the uploaded document's status indicates
-// indexing is complete. WeKnora server uses a few status values across versions
+// indexing is complete. LoreLattice server uses a few status values across versions
 // ("ready", "completed", "ok") - accept any non-pending/non-processing/non-failed
 // state so we don't break on a server-side rename. Failed status fails the test
 // fast.

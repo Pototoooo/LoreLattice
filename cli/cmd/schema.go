@@ -10,9 +10,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/output"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
 )
 
 // schemaRisk mirrors the destructive-write risk annotation in the schema view.
@@ -45,16 +45,16 @@ type commandSchema struct {
 	Flags         []schemaFlag `json:"flags,omitempty"`
 }
 
-// schemaIndexEntry is one row of the no-argument `weknora schema` index.
+// schemaIndexEntry is one row of the no-argument `lorelattice schema` index.
 type schemaIndexEntry struct {
 	Command string `json:"command"`
 	UsedFor string `json:"used_for,omitempty"`
 }
 
-// newCmdSchema builds the `weknora schema` introspection command. With no args
+// newCmdSchema builds the `lorelattice schema` introspection command. With no args
 // it lists every leaf command and its purpose; with a command path it prints
 // that command's full contract. This makes the structured help (otherwise only
-// reachable via WEKNORA_AGENT_HELP=1 on --help) a first-class, discoverable
+// reachable via LORELATTICE_AGENT_HELP=1 on --help) a first-class, discoverable
 // command — mirroring how mainstream agent-first CLIs expose schema introspection.
 func newCmdSchema() *cobra.Command {
 	cmd := &cobra.Command{
@@ -63,11 +63,11 @@ func newCmdSchema() *cobra.Command {
 		Long: `Print the machine-readable contract for a command, or — with no argument —
 an index of every command and what it is used for.
 
-  weknora schema                 # index: every leaf command + used_for
-  weknora schema kb create       # the contract for one command
-  weknora schema doc update      # used_for, flags, examples, output, risk
+  lorelattice schema                 # index: every leaf command + used_for
+  lorelattice schema kb create       # the contract for one command
+  lorelattice schema doc update      # used_for, flags, examples, output, risk
 
-This is the discoverable form of WEKNORA_AGENT_HELP=1 <cmd> --help: an agent
+This is the discoverable form of LORELATTICE_AGENT_HELP=1 <cmd> --help: an agent
 can enumerate the surface and learn how to call any command without scraping
 human help prose.`,
 		Args: cobra.ArbitraryArgs,
@@ -92,9 +92,9 @@ human help prose.`,
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
 		UsedFor: "introspect the CLI surface: list every command (no args) or print one command's contract (used_for, flags, examples, output, risk).",
 		Examples: []string{
-			"weknora schema",
-			"weknora schema kb create",
-			"weknora schema doc update --format json",
+			"lorelattice schema",
+			"lorelattice schema kb create",
+			"lorelattice schema doc update --format json",
 		},
 		Output: "with no args, envelope.data is an array of {command, used_for}; with a command path, envelope.data is {command, used_for, required_flags, examples, output, warnings, risk, flags}",
 	})
@@ -123,20 +123,20 @@ func resolveSchemaTarget(root *cobra.Command, args []string) (*cobra.Command, er
 		available := availableSubcommandNames(root)
 		hint := fmt.Sprintf("available top-level commands: %s", strings.Join(available, ", "))
 		if sug := cmdutil.SuggestClosest(unknown, available); len(sug) > 0 {
-			hint = fmt.Sprintf("did you mean: %s? (run `weknora schema` to list all)", strings.Join(sug, ", "))
+			hint = fmt.Sprintf("did you mean: %s? (run `lorelattice schema` to list all)", strings.Join(sug, ", "))
 		}
 		return nil, cmdutil.NewError(cmdutil.CodeInputUnknownSubcommand,
 			fmt.Sprintf("no command named %q", strings.Join(args, " "))).
 			WithHint(hint).
-			WithRetryArgv([]string{"weknora", "schema"})
+			WithRetryArgv([]string{"lorelattice", "schema"})
 	}
 	// Leftover args that are not the command's own resource positionals mean a
 	// deeper path was requested that doesn't exist (e.g. `schema kb bogus`).
 	if len(rest) > 0 && target.HasSubCommands() {
 		return nil, cmdutil.NewError(cmdutil.CodeInputUnknownSubcommand,
-			fmt.Sprintf("no subcommand %q under %q", rest[0], strings.TrimPrefix(target.CommandPath(), "weknora "))).
+			fmt.Sprintf("no subcommand %q under %q", rest[0], strings.TrimPrefix(target.CommandPath(), "lorelattice "))).
 			WithHint(fmt.Sprintf("available: %s", strings.Join(availableSubcommandNames(target), ", "))).
-			WithRetryArgv(append([]string{"weknora", "schema"}, strings.Fields(strings.TrimPrefix(target.CommandPath(), "weknora "))...))
+			WithRetryArgv(append([]string{"lorelattice", "schema"}, strings.Fields(strings.TrimPrefix(target.CommandPath(), "lorelattice "))...))
 	}
 	return target, nil
 }
@@ -153,7 +153,7 @@ func emitCommandSchema(target *cobra.Command, fopts *cmdutil.FormatOptions) erro
 // buildCommandSchema assembles the schema view from the command's AgentHelp,
 // risk annotation, and local (non-inherited) flags.
 func buildCommandSchema(target *cobra.Command) commandSchema {
-	cs := commandSchema{Command: strings.TrimPrefix(target.CommandPath(), "weknora ")}
+	cs := commandSchema{Command: strings.TrimPrefix(target.CommandPath(), "lorelattice ")}
 	if ah, ok := cmdutil.AgentHelpFor(target); ok {
 		cs.UsedFor = ah.UsedFor
 		cs.RequiredFlags = ah.RequiredFlags
@@ -184,7 +184,7 @@ func buildCommandSchema(target *cobra.Command) commandSchema {
 // writeCommandSchemaText renders one command's contract as readable prose for
 // the human (--format text) path.
 func writeCommandSchemaText(w io.Writer, cs commandSchema) error {
-	fmt.Fprintf(w, "weknora %s\n", cs.Command)
+	fmt.Fprintf(w, "lorelattice %s\n", cs.Command)
 	if cs.UsedFor != "" {
 		fmt.Fprintf(w, "\n%s\n", cs.UsedFor)
 	}
@@ -240,7 +240,7 @@ func emitSchemaIndex(root *cobra.Command, fopts *cmdutil.FormatOptions) error {
 				walk(sub)
 				continue
 			}
-			e := schemaIndexEntry{Command: strings.TrimPrefix(sub.CommandPath(), "weknora ")}
+			e := schemaIndexEntry{Command: strings.TrimPrefix(sub.CommandPath(), "lorelattice ")}
 			if ah, ok := cmdutil.AgentHelpFor(sub); ok {
 				e.UsedFor = ah.UsedFor
 			} else {

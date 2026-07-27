@@ -1,6 +1,6 @@
 package opensearch
 
-import "github.com/Tencent/WeKnora/internal/types"
+import "github.com/Pototoooo/lorelattice/internal/types"
 
 // internalCfg is the driver-internal, immutable view of IndexConfig.
 // Defaults are chosen so the env-path (no IndexConfig) and DB-store path

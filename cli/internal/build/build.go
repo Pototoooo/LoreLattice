@@ -1,6 +1,6 @@
 // Package build holds compile-time-injected build metadata.
 //
-// Values are set via -ldflags="-X github.com/Tencent/WeKnora/cli/internal/build.Version=..." at link time;
+// Values are set via -ldflags="-X github.com/Pototoooo/lorelattice/cli/internal/build.Version=..." at link time;
 // the Makefile's `version` target wires them up.
 package build
 

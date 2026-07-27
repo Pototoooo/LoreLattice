@@ -7,8 +7,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/models/vlm"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/models/vlm"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // fakeVLM is a minimal VLM stub that records calls and returns a fixed response.

@@ -5,11 +5,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
 )
 
-// TestSearch_NoArgs_ShowsHelp: bare `weknora search` (no subcommand)
+// TestSearch_NoArgs_ShowsHelp: bare `lorelattice search` (no subcommand)
 // must run cobra's Help() without erroring.
 func TestSearch_NoArgs_ShowsHelp(t *testing.T) {
 	_, _ = iostreams.SetForTest(t)
@@ -20,7 +20,7 @@ func TestSearch_NoArgs_ShowsHelp(t *testing.T) {
 	require.NoError(t, cmd.Execute())
 }
 
-// TestSearch_RejectsPositional: bare positional `weknora search "<q>" --kb X`
+// TestSearch_RejectsPositional: bare positional `lorelattice search "<q>" --kb X`
 // must error - search is a pure dispatcher with no shortcut form.
 func TestSearch_RejectsPositional(t *testing.T) {
 	_, _ = iostreams.SetForTest(t)

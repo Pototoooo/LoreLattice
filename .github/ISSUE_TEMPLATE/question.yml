@@ -1,5 +1,5 @@
 name: ❓ Question
-description: Ask a question about WeKnora or seek help
+description: Ask a question about LoreLattice or seek help
 title: "[Question]: "
 labels: ["question", "needs-triage"]
 body:
@@ -57,8 +57,8 @@ body:
       label: Other Environment Info
       description: Please provide other relevant environment information
       placeholder: |
-        - WeKnora App Version: [concrete version from Settings → System Info, e.g., v0.6.0 — NOT "latest"]
-        - WeKnora UI Version: [concrete version from Settings → System Info, e.g., v0.6.0]
+        - LoreLattice App Version: [concrete version from Settings → System Info, e.g., v0.6.0 — NOT "latest"]
+        - LoreLattice UI Version: [concrete version from Settings → System Info, e.g., v0.6.0]
         - Deployment: [e.g., Docker, build from source]
         - Other relevant info...
 

@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/Tencent/WeKnora/cli/internal/output"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
 )
 
 // globalFormatMode tracks the resolved --format value for the current invocation.
@@ -143,46 +143,46 @@ func printErrorEnvelope(w io.Writer, err error) {
 
 // defaultHint returns a canonical actionable hint for known error codes
 // when the call site didn't set one. `auth.unauthenticated` always points
-// at `weknora auth login` - covers the broad surface (auth status / kb
+// at `lorelattice auth login` - covers the broad surface (auth status / kb
 // list / kb view / search) without per-command hint plumbing.
 //
 // Empty string for codes without a stable canonical hint.
 func defaultHint(code ErrorCode) string {
 	switch code {
 	case CodeAuthUnauthenticated, CodeAuthBadCredential:
-		return "run `weknora auth login`"
+		return "run `lorelattice auth login`"
 	case CodeAuthTokenExpired:
-		return "your session expired; run `weknora auth login` to re-authenticate"
+		return "your session expired; run `lorelattice auth login` to re-authenticate"
 	case CodeAuthForbidden:
 		return "active profile lacks permission for this resource"
 	case CodeAuthCrossTenantBlocked, CodeAuthTenantMismatch:
-		return "verify tenant profile with `weknora auth status`"
+		return "verify tenant profile with `lorelattice auth status`"
 	case CodeNetworkError:
-		return "check base URL reachability with `weknora doctor`"
+		return "check base URL reachability with `lorelattice doctor`"
 	case CodeServerIncompatibleVersion:
-		return "run `weknora doctor` to see version skew details"
+		return "run `lorelattice doctor` to see version skew details"
 	case CodeServerRateLimited:
 		return "rate-limited; retry after a few seconds"
 	case CodeServerTimeout:
-		return "request timed out; retry, or run `weknora doctor` to check connectivity"
+		return "request timed out; retry, or run `lorelattice doctor` to check connectivity"
 	case CodeResourceNotFound:
 		return "verify the resource ID and try again"
 	case CodeInputInvalidArgument, CodeInputMissingFlag:
-		return "see `weknora <command> --help` for valid usage"
+		return "see `lorelattice <command> --help` for valid usage"
 	case CodeInputConfirmationRequired:
 		return "high-risk write - re-run with -y/--yes after the user explicitly approves"
 	case CodeLocalKeychainDenied:
 		return "verify keyring access; falls back to file storage"
 	case CodeLocalConfigCorrupt:
-		return "remove ~/.config/weknora/config.yaml and re-run `weknora auth login`"
+		return "remove ~/.config/lorelattice/config.yaml and re-run `lorelattice auth login`"
 	case CodeLocalFileIO:
-		return "check file permissions under $XDG_CONFIG_HOME/weknora/"
+		return "check file permissions under $XDG_CONFIG_HOME/lorelattice/"
 	case CodeKBIDRequired:
-		return "run `weknora link` to bind this directory to a knowledge base, or pass --kb"
+		return "run `lorelattice link` to bind this directory to a knowledge base, or pass --kb"
 	case CodeKBNotFound:
-		return "list available with `weknora kb list`"
+		return "list available with `lorelattice kb list`"
 	case CodeProjectLinkCorrupt:
-		return "remove .weknora/project.yaml and run `weknora link` again"
+		return "remove .lorelattice/project.yaml and run `lorelattice link` again"
 	case CodeUserAborted:
 		return "no action taken; pass -y/--yes to skip the confirmation prompt"
 	case CodeUploadFileNotFound:
@@ -205,13 +205,13 @@ func defaultHint(code ErrorCode) string {
 func defaultRetryArgv(code ErrorCode) []string {
 	switch code {
 	case CodeAuthUnauthenticated, CodeAuthBadCredential, CodeAuthTokenExpired:
-		return []string{"weknora", "auth", "login"}
+		return []string{"lorelattice", "auth", "login"}
 	case CodeKBIDRequired:
-		return []string{"weknora", "link"}
+		return []string{"lorelattice", "link"}
 	case CodeNetworkError, CodeServerTimeout:
-		return []string{"weknora", "doctor"}
+		return []string{"lorelattice", "doctor"}
 	case CodeProjectLinkCorrupt:
-		return []string{"weknora", "link"} // re-bind the project to a KB
+		return []string{"lorelattice", "link"} // re-bind the project to a KB
 	case CodeLocalConfigCorrupt:
 		// Recovery is two steps (delete config + re-login); the prose hint
 		// already spells it out, so the retry argv stays nil.

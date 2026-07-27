@@ -6,15 +6,15 @@
 --         Only intended for development rollbacks, never for production.
 --
 -- Operators who really need to run this in a non-dev environment must set
--- the session-level GUC `weknora.allow_destructive_migration` to 'true'
--- first (e.g. `SET weknora.allow_destructive_migration = 'true';`).
+-- the session-level GUC `lorelattice.allow_destructive_migration` to 'true'
+-- first (e.g. `SET lorelattice.allow_destructive_migration = 'true';`).
 -- Otherwise the migration aborts before touching any data.
 DO $$
 BEGIN
-    IF coalesce(current_setting('weknora.allow_destructive_migration', true), 'false') <> 'true' THEN
+    IF coalesce(current_setting('lorelattice.allow_destructive_migration', true), 'false') <> 'true' THEN
         RAISE EXCEPTION
             '[Migration 000043 down] BLOCKED: refuse to drop tenant_members / creator_id / runnable_by_viewer. '
-            'Set weknora.allow_destructive_migration = ''true'' in this session to override.';
+            'Set lorelattice.allow_destructive_migration = ''true'' in this session to override.';
     END IF;
     RAISE WARNING '[Migration 000043 down] Reverting tenant RBAC — role data will be lost';
 END $$;

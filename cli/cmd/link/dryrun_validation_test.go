@@ -14,11 +14,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/config"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/prompt"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/config"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/prompt"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // linkDryRunFactory builds a Factory whose Client closure panics if invoked —
@@ -41,7 +41,7 @@ func linkDryRunFactory(t *testing.T, cfg *config.Config) *cmdutil.Factory {
 // withRootHarnessLink wraps a link subcommand under a synthetic root cmd
 // that registers the global persistent flags.
 func withRootHarnessLink(sub *cobra.Command, args ...string) *cobra.Command {
-	root := &cobra.Command{Use: "weknora"}
+	root := &cobra.Command{Use: "lorelattice"}
 	pf := root.PersistentFlags()
 	pf.BoolP("yes", "y", false, "")
 	pf.String("format", "", "")
@@ -85,7 +85,7 @@ func TestLink_DryRun_RejectsNoKBNoTTY(t *testing.T) {
 	assert.Equal(t, cmdutil.CodeKBIDRequired, typed.Code)
 }
 
-// TestUnlink_DryRun_RejectsMissingLink: cwd has no .weknora/project.yaml →
+// TestUnlink_DryRun_RejectsMissingLink: cwd has no .lorelattice/project.yaml →
 // live path returns input.invalid_argument; --dry-run must do the same.
 func TestUnlink_DryRun_RejectsMissingLink(t *testing.T) {
 	iostreams.SetForTest(t)

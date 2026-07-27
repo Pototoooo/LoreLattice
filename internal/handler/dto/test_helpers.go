@@ -3,7 +3,7 @@ package dto
 import (
 	"context"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 func adminContext() context.Context {

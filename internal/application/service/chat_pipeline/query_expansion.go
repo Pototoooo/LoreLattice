@@ -7,7 +7,7 @@ import (
 	"sync"
 	"unicode"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // runQueryExpansion performs query expansion when initial recall is low.

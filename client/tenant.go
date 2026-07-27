@@ -1,4 +1,4 @@
-// Package client provides the implementation for interacting with the WeKnora API
+// Package client provides the implementation for interacting with the LoreLattice API
 // The Tenant related interfaces are used to manage tenants in the system
 // Tenants can be created, retrieved, updated, deleted, and queried
 // They can also be used to manage retriever engines for different tasks
@@ -43,7 +43,7 @@ type Tenant struct {
 	// Storage used (Bytes)
 	StorageUsed int64 `yaml:"storage_used"      json:"storage_used"      gorm:"default:0"`
 	// APIKey is only populated by CreateTenant when the server has
-	// tenant.auto_create_api_key (env WEKNORA_TENANT_AUTO_CREATE_API_KEY)
+	// tenant.auto_create_api_key (env LORELATTICE_TENANT_AUTO_CREATE_API_KEY)
 	// enabled: it carries the plaintext token of an auto-created full_access
 	// key. Empty otherwise. Save it on receipt — it is never returned again.
 	APIKey string `yaml:"api_key,omitempty" json:"api_key,omitempty"`
@@ -84,10 +84,10 @@ type TenantAPIKey struct {
 	APIKey           string           `json:"api_key"`
 	Role             TenantAPIKeyRole `json:"role"`
 	KnowledgeBaseIDs []string         `json:"knowledge_base_ids"`
-	LastUsedAt       *time.Time          `json:"last_used_at,omitempty"`
-	ExpiresAt        *time.Time          `json:"expires_at,omitempty"`
-	CreatedAt        time.Time           `json:"created_at"`
-	UpdatedAt        time.Time           `json:"updated_at"`
+	LastUsedAt       *time.Time       `json:"last_used_at,omitempty"`
+	ExpiresAt        *time.Time       `json:"expires_at,omitempty"`
+	CreatedAt        time.Time        `json:"created_at"`
+	UpdatedAt        time.Time        `json:"updated_at"`
 }
 
 // CreateTenantAPIKeyRequest creates a revocable tenant API key.

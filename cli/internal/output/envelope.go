@@ -68,7 +68,7 @@ type ErrDetail struct {
 	ExitCode int    `json:"exit_code,omitempty"`
 	Hint     string `json:"hint,omitempty"`
 	// RetryArgv is a directly-executable argv array (e.g.
-	// ["weknora","auth","login"]) so an agent can exec it without
+	// ["lorelattice","auth","login"]) so an agent can exec it without
 	// shell-splitting or quote-handling. Distinct from the prose Hint.
 	RetryArgv         []string `json:"retry_argv,omitempty"`
 	RetryAfterSeconds int      `json:"retry_after_seconds,omitempty"`

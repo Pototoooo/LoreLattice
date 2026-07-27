@@ -1,8 +1,8 @@
 {{/*
-Copyright 2025 Tencent
+Copyright 2025-2026 Pototoooo
 SPDX-License-Identifier: MIT
 
-WeKnora Helm Chart Template Helpers
+LoreLattice Helm Chart Template Helpers
 
 Best Practices References:
 - https://helm.sh/docs/chart_best_practices/templates/
@@ -12,14 +12,14 @@ Best Practices References:
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "weknora.name" -}}
+{{- define "lorelattice.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
 */}}
-{{- define "weknora.fullname" -}}
+{{- define "lorelattice.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -36,7 +36,7 @@ Create a default fully qualified app name.
 Create chart name and version as used by the chart label.
 Ref: https://helm.sh/docs/chart_best_practices/labels/
 */}}
-{{- define "weknora.chart" -}}
+{{- define "lorelattice.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -44,39 +44,39 @@ Ref: https://helm.sh/docs/chart_best_practices/labels/
 Common labels following Kubernetes recommended labels.
 Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/
 */}}
-{{- define "weknora.labels" -}}
-helm.sh/chart: {{ include "weknora.chart" . }}
-{{ include "weknora.selectorLabels" . }}
+{{- define "lorelattice.labels" -}}
+helm.sh/chart: {{ include "lorelattice.chart" . }}
+{{ include "lorelattice.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-app.kubernetes.io/part-of: weknora
+app.kubernetes.io/part-of: lorelattice
 {{- end }}
 
 {{/*
 Selector labels
 */}}
-{{- define "weknora.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "weknora.name" . }}
+{{- define "lorelattice.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "lorelattice.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Component labels - use for individual components
-Usage: {{ include "weknora.componentLabels" (dict "component" "app" "context" .) }}
+Usage: {{ include "lorelattice.componentLabels" (dict "component" "app" "context" .) }}
 */}}
-{{- define "weknora.componentLabels" -}}
-{{ include "weknora.labels" .context }}
+{{- define "lorelattice.componentLabels" -}}
+{{ include "lorelattice.labels" .context }}
 app.kubernetes.io/component: {{ .component }}
 {{- end }}
 
 {{/*
 Component selector labels
-Usage: {{ include "weknora.componentSelectorLabels" (dict "component" "app" "context" .) }}
+Usage: {{ include "lorelattice.componentSelectorLabels" (dict "component" "app" "context" .) }}
 */}}
-{{- define "weknora.componentSelectorLabels" -}}
-{{ include "weknora.selectorLabels" .context }}
+{{- define "lorelattice.componentSelectorLabels" -}}
+{{ include "lorelattice.selectorLabels" .context }}
 app.kubernetes.io/component: {{ .component }}
 {{- end }}
 
@@ -84,9 +84,9 @@ app.kubernetes.io/component: {{ .component }}
 Create the name of the service account to use.
 Ref: https://helm.sh/docs/chart_best_practices/rbac/
 */}}
-{{- define "weknora.serviceAccountName" -}}
+{{- define "lorelattice.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "weknora.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "lorelattice.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
@@ -95,11 +95,11 @@ Ref: https://helm.sh/docs/chart_best_practices/rbac/
 {{/*
 Secret name - supports existing secret
 */}}
-{{- define "weknora.secretName" -}}
+{{- define "lorelattice.secretName" -}}
 {{- if .Values.secrets.existingSecret }}
 {{- .Values.secrets.existingSecret }}
 {{- else }}
-{{- include "weknora.fullname" . }}-secrets
+{{- include "lorelattice.fullname" . }}-secrets
 {{- end }}
 {{- end }}
 
@@ -107,7 +107,7 @@ Secret name - supports existing secret
 Return the app image with tag.
 Defaults to Chart.appVersion if tag is not specified.
 */}}
-{{- define "weknora.app.image" -}}
+{{- define "lorelattice.app.image" -}}
 {{- $tag := default .Chart.AppVersion .Values.app.image.tag }}
 {{- printf "%s:%s" .Values.app.image.repository $tag }}
 {{- end }}
@@ -115,42 +115,42 @@ Defaults to Chart.appVersion if tag is not specified.
 {{/*
 Return the frontend image with tag.
 */}}
-{{- define "weknora.frontend.image" -}}
+{{- define "lorelattice.frontend.image" -}}
 {{- printf "%s:%s" .Values.frontend.image.repository .Values.frontend.image.tag }}
 {{- end }}
 
 {{/*
 Return the docreader image with tag.
 */}}
-{{- define "weknora.docreader.image" -}}
+{{- define "lorelattice.docreader.image" -}}
 {{- printf "%s:%s" .Values.docreader.image.repository .Values.docreader.image.tag }}
 {{- end }}
 
 {{/*
 Return the PostgreSQL image with tag.
 */}}
-{{- define "weknora.postgresql.image" -}}
+{{- define "lorelattice.postgresql.image" -}}
 {{- printf "%s:%s" .Values.postgresql.image.repository .Values.postgresql.image.tag }}
 {{- end }}
 
 {{/*
 Return the Redis image with tag.
 */}}
-{{- define "weknora.redis.image" -}}
+{{- define "lorelattice.redis.image" -}}
 {{- printf "%s:%s" .Values.redis.image.repository .Values.redis.image.tag }}
 {{- end }}
 
 {{/*
 Return the Neo4j image with tag.
 */}}
-{{- define "weknora.neo4j.image" -}}
+{{- define "lorelattice.neo4j.image" -}}
 {{- printf "%s:%s" .Values.neo4j.image.repository .Values.neo4j.image.tag }}
 {{- end }}
 
 {{/*
 Create image pull secrets list.
 */}}
-{{- define "weknora.imagePullSecrets" -}}
+{{- define "lorelattice.imagePullSecrets" -}}
 {{- with .Values.global.imagePullSecrets }}
 imagePullSecrets:
 {{- toYaml . | nindent 2 }}
@@ -160,7 +160,7 @@ imagePullSecrets:
 {{/*
 Return the storage class name.
 */}}
-{{- define "weknora.storageClass" -}}
+{{- define "lorelattice.storageClass" -}}
 {{- if .Values.global.storageClass }}
 {{- if eq .Values.global.storageClass "-" }}
 storageClassName: ""
@@ -174,7 +174,7 @@ storageClassName: {{ .Values.global.storageClass | quote }}
 Pod security context.
 Merges global defaults with component-specific overrides.
 */}}
-{{- define "weknora.podSecurityContext" -}}
+{{- define "lorelattice.podSecurityContext" -}}
 {{- $global := .Values.global.podSecurityContext | default dict }}
 {{- $component := .componentSecurityContext | default dict }}
 {{- $merged := merge $component $global }}
@@ -187,7 +187,7 @@ securityContext:
 {{/*
 Container security context.
 */}}
-{{- define "weknora.containerSecurityContext" -}}
+{{- define "lorelattice.containerSecurityContext" -}}
 {{- if . }}
 securityContext:
 {{- toYaml . | nindent 2 }}

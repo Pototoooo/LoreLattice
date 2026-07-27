@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# firstboot.sh - 由 weknora-firstboot.service 在新实例首次开机时自动执行。
+# firstboot.sh - 由 lorelattice-firstboot.service 在新实例首次开机时自动执行。
 # 任务: 生成随机密钥写入 .env -> 启动容器 -> 输出凭证 -> 标记完成 + 自禁用。
 #
 # 幂等性策略:
@@ -11,12 +11,12 @@
 #      凭证仍可在 ${ENV_FILE} 中查到。
 set -euo pipefail
 
-WEKNORA_DIR="${WEKNORA_DIR:-/opt/WeKnora}"
-ENV_FILE="${WEKNORA_DIR}/.env"
-ENV_TEMPLATE="${WEKNORA_DIR}/.env.example"
-CRED_FILE="/root/weknora-credentials.txt"
-LOG_FILE="/var/log/weknora-firstboot.log"
-MARKER="${WEKNORA_DIR}/.firstboot.done"
+LORELATTICE_DIR="${LORELATTICE_DIR:-/opt/LoreLattice}"
+ENV_FILE="${LORELATTICE_DIR}/.env"
+ENV_TEMPLATE="${LORELATTICE_DIR}/.env.example"
+CRED_FILE="/root/lorelattice-credentials.txt"
+LOG_FILE="/var/log/lorelattice-firstboot.log"
+MARKER="${LORELATTICE_DIR}/.firstboot.done"
 
 # 提前打开 LOG_FILE, 同时把 stderr 也复制一份到 systemd journal 方便调试
 # (单纯 exec >> LOG_FILE 时, 脚本一开始的失败会因为 stderr 已被吞掉而看不到)
@@ -30,7 +30,7 @@ if [[ -f "${MARKER}" ]]; then
 fi
 
 # cleanup.sh 不再保留 .env, 这里从 .env.example 拷贝模板再做替换。
-# 这样保证 firstboot 之前不会有任何含明文默认密码的 .env 让 weknora.service
+# 这样保证 firstboot 之前不会有任何含明文默认密码的 .env 让 lorelattice.service
 # 抢先把 postgres 数据卷用错的密码初始化掉。
 if [[ ! -f "${ENV_FILE}" ]]; then
   if [[ -f "${ENV_TEMPLATE}" ]]; then
@@ -77,15 +77,15 @@ replace JWT_SECRET      "${JWT}"
 replace SYSTEM_AES_KEY  "${SYS_AES}"
 replace GIN_MODE        "release"
 
-# 把 prepare.sh 阶段记录在 .cloud-image-meta 里的 WEKNORA_REF 还原为 .env 的
-# WEKNORA_VERSION, 否则 docker compose 会落回 :latest 默认值, 导致镜像版本
+# 把 prepare.sh 阶段记录在 .cloud-image-meta 里的 LORELATTICE_REF 还原为 .env 的
+# LORELATTICE_VERSION, 否则 docker compose 会落回 :latest 默认值, 导致镜像版本
 # 与 prepare 时拉取的版本不一致。
-META_FILE="${WEKNORA_DIR}/.cloud-image-meta"
+META_FILE="${LORELATTICE_DIR}/.cloud-image-meta"
 if [[ -f "${META_FILE}" ]]; then
-  META_REF=$(grep -E '^WEKNORA_REF=' "${META_FILE}" | tail -1 | cut -d= -f2- || true)
+  META_REF=$(grep -E '^LORELATTICE_REF=' "${META_FILE}" | tail -1 | cut -d= -f2- || true)
   if [[ -n "${META_REF}" ]]; then
-    replace WEKNORA_VERSION "${META_REF}"
-    echo "restored WEKNORA_VERSION=${META_REF} from ${META_FILE}"
+    replace LORELATTICE_VERSION "${META_REF}"
+    echo "restored LORELATTICE_VERSION=${META_REF} from ${META_FILE}"
   fi
 fi
 
@@ -97,7 +97,7 @@ touch "${MARKER}"
 chmod 0600 "${MARKER}"
 
 echo "env updated, marker written, starting docker compose..."
-cd "${WEKNORA_DIR}"
+cd "${LORELATTICE_DIR}"
 "${DOCKER_BIN}" compose up -d
 
 # 尝试拿公网 IP, 失败就用内网
@@ -107,7 +107,7 @@ PUB_IP=$(curl -fsS --max-time 5 https://ifconfig.me 2>/dev/null \
 
 cat >"${CRED_FILE}" <<INFO
 ========================================
-  WeKnora 实例初始化完成
+  LoreLattice 实例初始化完成
   生成时间: $(date -Iseconds)
 ========================================
 
@@ -115,7 +115,7 @@ cat >"${CRED_FILE}" <<INFO
 
 注册后如需关闭后续注册, 编辑 ${ENV_FILE}:
     DISABLE_REGISTRATION=true
-然后执行:  cd ${WEKNORA_DIR} && docker compose up -d
+然后执行:  cd ${LORELATTICE_DIR} && docker compose up -d
 
 下列随机凭证已写入 ${ENV_FILE}, 请妥善保存(仅 root 可读):
   DB_PASSWORD     = ${DB_PWD}
@@ -133,7 +133,7 @@ INFO
 echo "credentials written to ${CRED_FILE}"
 
 # 仅停掉 unit, 不删 unit 文件 (否则当前正在运行的 oneshot 可能被 systemd 标记 failed)。
-# 下次重启时, weknora-firstboot.service 通过 ConditionPathExists=!${MARKER} 自动跳过。
-systemctl disable weknora-firstboot.service || true
+# 下次重启时, lorelattice-firstboot.service 通过 ConditionPathExists=!${MARKER} 自动跳过。
+systemctl disable lorelattice-firstboot.service || true
 
 echo "==== firstboot finished at $(date -Iseconds) ===="

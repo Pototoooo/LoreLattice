@@ -11,8 +11,8 @@ const docTemplate = `{
         "title": "{{.Title}}",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
-            "name": "WeKnora Github",
-            "url": "https://github.com/Tencent/WeKnora"
+            "name": "LoreLattice Github",
+            "url": "https://github.com/Pototoooo/lorelattice"
         },
         "version": "{{.Version}}"
     },
@@ -67,13 +67,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "409": {
                         "description": "用户尚未完成授权",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -114,7 +114,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -171,13 +171,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "待审批记录不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -215,7 +215,7 @@ const docTemplate = `{
                     "500": {
                         "description": "服务器错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -262,7 +262,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -373,13 +373,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "智能体不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -433,13 +433,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "无法修改内置智能体",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -484,19 +484,19 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "无法删除内置智能体",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "智能体不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -543,13 +543,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "智能体不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -600,7 +600,7 @@ const docTemplate = `{
                     "403": {
                         "description": "无权限",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -671,13 +671,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "智能体不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -739,13 +739,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.LoginResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.LoginResponse"
                         }
                     },
                     "403": {
                         "description": "非 Lite 版本",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -799,7 +799,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -863,7 +863,7 @@ const docTemplate = `{
                     "410": {
                         "description": "链接无效或已撤销",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -889,7 +889,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.LoginRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.LoginRequest"
                         }
                     }
                 ],
@@ -897,13 +897,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.LoginResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.LoginResponse"
                         }
                     },
                     "401": {
                         "description": "认证失败",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -938,7 +938,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -973,7 +973,7 @@ const docTemplate = `{
                     "401": {
                         "description": "未授权",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1019,13 +1019,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "401": {
                         "description": "未授权",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1088,7 +1088,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OIDCConfigResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OIDCConfigResponse"
                         }
                     }
                 }
@@ -1120,19 +1120,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OIDCAuthURLResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OIDCAuthURLResponse"
                         }
                     },
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "OIDC未启用",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1178,7 +1178,7 @@ const docTemplate = `{
                     "401": {
                         "description": "令牌无效",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1204,7 +1204,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.RegisterRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.RegisterRequest"
                         }
                     }
                 ],
@@ -1212,19 +1212,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.RegisterResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.RegisterResponse"
                         }
                     },
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "注册功能已禁用",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1258,25 +1258,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.LoginResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.LoginResponse"
                         }
                     },
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "409": {
                         "description": "邮箱已注册",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "410": {
                         "description": "链接无效或已撤销",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1323,19 +1323,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.LoginResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.LoginResponse"
                         }
                     },
                     "400": {
                         "description": "参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "无该空间成员关系",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1370,7 +1370,7 @@ const docTemplate = `{
                     "401": {
                         "description": "令牌无效",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1480,13 +1480,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "分块不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1547,13 +1547,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "分块不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1614,7 +1614,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1659,7 +1659,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1722,13 +1722,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "分块不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1780,13 +1780,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "分块不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -1817,7 +1817,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.DataSource"
+                                "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.DataSource"
                             }
                         }
                     },
@@ -1851,7 +1851,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.DataSource"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.DataSource"
                         }
                     }
                 ],
@@ -1859,7 +1859,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.DataSource"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.DataSource"
                         }
                     },
                     "400": {
@@ -1897,7 +1897,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.SyncLog"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.SyncLog"
                         }
                     },
                     "404": {
@@ -1928,7 +1928,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_datasource.ConnectorMetadata"
+                                "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_datasource.ConnectorMetadata"
                             }
                         }
                     }
@@ -2004,7 +2004,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.DataSource"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.DataSource"
                         }
                     },
                     "404": {
@@ -2044,7 +2044,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.DataSource"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.DataSource"
                         }
                     }
                 ],
@@ -2052,7 +2052,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.DataSource"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.DataSource"
                         }
                     },
                     "400": {
@@ -2134,7 +2134,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.SyncLog"
+                                "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.SyncLog"
                             }
                         }
                     },
@@ -2275,7 +2275,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.Resource"
+                                "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.Resource"
                             }
                         }
                     },
@@ -2349,7 +2349,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.SyncLog"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.SyncLog"
                         }
                     },
                     "400": {
@@ -2443,7 +2443,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -2490,7 +2490,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -2537,7 +2537,7 @@ const docTemplate = `{
                     "404": {
                         "description": "任务不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -2845,7 +2845,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -2892,7 +2892,7 @@ const docTemplate = `{
                     "404": {
                         "description": "知识库不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -2946,13 +2946,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "知识库不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3001,7 +3001,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3074,7 +3074,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3123,7 +3123,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3179,7 +3179,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3259,7 +3259,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3306,7 +3306,7 @@ const docTemplate = `{
                     "404": {
                         "description": "任务不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3376,7 +3376,7 @@ const docTemplate = `{
                     "500": {
                         "description": "服务器错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3433,7 +3433,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3487,7 +3487,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3560,7 +3560,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3609,7 +3609,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3655,7 +3655,7 @@ const docTemplate = `{
                     "500": {
                         "description": "服务器错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3687,7 +3687,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.KnowledgeBase"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.KnowledgeBase"
                         }
                     }
                 ],
@@ -3702,7 +3702,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3751,7 +3751,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3798,7 +3798,7 @@ const docTemplate = `{
                     "404": {
                         "description": "任务不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3851,13 +3851,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "知识库不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3911,7 +3911,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -3956,7 +3956,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4026,7 +4026,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4070,7 +4070,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4159,7 +4159,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4198,7 +4198,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.FAQBatchUpsertPayload"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.FAQBatchUpsertPayload"
                         }
                     }
                 ],
@@ -4213,7 +4213,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4275,7 +4275,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4328,7 +4328,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4369,7 +4369,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.FAQEntryFieldsBatchUpdate"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.FAQEntryFieldsBatchUpdate"
                         }
                     }
                 ],
@@ -4384,7 +4384,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4440,7 +4440,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4494,13 +4494,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "条目不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4546,7 +4546,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.FAQEntryPayload"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.FAQEntryPayload"
                         }
                     }
                 ],
@@ -4561,7 +4561,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4624,13 +4624,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "条目不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4671,7 +4671,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.FAQEntryPayload"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.FAQEntryPayload"
                         }
                     }
                 ],
@@ -4686,7 +4686,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4742,13 +4742,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "知识库不存在或无导入记录",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4789,7 +4789,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.FAQSearchRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.FAQSearchRequest"
                         }
                     }
                 ],
@@ -4804,7 +4804,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4845,7 +4845,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.SearchParams"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.SearchParams"
                         }
                     }
                 ],
@@ -4860,7 +4860,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -4899,7 +4899,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.SearchParams"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.SearchParams"
                         }
                     }
                 ],
@@ -4914,7 +4914,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5015,7 +5015,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5060,13 +5060,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "权限不足",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5150,7 +5150,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "409": {
@@ -5198,7 +5198,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ManualKnowledgePayload"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ManualKnowledgePayload"
                         }
                     }
                 ],
@@ -5213,7 +5213,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5292,7 +5292,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "409": {
@@ -5343,13 +5343,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "知识库不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5396,7 +5396,7 @@ const docTemplate = `{
                     "404": {
                         "description": "知识库不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5430,7 +5430,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ListSharesResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ListSharesResponse"
                         }
                     }
                 }
@@ -5466,7 +5466,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ShareKnowledgeBaseRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ShareKnowledgeBaseRequest"
                         }
                     }
                 ],
@@ -5481,7 +5481,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5526,7 +5526,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.UpdateSharePermissionRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.UpdateSharePermissionRequest"
                         }
                     }
                 ],
@@ -5541,7 +5541,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5584,7 +5584,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5649,7 +5649,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5714,7 +5714,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5777,7 +5777,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5849,7 +5849,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5912,7 +5912,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -5961,13 +5961,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "权限不足",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6016,13 +6016,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "权限不足",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6090,7 +6090,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6131,7 +6131,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ManualKnowledgePayload"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ManualKnowledgePayload"
                         }
                     }
                 ],
@@ -6146,7 +6146,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6194,7 +6194,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6231,13 +6231,13 @@ const docTemplate = `{
                     "200": {
                         "description": "进度信息",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.KnowledgeMoveProgress"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.KnowledgeMoveProgress"
                         }
                     },
                     "404": {
                         "description": "任务不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6313,7 +6313,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6362,7 +6362,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6409,13 +6409,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "知识不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6454,7 +6454,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.Knowledge"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.Knowledge"
                         }
                     }
                 ],
@@ -6469,7 +6469,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6514,7 +6514,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6561,19 +6561,19 @@ const docTemplate = `{
                     "400": {
                         "description": "状态不支持取消",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "权限不足",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "知识不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6619,7 +6619,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6668,7 +6668,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6723,13 +6723,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "权限不足",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6804,13 +6804,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiFolderListResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiFolderListResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6846,7 +6846,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiFolderCreateRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiFolderCreateRequest"
                         }
                     }
                 ],
@@ -6854,19 +6854,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiFolder"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiFolder"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6911,7 +6911,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiFolderUpdateRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiFolderUpdateRequest"
                         }
                     }
                 ],
@@ -6919,25 +6919,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiFolder"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiFolder"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -6976,13 +6976,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -7046,7 +7046,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiGraphData"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiGraphData"
                         }
                     }
                 }
@@ -7098,7 +7098,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiIndexResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiIndexResponse"
                         }
                     }
                 }
@@ -7146,7 +7146,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiPageIssue"
+                                "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiPageIssue"
                             }
                         }
                     }
@@ -7209,7 +7209,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -7243,7 +7243,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_application_service.WikiLintReport"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_application_service.WikiLintReport"
                         }
                     }
                 }
@@ -7289,7 +7289,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiLogEntryListResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiLogEntryListResponse"
                         }
                     }
                 }
@@ -7327,7 +7327,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiPageMoveRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiPageMoveRequest"
                         }
                     }
                 ],
@@ -7335,13 +7335,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiPage"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiPage"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -7417,13 +7417,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiPageListResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiPageListResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -7459,7 +7459,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiPage"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiPage"
                         }
                     }
                 ],
@@ -7467,13 +7467,13 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiPage"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiPage"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -7514,13 +7514,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiPage"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiPage"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -7563,7 +7563,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiPage"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiPage"
                         }
                     }
                 ],
@@ -7571,13 +7571,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiPage"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiPage"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -7616,7 +7616,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -7699,7 +7699,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiPage"
+                                "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiPage"
                             }
                         }
                     }
@@ -7734,7 +7734,58 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiStats"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiStats"
+                        }
+                    }
+                }
+            }
+        },
+        "/lorelatticecloud/credentials": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    },
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "保存 APPID/APPSECRET 到当前空间配置（不自动创建模型）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoreLatticeCloud"
+                ],
+                "summary": "保存 LoreLatticeCloud 凭证",
+                "parameters": [
+                    {
+                        "description": "{app_id, app_secret}",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success: true",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -7772,7 +7823,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -7804,7 +7855,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MCPService"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MCPService"
                         }
                     }
                 ],
@@ -7819,7 +7870,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -7900,7 +7951,7 @@ const docTemplate = `{
                     "404": {
                         "description": "服务不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -7954,7 +8005,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -7999,7 +8050,7 @@ const docTemplate = `{
                     "500": {
                         "description": "服务器错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -8056,13 +8107,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "服务不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -8109,13 +8160,13 @@ const docTemplate = `{
                     "400": {
                         "description": "字段名非法",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "服务不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -8169,7 +8220,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -8288,7 +8339,7 @@ const docTemplate = `{
                     "500": {
                         "description": "服务器错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -8335,7 +8386,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -8399,13 +8450,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "MCP 服务或工具不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -8452,7 +8503,7 @@ const docTemplate = `{
                     "500": {
                         "description": "服务器错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -8663,7 +8714,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -8723,7 +8774,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -8777,7 +8828,7 @@ const docTemplate = `{
                     "500": {
                         "description": "服务器错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -8815,7 +8866,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -8862,7 +8913,43 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
+                        }
+                    }
+                }
+            }
+        },
+        "/models/lorelatticecloud/status": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    },
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "检查当前空间的 LoreLatticeCloud 凭证是否完好；needs_reinit=true 表示需要重新保存",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoreLatticeCloud"
+                ],
+                "summary": "检查 LoreLatticeCloud 凭证状态",
+                "responses": {
+                    "200": {
+                        "description": "凭证状态",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "服务器错误",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -8900,42 +8987,6 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "厂商列表",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/models/weknoracloud/status": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    },
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "检查当前空间的 WeKnoraCloud 凭证是否完好；needs_reinit=true 表示需要重新保存",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "WeKnoraCloud"
-                ],
-                "summary": "检查 WeKnoraCloud 凭证状态",
-                "responses": {
-                    "200": {
-                        "description": "凭证状态",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "服务器错误",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -8985,7 +9036,7 @@ const docTemplate = `{
                     "404": {
                         "description": "模型不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9039,7 +9090,7 @@ const docTemplate = `{
                     "404": {
                         "description": "模型不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9084,7 +9135,7 @@ const docTemplate = `{
                     "404": {
                         "description": "模型不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9109,7 +9160,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ListOrganizationsResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ListOrganizationsResponse"
                         }
                     }
                 }
@@ -9138,7 +9189,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.CreateOrganizationRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.CreateOrganizationRequest"
                         }
                     }
                 ],
@@ -9153,7 +9204,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9184,7 +9235,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.JoinOrganizationRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.JoinOrganizationRequest"
                         }
                     }
                 ],
@@ -9199,7 +9250,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9230,7 +9281,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.JoinByOrganizationIDRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.JoinByOrganizationIDRequest"
                         }
                     }
                 ],
@@ -9245,7 +9296,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9276,7 +9327,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.SubmitJoinRequestRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.SubmitJoinRequestRequest"
                         }
                     }
                 ],
@@ -9291,7 +9342,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9332,7 +9383,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9414,7 +9465,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9450,7 +9501,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.UpdateOrganizationRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.UpdateOrganizationRequest"
                         }
                     }
                 ],
@@ -9465,7 +9516,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9501,7 +9552,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9545,7 +9596,7 @@ const docTemplate = `{
                     "403": {
                         "description": "非组织成员",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9583,7 +9634,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.InviteMemberRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.InviteMemberRequest"
                         }
                     }
                 ],
@@ -9598,13 +9649,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9645,7 +9696,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9686,7 +9737,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9731,7 +9782,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ReviewJoinRequestRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ReviewJoinRequestRequest"
                         }
                     }
                 ],
@@ -9746,7 +9797,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9784,7 +9835,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9818,7 +9869,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ListMembersResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ListMembersResponse"
                         }
                     }
                 }
@@ -9863,7 +9914,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.UpdateMemberRoleRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.UpdateMemberRoleRequest"
                         }
                     }
                 ],
@@ -9878,7 +9929,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9921,7 +9972,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -9959,7 +10010,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.RequestRoleUpgradeRequest"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.RequestRoleUpgradeRequest"
                         }
                     }
                 ],
@@ -9974,7 +10025,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10029,7 +10080,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10139,7 +10190,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ListSharesResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ListSharesResponse"
                         }
                     }
                 }
@@ -10209,7 +10260,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10256,7 +10307,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10305,7 +10356,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10359,7 +10410,7 @@ const docTemplate = `{
                     "404": {
                         "description": "会话或消息不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10408,7 +10459,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10455,7 +10506,7 @@ const docTemplate = `{
                     "404": {
                         "description": "会话不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10494,7 +10545,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.Session"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.Session"
                         }
                     }
                 ],
@@ -10509,7 +10560,7 @@ const docTemplate = `{
                     "404": {
                         "description": "会话不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10554,7 +10605,7 @@ const docTemplate = `{
                     "404": {
                         "description": "会话不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10601,13 +10652,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "会话不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10651,7 +10702,7 @@ const docTemplate = `{
                     "404": {
                         "description": "会话不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10707,7 +10758,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10763,7 +10814,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10912,7 +10963,7 @@ const docTemplate = `{
                     "404": {
                         "description": "会话不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -10968,7 +11019,7 @@ const docTemplate = `{
                     "404": {
                         "description": "会话或消息不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -11067,7 +11118,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -11102,7 +11153,7 @@ const docTemplate = `{
                     "500": {
                         "description": "服务器错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -11166,7 +11217,7 @@ const docTemplate = `{
                     "500": {
                         "description": "服务器错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -11249,7 +11300,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request, validation, or connectivity test failure",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "401": {
@@ -11262,7 +11313,7 @@ const docTemplate = `{
                     "409": {
                         "description": "A storage backend with this name already exists",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -11311,7 +11362,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request or validation error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "401": {
@@ -11398,7 +11449,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Storage backend not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -11452,7 +11503,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Immutable field change, read-only backend, validation, or connectivity failure",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "401": {
@@ -11465,7 +11516,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Storage backend not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -11507,7 +11558,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Backend is default, bound, read-only, or legacy alias",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "401": {
@@ -11520,7 +11571,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Storage backend not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -11564,7 +11615,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Backend is not active",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "401": {
@@ -11577,7 +11628,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Storage backend not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -11628,7 +11679,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Storage backend not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -11793,7 +11844,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -11870,7 +11921,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User promoted successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.UserInfo"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.UserInfo"
                         }
                     },
                     "400": {
@@ -11925,7 +11976,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Privileges revoked successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.UserInfo"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.UserInfo"
                         }
                     },
                     "400": {
@@ -12101,7 +12152,7 @@ const docTemplate = `{
                     "200": {
                         "description": "the setting row",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.SystemSetting"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.SystemSetting"
                         }
                     },
                     "400": {
@@ -12154,7 +12205,7 @@ const docTemplate = `{
                     "200": {
                         "description": "the updated row",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.SystemSetting"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.SystemSetting"
                         }
                     },
                     "400": {
@@ -12483,7 +12534,7 @@ const docTemplate = `{
                     "500": {
                         "description": "服务器错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -12494,7 +12545,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "创建新的空间。任意已登录用户均可调用以建立自己的新工作区，\n调用方会被自动设为该空间的 Owner。跨空间超管仍可像以前一样\n通过本接口创建任意空间。\n当 tenant.auto_create_api_key（或 WEKNORA_TENANT_AUTO_CREATE_API_KEY）\n开启时，会自动创建一个 full_access API Key，并在响应体的 data.api_key 字段返回其明文 token。",
+                "description": "创建新的空间。任意已登录用户均可调用以建立自己的新工作区，\n调用方会被自动设为该空间的 Owner。跨空间超管仍可像以前一样\n通过本接口创建任意空间。\n当 tenant.auto_create_api_key（或 LORELATTICE_TENANT_AUTO_CREATE_API_KEY）\n开启时，会自动创建一个 full_access API Key，并在响应体的 data.api_key 字段返回其明文 token。",
                 "consumes": [
                     "application/json"
                 ],
@@ -12527,7 +12578,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -12562,7 +12613,7 @@ const docTemplate = `{
                     "403": {
                         "description": "权限不足",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -12600,7 +12651,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -12638,7 +12689,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -12685,7 +12736,7 @@ const docTemplate = `{
                     "400": {
                         "description": "不支持的键",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -12739,7 +12790,7 @@ const docTemplate = `{
                     "400": {
                         "description": "不支持的键",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -12805,7 +12856,7 @@ const docTemplate = `{
                     "403": {
                         "description": "权限不足",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -12852,13 +12903,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "404": {
                         "description": "空间不存在",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -12894,7 +12945,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.Tenant"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.Tenant"
                         }
                     }
                 ],
@@ -12909,7 +12960,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -12951,7 +13002,7 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -12995,13 +13046,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "权限不足",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -13052,13 +13103,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "权限不足",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -13111,13 +13162,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "403": {
                         "description": "权限不足",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -13190,7 +13241,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -13776,7 +13827,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request or validation error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "401": {
@@ -13789,7 +13840,7 @@ const docTemplate = `{
                     "409": {
                         "description": "Duplicate endpoint and index",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     }
                 }
@@ -13838,7 +13889,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.AppError"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.AppError"
                         }
                     },
                     "401": {
@@ -14212,7 +14263,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Provider 详情",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WebSearchProviderEntity"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WebSearchProviderEntity"
                         }
                     },
                     "404": {
@@ -14266,7 +14317,7 @@ const docTemplate = `{
                     "200": {
                         "description": "更新后的 Provider",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WebSearchProviderEntity"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WebSearchProviderEntity"
                         }
                     },
                     "400": {
@@ -14496,61 +14547,10 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/weknoracloud/credentials": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    },
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "保存 APPID/APPSECRET 到当前空间配置（不自动创建模型）",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "WeKnoraCloud"
-                ],
-                "summary": "保存 WeKnoraCloud 凭证",
-                "parameters": [
-                    {
-                        "description": "{app_id, app_secret}",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success: true",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "请求参数错误",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
-        "github_com_Tencent_WeKnora_internal_application_service.WikiLintIssue": {
+        "github_com_Pototoooo_lorelattice_internal_application_service.WikiLintIssue": {
             "type": "object",
             "properties": {
                 "auto_fixable": {
@@ -14563,18 +14563,18 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "severity": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_application_service.WikiLintIssueSeverity"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_application_service.WikiLintIssueSeverity"
                 },
                 "target_slug": {
                     "description": "TargetSlug identifies the other page involved in the issue (e.g. the\nbroken link target, or the entity slug for a missing cross-ref). It is\nthe structured field used by AutoFix instead of parsing Description.",
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_application_service.WikiLintIssueType"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_application_service.WikiLintIssueType"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_application_service.WikiLintIssueSeverity": {
+        "github_com_Pototoooo_lorelattice_internal_application_service.WikiLintIssueSeverity": {
             "type": "string",
             "enum": [
                 "info",
@@ -14587,7 +14587,7 @@ const docTemplate = `{
                 "SeverityError"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_application_service.WikiLintIssueType": {
+        "github_com_Pototoooo_lorelattice_internal_application_service.WikiLintIssueType": {
             "type": "string",
             "enum": [
                 "orphan_page",
@@ -14606,7 +14606,7 @@ const docTemplate = `{
                 "LintIssueDuplicateSlug"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_application_service.WikiLintReport": {
+        "github_com_Pototoooo_lorelattice_internal_application_service.WikiLintReport": {
             "type": "object",
             "properties": {
                 "health_score": {
@@ -14616,21 +14616,21 @@ const docTemplate = `{
                 "issues": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_application_service.WikiLintIssue"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_application_service.WikiLintIssue"
                     }
                 },
                 "knowledge_base_id": {
                     "type": "string"
                 },
                 "stats": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiStats"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiStats"
                 },
                 "summary": {
                     "type": "string"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_datasource.ConnectorMetadata": {
+        "github_com_Pototoooo_lorelattice_internal_datasource.ConnectorMetadata": {
             "type": "object",
             "properties": {
                 "auth_type": {
@@ -14662,11 +14662,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_errors.AppError": {
+        "github_com_Pototoooo_lorelattice_internal_errors.AppError": {
             "type": "object",
             "properties": {
                 "code": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_errors.ErrorCode"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_errors.ErrorCode"
                 },
                 "details": {},
                 "message": {
@@ -14674,7 +14674,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_errors.ErrorCode": {
+        "github_com_Pototoooo_lorelattice_internal_errors.ErrorCode": {
             "type": "integer",
             "enum": [
                 1000,
@@ -14727,7 +14727,7 @@ const docTemplate = `{
                 "ErrVectorStoreUnavailable"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_infrastructure_chunker.DocProfile": {
+        "github_com_Pototoooo_lorelattice_internal_infrastructure_chunker.DocProfile": {
             "type": "object",
             "properties": {
                 "all_caps_short_line_count": {
@@ -14799,7 +14799,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_infrastructure_chunker.StrategyTier": {
+        "github_com_Pototoooo_lorelattice_internal_infrastructure_chunker.StrategyTier": {
             "type": "string",
             "enum": [
                 "heading",
@@ -14812,18 +14812,18 @@ const docTemplate = `{
                 "TierLegacy"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_infrastructure_chunker.TierRejection": {
+        "github_com_Pototoooo_lorelattice_internal_infrastructure_chunker.TierRejection": {
             "type": "object",
             "properties": {
                 "reason": {
                     "type": "string"
                 },
                 "tier": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_infrastructure_chunker.StrategyTier"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_infrastructure_chunker.StrategyTier"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_models_limiter.RuntimeStat": {
+        "github_com_Pototoooo_lorelattice_internal_models_limiter.RuntimeStat": {
             "type": "object",
             "properties": {
                 "active": {
@@ -14843,7 +14843,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.APIPrincipalMode": {
+        "github_com_Pototoooo_lorelattice_internal_types.APIPrincipalMode": {
             "type": "string",
             "enum": [
                 "tenant",
@@ -14856,7 +14856,7 @@ const docTemplate = `{
                 "APIPrincipalModeSignedToken"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.ASRConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.ASRConfig": {
             "type": "object",
             "properties": {
                 "enabled": {
@@ -14871,7 +14871,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.AgentStep": {
+        "github_com_Pototoooo_lorelattice_internal_types.AgentStep": {
             "type": "object",
             "properties": {
                 "iteration": {
@@ -14894,12 +14894,12 @@ const docTemplate = `{
                     "description": "Tools called in this step (Act phase)",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ToolCall"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ToolCall"
                     }
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.AnswerStrategy": {
+        "github_com_Pototoooo_lorelattice_internal_types.AnswerStrategy": {
             "type": "string",
             "enum": [
                 "all",
@@ -14910,7 +14910,7 @@ const docTemplate = `{
                 "AnswerStrategyRandom"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.AuditAction": {
+        "github_com_Pototoooo_lorelattice_internal_types.AuditAction": {
             "type": "string",
             "enum": [
                 "rbac.member_added",
@@ -15037,11 +15037,11 @@ const docTemplate = `{
                 "AuditActionFAQImportFailed"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.AuditLog": {
+        "github_com_Pototoooo_lorelattice_internal_types.AuditLog": {
             "type": "object",
             "properties": {
                 "action": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.AuditAction"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.AuditAction"
                 },
                 "actor_role": {
                     "type": "string"
@@ -15062,7 +15062,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "outcome": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.AuditOutcome"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.AuditOutcome"
                 },
                 "request_method": {
                     "type": "string"
@@ -15090,7 +15090,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.AuditOutcome": {
+        "github_com_Pototoooo_lorelattice_internal_types.AuditOutcome": {
             "type": "string",
             "enum": [
                 "success",
@@ -15109,7 +15109,7 @@ const docTemplate = `{
                 "AuditOutcomeCanceled"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.COSEngineConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.COSEngineConfig": {
             "type": "object",
             "properties": {
                 "app_id": {
@@ -15138,7 +15138,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ChatHistoryConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.ChatHistoryConfig": {
             "type": "object",
             "properties": {
                 "embedding_model_id": {
@@ -15155,7 +15155,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ChunkingConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.ChunkingConfig": {
             "type": "object",
             "properties": {
                 "child_chunk_size": {
@@ -15189,7 +15189,7 @@ const docTemplate = `{
                     "description": "ParserEngineRules configures which parser engine to use for each file type.\nWhen empty, the builtin engine is used for all types.",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ParserEngineRule"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ParserEngineRule"
                     }
                 },
                 "separators": {
@@ -15213,7 +15213,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ConnectionConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.ConnectionConfig": {
             "type": "object",
             "properties": {
                 "addr": {
@@ -15270,7 +15270,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ContextCompressionStrategy": {
+        "github_com_Pototoooo_lorelattice_internal_types.ContextCompressionStrategy": {
             "type": "string",
             "enum": [
                 "sliding_window",
@@ -15281,14 +15281,14 @@ const docTemplate = `{
                 "ContextCompressionSmart"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.ContextConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.ContextConfig": {
             "type": "object",
             "properties": {
                 "compression_strategy": {
                     "description": "Compression strategy: \"sliding_window\" or \"smart\"",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ContextCompressionStrategy"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ContextCompressionStrategy"
                         }
                     ]
                 },
@@ -15306,7 +15306,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.CreateOrganizationRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.CreateOrganizationRequest": {
             "type": "object",
             "required": [
                 "name"
@@ -15336,15 +15336,15 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.CredentialsConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.CredentialsConfig": {
             "type": "object",
             "properties": {
-                "weknoracloud": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WeKnoraCloudCredentials"
+                "lorelatticecloud": {
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.LoreLatticeCloudCredentials"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.CustomAgentConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.CustomAgentConfig": {
             "type": "object",
             "properties": {
                 "agent_mode": {
@@ -15371,11 +15371,11 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "attachment_ocr_max_pages": {
-                    "description": "AttachmentOCRMaxPages caps how many pages of a scanned / image-only\ndocument this agent sends to the VLM for OCR. 0 falls back to the global\ndefault (WEKNORA_CHAT_ATTACHMENT_OCR_MAX_PAGES). More pages means higher\ncoverage but slower parsing and more VLM cost.",
+                    "description": "AttachmentOCRMaxPages caps how many pages of a scanned / image-only\ndocument this agent sends to the VLM for OCR. 0 falls back to the global\ndefault (LORELATTICE_CHAT_ATTACHMENT_OCR_MAX_PAGES). More pages means higher\ncoverage but slower parsing and more VLM cost.",
                     "type": "integer"
                 },
                 "attachment_parse_wait_timeout_sec": {
-                    "description": "AttachmentParseWaitTimeoutSec bounds, in seconds, how long a chat turn\nwaits for this agent's still-parsing attachments before proceeding with\nonly the finished ones. 0 falls back to the global default\n(WEKNORA_CHAT_ATTACHMENT_WAIT_TIMEOUT_SEC).",
+                    "description": "AttachmentParseWaitTimeoutSec bounds, in seconds, how long a chat turn\nwaits for this agent's still-parsing attachments before proceeding with\nonly the finished ones. 0 falls back to the global default\n(LORELATTICE_CHAT_ATTACHMENT_WAIT_TIMEOUT_SEC).",
                     "type": "integer"
                 },
                 "audio_upload_enabled": {
@@ -15386,7 +15386,7 @@ const docTemplate = `{
                     "description": "===== Chat Attachment Parsing Settings =====\nChatParserEngineRules selects parser engines for session-scoped chat\nattachments by file type. Takes precedence over the tenant-level\nParserEngineConfig.ChatParserEngineRules; an explicit per-request\nparser_engine still overrides both.",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ParserEngineRule"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ParserEngineRule"
                     }
                 },
                 "citation_enabled": {
@@ -15518,7 +15518,7 @@ const docTemplate = `{
                     "description": "===== Conversation Question Suggestions =====\nQuestionSuggestions owns both the static/knowledge-backed prompts shown\nbefore the first user turn and the contextual follow-up questions shown\nafter a completed assistant answer.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.QuestionSuggestionConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.QuestionSuggestionConfig"
                         }
                     ]
                 },
@@ -15614,7 +15614,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.DataSource": {
+        "github_com_Pototoooo_lorelattice_internal_types.DataSource": {
             "type": "object",
             "properties": {
                 "config": {
@@ -15674,7 +15674,7 @@ const docTemplate = `{
                     "description": "Latest sync log (not stored in DB, populated on query)",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.SyncLog"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.SyncLog"
                         }
                     ]
                 },
@@ -15720,7 +15720,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.EmbeddingParameters": {
+        "github_com_Pototoooo_lorelattice_internal_types.EmbeddingParameters": {
             "type": "object",
             "properties": {
                 "dimension": {
@@ -15734,7 +15734,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ExtractConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.ExtractConfig": {
             "type": "object",
             "properties": {
                 "custom_instructions": {
@@ -15747,13 +15747,13 @@ const docTemplate = `{
                 "nodes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.GraphNode"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.GraphNode"
                     }
                 },
                 "relations": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.GraphRelation"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.GraphRelation"
                     }
                 },
                 "tags": {
@@ -15767,7 +15767,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.FAQBatchUpsertPayload": {
+        "github_com_Pototoooo_lorelattice_internal_types.FAQBatchUpsertPayload": {
             "type": "object",
             "required": [
                 "entries"
@@ -15780,7 +15780,7 @@ const docTemplate = `{
                 "entries": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.FAQEntryPayload"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.FAQEntryPayload"
                     }
                 },
                 "knowledge_id": {
@@ -15799,32 +15799,32 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.FAQConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.FAQConfig": {
             "type": "object",
             "properties": {
                 "index_mode": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.FAQIndexMode"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.FAQIndexMode"
                 },
                 "question_index_mode": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.FAQQuestionIndexMode"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.FAQQuestionIndexMode"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.FAQEntryFieldsBatchUpdate": {
+        "github_com_Pototoooo_lorelattice_internal_types.FAQEntryFieldsBatchUpdate": {
             "type": "object",
             "properties": {
                 "by_id": {
                     "description": "ByID 按条目ID更新，key为条目ID (seq_id)",
                     "type": "object",
                     "additionalProperties": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.FAQEntryFieldsUpdate"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.FAQEntryFieldsUpdate"
                     }
                 },
                 "by_tag": {
                     "description": "ByTag 按Tag批量更新，key为TagID (seq_id)",
                     "type": "object",
                     "additionalProperties": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.FAQEntryFieldsUpdate"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.FAQEntryFieldsUpdate"
                     }
                 },
                 "exclude_ids": {
@@ -15836,7 +15836,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.FAQEntryFieldsUpdate": {
+        "github_com_Pototoooo_lorelattice_internal_types.FAQEntryFieldsUpdate": {
             "type": "object",
             "properties": {
                 "is_enabled": {
@@ -15850,14 +15850,14 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.FAQEntryPayload": {
+        "github_com_Pototoooo_lorelattice_internal_types.FAQEntryPayload": {
             "type": "object",
             "required": [
                 "standard_question"
             ],
             "properties": {
                 "answer_strategy": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.AnswerStrategy"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.AnswerStrategy"
                 },
                 "answers": {
                     "type": "array",
@@ -15898,7 +15898,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.FAQIndexMode": {
+        "github_com_Pototoooo_lorelattice_internal_types.FAQIndexMode": {
             "type": "string",
             "enum": [
                 "question_only",
@@ -15909,7 +15909,7 @@ const docTemplate = `{
                 "FAQIndexModeQuestionAnswer"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.FAQQuestionIndexMode": {
+        "github_com_Pototoooo_lorelattice_internal_types.FAQQuestionIndexMode": {
             "type": "string",
             "enum": [
                 "combined",
@@ -15920,7 +15920,7 @@ const docTemplate = `{
                 "FAQQuestionIndexModeSeparate"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.FAQSearchRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.FAQSearchRequest": {
             "type": "object",
             "required": [
                 "query_text"
@@ -15955,7 +15955,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.FollowUpSuggestionConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.FollowUpSuggestionConfig": {
             "type": "object",
             "properties": {
                 "additional_instruction": {
@@ -15996,7 +15996,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.GraphNode": {
+        "github_com_Pototoooo_lorelattice_internal_types.GraphNode": {
             "type": "object",
             "properties": {
                 "attributes": {
@@ -16016,7 +16016,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.GraphRelation": {
+        "github_com_Pototoooo_lorelattice_internal_types.GraphRelation": {
             "type": "object",
             "properties": {
                 "node1": {
@@ -16030,7 +16030,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ImageProcessingConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.ImageProcessingConfig": {
             "type": "object",
             "properties": {
                 "model_id": {
@@ -16039,7 +16039,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.IndexConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.IndexConfig": {
             "type": "object",
             "properties": {
                 "buckets_num": {
@@ -16108,7 +16108,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.IndexingStrategy": {
+        "github_com_Pototoooo_lorelattice_internal_types.IndexingStrategy": {
             "type": "object",
             "properties": {
                 "graph_enabled": {
@@ -16129,7 +16129,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.InviteMemberRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.InviteMemberRequest": {
             "type": "object",
             "required": [
                 "role"
@@ -16143,7 +16143,7 @@ const docTemplate = `{
                     "description": "Role to assign: admin/editor/viewer",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OrgMemberRole"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OrgMemberRole"
                         }
                     ]
                 },
@@ -16157,7 +16157,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.JoinByOrganizationIDRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.JoinByOrganizationIDRequest": {
             "type": "object",
             "required": [
                 "organization_id"
@@ -16175,13 +16175,13 @@ const docTemplate = `{
                     "description": "Optional: requested role (admin/editor/viewer); default viewer",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OrgMemberRole"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OrgMemberRole"
                         }
                     ]
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.JoinOrganizationRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.JoinOrganizationRequest": {
             "type": "object",
             "required": [
                 "invite_code"
@@ -16194,7 +16194,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.KBCloneTaskStatus": {
+        "github_com_Pototoooo_lorelattice_internal_types.KBCloneTaskStatus": {
             "type": "string",
             "enum": [
                 "pending",
@@ -16209,7 +16209,7 @@ const docTemplate = `{
                 "KBCloneStatusFailed"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.KS3EngineConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.KS3EngineConfig": {
             "type": "object",
             "properties": {
                 "access_key": {
@@ -16232,7 +16232,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.Knowledge": {
+        "github_com_Pototoooo_lorelattice_internal_types.Knowledge": {
             "type": "object",
             "properties": {
                 "channel": {
@@ -16341,7 +16341,7 @@ const docTemplate = `{
                     "description": "Tags holds the tags associated with this knowledge (populated on query, not persisted directly).",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.KnowledgeTag"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.KnowledgeTag"
                     }
                 },
                 "tenant_id": {
@@ -16362,14 +16362,14 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.KnowledgeBase": {
+        "github_com_Pototoooo_lorelattice_internal_types.KnowledgeBase": {
             "type": "object",
             "properties": {
                 "asr_config": {
                     "description": "ASR config (Automatic Speech Recognition)",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ASRConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ASRConfig"
                         }
                     ]
                 },
@@ -16381,7 +16381,7 @@ const docTemplate = `{
                     "description": "Chunking configuration",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ChunkingConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ChunkingConfig"
                         }
                     ]
                 },
@@ -16417,7 +16417,7 @@ const docTemplate = `{
                     "description": "Extract config",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ExtractConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ExtractConfig"
                         }
                     ]
                 },
@@ -16425,7 +16425,7 @@ const docTemplate = `{
                     "description": "FAQConfig stores FAQ specific configuration such as indexing strategy",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.FAQConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.FAQConfig"
                         }
                     ]
                 },
@@ -16437,7 +16437,7 @@ const docTemplate = `{
                     "description": "Image processing configuration",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ImageProcessingConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ImageProcessingConfig"
                         }
                     ]
                 },
@@ -16445,7 +16445,7 @@ const docTemplate = `{
                     "description": "IndexingStrategy controls which indexing pipelines are active for this knowledge base.\nPipelines: vector search, keyword search, wiki generation, knowledge graph extraction.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.IndexingStrategy"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.IndexingStrategy"
                         }
                     ]
                 },
@@ -16481,7 +16481,7 @@ const docTemplate = `{
                     "description": "QuestionGenerationConfig stores question generation configuration for document knowledge bases",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.QuestionGenerationConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.QuestionGenerationConfig"
                         }
                     ]
                 },
@@ -16497,7 +16497,7 @@ const docTemplate = `{
                     "description": "Deprecated: legacy COS config column. Kept for backward compatibility with old data.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.StorageConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.StorageConfig"
                         }
                     ]
                 },
@@ -16505,7 +16505,7 @@ const docTemplate = `{
                     "description": "Storage provider config (new): only stores provider selection; credentials from workspace StorageEngineConfig",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.StorageProviderConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.StorageProviderConfig"
                         }
                     ]
                 },
@@ -16533,7 +16533,7 @@ const docTemplate = `{
                     "description": "VLM config",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.VLMConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.VLMConfig"
                         }
                     ]
                 },
@@ -16541,20 +16541,20 @@ const docTemplate = `{
                     "description": "WikiConfig stores wiki-specific configuration (only for wiki type knowledge bases)",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiConfig"
                         }
                     ]
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.KnowledgeBaseConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.KnowledgeBaseConfig": {
             "type": "object",
             "properties": {
                 "chunking_config": {
                     "description": "Chunking configuration",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ChunkingConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ChunkingConfig"
                         }
                     ]
                 },
@@ -16562,7 +16562,7 @@ const docTemplate = `{
                     "description": "FAQ configuration (only for FAQ type knowledge bases)",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.FAQConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.FAQConfig"
                         }
                     ]
                 },
@@ -16570,7 +16570,7 @@ const docTemplate = `{
                     "description": "Image processing configuration",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ImageProcessingConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ImageProcessingConfig"
                         }
                     ]
                 },
@@ -16578,7 +16578,7 @@ const docTemplate = `{
                     "description": "IndexingStrategy controls which indexing pipelines are active.\nnil means \"no change\" when updating (preserves existing strategy).",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.IndexingStrategy"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.IndexingStrategy"
                         }
                     ]
                 },
@@ -16586,13 +16586,13 @@ const docTemplate = `{
                     "description": "Wiki configuration (only for wiki-enabled knowledge bases)",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiConfig"
                         }
                     ]
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.KnowledgeBaseShareResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.KnowledgeBaseShareResponse": {
             "type": "object",
             "properties": {
                 "chunk_count": {
@@ -16648,7 +16648,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.KnowledgeMoveProgress": {
+        "github_com_Pototoooo_lorelattice_internal_types.KnowledgeMoveProgress": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -16679,7 +16679,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.KBCloneTaskStatus"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.KBCloneTaskStatus"
                 },
                 "target_kb_id": {
                     "type": "string"
@@ -16697,20 +16697,20 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.KnowledgeProcessOverrides": {
+        "github_com_Pototoooo_lorelattice_internal_types.KnowledgeProcessOverrides": {
             "type": "object",
             "properties": {
                 "asr_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ASRConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ASRConfig"
                 },
                 "chunking_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ChunkingConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ChunkingConfig"
                 },
                 "enable_multimodel": {
                     "type": "boolean"
                 },
                 "extract_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ExtractConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ExtractConfig"
                 },
                 "graph_enabled": {
                     "type": "boolean"
@@ -16725,18 +16725,18 @@ const docTemplate = `{
                 "parser_engine_rules": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ParserEngineRule"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ParserEngineRule"
                     }
                 },
                 "question_generation_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.QuestionGenerationConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.QuestionGenerationConfig"
                 },
                 "vlm_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.VLMConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.VLMConfig"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.KnowledgeTag": {
+        "github_com_Pototoooo_lorelattice_internal_types.KnowledgeTag": {
             "type": "object",
             "properties": {
                 "color": {
@@ -16777,13 +16777,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ListMembersResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.ListMembersResponse": {
             "type": "object",
             "properties": {
                 "members": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OrganizationMemberResponse"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OrganizationMemberResponse"
                     }
                 },
                 "total": {
@@ -16791,20 +16791,20 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ListOrganizationsResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.ListOrganizationsResponse": {
             "type": "object",
             "properties": {
                 "organizations": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OrganizationResponse"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OrganizationResponse"
                     }
                 },
                 "resource_counts": {
                     "description": "各空间内知识库/智能体数量，供列表侧栏展示",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ResourceCountsByOrgResponse"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ResourceCountsByOrgResponse"
                         }
                     ]
                 },
@@ -16813,13 +16813,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ListSharesResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.ListSharesResponse": {
             "type": "object",
             "properties": {
                 "shares": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.KnowledgeBaseShareResponse"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.KnowledgeBaseShareResponse"
                     }
                 },
                 "total": {
@@ -16827,7 +16827,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.LocalEngineConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.LocalEngineConfig": {
             "type": "object",
             "properties": {
                 "path_prefix": {
@@ -16835,7 +16835,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.LoginRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.LoginRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -16851,14 +16851,14 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.LoginResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.LoginResponse": {
             "type": "object",
             "properties": {
                 "active_tenant": {
                     "description": "ActiveTenant is the workspace whose ID is encoded in the issued JWT;\nfuture requests are scoped to it until the client calls /auth/switch-tenant.\nDefaults to the user's home workspace on a fresh login.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.Tenant"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.Tenant"
                         }
                     ]
                 },
@@ -16866,7 +16866,7 @@ const docTemplate = `{
                     "description": "Memberships lists every workspace the user can authenticate into,\nalong with their role in each. Always populated (length 1 for users\nwho only belong to their home workspace) so frontends can render a\nworkspace switcher without a follow-up request. Serialised without\nomitempty so the field is always present as a JSON array (possibly\nempty) — the \"always populated\" contract relies on the server side\nguaranteeing a non-nil slice.",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.Membership"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.Membership"
                     }
                 },
                 "message": {
@@ -16882,11 +16882,22 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.User"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.User"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.MCPAdvancedConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.LoreLatticeCloudCredentials": {
+            "type": "object",
+            "properties": {
+                "app_id": {
+                    "type": "string"
+                },
+                "app_secret": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_Pototoooo_lorelattice_internal_types.MCPAdvancedConfig": {
             "type": "object",
             "properties": {
                 "retry_count": {
@@ -16903,7 +16914,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.MCPAuthConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.MCPAuthConfig": {
             "type": "object",
             "properties": {
                 "api_key": {
@@ -16921,7 +16932,7 @@ const docTemplate = `{
                     "description": "AuthType selects the authentication strategy. Empty (\"\") is treated as\nnone for backward compatibility with rows that pre-date this field.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MCPAuthType"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MCPAuthType"
                         }
                     ]
                 },
@@ -16943,7 +16954,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.MCPAuthType": {
+        "github_com_Pototoooo_lorelattice_internal_types.MCPAuthType": {
             "type": "string",
             "enum": [
                 "",
@@ -16958,26 +16969,26 @@ const docTemplate = `{
                 "MCPAuthOAuth"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.MCPEnvVars": {
+        "github_com_Pototoooo_lorelattice_internal_types.MCPEnvVars": {
             "type": "object",
             "additionalProperties": {
                 "type": "string"
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.MCPHeaders": {
+        "github_com_Pototoooo_lorelattice_internal_types.MCPHeaders": {
             "type": "object",
             "additionalProperties": {
                 "type": "string"
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.MCPService": {
+        "github_com_Pototoooo_lorelattice_internal_types.MCPService": {
             "type": "object",
             "properties": {
                 "advanced_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MCPAdvancedConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MCPAdvancedConfig"
                 },
                 "auth_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MCPAuthConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MCPAuthConfig"
                 },
                 "created_at": {
                     "type": "string"
@@ -16995,12 +17006,12 @@ const docTemplate = `{
                     "description": "Environment variables for stdio",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MCPEnvVars"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MCPEnvVars"
                         }
                     ]
                 },
                 "headers": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MCPHeaders"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MCPHeaders"
                 },
                 "id": {
                     "type": "string"
@@ -17016,7 +17027,7 @@ const docTemplate = `{
                     "description": "Required for stdio transport",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MCPStdioConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MCPStdioConfig"
                         }
                     ]
                 },
@@ -17024,7 +17035,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "transport_type": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MCPTransportType"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MCPTransportType"
                 },
                 "updated_at": {
                     "type": "string"
@@ -17035,7 +17046,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.MCPStdioConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.MCPStdioConfig": {
             "type": "object",
             "properties": {
                 "args": {
@@ -17051,7 +17062,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.MCPTransportType": {
+        "github_com_Pototoooo_lorelattice_internal_types.MCPTransportType": {
             "type": "string",
             "enum": [
                 "sse",
@@ -17074,7 +17085,7 @@ const docTemplate = `{
                 "MCPTransportStdio"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.ManualKnowledgePayload": {
+        "github_com_Pototoooo_lorelattice_internal_types.ManualKnowledgePayload": {
             "type": "object",
             "properties": {
                 "channel": {
@@ -17084,7 +17095,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "process_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.KnowledgeProcessOverrides"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.KnowledgeProcessOverrides"
                 },
                 "status": {
                     "type": "string"
@@ -17100,7 +17111,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.MatchType": {
+        "github_com_Pototoooo_lorelattice_internal_types.MatchType": {
             "type": "integer",
             "enum": [
                 0,
@@ -17146,11 +17157,11 @@ const docTemplate = `{
                 "MatchTypeDataAnalysis"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.Membership": {
+        "github_com_Pototoooo_lorelattice_internal_types.Membership": {
             "type": "object",
             "properties": {
                 "role": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.TenantRole"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.TenantRole"
                 },
                 "tenant_id": {
                     "type": "integer"
@@ -17160,7 +17171,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.MentionedItem": {
+        "github_com_Pototoooo_lorelattice_internal_types.MentionedItem": {
             "type": "object",
             "properties": {
                 "id": {
@@ -17195,7 +17206,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.Message": {
+        "github_com_Pototoooo_lorelattice_internal_types.Message": {
             "type": "object",
             "properties": {
                 "agent_duration_ms": {
@@ -17210,14 +17221,14 @@ const docTemplate = `{
                     "description": "Agent execution steps (only for assistant messages generated by agent)\nThis contains the detailed reasoning process and tool calls made by the agent\nStored for user history display, but NOT included in LLM context to avoid redundancy",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.AgentStep"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.AgentStep"
                     }
                 },
                 "attachments": {
                     "description": "Attached files (documents, audio, etc., for user messages)",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MessageAttachment"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MessageAttachment"
                     }
                 },
                 "channel": {
@@ -17248,7 +17259,7 @@ const docTemplate = `{
                     "description": "Attached images with OCR/Caption text (for user messages)",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MessageImage"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MessageImage"
                     }
                 },
                 "is_completed": {
@@ -17267,14 +17278,14 @@ const docTemplate = `{
                     "description": "References to knowledge chunks used in the response",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.SearchResult"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.SearchResult"
                     }
                 },
                 "mentioned_items": {
                     "description": "Mentioned knowledge bases and files (for user messages)\nStores the @mentioned items when user sends a message",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MentionedItem"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MentionedItem"
                     }
                 },
                 "model_id": {
@@ -17299,7 +17310,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.MessageAttachment": {
+        "github_com_Pototoooo_lorelattice_internal_types.MessageAttachment": {
             "type": "object",
             "properties": {
                 "content": {
@@ -17348,7 +17359,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.MessageImage": {
+        "github_com_Pototoooo_lorelattice_internal_types.MessageImage": {
             "type": "object",
             "properties": {
                 "caption": {
@@ -17359,7 +17370,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.MinIOEngineConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.MinIOEngineConfig": {
             "type": "object",
             "properties": {
                 "access_key_id": {
@@ -17386,14 +17397,14 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ModelParameters": {
+        "github_com_Pototoooo_lorelattice_internal_types.ModelParameters": {
             "type": "object",
             "properties": {
                 "api_key": {
                     "type": "string"
                 },
                 "app_id": {
-                    "description": "WeKnoraCloud 厂商专用凭证",
+                    "description": "LoreLatticeCloud 厂商专用凭证",
                     "type": "string"
                 },
                 "app_secret": {
@@ -17411,7 +17422,7 @@ const docTemplate = `{
                     }
                 },
                 "embedding_parameters": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.EmbeddingParameters"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.EmbeddingParameters"
                 },
                 "extra_config": {
                     "description": "Provider-specific configuration",
@@ -17441,7 +17452,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ModelSource": {
+        "github_com_Pototoooo_lorelattice_internal_types.ModelSource": {
             "type": "string",
             "enum": [
                 "local",
@@ -17524,7 +17535,7 @@ const docTemplate = `{
                 "ModelSourceAzureOpenAI"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.ModelType": {
+        "github_com_Pototoooo_lorelattice_internal_types.ModelType": {
             "type": "string",
             "enum": [
                 "Embedding",
@@ -17555,7 +17566,7 @@ const docTemplate = `{
                 "ModelTypeASR"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.OBSEngineConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.OBSEngineConfig": {
             "type": "object",
             "properties": {
                 "access_key": {
@@ -17581,7 +17592,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.OIDCAuthURLResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.OIDCAuthURLResponse": {
             "type": "object",
             "properties": {
                 "authorization_url": {
@@ -17598,7 +17609,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.OIDCConfigResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.OIDCConfigResponse": {
             "type": "object",
             "properties": {
                 "enabled": {
@@ -17612,7 +17623,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.OSSEngineConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.OSSEngineConfig": {
             "type": "object",
             "properties": {
                 "access_key": {
@@ -17644,7 +17655,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.OrgMemberRole": {
+        "github_com_Pototoooo_lorelattice_internal_types.OrgMemberRole": {
             "type": "string",
             "enum": [
                 "admin",
@@ -17657,7 +17668,7 @@ const docTemplate = `{
                 "OrgRoleViewer"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.OrganizationMemberResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.OrganizationMemberResponse": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -17692,7 +17703,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.OrganizationResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.OrganizationResponse": {
             "type": "object",
             "properties": {
                 "agent_share_count": {
@@ -17766,14 +17777,14 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ParserEngineConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.ParserEngineConfig": {
             "type": "object",
             "properties": {
                 "chat_parser_engine_rules": {
                     "description": "ChatParserEngineRules selects parser engines for session-scoped chat\ndocuments. Knowledge bases keep their own rules in ChunkingConfig.",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ParserEngineRule"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ParserEngineRule"
                     }
                 },
                 "mineru_api_key": {
@@ -17864,7 +17875,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ParserEngineRule": {
+        "github_com_Pototoooo_lorelattice_internal_types.ParserEngineRule": {
             "type": "object",
             "properties": {
                 "engine": {
@@ -17878,7 +17889,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.QuestionGenerationConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.QuestionGenerationConfig": {
             "type": "object",
             "properties": {
                 "custom_instructions": {
@@ -17894,18 +17905,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.QuestionSuggestionConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.QuestionSuggestionConfig": {
             "type": "object",
             "properties": {
                 "follow_ups": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.FollowUpSuggestionConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.FollowUpSuggestionConfig"
                 },
                 "starters": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.StarterSuggestionConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.StarterSuggestionConfig"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.QueueStat": {
+        "github_com_Pototoooo_lorelattice_internal_types.QueueStat": {
             "type": "object",
             "properties": {
                 "active": {
@@ -17962,7 +17973,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.RegisterRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.RegisterRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -17984,7 +17995,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.RegisterResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.RegisterResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -17994,14 +18005,14 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "tenant": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.Tenant"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.Tenant"
                 },
                 "user": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.User"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.User"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.RequestRoleUpgradeRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.RequestRoleUpgradeRequest": {
             "type": "object",
             "required": [
                 "requested_role"
@@ -18016,13 +18027,13 @@ const docTemplate = `{
                     "description": "The role user wants to upgrade to",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OrgMemberRole"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OrgMemberRole"
                         }
                     ]
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.Resource": {
+        "github_com_Pototoooo_lorelattice_internal_types.Resource": {
             "type": "object",
             "properties": {
                 "description": {
@@ -18064,7 +18075,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ResourceCountsByOrgResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.ResourceCountsByOrgResponse": {
             "type": "object",
             "properties": {
                 "agents": {
@@ -18091,7 +18102,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.RetrievalConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.RetrievalConfig": {
             "type": "object",
             "properties": {
                 "embedding_top_k": {
@@ -18132,14 +18143,14 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.RetrieverEngineParams": {
+        "github_com_Pototoooo_lorelattice_internal_types.RetrieverEngineParams": {
             "type": "object",
             "properties": {
                 "retriever_engine_type": {
                     "description": "Retriever engine type",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.RetrieverEngineType"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.RetrieverEngineType"
                         }
                     ]
                 },
@@ -18147,13 +18158,13 @@ const docTemplate = `{
                     "description": "Retriever type",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.RetrieverType"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.RetrieverType"
                         }
                     ]
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.RetrieverEngineType": {
+        "github_com_Pototoooo_lorelattice_internal_types.RetrieverEngineType": {
             "type": "string",
             "enum": [
                 "postgres",
@@ -18182,18 +18193,18 @@ const docTemplate = `{
                 "OpenSearchRetrieverEngineType"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.RetrieverEngines": {
+        "github_com_Pototoooo_lorelattice_internal_types.RetrieverEngines": {
             "type": "object",
             "properties": {
                 "engines": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.RetrieverEngineParams"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.RetrieverEngineParams"
                     }
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.RetrieverType": {
+        "github_com_Pototoooo_lorelattice_internal_types.RetrieverType": {
             "type": "string",
             "enum": [
                 "keywords",
@@ -18216,7 +18227,7 @@ const docTemplate = `{
                 "WebSearchRetrieverType"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.ReviewJoinRequestRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.ReviewJoinRequestRequest": {
             "type": "object",
             "properties": {
                 "approved": {
@@ -18230,13 +18241,13 @@ const docTemplate = `{
                     "description": "Optional: role to assign when approving; overrides applicant's requested role",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OrgMemberRole"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OrgMemberRole"
                         }
                     ]
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.RuntimeTaskAction": {
+        "github_com_Pototoooo_lorelattice_internal_types.RuntimeTaskAction": {
             "type": "string",
             "enum": [
                 "cancel",
@@ -18249,13 +18260,13 @@ const docTemplate = `{
                 "RuntimeTaskActionDelete"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.RuntimeTaskInfo": {
+        "github_com_Pototoooo_lorelattice_internal_types.RuntimeTaskInfo": {
             "type": "object",
             "properties": {
                 "allowed_actions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.RuntimeTaskAction"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.RuntimeTaskAction"
                     }
                 },
                 "completed_at": {
@@ -18313,7 +18324,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "state": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.RuntimeTaskState"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.RuntimeTaskState"
                 },
                 "sync_log_id": {
                     "type": "string"
@@ -18338,7 +18349,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.RuntimeTaskState": {
+        "github_com_Pototoooo_lorelattice_internal_types.RuntimeTaskState": {
             "type": "string",
             "enum": [
                 "pending",
@@ -18357,7 +18368,7 @@ const docTemplate = `{
                 "RuntimeTaskCompleted"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.S3EngineConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.S3EngineConfig": {
             "type": "object",
             "properties": {
                 "access_key": {
@@ -18386,7 +18397,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.SearchParams": {
+        "github_com_Pototoooo_lorelattice_internal_types.SearchParams": {
             "type": "object",
             "properties": {
                 "disable_keywords_match": {
@@ -18449,7 +18460,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.SearchResult": {
+        "github_com_Pototoooo_lorelattice_internal_types.SearchResult": {
             "type": "object",
             "properties": {
                 "chunk_index": {
@@ -18515,7 +18526,7 @@ const docTemplate = `{
                     "description": "Match type",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MatchType"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MatchType"
                         }
                     ]
                 },
@@ -18555,7 +18566,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.Session": {
+        "github_com_Pototoooo_lorelattice_internal_types.Session": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -18584,7 +18595,7 @@ const docTemplate = `{
                     "description": "LastRequestState records the input-bar state used the last time this\nsession sent a question (agent, model, KB scope, web search, MCPs).\nPersisted on every successful POST to /knowledge-chat or /agent-chat so\nthat reopening the session can restore the original request context to\nthe chat UI. Stored in the legacy sessions.agent_config JSONB column to\navoid a new migration; the shape used today is ` + "`" + `SessionLastRequestState` + "`" + `.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.SessionLastRequestState"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.SessionLastRequestState"
                         }
                     ]
                 },
@@ -18604,12 +18615,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
-                    "description": "UserID is the owner scope for this session. WeKnora user UUIDs, API\nexternal-user principals, and embed visitor principals all use this column.",
+                    "description": "UserID is the owner scope for this session. LoreLattice user UUIDs, API\nexternal-user principals, and embed visitor principals all use this column.",
                     "type": "string"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.SessionLastRequestState": {
+        "github_com_Pototoooo_lorelattice_internal_types.SessionLastRequestState": {
             "type": "object",
             "properties": {
                 "agent_enabled": {
@@ -18639,7 +18650,7 @@ const docTemplate = `{
                 "mentioned_items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MentionedItem"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MentionedItem"
                     }
                 },
                 "model_id": {
@@ -18662,7 +18673,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ShareKnowledgeBaseRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.ShareKnowledgeBaseRequest": {
             "type": "object",
             "required": [
                 "organization_id",
@@ -18673,11 +18684,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "permission": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OrgMemberRole"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OrgMemberRole"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.StarterSuggestionConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.StarterSuggestionConfig": {
             "type": "object",
             "properties": {
                 "count": {
@@ -18697,7 +18708,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.StorageBackendConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.StorageBackendConfig": {
             "type": "object",
             "properties": {
                 "access_key_id": {
@@ -18741,7 +18752,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.StorageConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.StorageConfig": {
             "type": "object",
             "properties": {
                 "app_id": {
@@ -18786,40 +18797,40 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.StorageEngineConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.StorageEngineConfig": {
             "type": "object",
             "properties": {
                 "cos": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.COSEngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.COSEngineConfig"
                 },
                 "default_provider": {
                     "description": "\"local\", \"minio\", \"cos\", \"tos\", \"s3\", \"oss\", \"ks3\", \"obs\"",
                     "type": "string"
                 },
                 "ks3": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.KS3EngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.KS3EngineConfig"
                 },
                 "local": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.LocalEngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.LocalEngineConfig"
                 },
                 "minio": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MinIOEngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MinIOEngineConfig"
                 },
                 "obs": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OBSEngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OBSEngineConfig"
                 },
                 "oss": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OSSEngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OSSEngineConfig"
                 },
                 "s3": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.S3EngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.S3EngineConfig"
                 },
                 "tos": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.TOSEngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.TOSEngineConfig"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.StorageProviderConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.StorageProviderConfig": {
             "type": "object",
             "properties": {
                 "provider": {
@@ -18828,7 +18839,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.SubmitJoinRequestRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.SubmitJoinRequestRequest": {
             "type": "object",
             "required": [
                 "invite_code"
@@ -18847,13 +18858,13 @@ const docTemplate = `{
                     "description": "Optional: role the applicant requests (admin/editor/viewer); default viewer",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OrgMemberRole"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OrgMemberRole"
                         }
                     ]
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.SuggestionAttribution": {
+        "github_com_Pototoooo_lorelattice_internal_types.SuggestionAttribution": {
             "type": "object",
             "properties": {
                 "question_id": {
@@ -18864,7 +18875,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.SyncLog": {
+        "github_com_Pototoooo_lorelattice_internal_types.SyncLog": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -18936,7 +18947,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.SystemSetting": {
+        "github_com_Pototoooo_lorelattice_internal_types.SystemSetting": {
             "type": "object",
             "properties": {
                 "category": {
@@ -18992,7 +19003,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.TOSEngineConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.TOSEngineConfig": {
             "type": "object",
             "properties": {
                 "access_key": {
@@ -19021,7 +19032,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.Tenant": {
+        "github_com_Pototoooo_lorelattice_internal_types.Tenant": {
             "type": "object",
             "properties": {
                 "business": {
@@ -19032,7 +19043,7 @@ const docTemplate = `{
                     "description": "Chat history config: knowledge base configuration for indexing and searching chat messages via vector search",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ChatHistoryConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ChatHistoryConfig"
                         }
                     ]
                 },
@@ -19040,7 +19051,7 @@ const docTemplate = `{
                     "description": "Global Context configuration for this workspace (default for all sessions)",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ContextConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ContextConfig"
                         }
                     ]
                 },
@@ -19049,10 +19060,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "credentials": {
-                    "description": "Credentials config: third-party provider credentials (e.g. WeKnoraCloud AppID/AppSecret)",
+                    "description": "Credentials config: third-party provider credentials (e.g. LoreLatticeCloud AppID/AppSecret)",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.CredentialsConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.CredentialsConfig"
                         }
                     ]
                 },
@@ -19084,7 +19095,7 @@ const docTemplate = `{
                     "description": "Parser engine config overrides (MinerU endpoint, API key, etc.). Used when parsing documents; overrides env.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ParserEngineConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ParserEngineConfig"
                         }
                     ]
                 },
@@ -19092,7 +19103,7 @@ const docTemplate = `{
                     "description": "Retrieval config: global search/retrieval parameters shared by knowledge search and message search",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.RetrievalConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.RetrievalConfig"
                         }
                     ]
                 },
@@ -19100,7 +19111,7 @@ const docTemplate = `{
                     "description": "Retriever engines",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.RetrieverEngines"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.RetrieverEngines"
                         }
                     ]
                 },
@@ -19112,7 +19123,7 @@ const docTemplate = `{
                     "description": "Storage engine config: parameters for Local, MinIO, COS. Used for document/file storage and docreader.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.StorageEngineConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.StorageEngineConfig"
                         }
                     ]
                 },
@@ -19132,13 +19143,13 @@ const docTemplate = `{
                     "description": "Global WebSearch configuration for this workspace",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WebSearchConfig"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WebSearchConfig"
                         }
                     ]
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.TenantRole": {
+        "github_com_Pototoooo_lorelattice_internal_types.TenantRole": {
             "type": "string",
             "enum": [
                 "owner",
@@ -19153,7 +19164,7 @@ const docTemplate = `{
                 "TenantRoleViewer"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.ToolCall": {
+        "github_com_Pototoooo_lorelattice_internal_types.ToolCall": {
             "type": "object",
             "properties": {
                 "args": {
@@ -19177,7 +19188,7 @@ const docTemplate = `{
                     "description": "Provider-specific tool-call state for replay",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ToolCallMetadata"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ToolCallMetadata"
                         }
                     ]
                 },
@@ -19189,13 +19200,13 @@ const docTemplate = `{
                     "description": "Execution result (contains Output)",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ToolResult"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ToolResult"
                         }
                     ]
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ToolCallMetadata": {
+        "github_com_Pototoooo_lorelattice_internal_types.ToolCallMetadata": {
             "type": "object",
             "additionalProperties": {
                 "type": "array",
@@ -19204,7 +19215,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.ToolResult": {
+        "github_com_Pototoooo_lorelattice_internal_types.ToolResult": {
             "type": "object",
             "properties": {
                 "data": {
@@ -19233,18 +19244,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.UpdateMemberRoleRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.UpdateMemberRoleRequest": {
             "type": "object",
             "required": [
                 "role"
             ],
             "properties": {
                 "role": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OrgMemberRole"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OrgMemberRole"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.UpdateOrganizationRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.UpdateOrganizationRequest": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -19278,18 +19289,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.UpdateSharePermissionRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.UpdateSharePermissionRequest": {
             "type": "object",
             "required": [
                 "permission"
             ],
             "properties": {
                 "permission": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OrgMemberRole"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OrgMemberRole"
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.User": {
+        "github_com_Pototoooo_lorelattice_internal_types.User": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -19332,7 +19343,7 @@ const docTemplate = `{
                     "description": "Per-user UI/feature preferences.\nStored as JSON (jsonb on Postgres, TEXT on SQLite) via the\ndriver.Valuer / sql.Scanner methods on UserPreferences.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.UserPreferences"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.UserPreferences"
                         }
                     ]
                 },
@@ -19340,7 +19351,7 @@ const docTemplate = `{
                     "description": "Association relationship, not stored in the database",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.Tenant"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.Tenant"
                         }
                     ]
                 },
@@ -19358,7 +19369,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.UserInfo": {
+        "github_com_Pototoooo_lorelattice_internal_types.UserInfo": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -19383,7 +19394,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "preferences": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.UserPreferences"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.UserPreferences"
                 },
                 "tenant_id": {
                     "type": "integer"
@@ -19396,7 +19407,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.UserPreferences": {
+        "github_com_Pototoooo_lorelattice_internal_types.UserPreferences": {
             "type": "object",
             "properties": {
                 "last_active_tenant_id": {
@@ -19405,7 +19416,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.VLMConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.VLMConfig": {
             "type": "object",
             "properties": {
                 "api_key": {
@@ -19440,18 +19451,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WeKnoraCloudCredentials": {
-            "type": "object",
-            "properties": {
-                "app_id": {
-                    "type": "string"
-                },
-                "app_secret": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_Tencent_WeKnora_internal_types.WebSearchConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.WebSearchConfig": {
             "type": "object",
             "properties": {
                 "api_key": {
@@ -19503,7 +19503,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WebSearchProviderEntity": {
+        "github_com_Pototoooo_lorelattice_internal_types.WebSearchProviderEntity": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -19533,7 +19533,7 @@ const docTemplate = `{
                     "description": "Provider-specific parameters (API key, engine ID, etc.) stored as encrypted JSON",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WebSearchProviderParameters"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WebSearchProviderParameters"
                         }
                     ]
                 },
@@ -19541,7 +19541,7 @@ const docTemplate = `{
                     "description": "Provider type: bing, google, duckduckgo, tavily",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WebSearchProviderType"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WebSearchProviderType"
                         }
                     ]
                 },
@@ -19554,7 +19554,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WebSearchProviderParameters": {
+        "github_com_Pototoooo_lorelattice_internal_types.WebSearchProviderParameters": {
             "type": "object",
             "properties": {
                 "api_key": {
@@ -19582,7 +19582,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WebSearchProviderType": {
+        "github_com_Pototoooo_lorelattice_internal_types.WebSearchProviderType": {
             "type": "string",
             "enum": [
                 "bing",
@@ -19607,7 +19607,7 @@ const docTemplate = `{
                 "WebSearchProviderTypeZhipu"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiConfig": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiConfig": {
             "type": "object",
             "properties": {
                 "content_instructions": {
@@ -19618,7 +19618,7 @@ const docTemplate = `{
                     "description": "ExtractionGranularity controls how many candidate slugs Pass 0 extracts\nper document. Empty / unknown value is treated as WikiExtractionStandard.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiExtractionGranularity"
+                            "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiExtractionGranularity"
                         }
                     ]
                 },
@@ -19652,7 +19652,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiExtractionGranularity": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiExtractionGranularity": {
             "type": "string",
             "enum": [
                 "focused",
@@ -19665,7 +19665,7 @@ const docTemplate = `{
                 "WikiExtractionExhaustive"
             ]
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiFolder": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiFolder": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -19703,7 +19703,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiFolderCreateRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiFolderCreateRequest": {
             "type": "object",
             "properties": {
                 "name": {
@@ -19714,13 +19714,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiFolderListResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiFolderListResponse": {
             "type": "object",
             "properties": {
                 "folders": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiFolderNode"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiFolderNode"
                     }
                 },
                 "parent_id": {
@@ -19728,7 +19728,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiFolderNode": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiFolderNode": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -19772,7 +19772,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiFolderUpdateRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiFolderUpdateRequest": {
             "type": "object",
             "properties": {
                 "move_parent": {
@@ -19786,27 +19786,27 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiGraphData": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiGraphData": {
             "type": "object",
             "properties": {
                 "edges": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiGraphEdge"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiGraphEdge"
                     }
                 },
                 "meta": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiGraphMeta"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiGraphMeta"
                 },
                 "nodes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiGraphNode"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiGraphNode"
                     }
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiGraphEdge": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiGraphEdge": {
             "type": "object",
             "properties": {
                 "source": {
@@ -19819,7 +19819,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiGraphMeta": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiGraphMeta": {
             "type": "object",
             "properties": {
                 "center": {
@@ -19847,7 +19847,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiGraphNode": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiGraphNode": {
             "type": "object",
             "properties": {
                 "link_count": {
@@ -19865,7 +19865,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiIndexEntry": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiIndexEntry": {
             "type": "object",
             "properties": {
                 "category_path": {
@@ -19897,13 +19897,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiIndexGroup": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiIndexGroup": {
             "type": "object",
             "properties": {
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiIndexEntry"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiIndexEntry"
                     }
                 },
                 "next_cursor": {
@@ -19917,13 +19917,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiIndexResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiIndexResponse": {
             "type": "object",
             "properties": {
                 "groups": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiIndexGroup"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiIndexGroup"
                     }
                 },
                 "intro": {
@@ -19934,7 +19934,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiLogEntry": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiLogEntry": {
             "type": "object",
             "properties": {
                 "action": {
@@ -19965,7 +19965,7 @@ const docTemplate = `{
                     "description": "Wiki pages affected by this event. Each ref carries both slug (for\nnavigation) and title (for display) so the log renders human-\nreadable text without a post-hoc slug→title lookup that might fail\nfor now-deleted pages.",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiLogPageRef"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiLogPageRef"
                     }
                 },
                 "summary": {
@@ -19978,13 +19978,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiLogEntryListResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiLogEntryListResponse": {
             "type": "object",
             "properties": {
                 "entries": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiLogEntry"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiLogEntry"
                     }
                 },
                 "next_cursor": {
@@ -19992,7 +19992,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiLogPageRef": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiLogPageRef": {
             "type": "object",
             "properties": {
                 "slug": {
@@ -20003,7 +20003,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiPage": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiPage": {
             "type": "object",
             "properties": {
                 "aliases": {
@@ -20133,7 +20133,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiPageIssue": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiPageIssue": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -20177,7 +20177,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiPageListResponse": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiPageListResponse": {
             "type": "object",
             "properties": {
                 "page": {
@@ -20189,7 +20189,7 @@ const docTemplate = `{
                 "pages": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiPage"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiPage"
                     }
                 },
                 "total": {
@@ -20200,7 +20200,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiPageMoveRequest": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiPageMoveRequest": {
             "type": "object",
             "required": [
                 "slug"
@@ -20214,7 +20214,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Tencent_WeKnora_internal_types.WikiStats": {
+        "github_com_Pototoooo_lorelattice_internal_types.WikiStats": {
             "type": "object",
             "properties": {
                 "is_active": {
@@ -20244,7 +20244,7 @@ const docTemplate = `{
                     "description": "last N updated pages",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WikiPage"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WikiPage"
                     }
                 },
                 "total_links": {
@@ -20323,7 +20323,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.CustomAgentConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.CustomAgentConfig"
                 },
                 "description": {
                     "type": "string"
@@ -20352,13 +20352,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "parameters": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ModelParameters"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ModelParameters"
                 },
                 "source": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ModelSource"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ModelSource"
                 },
                 "type": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ModelType"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ModelType"
                 }
             }
         },
@@ -20371,13 +20371,13 @@ const docTemplate = `{
             ],
             "properties": {
                 "connection_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ConnectionConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ConnectionConfig"
                 },
                 "engine_type": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.RetrieverEngineType"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.RetrieverEngineType"
                 },
                 "index_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.IndexConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.IndexConfig"
                 },
                 "name": {
                     "type": "string"
@@ -20739,7 +20739,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "asr_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ASRConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ASRConfig"
                 },
                 "documentSplitting": {
                     "description": "文档分块配置",
@@ -20769,7 +20769,7 @@ const docTemplate = `{
                         "parserEngineRules": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ParserEngineRule"
+                                "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ParserEngineRule"
                             }
                         },
                         "separators": {
@@ -20819,13 +20819,13 @@ const docTemplate = `{
                         "nodes": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.GraphNode"
+                                "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.GraphNode"
                             }
                         },
                         "relations": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.GraphRelation"
+                                "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.GraphRelation"
                             }
                         },
                         "tags": {
@@ -20862,7 +20862,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "vlm_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.VLMConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.VLMConfig"
                 }
             }
         },
@@ -20872,7 +20872,7 @@ const docTemplate = `{
                 "admins": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.UserInfo"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.UserInfo"
                     }
                 },
                 "total": {
@@ -21060,16 +21060,16 @@ const docTemplate = `{
                     }
                 },
                 "profile": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_infrastructure_chunker.DocProfile"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_infrastructure_chunker.DocProfile"
                 },
                 "rejected": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_infrastructure_chunker.TierRejection"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_infrastructure_chunker.TierRejection"
                     }
                 },
                 "selected_tier": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_infrastructure_chunker.StrategyTier"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_infrastructure_chunker.StrategyTier"
                 },
                 "stats": {
                     "$ref": "#/definitions/internal_handler.PreviewChunkingStats"
@@ -21077,7 +21077,7 @@ const docTemplate = `{
                 "tier_chain": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_infrastructure_chunker.StrategyTier"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_infrastructure_chunker.StrategyTier"
                     }
                 }
             }
@@ -21208,7 +21208,7 @@ const docTemplate = `{
                 "models": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_models_limiter.RuntimeStat"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_models_limiter.RuntimeStat"
                     }
                 },
                 "parse_concurrency": {
@@ -21224,7 +21224,7 @@ const docTemplate = `{
                 "queues": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.QueueStat"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.QueueStat"
                     }
                 },
                 "timestamp": {
@@ -21257,7 +21257,7 @@ const docTemplate = `{
                 "tasks": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.RuntimeTaskInfo"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.RuntimeTaskInfo"
                     }
                 }
             }
@@ -21325,29 +21325,29 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "cos": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.COSEngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.COSEngineConfig"
                 },
                 "ks3": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.KS3EngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.KS3EngineConfig"
                 },
                 "minio": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.MinIOEngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.MinIOEngineConfig"
                 },
                 "obs": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OBSEngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OBSEngineConfig"
                 },
                 "oss": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.OSSEngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.OSSEngineConfig"
                 },
                 "provider": {
                     "description": "\"minio\", \"cos\", \"tos\", \"s3\", \"oss\", \"ks3\", \"obs\"",
                     "type": "string"
                 },
                 "s3": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.S3EngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.S3EngineConfig"
                 },
                 "tos": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.TOSEngineConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.TOSEngineConfig"
                 }
             }
         },
@@ -21410,7 +21410,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "parameters": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WebSearchProviderParameters"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WebSearchProviderParameters"
                 },
                 "provider": {
                     "type": "string"
@@ -21425,10 +21425,10 @@ const docTemplate = `{
             ],
             "properties": {
                 "connection_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ConnectionConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ConnectionConfig"
                 },
                 "engine_type": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.RetrieverEngineType"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.RetrieverEngineType"
                 }
             }
         },
@@ -21461,7 +21461,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.CustomAgentConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.CustomAgentConfig"
                 },
                 "description": {
                     "type": "string"
@@ -21507,7 +21507,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.KnowledgeBaseConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.KnowledgeBaseConfig"
                 },
                 "description": {
                     "type": "string"
@@ -21530,13 +21530,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "parameters": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ModelParameters"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ModelParameters"
                 },
                 "source": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ModelSource"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ModelSource"
                 },
                 "type": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.ModelType"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.ModelType"
                 }
             }
         },
@@ -21553,7 +21553,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "parameters": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.WebSearchProviderParameters"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.WebSearchProviderParameters"
                 }
             }
         },
@@ -21587,7 +21587,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.TenantRole"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.TenantRole"
                 }
             }
         },
@@ -21616,7 +21616,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "mode": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.APIPrincipalMode"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.APIPrincipalMode"
                 },
                 "require_direct_header": {
                     "type": "boolean"
@@ -21643,7 +21643,7 @@ const docTemplate = `{
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.AuditLog"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.AuditLog"
                     }
                 },
                 "next_cursor": {
@@ -21671,7 +21671,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "process_config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.KnowledgeProcessOverrides"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.KnowledgeProcessOverrides"
                 }
             }
         },
@@ -21689,7 +21689,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.TenantRole"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.TenantRole"
                 }
             }
         },
@@ -21703,7 +21703,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.TenantRole"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.TenantRole"
                 }
             }
         },
@@ -21742,7 +21742,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.TenantRole"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.TenantRole"
                 },
                 "tenant_id": {
                     "type": "integer"
@@ -21812,7 +21812,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "config": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.StorageBackendConfig"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.StorageBackendConfig"
                 },
                 "name": {
                     "type": "string"
@@ -21847,7 +21847,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "role": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.TenantRole"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.TenantRole"
                 }
             }
         },
@@ -21960,7 +21960,7 @@ const docTemplate = `{
                     }
                 },
                 "suggestion_attribution": {
-                    "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.SuggestionAttribution"
+                    "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.SuggestionAttribution"
                 },
                 "summary_model_id": {
                     "description": "Optional summary model ID for this request (overrides session default)",
@@ -22002,7 +22002,7 @@ const docTemplate = `{
                     "description": "Messages to use as context for title generation",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Tencent_WeKnora_internal_types.Message"
+                        "$ref": "#/definitions/github_com_Pototoooo_lorelattice_internal_types.Message"
                     }
                 }
             }
@@ -22151,8 +22151,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "WeKnora API",
-	Description:      "WeKnora 知识库管理系统 API 文档",
+	Title:            "LoreLattice API",
+	Description:      "LoreLattice 知识库管理系统 API 文档",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

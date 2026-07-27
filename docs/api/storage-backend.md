@@ -88,7 +88,7 @@ curl --location --request POST 'http://localhost:8080/api/v1/storage-backends/te
         "region": "ap-test-1",
         "access_key_id": "AKID",
         "secret_access_key": "SECRET",
-        "bucket_name": "weknora"
+        "bucket_name": "lorelattice"
     }
 }'
 ```
@@ -139,7 +139,7 @@ curl --location 'http://localhost:8080/api/v1/storage-backends' \
         "region": "ap-test-1",
         "access_key_id": "AKID",
         "secret_access_key": "SECRET",
-        "bucket_name": "weknora",
+        "bucket_name": "lorelattice",
         "path_prefix": "prod"
     }
 }'
@@ -159,7 +159,7 @@ curl --location 'http://localhost:8080/api/v1/storage-backends' \
             "region": "ap-test-1",
             "access_key_id": "***",
             "secret_access_key": "***",
-            "bucket_name": "weknora",
+            "bucket_name": "lorelattice",
             "path_prefix": "prod"
         },
         "source": "user",
@@ -192,7 +192,7 @@ curl --location 'http://localhost:8080/api/v1/storage-backends' \
             "id": "550e8400-e29b-41d4-a716-446655440000",
             "name": "s3-hot",
             "provider": "s3",
-            "config": { "endpoint": "https://s3.example.com", "access_key_id": "***", "secret_access_key": "***", "bucket_name": "weknora" },
+            "config": { "endpoint": "https://s3.example.com", "access_key_id": "***", "secret_access_key": "***", "bucket_name": "lorelattice" },
             "source": "user",
             "status": "active",
             "legacy_alias": false

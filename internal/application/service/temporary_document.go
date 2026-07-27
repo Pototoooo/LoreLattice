@@ -15,13 +15,13 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/Tencent/WeKnora/internal/common"
-	"github.com/Tencent/WeKnora/internal/infrastructure/chunker"
-	"github.com/Tencent/WeKnora/internal/infrastructure/docparser"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/common"
+	"github.com/Pototoooo/lorelattice/internal/infrastructure/chunker"
+	"github.com/Pototoooo/lorelattice/internal/infrastructure/docparser"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 	"github.com/google/uuid"
 	"github.com/hibiken/asynq"
 )
@@ -33,7 +33,7 @@ const (
 	temporaryDocumentMaxPromptParts = 16
 	// defaultTemporaryDocumentImageOCRMaxPages caps how many page images a
 	// scanned / image-only document may send to the VLM, bounding OCR latency.
-	// Override via WEKNORA_CHAT_ATTACHMENT_OCR_MAX_PAGES.
+	// Override via LORELATTICE_CHAT_ATTACHMENT_OCR_MAX_PAGES.
 	defaultTemporaryDocumentImageOCRMaxPages = 8
 	// temporaryDocumentLowTextRunes is the extracted-text threshold (in runes,
 	// ignoring image markdown) below which a document is treated as
@@ -43,7 +43,7 @@ const (
 	// OCR'd by the VLM at once. Multi-page scans benefit from concurrent OCR
 	// (wall-clock latency drops roughly linearly); the default matches the page
 	// cap so a full scan finishes in a single wave. Raising it loads the VLM
-	// backend harder — tune via WEKNORA_CHAT_ATTACHMENT_OCR_CONCURRENCY.
+	// backend harder — tune via LORELATTICE_CHAT_ATTACHMENT_OCR_CONCURRENCY.
 	defaultTemporaryDocumentOCRConcurrency = 8
 	// temporaryDocumentOCRSufficientRunes is the OCR-yield threshold (in runes)
 	// above which a standalone image is treated as text-rich enough that a VLM
@@ -55,15 +55,15 @@ const (
 )
 
 // temporaryDocumentImageOCRMaxPages returns the max page count OCR'd per
-// scanned document, honoring WEKNORA_CHAT_ATTACHMENT_OCR_MAX_PAGES.
+// scanned document, honoring LORELATTICE_CHAT_ATTACHMENT_OCR_MAX_PAGES.
 func temporaryDocumentImageOCRMaxPages() int {
-	return envPositiveInt("WEKNORA_CHAT_ATTACHMENT_OCR_MAX_PAGES", defaultTemporaryDocumentImageOCRMaxPages)
+	return envPositiveInt("LORELATTICE_CHAT_ATTACHMENT_OCR_MAX_PAGES", defaultTemporaryDocumentImageOCRMaxPages)
 }
 
 // temporaryDocumentOCRConcurrency returns the VLM OCR concurrency, honoring
-// WEKNORA_CHAT_ATTACHMENT_OCR_CONCURRENCY.
+// LORELATTICE_CHAT_ATTACHMENT_OCR_CONCURRENCY.
 func temporaryDocumentOCRConcurrency() int {
-	return envPositiveInt("WEKNORA_CHAT_ATTACHMENT_OCR_CONCURRENCY", defaultTemporaryDocumentOCRConcurrency)
+	return envPositiveInt("LORELATTICE_CHAT_ATTACHMENT_OCR_CONCURRENCY", defaultTemporaryDocumentOCRConcurrency)
 }
 
 // envPositiveInt reads a positive integer from the environment, falling back to
@@ -122,7 +122,7 @@ func NewTemporaryDocumentService(
 }
 
 func temporaryDocumentTTL() time.Duration {
-	if raw := strings.TrimSpace(os.Getenv("WEKNORA_CHAT_ATTACHMENT_TTL_HOURS")); raw != "" {
+	if raw := strings.TrimSpace(os.Getenv("LORELATTICE_CHAT_ATTACHMENT_TTL_HOURS")); raw != "" {
 		if hours, err := strconv.Atoi(raw); err == nil && hours > 0 {
 			return time.Duration(hours) * time.Hour
 		}

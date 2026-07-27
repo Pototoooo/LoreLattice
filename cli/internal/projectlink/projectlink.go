@@ -1,8 +1,8 @@
 // Package projectlink reads and writes the per-project link file
-// .weknora/project.yaml that anchors a working directory to a profile+KB.
+// .lorelattice/project.yaml that anchors a working directory to a profile+KB.
 //
 // Discovery walks up from the start directory until either (a) a
-// .weknora/project.yaml is found, (b) the filesystem root is reached, or
+// .lorelattice/project.yaml is found, (b) the filesystem root is reached, or
 // (c) the walk exceeds a 64-level depth limit (cycle protection for
 // pathological symlink setups). Pattern matches `cargo`, `npm`, and `git`
 // - find-the-project's-root walks; mount-boundary crossing is allowed
@@ -16,22 +16,22 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/Tencent/WeKnora/cli/internal/xdg"
+	"github.com/Pototoooo/lorelattice/cli/internal/xdg"
 	"gopkg.in/yaml.v3"
 )
 
-// Project is the on-disk schema of .weknora/project.yaml.
+// Project is the on-disk schema of .lorelattice/project.yaml.
 type Project struct {
 	Profile   string    `yaml:"profile,omitempty"`
 	KBID      string    `yaml:"kb_id"`
 	CreatedAt time.Time `yaml:"created_at"`
 }
 
-// FileName is the project link file basename relative to .weknora/.
+// FileName is the project link file basename relative to .lorelattice/.
 const FileName = "project.yaml"
 
 // DirName is the project-link directory name.
-const DirName = ".weknora"
+const DirName = ".lorelattice"
 
 const maxWalkDepth = 64
 
@@ -79,7 +79,7 @@ func Load(path string) (*Project, error) {
 }
 
 // Save writes the project link to path atomically (0600 perms).
-// Creates parent .weknora/ directory if missing.
+// Creates parent .lorelattice/ directory if missing.
 func Save(path string, p *Project) error {
 	return xdg.WriteAtomicYAML(path, p)
 }

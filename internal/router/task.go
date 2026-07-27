@@ -10,13 +10,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/application/service"
-	"github.com/Tencent/WeKnora/internal/common"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/middleware/asynqdl"
-	"github.com/Tencent/WeKnora/internal/tracing/langfuse"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/application/service"
+	"github.com/Pototoooo/lorelattice/internal/common"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/middleware/asynqdl"
+	"github.com/Pototoooo/lorelattice/internal/tracing/langfuse"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 	"github.com/hibiken/asynq"
 	"go.uber.org/dig"
 )
@@ -54,11 +54,11 @@ type AsynqTaskParams struct {
 // raise the default to 500ms while still allowing operators to tune via env.
 const defaultRedisOpTimeoutMs = 500
 
-// readRedisOpTimeoutMs reads WEKNORA_REDIS_OP_TIMEOUT_MS, falling back to
+// readRedisOpTimeoutMs reads LORELATTICE_REDIS_OP_TIMEOUT_MS, falling back to
 // defaultRedisOpTimeoutMs on missing/invalid input. Kept as a separate helper
 // so both ReadTimeout and WriteTimeout share the same source of truth.
 func readRedisOpTimeoutMs() int {
-	if v := strings.TrimSpace(os.Getenv("WEKNORA_REDIS_OP_TIMEOUT_MS")); v != "" {
+	if v := strings.TrimSpace(os.Getenv("LORELATTICE_REDIS_OP_TIMEOUT_MS")); v != "" {
 		if parsed, err := strconv.Atoi(v); err == nil && parsed > 0 {
 			return parsed
 		}
@@ -214,7 +214,7 @@ func NewSharedAsynqServer(svc interfaces.SystemSettingService) *asynq.Server {
 
 // NewWikiAsynqServer builds the dedicated wiki pool: QueueWiki only. It runs
 // the shared handler mux but only ever pulls wiki tasks, so its concurrency
-// budget (WEKNORA_WIKI_ASYNQ_CONCURRENCY, default 8) is spent exclusively on
+// budget (LORELATTICE_WIKI_ASYNQ_CONCURRENCY, default 8) is spent exclusively on
 // wiki generation. This is the hard capacity isolation that prevents the parse
 // pipeline from starving wiki (and vice-versa) during concurrent uploads.
 func NewWikiAsynqServer(svc interfaces.SystemSettingService) *asynq.Server {

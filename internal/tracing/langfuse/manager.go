@@ -5,7 +5,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -54,7 +54,7 @@ func Init(cfg Config) (*Manager, error) {
 	m := &Manager{cfg: cfg}
 	if cfg.Enabled {
 		resAttrs := []attribute.KeyValue{
-			attribute.String("service.name", "weknora"),
+			attribute.String("service.name", "lorelattice"),
 			attribute.String(attrLangfusePubKey, cfg.PublicKey),
 		}
 		if cfg.Environment != "" {

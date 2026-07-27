@@ -6,7 +6,7 @@ OIDC 完整调用流程见 [../OIDC认证调用流程.md](../OIDC认证调用流
 
 ## 说明
 
-WeKnora 的 `/auth/*` 端点本身**不需要 X-API-Key**，但部分端点需要在 `Authorization: Bearer <token>` 头中携带由 `/auth/login` 或 `/auth/oidc/callback` 返回的 JWT：
+LoreLattice 的 `/auth/*` 端点本身**不需要 X-API-Key**，但部分端点需要在 `Authorization: Bearer <token>` 头中携带由 `/auth/login` 或 `/auth/oidc/callback` 返回的 JWT：
 
 | 端点 | 鉴权方式 |
 | --- | --- |
@@ -136,7 +136,7 @@ curl --location 'http://localhost:8080/api/v1/auth/oidc/config'
 {
     "success": true,
     "enabled": true,
-    "provider_display_name": "WeKnora SSO"
+    "provider_display_name": "LoreLattice SSO"
 }
 ```
 
@@ -163,7 +163,7 @@ curl --location 'http://localhost:8080/api/v1/auth/oidc/url?redirect=%2Fdashboar
 ```json
 {
     "success": true,
-    "provider_display_name": "WeKnora SSO",
+    "provider_display_name": "LoreLattice SSO",
     "authorization_url": "https://idp.example.com/oauth/authorize?client_id=...&state=...",
     "state": "abcdef..."
 }

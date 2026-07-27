@@ -82,9 +82,9 @@ export interface CustomAgentConfig {
   asr_model_id?: string;            // ASR模型ID（音频转录用）
   // 附件图片理解 / 扫描件 OCR 开关（默认: false，开启会增加解析耗时）
   attachment_image_understanding?: boolean;
-  // 扫描件 OCR 最大页数（0 = 使用全局默认 WEKNORA_CHAT_ATTACHMENT_OCR_MAX_PAGES）
+  // 扫描件 OCR 最大页数（0 = 使用全局默认 LORELATTICE_CHAT_ATTACHMENT_OCR_MAX_PAGES）
   attachment_ocr_max_pages?: number;
-  // 单轮问答等待附件解析完成的最长时间（秒，0 = 使用全局默认 WEKNORA_CHAT_ATTACHMENT_WAIT_TIMEOUT_SEC）
+  // 单轮问答等待附件解析完成的最长时间（秒，0 = 使用全局默认 LORELATTICE_CHAT_ATTACHMENT_WAIT_TIMEOUT_SEC）
   attachment_parse_wait_timeout_sec?: number;
 
   // ===== 聊天附件解析引擎策略 =====

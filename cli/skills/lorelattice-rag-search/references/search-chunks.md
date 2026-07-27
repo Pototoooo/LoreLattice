@@ -6,7 +6,7 @@ for you to reason over; it does NOT synthesize an answer (use `chat` for that).
 ## Command & flags
 
 ```
-weknora search chunks "<query>" --kb <name-or-id> [flags]
+lorelattice search chunks "<query>" --kb <name-or-id> [flags]
 ```
 
 | Flag | Default | Meaning |
@@ -36,7 +36,7 @@ then the CLI trims).
 - `score` is the fused rank; `match_type` indicates which channel(s) hit.
 - `knowledge_id` / `knowledge_title` attribute the chunk to its source document.
 - Project just what you need with `--jq`, e.g.
-  `weknora search chunks "q" --kb eng --jq '.data[] | {score,content}'`.
+  `lorelattice search chunks "q" --kb eng --jq '.data[] | {score,content}'`.
 
 ## When to use vs alternatives
 

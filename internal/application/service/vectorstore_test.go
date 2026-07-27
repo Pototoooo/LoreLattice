@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/errors"
-	"github.com/Tencent/WeKnora/internal/models/embedding"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/errors"
+	"github.com/Pototoooo/lorelattice/internal/models/embedding"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	sqlitedrv "gorm.io/driver/sqlite"
@@ -667,7 +667,7 @@ func TestTestConnection_DorisInvalidAddr(t *testing.T) {
 
 	_, err := svc.TestConnection(ctx, types.DorisRetrieverEngineType, types.ConnectionConfig{
 		Addr:     "127.0.0.1:1", // 一定不可连通
-		Database: "weknora",
+		Database: "lorelattice",
 		Username: "root",
 	})
 	require.Error(t, err)
@@ -768,13 +768,13 @@ func TestValidateConnectionConfig(t *testing.T) {
 		{
 			name:       "doris valid",
 			engineType: types.DorisRetrieverEngineType,
-			config:     types.ConnectionConfig{Addr: "doris-fe:9030", Database: "weknora"},
+			config:     types.ConnectionConfig{Addr: "doris-fe:9030", Database: "lorelattice"},
 			wantError:  false,
 		},
 		{
 			name:       "doris missing addr",
 			engineType: types.DorisRetrieverEngineType,
-			config:     types.ConnectionConfig{Database: "weknora"},
+			config:     types.ConnectionConfig{Database: "lorelattice"},
 			wantError:  true,
 		},
 		{

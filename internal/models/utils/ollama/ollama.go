@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 	"github.com/ollama/ollama/api"
 )
 

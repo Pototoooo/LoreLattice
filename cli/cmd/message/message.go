@@ -1,14 +1,14 @@
-// Package messagecmd implements `weknora message` — inspect and manage the
+// Package messagecmd implements `lorelattice message` — inspect and manage the
 // messages inside chat sessions (the multi-turn substrate behind session ask).
 package messagecmd
 
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
 )
 
-// NewCmd builds the `weknora message` command group.
+// NewCmd builds the `lorelattice message` command group.
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "message",

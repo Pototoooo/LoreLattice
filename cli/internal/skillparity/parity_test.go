@@ -1,4 +1,4 @@
-// Package skillparity contains the K6 drift guard: every weknora command and
+// Package skillparity contains the K6 drift guard: every lorelattice command and
 // long flag referenced in a bundled Agent Skill (cli/skills/**) must still
 // exist in the live cobra command tree. A skill that references a renamed or
 // removed flag/command is worse than no skill, so this fails CI on drift.
@@ -15,8 +15,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/Tencent/WeKnora/cli/cmd"
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/cmd"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
 )
 
 var (
@@ -85,17 +85,17 @@ func TestSkillsReferenceLiveCommandsAndFlags(t *testing.T) {
 		}
 		// Normalize CRLF → LF before parsing: Windows CI checks out *.md with
 		// CRLF (git autocrlf), and the \n-anchored codeFence regex would never
-		// match ```weknora\r\n, resolving zero commands. Keep the tokenizer
+		// match ```lorelattice\r\n, resolving zero commands. Keep the tokenizer
 		// OS-independent rather than depend on checkout line endings.
 		content := strings.ReplaceAll(string(raw), "\r\n", "\n")
 		rel, _ := filepath.Rel(skillsRoot(t), path)
 		for _, block := range codeFence.FindAllStringSubmatch(content, -1) {
 			for _, line := range strings.Split(block[1], "\n") {
-				idx := strings.Index(line, "weknora ")
+				idx := strings.Index(line, "lorelattice ")
 				if idx < 0 {
 					continue
 				}
-				inv := line[idx+len("weknora"):]
+				inv := line[idx+len("lorelattice"):]
 				toks := strings.Fields(inv)
 				if len(toks) == 0 {
 					continue
@@ -112,7 +112,7 @@ func TestSkillsReferenceLiveCommandsAndFlags(t *testing.T) {
 						i++ // consume the value
 					}
 				}
-				// Placeholder command (e.g. `weknora <command> --help`) → skip.
+				// Placeholder command (e.g. `lorelattice <command> --help`) → skip.
 				if i < len(toks) && strings.HasPrefix(toks[i], "<") {
 					continue
 				}
@@ -140,7 +140,7 @@ func TestSkillsReferenceLiveCommandsAndFlags(t *testing.T) {
 		}
 	}
 	if !checkedAny {
-		t.Fatal("parser resolved no weknora commands from skills — check tokenizer")
+		t.Fatal("parser resolved no lorelattice commands from skills — check tokenizer")
 	}
 }
 

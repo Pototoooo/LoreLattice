@@ -4,7 +4,7 @@ This guide walks you through implementing a new connector (e.g., Feishu, Notion,
 
 ## Overview
 
-A connector is an adapter that translates between WeKnora's data model and an external platform's API. It handles:
+A connector is an adapter that translates between LoreLattice's data model and an external platform's API. It handles:
 - Connection validation (credentials, connectivity)
 - Resource listing (documents, spaces, folders the user can choose from)
 - Full sync (fetch all items from selected resources)
@@ -119,7 +119,7 @@ import (
     "context"
     "fmt"
     
-    "github.com/Tencent/WeKnora/internal/types"
+    "github.com/Pototoooo/lorelattice/internal/types"
 )
 
 type YourConnector struct {
@@ -173,7 +173,7 @@ func (c *YourConnector) ListResources(ctx context.Context, config *types.DataSou
         return nil, err
     }
     
-    // Convert to WeKnora Resource format
+    // Convert to LoreLattice Resource format
     resources := make([]types.Resource, len(yourResources))
     for i, yr := range yourResources {
         resources[i] = types.Resource{
@@ -299,7 +299,7 @@ Edit `internal/container/container.go`:
 ```go
 import (
     // ... existing imports
-    yourconnector "github.com/Tencent/WeKnora/internal/datasource/connector/yourtype"
+    yourconnector "github.com/Pototoooo/lorelattice/internal/datasource/connector/yourtype"
 )
 
 func setupContainer() (*dig.Container, error) {
@@ -478,7 +478,7 @@ type Item struct {
 
 The Feishu connector would be a good first implementation since:
 1. Feishu API is well-documented
-2. WeKnora already has `internal/im/feishu/` for reference
+2. LoreLattice already has `internal/im/feishu/` for reference
 3. Popular in China (key market)
 4. Has webhook support for real-time sync
 

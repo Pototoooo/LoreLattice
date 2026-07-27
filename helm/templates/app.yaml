@@ -1,22 +1,22 @@
 {{/*
-Copyright 2025 Tencent
+Copyright 2025-2026 Pototoooo
 SPDX-License-Identifier: MIT
 
-WeKnora Backend API Server Deployment and Service.
+LoreLattice Backend API Server Deployment and Service.
 */}}
 {{- if .Values.app.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "weknora.fullname" . }}-app
+  name: {{ include "lorelattice.fullname" . }}-app
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "app" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "app" "context" .) | nindent 4 }}
 spec:
   replicas: {{ .Values.app.replicaCount }}
   selector:
     matchLabels:
-      {{- include "weknora.componentSelectorLabels" (dict "component" "app" "context" .) | nindent 6 }}
+      {{- include "lorelattice.componentSelectorLabels" (dict "component" "app" "context" .) | nindent 6 }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -25,17 +25,17 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "weknora.componentSelectorLabels" (dict "component" "app" "context" .) | nindent 8 }}
+        {{- include "lorelattice.componentSelectorLabels" (dict "component" "app" "context" .) | nindent 8 }}
     spec:
-      {{- include "weknora.imagePullSecrets" . | nindent 6 }}
-      serviceAccountName: {{ include "weknora.serviceAccountName" . }}
+      {{- include "lorelattice.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "lorelattice.serviceAccountName" . }}
       {{- with .Values.app.podSecurityContext | default .Values.global.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: app
-          image: {{ include "weknora.app.image" . }}
+          image: {{ include "lorelattice.app.image" . }}
           imagePullPolicy: {{ .Values.app.image.pullPolicy }}
           {{- with .Values.app.securityContext }}
           securityContext:
@@ -61,17 +61,17 @@ spec:
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: DB_USER
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: DB_PASSWORD
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: DB_NAME
             # Redis configuration
             - name: REDIS_ADDR
@@ -79,13 +79,13 @@ spec:
             - name: REDIS_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: REDIS_USERNAME
                   optional: true
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: REDIS_PASSWORD
             - name: REDIS_DB
               value: "0"
@@ -97,12 +97,12 @@ spec:
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: JWT_SECRET
             - name: SYSTEM_AES_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: SYSTEM_AES_KEY
             # Retrieval & Storage
             - name: RETRIEVE_DRIVER
@@ -130,12 +130,12 @@ spec:
             - name: NEO4J_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: NEO4J_USERNAME
             - name: NEO4J_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: NEO4J_PASSWORD
             {{- end }}
             {{- with .Values.app.extraEnv }}
@@ -159,7 +159,7 @@ spec:
         - name: data-files
           {{- if .Values.dataFiles.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.dataFiles.persistence.existingClaim | default (printf "%s-data-files" (include "weknora.fullname" .)) }}
+            claimName: {{ .Values.dataFiles.persistence.existingClaim | default (printf "%s-data-files" (include "lorelattice.fullname" .)) }}
           {{- else }}
           emptyDir: {}
           {{- end }}
@@ -183,11 +183,11 @@ metadata:
   name: app
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "app" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "app" "context" .) | nindent 4 }}
 spec:
   type: {{ .Values.app.service.type }}
   selector:
-    {{- include "weknora.componentSelectorLabels" (dict "component" "app" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentSelectorLabels" (dict "component" "app" "context" .) | nindent 4 }}
   ports:
     - name: http
       port: {{ .Values.app.service.port }}

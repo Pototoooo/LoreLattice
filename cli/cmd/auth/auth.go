@@ -5,7 +5,7 @@ package auth
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
 )
 
 // Credential-mode tokens used in the JSON output of auth list / login /
@@ -34,7 +34,7 @@ func modeFromRefs(apiKeyRef, tokenRef string) string {
 	}
 }
 
-// NewCmdAuth builds the `weknora auth` command tree and registers its
+// NewCmdAuth builds the `lorelattice auth` command tree and registers its
 // subcommands. Called from cli/cmd/root.go.
 func NewCmdAuth(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{

@@ -3,7 +3,7 @@ package docparser
 import (
 	"strings"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // EngineRegistration is the interface every locally registered parser engine
@@ -27,7 +27,7 @@ func RegisterEngine(e EngineRegistration) {
 func init() {
 	RegisterEngine(&builtinEngine{})
 	RegisterEngine(&simpleEngine{})
-	RegisterEngine(&weKnoraCloudEngine{})
+	RegisterEngine(&loreLatticeCloudEngine{})
 	RegisterEngine(&mineruEngine{})
 	RegisterEngine(&mineruCloudEngine{})
 	RegisterEngine(&paddleOCRVLEngine{})
@@ -57,8 +57,8 @@ func (e *builtinEngine) CheckAvailable(docreaderConnected bool, _ map[string]str
 // SimpleEngineName is the engine name for Go-native simple format handling.
 const SimpleEngineName = "simple"
 
-// WeKnoraCloudEngineName is the engine name for WeKnoraCloud-backed document parsing.
-const WeKnoraCloudEngineName = "weknoracloud"
+// LoreLatticeCloudEngineName is the engine name for LoreLatticeCloud-backed document parsing.
+const LoreLatticeCloudEngineName = "lorelatticecloud"
 
 // ---------------------------------------------------------------------------
 // simple — Go handles md/txt/csv natively, no external service needed.
@@ -80,21 +80,21 @@ func (e *simpleEngine) CheckAvailable(_ bool, _ map[string]string) (bool, string
 }
 
 // ---------------------------------------------------------------------------
-// weknoracloud — Tenant-scoped WeKnoraCloud docreader with signed requests.
+// lorelatticecloud — Tenant-scoped LoreLatticeCloud docreader with signed requests.
 // ---------------------------------------------------------------------------
 
-type weKnoraCloudEngine struct{}
+type loreLatticeCloudEngine struct{}
 
-func (e *weKnoraCloudEngine) Name() string        { return WeKnoraCloudEngineName }
-func (e *weKnoraCloudEngine) Description() string { return "WeKnoraCloud document reader" }
-func (e *weKnoraCloudEngine) FileTypes(_ bool) []string {
+func (e *loreLatticeCloudEngine) Name() string        { return LoreLatticeCloudEngineName }
+func (e *loreLatticeCloudEngine) Description() string { return "LoreLatticeCloud document reader" }
+func (e *loreLatticeCloudEngine) FileTypes(_ bool) []string {
 	return []string{"docx", "doc", "pdf", "md", "markdown", "xlsx", "xls", "pptx", "ppt"}
 }
-func (e *weKnoraCloudEngine) CheckAvailable(docreaderConnected bool, overrides map[string]string) (bool, string) {
-	if overrides["weknoracloud_app_id"] != "" {
+func (e *loreLatticeCloudEngine) CheckAvailable(docreaderConnected bool, overrides map[string]string) (bool, string) {
+	if overrides["lorelatticecloud_app_id"] != "" {
 		return true, ""
 	}
-	return false, "WeKnora Cloud credentials not configured. Go to Settings → WeKnora Cloud to set up."
+	return false, "LoreLattice Cloud credentials not configured. Go to Settings → LoreLattice Cloud to set up."
 }
 
 // ---------------------------------------------------------------------------

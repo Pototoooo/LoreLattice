@@ -3,7 +3,7 @@ package event
 import (
 	"context"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // EventBusAdapter adapts *EventBus to types.EventBusInterface

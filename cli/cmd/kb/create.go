@@ -7,10 +7,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/output"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // kbCreateFields enumerates the fields surfaced for `--format json` discovery
@@ -45,7 +45,7 @@ type CreateService interface {
 	CreateKnowledgeBase(ctx context.Context, kb *sdk.KnowledgeBase) (*sdk.KnowledgeBase, error)
 }
 
-// NewCmdCreate builds `weknora kb create <name>`. Positional <name> only,
+// NewCmdCreate builds `lorelattice kb create <name>`. Positional <name> only,
 // consistent with `agent create <name>`.
 func NewCmdCreate(f *cmdutil.Factory) *cobra.Command {
 	opts := &CreateOptions{}
@@ -86,14 +86,14 @@ func NewCmdCreate(f *cmdutil.Factory) *cobra.Command {
 			}
 			// --embedding-model accepts a model id or name (a UUID passes
 			// through; a name resolves among Embedding models). Configuring a
-			// KB's models fully is `weknora kb config set`; this just pre-sets the
+			// KB's models fully is `lorelattice kb config set`; this just pre-sets the
 			// embedding model at creation.
 			if opts.EmbeddingModel, err = cmdutil.ResolveModelRef(c.Context(), cli, opts.EmbeddingModel, "Embedding"); err != nil {
 				return err
 			}
 			// --chat-model (id or name) pre-sets the KB's LLM at creation, so a
 			// KB can be born retrieval-ready in one step. Full model config
-			// (rerank / multimodal) is still `weknora kb config set`.
+			// (rerank / multimodal) is still `lorelattice kb config set`.
 			if opts.ChatModel, err = cmdutil.ResolveModelRef(c.Context(), cli, opts.ChatModel, "KnowledgeQA"); err != nil {
 				return err
 			}
@@ -111,9 +111,9 @@ func NewCmdCreate(f *cmdutil.Factory) *cobra.Command {
 		UsedFor:       "Create a new knowledge base with the given name. Emits the created KB object with its id.",
 		RequiredFlags: []string{"<name> (positional)"},
 		Examples: []string{
-			`weknora kb create "Eng Docs"`,
-			`weknora kb create "Eng Docs" --embedding-model text-embedding-3-small --chat-model gpt-4o-mini  # retrieval-ready in one step`,
-			`weknora kb create "Eng Docs" --jq .data.id   # capture id to chain into doc upload --kb`,
+			`lorelattice kb create "Eng Docs"`,
+			`lorelattice kb create "Eng Docs" --embedding-model text-embedding-3-small --chat-model gpt-4o-mini  # retrieval-ready in one step`,
+			`lorelattice kb create "Eng Docs" --jq .data.id   # capture id to chain into doc upload --kb`,
 		},
 		Output: "envelope.data is the created KnowledgeBase object with id, name, type, embedding_model_id, summary_model_id",
 	})
@@ -155,7 +155,7 @@ func runCreate(ctx context.Context, opts *CreateOptions, fopts *cmdutil.FormatOp
 	// the agent to discover a silent-draft KB via a later empty search.
 	var meta *output.Meta
 	if created.EmbeddingModelID == "" {
-		meta = &output.Meta{Hint: "retrieval_ready=false: no embedding model bound. Uploaded docs will not be searchable until you run `weknora kb config set " + created.ID + " --embedding-model <id> --chat-model <id>` (create the KB with --embedding-model/--chat-model to skip this step)."}
+		meta = &output.Meta{Hint: "retrieval_ready=false: no embedding model bound. Uploaded docs will not be searchable until you run `lorelattice kb config set " + created.ID + " --embedding-model <id> --chat-model <id>` (create the KB with --embedding-model/--chat-model to skip this step)."}
 	}
 
 	if fopts.WantsJSON() {

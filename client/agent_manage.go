@@ -1,4 +1,4 @@
-// Package client provides the implementation for interacting with the WeKnora API
+// Package client provides the implementation for interacting with the LoreLattice API
 // The Agent management interfaces are used to manage custom agents (CRUD operations)
 package client
 

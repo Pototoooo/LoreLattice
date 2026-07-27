@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -367,7 +367,7 @@ func TestJsonToMarkdown_BOM(t *testing.T) {
 }
 
 func TestJsonToMarkdown_UnicodeContent(t *testing.T) {
-	input := `{"名称": "WeKnora 知识库", "描述": "支持中文 JSON 🎉", "emoji": "🚀"}`
+	input := `{"名称": "LoreLattice 知识库", "描述": "支持中文 JSON 🎉", "emoji": "🚀"}`
 	result, err := jsonToMarkdown([]byte(input))
 	visualReport(t, "Unicode / Chinese / Emoji", input, result, err, []checkResult{
 		check("no error", err == nil),
@@ -455,8 +455,8 @@ func TestJsonToMarkdown_SingleElementArray(t *testing.T) {
 
 func TestJsonToMarkdown_RealisticConfig(t *testing.T) {
 	input := `{
-  "app": {"name": "WeKnora", "version": "2.0.0", "debug": false},
-  "database": {"host": "localhost", "port": 5432, "name": "weknora_db", "pool_size": 10},
+  "app": {"name": "LoreLattice", "version": "2.0.0", "debug": false},
+  "database": {"host": "localhost", "port": 5432, "name": "lorelattice_db", "pool_size": 10},
   "redis": {"host": "localhost", "port": 6379},
   "features": {"json_upload": true, "multimodel": true, "graph_extraction": false}
 }`
@@ -465,7 +465,7 @@ func TestJsonToMarkdown_RealisticConfig(t *testing.T) {
 	visualReport(t, "Realistic: App Config (fits in 1 block)", input, result, err, []checkResult{
 		check("no error", err == nil),
 		check("all blocks are valid JSON", allBlocksValidJSON(result)),
-		check("contains 'WeKnora'", strings.Contains(result, "WeKnora")),
+		check("contains 'LoreLattice'", strings.Contains(result, "LoreLattice")),
 		check("contains 'database'", strings.Contains(result, "database")),
 		check(fmt.Sprintf("single block (fits, got %d)", blocks), blocks == 1),
 	})
@@ -506,13 +506,13 @@ func TestJsonToMarkdown_RealisticLargeNestedConfig(t *testing.T) {
 	rules := make(map[string]interface{})
 	for i := 0; i < 30; i++ {
 		rules[fmt.Sprintf("rule_%02d", i)] = map[string]interface{}{
-			"pattern": strings.Repeat("pattern", 10),
-			"action":  "allow",
+			"pattern":  strings.Repeat("pattern", 10),
+			"action":   "allow",
 			"priority": i,
 		}
 	}
 	config := map[string]interface{}{
-		"version": "3.0",
+		"version":  "3.0",
 		"metadata": map[string]interface{}{"author": "admin", "updated": "2026-03-24"},
 		"firewall": map[string]interface{}{
 			"enabled": true,

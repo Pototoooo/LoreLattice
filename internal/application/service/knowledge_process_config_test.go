@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	werrors "github.com/Tencent/WeKnora/internal/errors"
-	"github.com/Tencent/WeKnora/internal/infrastructure/chunker"
-	"github.com/Tencent/WeKnora/internal/types"
+	werrors "github.com/Pototoooo/lorelattice/internal/errors"
+	"github.com/Pototoooo/lorelattice/internal/infrastructure/chunker"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/stretchr/testify/require"
 )
 

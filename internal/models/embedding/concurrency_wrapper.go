@@ -3,7 +3,7 @@ package embedding
 import (
 	"context"
 
-	"github.com/Tencent/WeKnora/internal/models/limiter"
+	"github.com/Pototoooo/lorelattice/internal/models/limiter"
 )
 
 // Embedding is the highest-volume background model call: document ingestion

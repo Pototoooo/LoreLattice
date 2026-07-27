@@ -8,12 +8,12 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/prompt"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/prompt"
 )
 
 // BuildRetryArgv assembles the directly-executable retry argv for a
-// confirmation-gated command: head (e.g. []string{"weknora","kb","update",id})
+// confirmation-gated command: head (e.g. []string{"lorelattice","kb","update",id})
 // followed by each *changed* flag named in allow (as "--name", "value") in
 // pflag's visit order, plus a trailing "-y". Flags not in allow — multi-value
 // or file-based ones where a precise single argv is impractical — are skipped;
@@ -62,7 +62,7 @@ func titleFirst(s string) string {
 // Pass n = total count of items about to be deleted.
 // action is the namespaced action verb (e.g. "doc.delete") for the risk envelope.
 // retryArgv is the directly-executable retry argv array
-// (e.g. []string{"weknora","doc","delete","a","b","-y"}); pass nil when no
+// (e.g. []string{"lorelattice","doc","delete","a","b","-y"}); pass nil when no
 // clean retry argv is available.
 func ConfirmDestructiveBatch(p prompt.Prompter, yes, jsonOut bool, verb, what string, n int, action string, retryArgv []string) error {
 	if yes {
@@ -106,7 +106,7 @@ func ConfirmDestructiveBatch(p prompt.Prompter, yes, jsonOut bool, verb, what st
 // `yes` should be sourced from the persistent global -y/--yes flag.
 // action is the namespaced action verb (e.g. "kb.delete") for the risk envelope.
 // retryArgv is the directly-executable retry argv array
-// (e.g. []string{"weknora","kb","delete","kb_x","-y"}); pass nil when no
+// (e.g. []string{"lorelattice","kb","delete","kb_x","-y"}); pass nil when no
 // clean retry argv is available.
 func ConfirmDestructive(p prompt.Prompter, yes, jsonOut bool, verb, what, id, action string, retryArgv []string) error {
 	return confirmGated(p, yes, jsonOut, verb, what, id, action, RiskDestructive, retryArgv)

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Tencent/WeKnora/cli/internal/compat"
+	"github.com/Pototoooo/lorelattice/cli/internal/compat"
 )
 
 func TestCompat(t *testing.T) {
@@ -23,7 +23,7 @@ func TestCompat(t *testing.T) {
 		{"server unset", "", "1.2.3", compat.OK, ""},
 		{"malformed server", "garbage", "1.2.3", compat.OK, ""}, // fail-open
 
-		// "v" prefix tolerance (git describe + Tencent tag convention)
+		// "v" prefix tolerance (git describe + legacy tag convention)
 		{"v-prefix both", "v1.2.0", "v1.5.0", compat.SoftWarn, "server is older"},
 		{"v-prefix server only", "v1.9.9", "2.0.0", compat.HardError, "incompatible"},
 		{"v-prefix cli only", "1.9.9", "v2.0.0", compat.HardError, "incompatible"},

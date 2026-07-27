@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/searchutil"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/searchutil"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 func TestCollectScopedTextChildIDs(t *testing.T) {

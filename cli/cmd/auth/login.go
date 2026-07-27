@@ -8,11 +8,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/config"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/secrets"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/config"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/secrets"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // authLoginFields enumerates the fields surfaced for `--format json` discovery on
@@ -26,7 +26,7 @@ var authLoginFields = []string{
 // LoginOptions is the configuration captured from flags + prompts. Host and
 // Profile are resolved from the active profile in config (not from flags) -
 // `auth login` authenticates the already-existing active profile, created
-// beforehand with `weknora profile add <name> --host <h> --use`.
+// beforehand with `lorelattice profile add <name> --host <h> --use`.
 type LoginOptions struct {
 	Host        string // resolved from the active profile's Host in config
 	Profile     string // resolved active profile name (honors global --profile)
@@ -65,22 +65,22 @@ var defaultAPIKeyValidator apiKeyValidator = func(ctx context.Context, host, api
 	return resp.Data.User, nil
 }
 
-// NewCmdLogin builds the `weknora auth login` command. runF is the testable
+// NewCmdLogin builds the `lorelattice auth login` command. runF is the testable
 // entrypoint (left nil for production; see cli/cmd/auth/login_test.go).
 func NewCmdLogin(f *cmdutil.Factory, runF func(context.Context, *LoginOptions, *cmdutil.FormatOptions, *cmdutil.Factory, LoginService) error) *cobra.Command {
 	opts := &LoginOptions{}
 	cmd := &cobra.Command{
 		Use:   "login",
-		Short: "Authenticate the active profile against its WeKnora server",
+		Short: "Authenticate the active profile against its LoreLattice server",
 		Long: `Authenticate the active profile by email + password (interactive prompt) or
 pipe an API key with --with-token.
 
 ` + "`auth login`" + ` operates on the active profile (override with the global
 --profile flag). Create the profile first with
-` + "`weknora profile add <name> --host <h> --use`" + `, then run ` + "`weknora auth login`" + `.
+` + "`lorelattice profile add <name> --host <h> --use`" + `, then run ` + "`lorelattice auth login`" + `.
 
 Credentials are persisted to the OS keyring when available; otherwise to a
-0600 file under $XDG_CONFIG_HOME/weknora/secrets.`,
+0600 file under $XDG_CONFIG_HOME/lorelattice/secrets.`,
 		Args: cobra.NoArgs,
 		RunE: func(c *cobra.Command, args []string) error {
 			fopts, err := cmdutil.CheckFormatFlag(c)
@@ -103,10 +103,10 @@ Credentials are persisted to the OS keyring when available; otherwise to a
 	cmdutil.AddFormatFlag(cmd, authLoginFields...)
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
 		UsedFor:  "authenticate the active profile; --with-token reads an API key from stdin (non-interactive)",
-		Examples: []string{`echo "$WEKNORA_API_KEY" | weknora auth login --with-token`},
+		Examples: []string{`echo "$LORELATTICE_API_KEY" | lorelattice auth login --with-token`},
 		Output:   "envelope.data is {profile, host, mode, email, tenant_id} on success (email matches `auth status`)",
 		Warnings: []string{
-			"a profile must exist and be active first (`weknora profile add <n> --host <url> --use`)",
+			"a profile must exist and be active first (`lorelattice profile add <n> --host <url> --use`)",
 			"password login is interactive-only (no flags) — agents must use --with-token with the key piped to stdin",
 		},
 	})
@@ -119,7 +119,7 @@ Credentials are persisted to the OS keyring when available; otherwise to a
 // add`'s job. Returns typed errors when no active profile is configured or
 // the profile lacks a host.
 func resolveActiveProfile(f *cmdutil.Factory) (name, host string, err error) {
-	// f.Config() already folds the global --profile / WEKNORA_PROFILE override
+	// f.Config() already folds the global --profile / LORELATTICE_PROFILE override
 	// into cfg.CurrentProfile (same source f.ActiveProfile reads), so one load
 	// resolves the active profile — matches logout/refresh.
 	cfg, err := f.Config()
@@ -128,10 +128,10 @@ func resolveActiveProfile(f *cmdutil.Factory) (name, host string, err error) {
 	}
 	active := cfg.CurrentProfile
 	if active == "" {
-		msg := "no active profile; run `weknora profile add <name> --host <h> --use` first"
+		msg := "no active profile; run `lorelattice profile add <name> --host <h> --use` first"
 		if envActive, kind := cmdutil.EnvCredential(); envActive {
 			msg = "no active profile to log in — you are already authenticated this session via " + kind +
-				"; `auth login` only persists a named profile, so run `weknora profile add <name> --host <h> --use` first if you want one"
+				"; `auth login` only persists a named profile, so run `lorelattice profile add <name> --host <h> --use` first if you want one"
 		}
 		return "", "", cmdutil.NewError(cmdutil.CodeAuthUnauthenticated, msg)
 	}
@@ -197,7 +197,7 @@ func runLogin(ctx context.Context, opts *LoginOptions, fopts *cmdutil.FormatOpti
 			// Transport errors (connection refused, DNS failure) must not be
 			// surfaced as auth.bad_credential — the key may be fine but the
 			// host is unreachable. Classify via WrapHTTP so network errors
-			// get CodeNetworkError and the hint points at `weknora doctor`.
+			// get CodeNetworkError and the hint points at `lorelattice doctor`.
 			if cmdutil.ClassifyHTTPError(err) == cmdutil.CodeNetworkError {
 				return cmdutil.Wrapf(cmdutil.CodeNetworkError, err, "validate API key: check host reachability")
 			}
@@ -381,8 +381,8 @@ func warnOnFileFallback(store secrets.Store) {
 	if _, isFile := store.(*secrets.FileStore); !isFile {
 		return
 	}
-	fmt.Fprintln(iostreams.IO.Err, "warning: OS keychain unavailable - credentials will be saved to a 0600 file under $XDG_CONFIG_HOME/weknora/secrets/.")
-	fmt.Fprintln(iostreams.IO.Err, "         install / unlock the keyring (or use `weknora doctor` to inspect) for OS-backed storage.")
+	fmt.Fprintln(iostreams.IO.Err, "warning: OS keychain unavailable - credentials will be saved to a 0600 file under $XDG_CONFIG_HOME/lorelattice/secrets/.")
+	fmt.Fprintln(iostreams.IO.Err, "         install / unlock the keyring (or use `lorelattice doctor` to inspect) for OS-backed storage.")
 }
 
 // readStdinTrimmed reads all of r and returns the result with surrounding

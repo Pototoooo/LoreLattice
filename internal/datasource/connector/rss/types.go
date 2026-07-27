@@ -1,6 +1,6 @@
-// Package rss implements the RSS/Atom data source connector for WeKnora.
+// Package rss implements the RSS/Atom data source connector for LoreLattice.
 //
-// It syncs articles from one or more RSS/Atom/JSON feeds into a WeKnora
+// It syncs articles from one or more RSS/Atom/JSON feeds into a LoreLattice
 // knowledge base. Each configured feed URL is treated as a selectable
 // resource; each feed item becomes a knowledge entry whose body is the
 // article's full text rendered as Markdown.
@@ -18,7 +18,7 @@
 //     Deletions are NOT synced — feeds routinely drop old items.
 //
 // All outbound requests go through the SSRF-safe HTTP client so a malicious
-// feed cannot redirect WeKnora to internal services.
+// feed cannot redirect LoreLattice to internal services.
 package rss
 
 import (
@@ -31,8 +31,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/Tencent/WeKnora/internal/datasource"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/datasource"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/mmcdole/gofeed"
 )
 

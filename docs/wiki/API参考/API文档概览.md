@@ -7,7 +7,7 @@ source: api/README.md
 
 # API 文档概览
 
-WeKnora 提供了一系列 RESTful API，用于创建和管理知识库、检索知识，以及进行基于知识的问答。
+LoreLattice 提供了一系列 RESTful API，用于创建和管理知识库、检索知识，以及进行基于知识的问答。
 
 ## 基础信息
 
@@ -15,7 +15,7 @@ WeKnora 提供了一系列 RESTful API，用于创建和管理知识库、检索
 - **响应格式**: JSON
 - **认证方式**: API Key
 
-> API 认证使用 WeKnora 本地 JWT，OIDC 认证流程参见 [OIDC认证调用流程](../安全认证/OIDC认证调用流程.md)
+> API 认证使用 LoreLattice 本地 JWT，OIDC 认证流程参见 [OIDC认证调用流程](../安全认证/OIDC认证调用流程.md)
 
 ## 认证机制
 

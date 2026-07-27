@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // DeleteService is the narrow SDK surface this command depends on.
@@ -21,7 +21,7 @@ type deleteOptions struct {
 	DryRun bool
 }
 
-// NewCmdDelete builds `weknora model delete <model-id>`.
+// NewCmdDelete builds `lorelattice model delete <model-id>`.
 func NewCmdDelete(f *cmdutil.Factory) *cobra.Command {
 	opts := &deleteOptions{}
 	cmd := &cobra.Command{
@@ -50,7 +50,7 @@ agent still referencing the model will fail until repointed.`,
 				return err
 			}
 			if err := cmdutil.ConfirmDestructive(f.Prompter(), opts.Yes, fopts.WantsJSON(),
-				"delete", "model", id, "model.delete", []string{"weknora", "model", "delete", id, "-y"}); err != nil {
+				"delete", "model", id, "model.delete", []string{"lorelattice", "model", "delete", id, "-y"}); err != nil {
 				return err
 			}
 			return runDelete(c.Context(), fopts, cli, id)
@@ -62,7 +62,7 @@ agent still referencing the model will fail until repointed.`,
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
 		UsedFor:       "delete a model by id",
 		RequiredFlags: []string{"<model-id> (positional)"},
-		Examples:      []string{"weknora model delete model_abc -y"},
+		Examples:      []string{"lorelattice model delete model_abc -y"},
 		Output:        "envelope.data is {id, deleted:true}",
 		Warnings: []string{
 			"Requires explicit user approval (exit 10 / input.confirmation_required); never auto-add -y.",

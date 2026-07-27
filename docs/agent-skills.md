@@ -128,9 +128,9 @@ Sandbox 相关配置通过环境变量设置：
 
 | 环境变量 | 说明 | 默认值 |
 |---------|------|--------|
-| `WEKNORA_SANDBOX_MODE` | sandbox 模式: `docker`, `local`, `disabled` | `disabled` |
-| `WEKNORA_SANDBOX_TIMEOUT` | 脚本执行超时（秒） | `60` |
-| `WEKNORA_SANDBOX_DOCKER_IMAGE` | 自定义 Docker 镜像 | `wechatopenai/weknora-sandbox:latest` |
+| `LORELATTICE_SANDBOX_MODE` | sandbox 模式: `docker`, `local`, `disabled` | `disabled` |
+| `LORELATTICE_SANDBOX_TIMEOUT` | 脚本执行超时（秒） | `60` |
+| `LORELATTICE_SANDBOX_DOCKER_IMAGE` | 自定义 Docker 镜像 | `pototoooo/lorelattice-sandbox:latest` |
 
 ### Sandbox 模式
 
@@ -481,13 +481,13 @@ Docker 模式提供最强的隔离：
 
 #### 沙箱镜像
 
-系统使用专用的沙箱镜像 `wechatopenai/weknora-sandbox`，预装了 Python 3.11、Node.js 20、常用 CLI 工具和 Python 库，无需在执行时临时安装依赖。
+系统使用专用的沙箱镜像 `pototoooo/lorelattice-sandbox`，预装了 Python 3.11、Node.js 20、常用 CLI 工具和 Python 库，无需在执行时临时安装依赖。
 
 **预拉取镜像**（推荐在首次部署时执行，避免首次执行脚本时等待下载）：
 
 ```bash
 # 方式一：直接拉取
-docker pull wechatopenai/weknora-sandbox:latest
+docker pull pototoooo/lorelattice-sandbox:latest
 
 # 方式二：本地构建
 sh scripts/build_images.sh -s
@@ -510,7 +510,7 @@ docker run --rm \
   --network=none \
   -v /path/to/skill:/skill:ro \
   -w /skill \
-  wechatopenai/weknora-sandbox:latest \
+  pototoooo/lorelattice-sandbox:latest \
   python scripts/analyze.py input.pdf
 ```
 

@@ -9,11 +9,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/output"
-	"github.com/Tencent/WeKnora/cli/internal/text"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
+	"github.com/Pototoooo/lorelattice/cli/internal/text"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // docsPageSize is the default --page-size on `search docs`: how many
@@ -59,7 +59,7 @@ type DocsSearchService interface {
 	ListKnowledgeWithFilter(ctx context.Context, kbID string, page, pageSize int, filter sdk.KnowledgeListFilter) ([]sdk.Knowledge, int64, error)
 }
 
-// NewCmdDocs builds `weknora search docs "<query>" --kb <id-or-name>`.
+// NewCmdDocs builds `lorelattice search docs "<query>" --kb <id-or-name>`.
 // Pages through the KB's documents and surfaces every entry whose title
 // or file_name contains the query as a server-side case-insensitive LIKE
 // match. Useful for finding a specific upload to download or delete.
@@ -78,9 +78,9 @@ The query is a case-insensitive server-side LIKE filter (the server runs
 
 By default, --all-pages=true walks every server page until --limit is
 reached or the KB is exhausted. Pass --all-pages=false to stop after one page.`,
-		Example: `  weknora search docs "Q3 forecast" --kb finance
-  weknora search docs "spec" --kb engineering --limit 5
-  weknora search docs "spec" --kb engineering --all-pages=false`,
+		Example: `  lorelattice search docs "Q3 forecast" --kb finance
+  lorelattice search docs "spec" --kb engineering --limit 5
+  lorelattice search docs "spec" --kb engineering --all-pages=false`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			opts.Query = strings.TrimSpace(args[0])
@@ -96,7 +96,7 @@ reached or the KB is exhausted. Pass --all-pages=false to stop after one page.`,
 			}
 			fopts.ResolveDefault(iostreams.IO.IsStdoutTTY())
 			// Resolve KB via the shared flag→env→project-link chain (same as
-			// `doc list` / `chat`), so a linked directory or WEKNORA_KB_ID
+			// `doc list` / `chat`), so a linked directory or LORELATTICE_KB_ID
 			// works without an explicit --kb. Resolve before building the
 			// client so an unresolved KB short-circuits to local.kb_id_required
 			// without a client round-trip.
@@ -118,9 +118,9 @@ reached or the KB is exhausted. Pass --all-pages=false to stop after one page.`,
 	cmd.Flags().BoolVar(&opts.AllPages, "all-pages", true, "Walk every server page until exhausted or --limit hit")
 	cmdutil.AddFormatFlag(cmd, docsFields...)
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
-		UsedFor:       "Find documents in a knowledge base by keyword (server-side LIKE filter on title/file_name). The KB comes from --kb (id or name), else WEKNORA_KB_ID, else the linked directory. Results come with meta.count; use --limit to cap and --all-pages=false to stop after one page.",
-		RequiredFlags: []string{"<query> (positional)", "--kb (or WEKNORA_KB_ID / linked directory)"},
-		Examples:      []string{`weknora search docs "spec" --kb engineering --format json`},
+		UsedFor:       "Find documents in a knowledge base by keyword (server-side LIKE filter on title/file_name). The KB comes from --kb (id or name), else LORELATTICE_KB_ID, else the linked directory. Results come with meta.count; use --limit to cap and --all-pages=false to stop after one page.",
+		RequiredFlags: []string{"<query> (positional)", "--kb (or LORELATTICE_KB_ID / linked directory)"},
+		Examples:      []string{`lorelattice search docs "spec" --kb engineering --format json`},
 		Output:        "envelope.data is an array of Knowledge objects with id, title, file_name, parse_status; meta.count is the returned count, meta.total_count the server's full match count, meta.has_more=true if more matched than --limit",
 	})
 	return cmd

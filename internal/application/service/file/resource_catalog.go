@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 )
 
 // resourceCatalogFileService keeps provider drivers physical-path-only while

@@ -1,4 +1,4 @@
-// Package client provides the implementation for interacting with the WeKnora API
+// Package client provides the implementation for interacting with the LoreLattice API
 // The Knowledge related interfaces are used to manage knowledge entries in the knowledge base
 // Knowledge entries can be created from local files, web URLs, or directly from text content
 // They can also be retrieved, deleted, and downloaded as files
@@ -86,14 +86,14 @@ var ErrDuplicateURL = errors.New("URL already exists")
 // KnowledgeProcessOverrides stores per-upload parse config overrides sent as process_config.
 // When nil, the server uses the knowledge base defaults only.
 type KnowledgeProcessOverrides struct {
-	ParserEngineRules        []ParserEngineRule            `json:"parser_engine_rules,omitempty"`
-	ChunkingConfig           *ChunkingConfig               `json:"chunking_config,omitempty"`
-	EnableMultimodel         *bool                         `json:"enable_multimodel,omitempty"`
-	VLMConfig                *VLMConfig                    `json:"vlm_config,omitempty"`
-	ASRConfig                *ASRConfig                    `json:"asr_config,omitempty"`
-	QuestionGenerationConfig *QuestionGenerationConfig     `json:"question_generation_config,omitempty"`
-	GraphEnabled             *bool                         `json:"graph_enabled,omitempty"`
-	ExtractConfig            *ExtractConfig                `json:"extract_config,omitempty"`
+	ParserEngineRules        []ParserEngineRule        `json:"parser_engine_rules,omitempty"`
+	ChunkingConfig           *ChunkingConfig           `json:"chunking_config,omitempty"`
+	EnableMultimodel         *bool                     `json:"enable_multimodel,omitempty"`
+	VLMConfig                *VLMConfig                `json:"vlm_config,omitempty"`
+	ASRConfig                *ASRConfig                `json:"asr_config,omitempty"`
+	QuestionGenerationConfig *QuestionGenerationConfig `json:"question_generation_config,omitempty"`
+	GraphEnabled             *bool                     `json:"graph_enabled,omitempty"`
+	ExtractConfig            *ExtractConfig            `json:"extract_config,omitempty"`
 }
 
 // CreateKnowledgeFromFile creates a knowledge entry from a local file path
@@ -428,7 +428,7 @@ func (c *Client) DownloadKnowledgeFile(ctx context.Context, knowledgeID string, 
 // empty when the server didn't send one) and a streaming reader for the
 // body. Callers MUST Close the returned reader.
 //
-// Used by `weknora doc download` so the CLI can inspect the filename
+// Used by `lorelattice doc download` so the CLI can inspect the filename
 // before opening the destination file — avoids streaming the full body
 // to a temp file just to discover the request would have been rejected
 // (overwrite without --force, missing --out for unnamed downloads, etc.).
@@ -527,7 +527,7 @@ func (c *Client) ReparseKnowledge(ctx context.Context, knowledgeID string) (*Kno
 //   - pending      — task has not started
 //   - processing   — DocReader / chunking / embedding stage
 //   - finalizing   — primary parse done, enrichment subtasks (summary,
-//                    question generation, graph extract) still running
+//     question generation, graph extract) still running
 //
 // Returns an error when the knowledge is in a terminal state
 // (completed, failed) or already being deleted.

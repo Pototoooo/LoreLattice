@@ -14,19 +14,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/application/repository"
-	"github.com/Tencent/WeKnora/internal/application/service"
-	"github.com/Tencent/WeKnora/internal/application/service/file"
-	"github.com/Tencent/WeKnora/internal/config"
-	"github.com/Tencent/WeKnora/internal/database"
-	apperrors "github.com/Tencent/WeKnora/internal/errors"
-	"github.com/Tencent/WeKnora/internal/infrastructure/docparser"
-	"github.com/Tencent/WeKnora/internal/logger"
-	modellimiter "github.com/Tencent/WeKnora/internal/models/limiter"
-	"github.com/Tencent/WeKnora/internal/runtime"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/application/repository"
+	"github.com/Pototoooo/lorelattice/internal/application/service"
+	"github.com/Pototoooo/lorelattice/internal/application/service/file"
+	"github.com/Pototoooo/lorelattice/internal/config"
+	"github.com/Pototoooo/lorelattice/internal/database"
+	apperrors "github.com/Pototoooo/lorelattice/internal/errors"
+	"github.com/Pototoooo/lorelattice/internal/infrastructure/docparser"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	modellimiter "github.com/Pototoooo/lorelattice/internal/models/limiter"
+	"github.com/Pototoooo/lorelattice/internal/runtime"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -400,11 +400,11 @@ func (h *SystemHandler) ListParserEngines(c *gin.Context) {
 			if tenant.ParserEngineConfig != nil {
 				overrides = tenant.ParserEngineConfig.ToOverridesMap()
 			}
-			if creds := tenant.Credentials.GetWeKnoraCloud(); creds != nil {
+			if creds := tenant.Credentials.GetLoreLatticeCloud(); creds != nil {
 				if overrides == nil {
 					overrides = make(map[string]string)
 				}
-				overrides["weknoracloud_app_id"] = creds.AppID
+				overrides["lorelatticecloud_app_id"] = creds.AppID
 			}
 		}
 	}
@@ -462,11 +462,11 @@ func (h *SystemHandler) ReconnectDocReader(c *gin.Context) {
 			if tenant.ParserEngineConfig != nil {
 				overrides = tenant.ParserEngineConfig.ToOverridesMap()
 			}
-			if creds := tenant.Credentials.GetWeKnoraCloud(); creds != nil {
+			if creds := tenant.Credentials.GetLoreLatticeCloud(); creds != nil {
 				if overrides == nil {
 					overrides = make(map[string]string)
 				}
-				overrides["weknoracloud_app_id"] = creds.AppID
+				overrides["lorelatticecloud_app_id"] = creds.AppID
 			}
 		}
 	}
@@ -503,11 +503,11 @@ func (h *SystemHandler) CheckParserEngines(c *gin.Context) {
 	merged := types.MergeParserEngineConfigForUpdate(&body, existing)
 	overrides := merged.ToOverridesMap()
 	if tenant != nil {
-		if creds := tenant.Credentials.GetWeKnoraCloud(); creds != nil {
+		if creds := tenant.Credentials.GetLoreLatticeCloud(); creds != nil {
 			if overrides == nil {
 				overrides = make(map[string]string)
 			}
-			overrides["weknoracloud_app_id"] = creds.AppID
+			overrides["lorelatticecloud_app_id"] = creds.AppID
 		}
 	}
 	reader, docreaderAddr, docreaderTransport := h.resolveDocReader(c.Request.Context(), overrides)
@@ -519,7 +519,7 @@ func (h *SystemHandler) CheckParserEngines(c *gin.Context) {
 
 func (h *SystemHandler) resolveDocReader(ctx context.Context, overrides map[string]string) (interfaces.DocumentReader, string, string) {
 	if len(overrides) > 0 {
-		if addr := strings.TrimSpace(overrides["docreader_addr"]); addr != "" && service.IsWeKnoraCloudDocReaderAddr(addr) {
+		if addr := strings.TrimSpace(overrides["docreader_addr"]); addr != "" && service.IsLoreLatticeCloudDocReaderAddr(addr) {
 			reader := h.ResolveDocumentReader(ctx, addr)
 			return reader, addr, transportFromDocReaderAddr(addr)
 		}
@@ -1298,12 +1298,12 @@ func (h *SystemHandler) ResolveDocumentReader(ctx context.Context, addr string) 
 		return h.documentReader
 	}
 
-	if service.IsWeKnoraCloudDocReaderAddr(addr) {
-		creds := h.tenantSvc.GetWeKnoraCloudCredentials(ctx)
+	if service.IsLoreLatticeCloudDocReaderAddr(addr) {
+		creds := h.tenantSvc.GetLoreLatticeCloudCredentials(ctx)
 		if creds == nil {
 			return nil
 		}
-		reader, err := docparser.NewWeKnoraCloudSignedDocumentReader(creds.AppID, creds.AppSecret)
+		reader, err := docparser.NewLoreLatticeCloudSignedDocumentReader(creds.AppID, creds.AppSecret)
 		if err != nil {
 			return nil
 		}
@@ -2233,7 +2233,7 @@ func (h *SystemHandler) ApplyDefaultStorageQuotaToAllTenants(c *gin.Context) {
 	gb := h.systemSettingSvc.GetInt(
 		ctx,
 		"tenant.default_storage_quota_gb",
-		"WEKNORA_TENANT_DEFAULT_STORAGE_QUOTA_GB",
+		"LORELATTICE_TENANT_DEFAULT_STORAGE_QUOTA_GB",
 		10,
 	)
 	if gb <= 0 {

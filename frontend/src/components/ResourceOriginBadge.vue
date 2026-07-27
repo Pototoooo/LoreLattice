@@ -26,7 +26,7 @@ import { useAuthStore } from '@/stores/auth'
  *  - creator     : same data shape as `tenant`, but the surrounding section
  *                  header already names the tenant ("本空间 · 仅查看"), so
  *                  the badge only carries the creator name to avoid the
- *                  duplicated "本空间 / wizardchen's Workspace" pill on
+ *                  duplicated "本空间 / Pototoooo's Workspace" pill on
  *                  every card. Falls back to the i18n label when the
  *                  creator name is unknown.
  *  - space       : reached through a cross-tenant space (organization)

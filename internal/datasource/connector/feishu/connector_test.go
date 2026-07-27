@@ -13,9 +13,9 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 )
 
 func TestMain(m *testing.M) {
@@ -480,7 +480,7 @@ func TestConnectorListResources(t *testing.T) {
 
 // TestConnectorListResources_LazyLoadsOneLevel verifies that ListResources loads
 // the wiki tree lazily — only the requested level — instead of recursing the whole
-// tree up front (Tencent/WeKnora#1672).
+// tree up front (Pototoooo/lorelattice#1672).
 func TestConnectorListResources_LazyLoadsOneLevel(t *testing.T) {
 	topNodes := []wikiNode{
 		{NodeToken: "nt-root", ObjToken: "obj-root", ObjType: "docx", Title: "Root", HasChild: true, ObjEditTime: "100"},

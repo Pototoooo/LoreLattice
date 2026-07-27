@@ -1,13 +1,12 @@
-# WeKnora Helm Chart
+# LoreLattice Helm Chart
 
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/weknora)](https://artifacthub.io/packages/helm/weknora/weknora)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/lorelattice)](https://artifacthub.io/packages/helm/lorelattice/lorelattice)
 
-Helm chart for deploying [WeKnora](https://github.com/Tencent/WeKnora) - an AI-powered Knowledge RAG Platform.
+Helm chart for deploying [LoreLattice](https://github.com/Pototoooo/lorelattice) - an AI-powered Knowledge RAG Platform.
 
 ## Overview
 
-WeKnora is an intelligent knowledge base platform that combines:
+LoreLattice is an intelligent knowledge base platform that combines:
 - Document parsing and understanding
 - Vector search with BM25 hybrid retrieval
 - LLM integration for conversational AI
@@ -24,8 +23,8 @@ WeKnora is an intelligent knowledge base platform that combines:
 
 ```bash
 # Add required secrets
-helm install weknora ./helm \
-  --namespace weknora \
+helm install lorelattice ./helm \
+  --namespace lorelattice \
   --create-namespace \
   --set secrets.dbPassword=<your-db-password> \
   --set secrets.redisPassword=<your-redis-password> \
@@ -61,8 +60,8 @@ helm install weknora ./helm \
 ### Basic Installation
 
 ```bash
-helm install weknora ./helm \
-  --namespace weknora \
+helm install lorelattice ./helm \
+  --namespace lorelattice \
   --create-namespace \
   --set secrets.dbPassword=secure-password \
   --set secrets.redisPassword=secure-password \
@@ -72,13 +71,13 @@ helm install weknora ./helm \
 ### With Ingress
 
 ```bash
-helm install weknora ./helm \
-  --namespace weknora \
+helm install lorelattice ./helm \
+  --namespace lorelattice \
   --create-namespace \
   --set ingress.enabled=true \
-  --set ingress.host=weknora.example.com \
+  --set ingress.host=lorelattice.example.com \
   --set ingress.tls.enabled=true \
-  --set ingress.tls.secretName=weknora-tls \
+  --set ingress.tls.secretName=lorelattice-tls \
   --set secrets.dbPassword=secure-password \
   --set secrets.redisPassword=secure-password \
   --set secrets.jwtSecret=$(openssl rand -base64 32)
@@ -87,8 +86,8 @@ helm install weknora ./helm \
 ### With External LLM (Ollama)
 
 ```bash
-helm install weknora ./helm \
-  --namespace weknora \
+helm install lorelattice ./helm \
+  --namespace lorelattice \
   --create-namespace \
   --set app.extraEnv[0].name=OLLAMA_BASE_URL \
   --set app.extraEnv[0].value=http://ollama.ollama:11434 \
@@ -124,18 +123,18 @@ postgresql:
 
 ingress:
   enabled: true
-  host: weknora.company.com
+  host: lorelattice.company.com
   tls:
     enabled: true
-    secretName: weknora-tls
+    secretName: lorelattice-tls
 
 secrets:
-  existingSecret: weknora-secrets  # Use pre-created secret
+  existingSecret: lorelattice-secrets  # Use pre-created secret
 ```
 
 ```bash
-helm install weknora ./helm \
-  --namespace weknora \
+helm install lorelattice ./helm \
+  --namespace lorelattice \
   --create-namespace \
   -f values-production.yaml
 ```
@@ -165,7 +164,7 @@ helm install weknora ./helm \
 |-----------|-------------|---------|
 | `app.enabled` | Enable backend | `true` |
 | `app.replicaCount` | Number of replicas | `1` |
-| `app.image.repository` | Image repository | `wechatopenai/weknora-app` |
+| `app.image.repository` | Image repository | `pototoooo/lorelattice-app` |
 | `app.image.tag` | Image tag | `""` (uses appVersion) |
 | `app.resources` | Resource limits | See values.yaml |
 | `app.env` | Environment variables | See values.yaml |
@@ -177,7 +176,7 @@ helm install weknora ./helm \
 |-----------|-------------|---------|
 | `frontend.enabled` | Enable frontend | `true` |
 | `frontend.replicaCount` | Number of replicas | `1` |
-| `frontend.image.repository` | Image repository | `wechatopenai/weknora-ui` |
+| `frontend.image.repository` | Image repository | `pototoooo/lorelattice-ui` |
 | `frontend.image.tag` | Image tag | `latest` |
 
 ### PostgreSQL (ParadeDB)
@@ -206,7 +205,7 @@ helm install weknora ./helm \
 |-----------|-------------|---------|
 | `ingress.enabled` | Enable ingress | `false` |
 | `ingress.className` | Ingress class | `nginx` |
-| `ingress.host` | Hostname | `weknora.example.com` |
+| `ingress.host` | Hostname | `lorelattice.example.com` |
 | `ingress.tls.enabled` | Enable TLS | `false` |
 | `ingress.tls.secretName` | TLS secret name | `""` |
 
@@ -216,7 +215,7 @@ helm install weknora ./helm \
 |-----------|-------------|---------|
 | `secrets.dbUser` | Database username | `postgres` |
 | `secrets.dbPassword` | Database password | `""` (required) |
-| `secrets.dbName` | Database name | `weknora` |
+| `secrets.dbName` | Database name | `lorelattice` |
 | `secrets.redisPassword` | Redis password | `""` (required) |
 | `secrets.jwtSecret` | JWT signing secret | `""` (required) |
 | `secrets.existingSecret` | Use existing secret | `""` |
@@ -239,13 +238,13 @@ These map to docker-compose profiles:
 
 1. **Helm --set flags** (for testing)
    ```bash
-   helm install weknora ./helm --set secrets.dbPassword=xxx
+   helm install lorelattice ./helm --set secrets.dbPassword=xxx
    ```
 
 2. **External Secrets Operator** (recommended for production)
    ```yaml
    secrets:
-     existingSecret: weknora-external-secret
+     existingSecret: lorelattice-external-secret
    ```
 
 3. **Sealed Secrets** (for GitOps)
@@ -264,53 +263,53 @@ The chart follows CNCF security best practices:
 ## Upgrading
 
 ```bash
-helm upgrade weknora ./helm \
-  --namespace weknora \
+helm upgrade lorelattice ./helm \
+  --namespace lorelattice \
   --reuse-values
 ```
 
 ## Uninstalling
 
 ```bash
-helm uninstall weknora --namespace weknora
+helm uninstall lorelattice --namespace lorelattice
 
 # Optional: Remove PVCs
-kubectl delete pvc -n weknora -l app.kubernetes.io/instance=weknora
+kubectl delete pvc -n lorelattice -l app.kubernetes.io/instance=lorelattice
 ```
 
 ## Troubleshooting
 
 ### Check Pod Status
 ```bash
-kubectl get pods -n weknora
+kubectl get pods -n lorelattice
 ```
 
 ### View Logs
 ```bash
 # Backend logs
-kubectl logs -n weknora -l app.kubernetes.io/component=app -f
+kubectl logs -n lorelattice -l app.kubernetes.io/component=app -f
 
 # Frontend logs
-kubectl logs -n weknora -l app.kubernetes.io/component=frontend -f
+kubectl logs -n lorelattice -l app.kubernetes.io/component=frontend -f
 ```
 
 ### Common Issues
 
 **Pod stuck in Pending**
-- Check if PVCs are bound: `kubectl get pvc -n weknora`
+- Check if PVCs are bound: `kubectl get pvc -n lorelattice`
 - Verify storage class exists: `kubectl get sc`
 
 **Connection refused errors**
 - Wait for all pods to be Ready
-- Check service endpoints: `kubectl get endpoints -n weknora`
+- Check service endpoints: `kubectl get endpoints -n lorelattice`
 
 **Database connection errors**
 - Verify secrets are correct
-- Check PostgreSQL logs: `kubectl logs -n weknora -l app.kubernetes.io/component=database`
+- Check PostgreSQL logs: `kubectl logs -n lorelattice -l app.kubernetes.io/component=database`
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/Tencent/WeKnora/blob/main/CONTRIBUTING.md) in the main repository.
+See [CONTRIBUTING.md](https://github.com/Pototoooo/lorelattice/blob/main/CONTRIBUTING.md) in the main repository.
 
 ## References
 
@@ -320,6 +319,3 @@ This Helm chart follows best practices from:
 - [Prometheus Helm Charts](https://github.com/prometheus-community/helm-charts)
 - [cert-manager Helm Chart](https://github.com/cert-manager/cert-manager)
 
-## License
-
-This chart is licensed under the MIT License - see the [LICENSE](https://github.com/Tencent/WeKnora/blob/main/LICENSE) file for details.

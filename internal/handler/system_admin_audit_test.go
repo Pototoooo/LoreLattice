@@ -6,8 +6,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 )
 
 // capturingAuditService implements just AuditLogService.Log for the
@@ -66,7 +66,7 @@ func TestEmitAdminAudit_PopulatesCanonicalFields(t *testing.T) {
 	svc := &capturingAuditService{}
 	h := newSystemHandlerWithAudit(svc)
 
-	target := &types.User{ID: "u-target", Username: "wizardchen2", Email: "x@y.z"}
+	target := &types.User{ID: "u-target", Username: "pototoooo2", Email: "x@y.z"}
 	details := map[string]any{
 		"target_email":    target.Email,
 		"target_username": target.Username,
@@ -121,7 +121,7 @@ func TestEmitAdminAudit_PopulatesCanonicalFields(t *testing.T) {
 	if roundTrip["target_email"] != "x@y.z" {
 		t.Fatalf("details.target_email lost in marshal: %v", roundTrip["target_email"])
 	}
-	if roundTrip["target_username"] != "wizardchen2" {
+	if roundTrip["target_username"] != "pototoooo2" {
 		t.Fatalf("details.target_username lost in marshal: %v", roundTrip["target_username"])
 	}
 	if roundTrip["idempotent"] != false {

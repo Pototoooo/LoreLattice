@@ -13,9 +13,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 	"github.com/tencent/vectordatabase-sdk-go/tcvdbtext/encoder"
 	"github.com/tencent/vectordatabase-sdk-go/tcvectordb"
 )
@@ -429,7 +429,7 @@ func (r *repository) ensureCollection(ctx context.Context, dimension int) error 
 		collectionName,
 		uint32(r.shardsNum),
 		uint32(r.replicasNum),
-		fmt.Sprintf("WeKnora embeddings collection with dimension %d", dimension),
+		fmt.Sprintf("LoreLattice embeddings collection with dimension %d", dimension),
 		indexes,
 	)
 	if err != nil {

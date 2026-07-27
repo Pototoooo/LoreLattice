@@ -10,9 +10,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/Tencent/WeKnora/internal/models/provider"
-	"github.com/Tencent/WeKnora/internal/types"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/models/provider"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 )
 
 const anthropicVersion = "2023-06-01"

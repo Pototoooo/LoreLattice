@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Tencent/WeKnora/cli/internal/testutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/testutil"
 )
 
 func TestFileStore_RoundTrip(t *testing.T) {

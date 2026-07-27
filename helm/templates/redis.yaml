@@ -1,5 +1,5 @@
 {{/*
-Copyright 2025 Tencent
+Copyright 2025-2026 Pototoooo
 SPDX-License-Identifier: MIT
 
 Redis Deployment and Service.
@@ -9,32 +9,32 @@ Redis is used for stream management and async task queuing.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "weknora.fullname" . }}-redis
+  name: {{ include "lorelattice.fullname" . }}-redis
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "cache" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "cache" "context" .) | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "weknora.componentSelectorLabels" (dict "component" "cache" "context" .) | nindent 6 }}
+      {{- include "lorelattice.componentSelectorLabels" (dict "component" "cache" "context" .) | nindent 6 }}
   # Use Recreate strategy to avoid data corruption
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        {{- include "weknora.componentSelectorLabels" (dict "component" "cache" "context" .) | nindent 8 }}
+        {{- include "lorelattice.componentSelectorLabels" (dict "component" "cache" "context" .) | nindent 8 }}
     spec:
-      {{- include "weknora.imagePullSecrets" . | nindent 6 }}
-      serviceAccountName: {{ include "weknora.serviceAccountName" . }}
+      {{- include "lorelattice.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "lorelattice.serviceAccountName" . }}
       {{- with .Values.global.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: redis
-          image: {{ include "weknora.redis.image" . }}
+          image: {{ include "lorelattice.redis.image" . }}
           imagePullPolicy: IfNotPresent
           {{- with .Values.redis.securityContext }}
           securityContext:
@@ -52,7 +52,7 @@ spec:
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: REDIS_PASSWORD
           ports:
             - containerPort: 6379
@@ -87,7 +87,7 @@ spec:
         - name: redis-data
           {{- if .Values.redis.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.redis.persistence.existingClaim | default (printf "%s-redis" (include "weknora.fullname" .)) }}
+            claimName: {{ .Values.redis.persistence.existingClaim | default (printf "%s-redis" (include "lorelattice.fullname" .)) }}
           {{- else }}
           emptyDir: {}
           {{- end }}
@@ -111,11 +111,11 @@ metadata:
   name: redis
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "cache" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "cache" "context" .) | nindent 4 }}
 spec:
   type: ClusterIP
   selector:
-    {{- include "weknora.componentSelectorLabels" (dict "component" "cache" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentSelectorLabels" (dict "component" "cache" "context" .) | nindent 4 }}
   ports:
     - name: redis
       port: 6379

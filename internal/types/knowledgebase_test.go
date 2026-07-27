@@ -16,7 +16,7 @@ func TestParseProviderScheme(t *testing.T) {
 		{"cos://bucket/key", "cos"},
 		{"tos://bucket/key", "tos"},
 		{"s3://bucket/key", "s3"},
-		{"s3://my-bucket/weknora/123/exports/abc.png", "s3"},
+		{"s3://my-bucket/lorelattice/123/exports/abc.png", "s3"},
 		{"https://example.com/img.png", ""},
 		{"http://localhost:9000/bucket/key", ""},
 		{"/data/files/images/abc.png", ""},

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -84,7 +84,7 @@ type SpanOptions struct {
 
 // StartTrace opens a root span. When ctx carries a remote SpanContext (from a
 // W3C traceparent extracted by GinMiddleware), the root span inherits the
-// upstream trace id — this is what makes a sop3 run and its WeKnora call land
+// upstream trace id — this is what makes a sop3 run and its LoreLattice call land
 // under the same trace in LiteFuse. The returned *Trace is non-nil even when
 // disabled (methods are no-ops), so callers don't need nil checks.
 func (m *Manager) StartTrace(ctx context.Context, opts TraceOptions) (context.Context, *Trace) {

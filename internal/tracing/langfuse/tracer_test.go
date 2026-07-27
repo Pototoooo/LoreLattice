@@ -280,8 +280,8 @@ func TestStartSpan_AutoRootExported(t *testing.T) {
 
 // TestTraceparentPropagation is the sop3 correlation core test: an incoming
 // W3C traceparent (as injected by an upstream caller like sop3) is extracted,
-// and the WeKnora root span inherits the upstream trace id — so in LiteFuse
-// the WeKnora trace and the upstream caller's trace are the same trace.
+// and the LoreLattice root span inherits the upstream trace id — so in LiteFuse
+// the LoreLattice trace and the upstream caller's trace are the same trace.
 func TestTraceparentPropagation(t *testing.T) {
 	m, exp := newTestManager(t)
 
@@ -296,18 +296,18 @@ func TestTraceparentPropagation(t *testing.T) {
 
 	// The HTTP middleware extracts the traceparent into the request context.
 	httpCtx := propagator.Extract(context.Background(), carrier)
-	_, trace := m.StartTrace(httpCtx, TraceOptions{Name: "weknora-root"})
+	_, trace := m.StartTrace(httpCtx, TraceOptions{Name: "lorelattice-root"})
 	trace.Finish(nil, nil)
 
 	for _, s := range exp.GetSpans() {
-		if s.Name != "weknora-root" {
+		if s.Name != "lorelattice-root" {
 			continue
 		}
 		if s.SpanContext.TraceID() != remoteTraceID {
-			t.Errorf("weknora root trace id = %s, want upstream %s (traceparent not inherited)",
+			t.Errorf("lorelattice root trace id = %s, want upstream %s (traceparent not inherited)",
 				s.SpanContext.TraceID(), remoteTraceID)
 		}
 		return
 	}
-	t.Fatal("weknora-root span not exported")
+	t.Fatal("lorelattice-root span not exported")
 }

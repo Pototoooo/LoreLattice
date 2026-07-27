@@ -4,7 +4,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // TestMergeCitationsIntoItems_PopulatesSourceChunksOnCandidates verifies that

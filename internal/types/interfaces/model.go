@@ -3,12 +3,12 @@ package interfaces
 import (
 	"context"
 
-	"github.com/Tencent/WeKnora/internal/models/chat"
-	"github.com/Tencent/WeKnora/internal/models/embedding"
-	"github.com/Tencent/WeKnora/internal/models/rerank"
-	"github.com/Tencent/WeKnora/internal/models/asr"
-	"github.com/Tencent/WeKnora/internal/models/vlm"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/models/asr"
+	"github.com/Pototoooo/lorelattice/internal/models/chat"
+	"github.com/Pototoooo/lorelattice/internal/models/embedding"
+	"github.com/Pototoooo/lorelattice/internal/models/rerank"
+	"github.com/Pototoooo/lorelattice/internal/models/vlm"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // ModelService defines the model service interface

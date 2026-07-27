@@ -1,6 +1,6 @@
-# WeKnora HTTP Client
+# LoreLattice HTTP Client
 
-This package provides a client library for interacting with WeKnora services, supporting all HTTP-based interface calls, making it easier for other modules to integrate with WeKnora services without having to write HTTP request code directly.
+This package provides a client library for interacting with LoreLattice services, supporting all HTTP-based interface calls, making it easier for other modules to integrate with LoreLattice services without having to write HTTP request code directly.
 
 ## Main Features
 
@@ -23,7 +23,7 @@ The client includes the following main functional modules:
 ```go
 import (
     "context"
-    "github.com/Tencent/WeKnora/client"
+    "github.com/Pototoooo/lorelattice/client"
     "time"
 )
 

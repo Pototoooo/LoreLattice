@@ -12,7 +12,7 @@ import (
 )
 
 // TestSkillReferencedMCPToolsExist is part of the K6 drift guard: the MCP tool
-// names the bundled `weknora-shared` skill advertises (in its "CLI vs MCP"
+// names the bundled `lorelattice-shared` skill advertises (in its "CLI vs MCP"
 // section) must all be registered by registerTools. Guards against a skill
 // naming a renamed/removed tool (e.g. the agent_invoke→session_ask rename).
 func TestSkillReferencedMCPToolsExist(t *testing.T) {
@@ -20,7 +20,7 @@ func TestSkillReferencedMCPToolsExist(t *testing.T) {
 	if !ok {
 		t.Fatal("runtime.Caller failed")
 	}
-	skillPath := filepath.Join(filepath.Dir(file), "..", "..", "skills", "weknora-shared", "SKILL.md")
+	skillPath := filepath.Join(filepath.Dir(file), "..", "..", "skills", "lorelattice-shared", "SKILL.md")
 	raw, err := os.ReadFile(skillPath)
 	if err != nil {
 		t.Fatalf("read skill: %v", err)
@@ -30,7 +30,7 @@ func TestSkillReferencedMCPToolsExist(t *testing.T) {
 	// Slice the "CLI vs MCP" section (heading → next "## " heading).
 	start := strings.Index(body, "CLI vs MCP")
 	if start < 0 {
-		t.Fatal("weknora-shared SKILL.md has no 'CLI vs MCP' section to validate")
+		t.Fatal("lorelattice-shared SKILL.md has no 'CLI vs MCP' section to validate")
 	}
 	section := body[start:]
 	if end := strings.Index(section, "\n## "); end >= 0 {
@@ -65,7 +65,7 @@ func TestSkillReferencedMCPToolsExist(t *testing.T) {
 
 	for name := range referenced {
 		if !registered[name] {
-			t.Errorf("weknora-shared skill references MCP tool %q which is NOT registered (renamed/removed?)", name)
+			t.Errorf("lorelattice-shared skill references MCP tool %q which is NOT registered (renamed/removed?)", name)
 		}
 	}
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	skillsfs "github.com/Tencent/WeKnora/cli/skills"
+	skillsfs "github.com/Pototoooo/lorelattice/cli/skills"
 )
 
 // TestEmbeddedSkillsPresent: the binary embeds the bundled skills with their

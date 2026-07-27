@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 )
 
 const geminiEmbeddingBaseURL = "https://generativelanguage.googleapis.com/v1beta"

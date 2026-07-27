@@ -1,6 +1,6 @@
 # 需求构建指南
 
-将 WeKnora RAG 检索结果转换为 OpenMAIC 课程生成所需的 `requirement` 格式。
+将 LoreLattice RAG 检索结果转换为 OpenMAIC 课程生成所需的 `requirement` 格式。
 
 ## 核心原则
 

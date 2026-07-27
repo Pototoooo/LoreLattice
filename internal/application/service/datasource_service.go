@@ -12,12 +12,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/datasource"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/tracing/langfuse"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/datasource"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/tracing/langfuse"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 	"github.com/hibiken/asynq"
 )
 
@@ -661,7 +661,7 @@ func (s *DataSourceService) ProcessSync(ctx context.Context, task *asynq.Task) e
 
 	// Streaming path: connectors that support it interleave fetch→ingest→
 	// checkpoint so a large sync bounds memory and resumes after a timeout
-	// instead of restarting (Tencent/WeKnora#2136). Others fall back below.
+	// instead of restarting (Pototoooo/lorelattice#2136). Others fall back below.
 	if sc, ok := connector.(datasource.StreamingConnector); ok {
 		return s.processSyncStreaming(ctx, sc, ds, syncLog, config, payload, wasPaused)
 	}
@@ -796,7 +796,7 @@ func (s *DataSourceService) resolveAutoTagIDs(ctx context.Context, ds *types.Dat
 // sync-log list response, so an unbounded list on a sync that fails thousands of
 // documents means multi-MB DB rows and payloads. The accurate failure count
 // lives in SyncResult.Failed (a bounded int); this list only keeps a sample for
-// display (Tencent/WeKnora#2136 / #1262).
+// display (Pototoooo/lorelattice#2136 / #1262).
 const maxSyncResultErrors = 100
 
 // recordSyncError appends an error sample to result.Errors, capped at
@@ -1010,7 +1010,7 @@ func (s *DataSourceService) processSyncStreaming(
 	// Surface per-document failures as a partial sync (not silent success), so
 	// the sync-log drawer's failure detail explains which docs didn't make it —
 	// the visibility gap behind "status normal but not everything syncs"
-	// (Tencent/WeKnora#2136). Failed nodes were not advanced in the cursor, so
+	// (Pototoooo/lorelattice#2136). Failed nodes were not advanced in the cursor, so
 	// the next run retries them.
 	status := types.SyncLogStatusSuccess
 	errMsg := ""
@@ -1142,7 +1142,7 @@ func (s *DataSourceService) validateDataSourceConfig(ctx context.Context, ds *ty
 //
 // Routing logic:
 //   - Has Content bytes → CreateKnowledgeFromFile (走完整的文档解析 pipeline)
-//   - Has URL only      → CreateKnowledgeFromURL  (让 WeKnora 下载并解析)
+//   - Has URL only      → CreateKnowledgeFromURL  (让 LoreLattice 下载并解析)
 //
 // Returns (isUpdate, error) — isUpdate is true when an existing item was replaced.
 func (s *DataSourceService) ingestItem(ctx context.Context, ds *types.DataSource, item *types.FetchedItem, tagIDs []string) (bool, error) {
@@ -1195,7 +1195,7 @@ func (s *DataSourceService) ingestItem(ctx context.Context, ds *types.DataSource
 		return isUpdate, err
 	}
 
-	// Case 2: only a remote URL — let WeKnora handle downloading and parsing
+	// Case 2: only a remote URL — let LoreLattice handle downloading and parsing
 	if item.URL != "" {
 		_, err := s.knowledgeService.CreateKnowledgeFromURL(
 			ctx,

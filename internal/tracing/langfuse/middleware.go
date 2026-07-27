@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel/propagation"
 )
@@ -26,9 +26,9 @@ func GinMiddleware() gin.HandlerFunc {
 		}
 
 		ctx := c.Request.Context()
-		// Extract a W3C traceparent from the incoming request so the WeKnora
+		// Extract a W3C traceparent from the incoming request so the LoreLattice
 		// trace inherits the upstream caller's trace id. This is what lets a
-		// sop3 pipeline run (identified by its W3C trace_id) and the WeKnora
+		// sop3 pipeline run (identified by its W3C trace_id) and the LoreLattice
 		// agent-chat call it triggers land under the same trace in LiteFuse.
 		// When no traceparent is present (human UI calls, other clients) the
 		// root span starts a fresh trace as before.

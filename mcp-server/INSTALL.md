@@ -1,4 +1,4 @@
-# WeKnora MCP Server 安装和使用指南
+# LoreLattice MCP Server 安装和使用指南
 
 ## 快速开始
 
@@ -10,16 +10,16 @@ pip install -r requirements.txt
 ### 2. 设置环境变量
 ```bash
 # Linux/macOS
-export WEKNORA_BASE_URL="http://localhost:8080/api/v1"
-export WEKNORA_API_KEY="your_api_key_here"
+export LORELATTICE_BASE_URL="http://localhost:8080/api/v1"
+export LORELATTICE_API_KEY="your_api_key_here"
 
 # Windows PowerShell
-$env:WEKNORA_BASE_URL="http://localhost:8080/api/v1"
-$env:WEKNORA_API_KEY="your_api_key_here"
+$env:LORELATTICE_BASE_URL="http://localhost:8080/api/v1"
+$env:LORELATTICE_API_KEY="your_api_key_here"
 
 # Windows CMD
-set WEKNORA_BASE_URL=http://localhost:8080/api/v1
-set WEKNORA_API_KEY=your_api_key_here
+set LORELATTICE_BASE_URL=http://localhost:8080/api/v1
+set LORELATTICE_API_KEY=your_api_key_here
 ```
 
 ### 3. 运行服务器
@@ -38,12 +38,12 @@ python run_server.py
 
 #### 方式 3: 直接运行服务器模块
 ```bash
-python weknora_mcp_server.py
+python lorelattice_mcp_server.py
 ```
 
 #### 方式 4: 作为 Python 模块运行
 ```bash
-python -m weknora_mcp_server
+python -m lorelattice_mcp_server
 ```
 
 ## 作为 Python 包安装
@@ -55,9 +55,9 @@ pip install -e .
 
 安装后可以使用命令行工具：
 ```bash
-weknora-mcp-server
+lorelattice-mcp-server
 # 或
-weknora-server
+lorelattice-server
 ```
 
 ### 生产模式安装
@@ -94,7 +94,7 @@ python main.py --check-only
 ```
 
 这将显示：
-- WeKnora API 基础 URL 配置
+- LoreLattice API 基础 URL 配置
 - API 密钥设置状态
 - 依赖包安装状态
 
@@ -107,14 +107,14 @@ python main.py --check-only
 - 没有文件名冲突
 
 ### 2. 连接错误
-如果无法连接到 WeKnora API：
-- 检查 `WEKNORA_BASE_URL` 是否正确
-- 确认 WeKnora 服务正在运行
+如果无法连接到 LoreLattice API：
+- 检查 `LORELATTICE_BASE_URL` 是否正确
+- 确认 LoreLattice 服务正在运行
 - 验证网络连接
 
 ### 3. 认证错误
 如果遇到认证问题：
-- 检查 `WEKNORA_API_KEY` 是否设置
+- 检查 `LORELATTICE_API_KEY` 是否设置
 - 确认 API 密钥有效
 - 验证权限设置
 
@@ -122,11 +122,11 @@ python main.py --check-only
 
 ### 项目结构
 ```
-WeKnoraMCP/
+LoreLatticeMCP/
 ├── __init__.py              # 包初始化文件
 ├── main.py                  # 主入口点
 ├── run_server.py           # 原始启动脚本
-├── weknora_mcp_server.py   # MCP 服务器实现
+├── lorelattice_mcp_server.py   # MCP 服务器实现
 ├── requirements.txt        # 依赖列表
 ├── setup.py               # 安装脚本
 ├── MANIFEST.in            # 包含文件清单
@@ -136,7 +136,7 @@ WeKnoraMCP/
 ```
 
 ### 添加新功能
-1. 在 `WeKnoraClient` 类中添加新的 API 方法
+1. 在 `LoreLatticeClient` 类中添加新的 API 方法
 2. 在 `handle_list_tools()` 中注册新工具
 3. 在 `handle_call_tool()` 中实现工具逻辑
 4. 更新文档和测试
@@ -167,26 +167,26 @@ RUN pip install -r requirements.txt
 COPY . .
 RUN pip install -e .
 
-ENV WEKNORA_BASE_URL=http://localhost:8080/api/v1
+ENV LORELATTICE_BASE_URL=http://localhost:8080/api/v1
 EXPOSE 8000
 
-CMD ["weknora-mcp-server"]
+CMD ["lorelattice-mcp-server"]
 ```
 
 ### 系统服务
-创建 systemd 服务文件 `/etc/systemd/system/weknora-mcp.service`：
+创建 systemd 服务文件 `/etc/systemd/system/lorelattice-mcp.service`：
 ```ini
 [Unit]
-Description=WeKnora MCP Server
+Description=LoreLattice MCP Server
 After=network.target
 
 [Service]
 Type=simple
-User=weknora
-WorkingDirectory=/opt/weknora-mcp
-Environment=WEKNORA_BASE_URL=http://localhost:8080/api/v1
-Environment=WEKNORA_API_KEY=your_api_key
-ExecStart=/usr/local/bin/weknora-mcp-server
+User=lorelattice
+WorkingDirectory=/opt/lorelattice-mcp
+Environment=LORELATTICE_BASE_URL=http://localhost:8080/api/v1
+Environment=LORELATTICE_API_KEY=your_api_key
+ExecStart=/usr/local/bin/lorelattice-mcp-server
 Restart=always
 
 [Install]
@@ -195,8 +195,8 @@ WantedBy=multi-user.target
 
 启用服务：
 ```bash
-sudo systemctl enable weknora-mcp
-sudo systemctl start weknora-mcp
+sudo systemctl enable lorelattice-mcp
+sudo systemctl start lorelattice-mcp
 ```
 
 ## 支持
@@ -205,4 +205,4 @@ sudo systemctl start weknora-mcp
 1. 查看日志输出
 2. 检查环境配置
 3. 参考故障排除部分
-4. 提交 Issue 到项目仓库: https://github.com/NannaOlympicBroadcast/WeKnoraMCP/issues
+4. 提交 Issue 到项目仓库: https://github.com/Pototoooo/lorelattice/issues

@@ -15,7 +15,7 @@
 
 ## 服务商支持 (Provider Support)
 
-WeKnora 支持多种主流 AI 模型服务商，在创建模型时可通过 `parameters.provider` 字段指定服务商类型以获得更好的兼容性。
+LoreLattice 支持多种主流 AI 模型服务商，在创建模型时可通过 `parameters.provider` 字段指定服务商类型以获得更好的兼容性。
 
 ### 支持的服务商列表
 

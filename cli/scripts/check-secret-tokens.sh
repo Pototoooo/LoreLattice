@@ -4,7 +4,7 @@
 # API key or JWT most easily gets pasted by accident (copying a working
 # session into a how-to). Same intent as a gitleaks/doc-token pre-commit scan.
 #
-# Heuristic, low false-positive: a real WeKnora API key is `sk-` followed by a
+# Heuristic, low false-positive: a real LoreLattice API key is `sk-` followed by a
 # long high-entropy body that CONTAINS A DIGIT (e.g.
 # sk-bVd4ebLoyn-DKevdkgw527XAakwv4G6Tz6FhgXPlOpBO-Ico); placeholder words like
 # `sk-specific` / `sk-staging` have no digit and are short, so they pass. JWTs
@@ -45,7 +45,7 @@ done
 if [ "$fail" -ne 0 ]; then
   echo
   echo "A real-looking credential is committed in docs. Replace it with a"
-  echo "placeholder (e.g. sk-EXAMPLE / <api-key> / \$(weknora auth token))."
+  echo "placeholder (e.g. sk-EXAMPLE / <api-key> / \$(lorelattice auth token))."
   exit 1
 fi
 echo "no committed credentials found in docs"

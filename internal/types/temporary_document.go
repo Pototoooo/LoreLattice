@@ -102,7 +102,7 @@ type TemporaryDocumentCreateOptions struct {
 	// scanned documents whose extracted text falls below a threshold.
 	ImageUnderstanding bool `json:"image_understanding,omitempty"`
 	// OCRMaxPages overrides the global VLM OCR page cap for this document.
-	// 0 uses the global default (WEKNORA_CHAT_ATTACHMENT_OCR_MAX_PAGES).
+	// 0 uses the global default (LORELATTICE_CHAT_ATTACHMENT_OCR_MAX_PAGES).
 	OCRMaxPages int `json:"ocr_max_pages,omitempty"`
 }
 

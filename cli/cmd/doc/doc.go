@@ -1,4 +1,4 @@
-// Package doc implements the `weknora doc` subtree (list / view / upload /
+// Package doc implements the `lorelattice doc` subtree (list / view / upload /
 // fetch / create / download / delete / wait). Upload supports --recursive /
 // --glob for bulk ingestion from local files. Fetch ingests a remote URL.
 // Create adds a knowledge entry from inline text content.
@@ -12,10 +12,10 @@ package doc
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
 )
 
-// NewCmd builds the `weknora doc` parent command.
+// NewCmd builds the `lorelattice doc` parent command.
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "doc",

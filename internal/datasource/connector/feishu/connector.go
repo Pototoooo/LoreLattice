@@ -11,9 +11,9 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/Tencent/WeKnora/internal/datasource"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/datasource"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // Connector implements the datasource.Connector interface for Feishu and, with
@@ -55,7 +55,7 @@ var feishuStreamCheckpointMaxInterval = 30 * time.Second
 // fetchTally accumulates the outcome of fetching a wiki node subtree so the
 // connector can emit a single actionable summary. Without it, unsupported nodes
 // (mindnote/slides/etc.) vanish with no item, no error and no log, leaving users
-// unable to explain why "13 documents synced only 3" (Tencent/WeKnora#2136).
+// unable to explain why "13 documents synced only 3" (Pototoooo/lorelattice#2136).
 type fetchTally struct {
 	discovered    int
 	fetched       int
@@ -107,7 +107,7 @@ func (c *Connector) Validate(ctx context.Context, config *types.DataSourceConfig
 //   - parentID == "spaceID:nodeToken" → list the direct children of that node.
 //
 // Eagerly recursing the whole tree here used to time out for large wikis
-// (Tencent/WeKnora#1672); the recursive walk now happens only at sync time.
+// (Pototoooo/lorelattice#1672); the recursive walk now happens only at sync time.
 func (c *Connector) ListResources(
 	ctx context.Context, config *types.DataSourceConfig, parentID string,
 ) ([]types.Resource, error) {
@@ -396,7 +396,7 @@ func (c *Connector) FetchIncremental(ctx context.Context, config *types.DataSour
 // and incremental paths: with cursor == nil it fetches everything, and with a
 // cursor it skips nodes whose recorded edit time is unchanged — the same
 // mechanism that lets a sync which timed out mid-traversal resume from the last
-// checkpoint instead of restarting (Tencent/WeKnora#2136).
+// checkpoint instead of restarting (Pototoooo/lorelattice#2136).
 //
 // Instead of accumulating every item in memory (FetchAll), it Emits each item
 // as it is fetched and Checkpoints the cursor every feishuStreamCheckpointInterval
@@ -487,7 +487,7 @@ func (c *Connector) FetchStream(
 				// Do NOT advance the cursor: the content was never fetched.
 				// Retain the prior edit time (if any) so prev != current next
 				// run and the node is retried, instead of being permanently
-				// skipped on a transient export failure (Tencent/WeKnora#2136).
+				// skipped on a transient export failure (Pototoooo/lorelattice#2136).
 				if hadPrev {
 					newCursor.SpaceNodeTimes[resourceID][node.NodeToken] = prevEdit
 				}

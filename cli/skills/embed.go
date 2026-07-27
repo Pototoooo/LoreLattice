@@ -1,5 +1,5 @@
 // Package skills embeds the bundled Agent Skills into the CLI binary so
-// `weknora skills install` can write them out without a source checkout
+// `lorelattice skills install` can write them out without a source checkout
 // (replacing the manual symlink-from-checkout MVP). The markdown under each
 // skill dir is the single source of truth — embedding it keeps the shipped
 // binary and the docs in lockstep (the parity tests guard the command/flag
@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-//go:embed all:weknora-shared all:weknora-rag-search
+//go:embed all:lorelattice-shared all:lorelattice-rag-search
 var fsys embed.FS
 
 // Skill is one bundled skill: its directory name, the description parsed from
@@ -58,7 +58,7 @@ func List() ([]Skill, error) {
 }
 
 // skillFiles returns every file path under a skill dir (relative to the FS
-// root, e.g. "weknora-shared/SKILL.md"), sorted.
+// root, e.g. "lorelattice-shared/SKILL.md"), sorted.
 func skillFiles(dir string) ([]string, error) {
 	var files []string
 	err := fs.WalkDir(fsys, dir, func(p string, d fs.DirEntry, err error) error {

@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// ExampleUsage demonstrates the complete usage flow of the WeKnora client, including:
+// ExampleUsage demonstrates the complete usage flow of the LoreLattice client, including:
 // - Creating a client instance
 // - Creating a knowledge base
 // - Uploading knowledge files

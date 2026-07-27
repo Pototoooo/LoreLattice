@@ -9,8 +9,8 @@
 
 ### 新增
 - 初始版本发布
-- WeKnora MCP Server 核心功能
-- 完整的 WeKnora API 集成
+- LoreLattice MCP Server 核心功能
+- 完整的 LoreLattice API 集成
 - 空间管理工具
 - 知识库管理工具
 - 知识管理工具
@@ -50,12 +50,12 @@
 
 ### 文件结构
 ```
-WeKnoraMCP/
+LoreLatticeMCP/
 ├── __init__.py              # 包初始化文件
 ├── main.py                  # 主入口点 (推荐)
 ├── run.py                   # 便捷启动脚本
 ├── run_server.py           # 原始启动脚本
-├── weknora_mcp_server.py   # MCP 服务器实现
+├── lorelattice_mcp_server.py   # MCP 服务器实现
 ├── test_module.py          # 模组测试脚本
 ├── requirements.txt        # 依赖列表
 ├── setup.py               # 安装脚本 (传统)
@@ -71,10 +71,10 @@ WeKnoraMCP/
 1. `python main.py` - 主入口点 (推荐)
 2. `python run_server.py` - 原始启动脚本
 3. `python run.py` - 便捷启动脚本
-4. `python weknora_mcp_server.py` - 直接运行
-5. `python -m weknora_mcp_server` - 模块运行
-6. `weknora-mcp-server` - 安装后命令行工具
-7. `weknora-server` - 安装后命令行工具 (别名)
+4. `python lorelattice_mcp_server.py` - 直接运行
+5. `python -m lorelattice_mcp_server` - 模块运行
+6. `lorelattice-mcp-server` - 安装后命令行工具
+7. `lorelattice-server` - 安装后命令行工具 (别名)
 
 ### 技术特性
 - 基于 Model Context Protocol (MCP) 1.0.0+

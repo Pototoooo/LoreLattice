@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package docreader;
 
-option go_package = "github.com/Tencent/WeKnora/internal/docreader/proto";
+option go_package = "github.com/Pototoooo/lorelattice/docreader/proto";
 
 service DocReader {
   rpc Read(ReadRequest) returns (ReadResponse) {}

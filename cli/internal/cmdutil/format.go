@@ -10,8 +10,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/format"
-	"github.com/Tencent/WeKnora/cli/internal/output"
+	"github.com/Pototoooo/lorelattice/cli/internal/format"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
 )
 
 // FormatMode is the resolved --format value (typed enum).
@@ -23,7 +23,7 @@ const (
 	FormatNDJSON FormatMode = "ndjson"
 )
 
-// DefaultFormatMode is the mode used when neither --format nor WEKNORA_FORMAT
+// DefaultFormatMode is the mode used when neither --format nor LORELATTICE_FORMAT
 // is set. Single source of truth shared by FormatOptions.ResolveDefault and
 // cmd.resolveFormatEarly (the early cobra-parse-error path) so the two cannot
 // drift on what "no flag" defaults to.
@@ -159,9 +159,9 @@ func mapJQError(err error) error {
 // human-readable output with `--format text`.
 func (o *FormatOptions) ResolveDefault(tty bool) {
 	o.TTY = tty
-	// Apply WEKNORA_FORMAT before the hard default so the documented
+	// Apply LORELATTICE_FORMAT before the hard default so the documented
 	// precedence holds: explicit --format (already set on o.Mode by
-	// CheckFormatFlag) > WEKNORA_FORMAT > DefaultFormatMode. FromEnv is a
+	// CheckFormatFlag) > LORELATTICE_FORMAT > DefaultFormatMode. FromEnv is a
 	// no-op when --format was passed. Folded in here because nearly every
 	// command calls ResolveDefault but only a couple called FromEnv, so the
 	// env var was silently ignored on success output across the CLI.
@@ -171,7 +171,7 @@ func (o *FormatOptions) ResolveDefault(tty bool) {
 	}
 }
 
-// FromEnv reads WEKNORA_FORMAT and applies it when Mode hasn't been set
+// FromEnv reads LORELATTICE_FORMAT and applies it when Mode hasn't been set
 // by --format. ResolveDefault now calls this, so commands get the env var
 // applied automatically; explicit callers (e.g. the root PersistentPreRunE,
 // which resolves the error-envelope mode before any command RunE) remain
@@ -183,7 +183,7 @@ func (o *FormatOptions) FromEnv() {
 	if o.Mode != "" {
 		return
 	}
-	v := os.Getenv("WEKNORA_FORMAT")
+	v := os.Getenv("LORELATTICE_FORMAT")
 	switch v {
 	case "text", "json", "ndjson":
 		o.Mode = FormatMode(v)

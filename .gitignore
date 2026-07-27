@@ -28,15 +28,15 @@ temp/
 logs/
 *.pid
 
-WeKnora
-WeKnora-lite
+LoreLattice
+LoreLattice-lite
 cmd/desktop/build/bin/
 /models/
 test/data/mswag.txt
 data/files/
-data/weknora.db
-data/weknora.db-wal
-data/weknora.db-shm
+data/lorelattice.db
+data/lorelattice.db-wal
+data/lorelattice.db-shm
 skills-lock.json
 
 web/
@@ -46,7 +46,7 @@ web/
 /server
 frontend/.vite
 frontend/chrome-extension/
-WeKnora-Chrome-Extension
+LoreLattice-Chrome-Extension
 packages/protoc-3.19.4-linux-x86_64.zip
 
 Claude.md

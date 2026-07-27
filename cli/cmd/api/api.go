@@ -1,4 +1,4 @@
-// Package api implements the `weknora api` raw HTTP passthrough command.
+// Package api implements the `lorelattice api` raw HTTP passthrough command.
 //
 // Shape: one positional (path) + `-X/--method` flag, default GET (auto-
 // promoted to POST when a body is supplied via -d/--input). Text mode writes
@@ -22,9 +22,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // apiFields is intentionally a marker - api wraps arbitrary HTTP responses
@@ -50,12 +50,12 @@ type Service interface {
 	Raw(ctx context.Context, method, path string, body any) (*http.Response, error)
 }
 
-// NewCmd returns the `weknora api` command.
+// NewCmd returns the `lorelattice api` command.
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
 	opts := &Options{}
 	cmd := &cobra.Command{
 		Use:   "api <path>",
-		Short: "Make a raw API request to the WeKnora server",
+		Short: "Make a raw API request to the LoreLattice server",
 		Long: `Raw HTTP API access. JSON body via -d/--data (inline) or --input <file>/- (stdin).
 
 The default method is GET; supplying a body (-d or --input) auto-promotes it
@@ -69,11 +69,11 @@ under envelope.data — drill in with --jq '.data...' at the server's own depth
 (e.g. '.data.data[]' for a list endpoint). Only -X DELETE is confirmation-gated.
 
 Examples:
-  weknora api /api/v1/knowledge-bases                                  # GET
-  weknora api /api/v1/knowledge-bases -d '{"name":"foo"}'              # POST (auto)
-  weknora api /api/v1/knowledge-bases -F name=foo -F enabled=true      # POST, typed body
-  echo '{"name":"foo"}' | weknora api /api/v1/knowledge-bases --input -  # POST via stdin
-  weknora api /api/v1/knowledge-bases/kb_xxx -X DELETE`,
+  lorelattice api /api/v1/knowledge-bases                                  # GET
+  lorelattice api /api/v1/knowledge-bases -d '{"name":"foo"}'              # POST (auto)
+  lorelattice api /api/v1/knowledge-bases -F name=foo -F enabled=true      # POST, typed body
+  echo '{"name":"foo"}' | lorelattice api /api/v1/knowledge-bases --input -  # POST via stdin
+  lorelattice api /api/v1/knowledge-bases/kb_xxx -X DELETE`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			opts.Yes, _ = c.Flags().GetBool("yes")
@@ -120,8 +120,8 @@ Examples:
 				}
 			}
 			method := resolveMethod(opts)
-			// Escape-hatch DELETE through `weknora api` is just as destructive
-			// as `weknora kb delete` - exit-10 destructive protocol must apply
+			// Escape-hatch DELETE through `lorelattice api` is just as destructive
+			// as `lorelattice kb delete` - exit-10 destructive protocol must apply
 			// (cli/README.md). PUT/PATCH mutate server state like a typed
 			// `kb/agent/doc update`, so they get the same exit-10 WRITE gate;
 			// without it the raw escape hatch bypassed the "an agent cannot
@@ -129,7 +129,7 @@ Examples:
 			// `create` (also ungated). GET/HEAD are reads.
 			switch method {
 			case http.MethodDelete:
-				if err := cmdutil.ConfirmDestructive(f.Prompter(), opts.Yes, fopts.WantsJSON(), "delete", "endpoint", args[0], "api.delete", []string{"weknora", "api", "-X", "DELETE", args[0], "-y"}); err != nil {
+				if err := cmdutil.ConfirmDestructive(f.Prompter(), opts.Yes, fopts.WantsJSON(), "delete", "endpoint", args[0], "api.delete", []string{"lorelattice", "api", "-X", "DELETE", args[0], "-y"}); err != nil {
 					return err
 				}
 			case http.MethodPut, http.MethodPatch:
@@ -153,14 +153,14 @@ Examples:
 	cmdutil.AddFormatFlag(cmd, apiFields...)
 	cmdutil.AddDryRunFlag(cmd, &opts.DryRun)
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
-		UsedFor:       "raw HTTP passthrough to weknora-server API endpoints when typed subcommands are insufficient",
+		UsedFor:       "raw HTTP passthrough to lorelattice-server API endpoints when typed subcommands are insufficient",
 		RequiredFlags: []string{"path (positional)"},
 		Examples: []string{
-			"weknora api /api/v1/knowledge-bases",
-			"weknora api /api/v1/knowledge-bases -d '{\"name\":\"foo\"}'",
-			"weknora api -X POST /api/v1/knowledge-bases -F name=\"Eng Docs\" -F enabled=true",
-			"weknora api -X DELETE /api/v1/knowledge-bases/kb_x -y",
-			"echo '{\"name\":\"foo\"}' | weknora api /api/v1/knowledge-bases --input -",
+			"lorelattice api /api/v1/knowledge-bases",
+			"lorelattice api /api/v1/knowledge-bases -d '{\"name\":\"foo\"}'",
+			"lorelattice api -X POST /api/v1/knowledge-bases -F name=\"Eng Docs\" -F enabled=true",
+			"lorelattice api -X DELETE /api/v1/knowledge-bases/kb_x -y",
+			"echo '{\"name\":\"foo\"}' | lorelattice api /api/v1/knowledge-bases --input -",
 		},
 		Output: "text mode (default): the raw server response body on stdout. json mode: the parsed server response is placed directly under envelope.data — project with --jq '.data...' at the server's own depth (e.g. '.data.data[]' for a list endpoint, '.data.data.id' for a created object). With --paginate, envelope.data is the merged {data, total}.",
 		Warnings: []string{
@@ -304,11 +304,11 @@ func resolveMethod(opts *Options) string {
 	return "GET"
 }
 
-// apiRetryArgv reconstructs a directly-executable `weknora api` argv (with -y)
+// apiRetryArgv reconstructs a directly-executable `lorelattice api` argv (with -y)
 // for the write-confirmation gate, preserving the method, path and body flags
 // the caller passed so an agent can re-run the exact mutation after approval.
 func apiRetryArgv(opts *Options, method, path string) []string {
-	argv := []string{"weknora", "api", "-X", method, path}
+	argv := []string{"lorelattice", "api", "-X", method, path}
 	switch {
 	case opts.Data != "":
 		argv = append(argv, "-d", opts.Data)

@@ -1,6 +1,6 @@
 # Database migration troubleshooting
 
-This guide is linked from the system info page when WeKnora's startup database
+This guide is linked from the system info page when LoreLattice's startup database
 migration fails. It covers the most common causes, how to diagnose them, and
 how to recover without losing data.
 
@@ -11,7 +11,7 @@ If none of these match your situation, jump to
 
 ## What "migration failed" means
 
-WeKnora auto-runs `golang-migrate` migrations on every startup. When a
+LoreLattice auto-runs `golang-migrate` migrations on every startup. When a
 migration fails, the application **still finishes starting up** (so the UI
 remains reachable to help you diagnose the problem), but:
 
@@ -53,7 +53,7 @@ ERROR: function ... does not exist
 
 ```sql
 -- Connect as a superuser (typically `postgres`):
-\c your_weknora_database
+\c your_lorelattice_database
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE EXTENSION IF NOT EXISTS vector;       -- if RETRIEVE_DRIVER includes pgvector
 CREATE EXTENSION IF NOT EXISTS pg_search;    -- only on ParadeDB
@@ -62,7 +62,7 @@ CREATE EXTENSION IF NOT EXISTS pg_search;    -- only on ParadeDB
 SELECT extname, extversion FROM pg_extension WHERE extname IN ('pg_trgm','vector','pg_search');
 ```
 
-Then restart WeKnora. The next startup will pick up where the failing
+Then restart LoreLattice. The next startup will pick up where the failing
 migration left off.
 
 If `CREATE EXTENSION` itself errors with **"could not open extension control
@@ -75,7 +75,7 @@ preinstalled, then retry.
 
 If a migration crashed partway through (OOM, container kill, network blip)
 `golang-migrate` marks the schema as "dirty" at the failing version. By
-default, WeKnora's startup tries to auto-recover; if you disabled that with
+default, LoreLattice's startup tries to auto-recover; if you disabled that with
 `AUTO_RECOVER_DIRTY=false` you'll see:
 
 ```
@@ -95,7 +95,7 @@ make migrate-force version=<N-1>
 make migrate-up
 ```
 
-After that, restart WeKnora.
+After that, restart LoreLattice.
 
 Or set `AUTO_RECOVER_DIRTY=true` (the default in recent versions) and just
 restart — startup will perform the same `force` + retry automatically.
@@ -148,7 +148,7 @@ migration's `*.up.sql` and then re-run pending migrations.
    error will be far more specific than the migration wrapper's.
 4. **Fix the underlying cause** (install extension, fix privileges, free
    disk, …), then either:
-   - Restart WeKnora and let auto-recovery retry; **or**
+   - Restart LoreLattice and let auto-recovery retry; **or**
    - Run `make migrate-up` from a checkout to apply migrations outside the
      server process.
 5. **Verify**: the system info page should now show the DB version without
@@ -162,11 +162,11 @@ migration's `*.up.sql` and then re-run pending migrations.
 If you've worked through the checklist and the migration still fails, please
 open an issue at:
 
-<https://github.com/Tencent/WeKnora/issues/new?template=bug_report.yml>
+<https://github.com/Pototoooo/lorelattice/issues/new?template=bug_report.yml>
 
 Include:
 
-- WeKnora version + commit ID (from the system info page).
+- LoreLattice version + commit ID (from the system info page).
 - The full error from the system info page (or container logs).
 - PostgreSQL version (`SELECT version();`) and how it was deployed (vanilla,
   ParadeDB, Aurora, Aliyun RDS, …).

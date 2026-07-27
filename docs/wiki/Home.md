@@ -1,12 +1,12 @@
 ---
-title: WeKnora Wiki 首页
+title: LoreLattice Wiki 首页
 tags: [首页, 导航, MOC]
 aliases: [Home, Index, wiki首页]
 ---
 
-# WeKnora Wiki
+# LoreLattice Wiki
 
-欢迎使用 WeKnora 知识库 wiki！这里是 WeKnora 项目文档的互联知识网络，所有页面通过双向链接关联，帮助你从任意入口探索整个知识体系。
+欢迎使用 LoreLattice 知识库 wiki！这里是 LoreLattice 项目文档的互联知识网络，所有页面通过双向链接关联，帮助你从任意入口探索整个知识体系。
 
 ---
 
@@ -70,7 +70,7 @@ aliases: [Home, Index, wiki首页]
 
 ```mermaid
 graph TB
-    Home[WeKnora Wiki]
+    Home[LoreLattice Wiki]
     Home --> 项目概述
     Home --> 核心功能
     Home --> 集成扩展

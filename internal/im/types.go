@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -216,7 +216,7 @@ func (ch *IMChannel) computeBotIdentity() string {
 	return ""
 }
 
-// ChannelSession maps an IM channel (user+chat combination) to a WeKnora session.
+// ChannelSession maps an IM channel (user+chat combination) to a LoreLattice session.
 // This allows the IM integration to maintain conversation continuity.
 type ChannelSession struct {
 	ID          string         `json:"id"            gorm:"type:varchar(36);primaryKey;default:uuid_generate_v4()"`

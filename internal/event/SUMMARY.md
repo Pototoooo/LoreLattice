@@ -1,8 +1,8 @@
-# WeKnora 事件系统总结
+# LoreLattice 事件系统总结
 
 ## 概述
 
-已成功为 WeKnora 项目创建了一个完整的事件发送和监听机制，支持对用户查询处理流程中的各个步骤进行事件处理。
+已成功为 LoreLattice 项目创建了一个完整的事件发送和监听机制，支持对用户查询处理流程中的各个步骤进行事件处理。
 
 ## 核心功能
 
@@ -123,7 +123,7 @@ bus.On(event.EventError, func(ctx context.Context, e event.Event) error {
 在应用启动时（如 `main.go` 或 `container.go`）：
 
 ```go
-import "github.com/Tencent/WeKnora/internal/event"
+import "github.com/Pototoooo/lorelattice/internal/event"
 
 func Initialize() {
     // 获取全局事件总线
@@ -234,5 +234,5 @@ Step 5: Chat Completion
 
 ## 总结
 
-事件系统已完全实现并经过测试验证，可以立即集成到 WeKnora 项目中，用于监控、日志记录、分析和调试查询处理流程的各个阶段。系统设计简洁、性能优异、易于使用和扩展。
+事件系统已完全实现并经过测试验证，可以立即集成到 LoreLattice 项目中，用于监控、日志记录、分析和调试查询处理流程的各个阶段。系统设计简洁、性能优异、易于使用和扩展。
 

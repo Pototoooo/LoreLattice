@@ -1,6 +1,6 @@
-# WeKnora HTTP 客户端
+# LoreLattice HTTP 客户端
 
-这个包提供了与WeKnora服务进行交互的客户端库，支持所有基于HTTP的接口调用，使其他模块更方便地集成WeKnora服务，无需直接编写HTTP请求代码。
+这个包提供了与LoreLattice服务进行交互的客户端库，支持所有基于HTTP的接口调用，使其他模块更方便地集成LoreLattice服务，无需直接编写HTTP请求代码。
 
 ## 主要功能
 
@@ -23,7 +23,7 @@
 ```go
 import (
     "context"
-    "github.com/Tencent/WeKnora/client"
+    "github.com/Pototoooo/lorelattice/client"
     "time"
 )
 

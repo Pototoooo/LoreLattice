@@ -5,7 +5,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 func TestEngineAwareNormalizer_KeywordPassthrough(t *testing.T) {
@@ -77,7 +77,7 @@ func TestEngineAwareNormalizer_UnitInterval(t *testing.T) {
 	//   - Weaviate — driver requests certainty, intrinsically in [0, 1].
 	//   - Postgres pgvector / SQLite sqlite-vec / Qdrant /
 	//     TencentVectorDB / Doris — theoretically [-1, 1] but the
-	//     IR-normalized embeddings WeKnora targets (BGE / OpenAI /
+	//     IR-normalized embeddings LoreLattice targets (BGE / OpenAI /
 	//     Cohere / sentence-transformers) keep the observed range
 	//     in [0, 1]; the silent floor at clamp01(<0) → 0 is the
 	//     defense for embedding models that violate that assumption.

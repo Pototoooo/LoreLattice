@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // TenantService defines the tenant service interface
@@ -36,8 +36,8 @@ type TenantService interface {
 	SearchTenants(ctx context.Context, keyword string, tenantID uint64, page, pageSize int) ([]*types.Tenant, int64, error)
 	// GetTenantByIDForUser gets a tenant by ID with permission check
 	GetTenantByIDForUser(ctx context.Context, tenantID uint64, userID string) (*types.Tenant, error)
-	// GetWeKnoraCloudCredentials returns the decrypted WeKnoraCloud credentials for the current tenant.
-	GetWeKnoraCloudCredentials(ctx context.Context) *types.WeKnoraCloudCredentials
+	// GetLoreLatticeCloudCredentials returns the decrypted LoreLatticeCloud credentials for the current tenant.
+	GetLoreLatticeCloudCredentials(ctx context.Context) *types.LoreLatticeCloudCredentials
 }
 
 // TenantRepository defines the tenant repository interface

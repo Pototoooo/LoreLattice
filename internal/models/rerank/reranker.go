@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/models/provider"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/models/provider"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // Reranker defines the interface for document reranking
@@ -94,7 +94,7 @@ type RerankerConfig struct {
 
 // ConfigFromModel 根据 types.Model 构造 RerankerConfig。
 // 生产路径（从 DB 拉起）和测试连接路径（临时表单）共享这份映射。
-// appID / appSecret 是已解密的 WeKnoraCloud 凭证，调用方负责传入。
+// appID / appSecret 是已解密的 LoreLatticeCloud 凭证，调用方负责传入。
 func ConfigFromModel(m *types.Model, appID, appSecret string) *RerankerConfig {
 	if m == nil {
 		return nil
@@ -150,8 +150,8 @@ func newReranker(config *RerankerConfig) (Reranker, error) {
 		reranker, err = NewJinaReranker(config)
 	case provider.ProviderNvidia:
 		reranker, err = NewNvidiaReranker(config)
-	case provider.ProviderWeKnoraCloud:
-		reranker, err = NewWeKnoraCloudReranker(config)
+	case provider.ProviderLoreLatticeCloud:
+		reranker, err = NewLoreLatticeCloudReranker(config)
 	case provider.ProviderLKEAP:
 		reranker, err = NewLKEAPReranker(config)
 	case provider.ProviderVolcengine:

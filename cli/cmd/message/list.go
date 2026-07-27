@@ -8,11 +8,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/output"
-	"github.com/Tencent/WeKnora/cli/internal/text"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
+	"github.com/Pototoooo/lorelattice/cli/internal/text"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // messageListFields enumerates the projectable scalar fields of sdk.Message
@@ -37,7 +37,7 @@ type ListService interface {
 	LoadMessages(ctx context.Context, sessionID string, limit int, beforeTime *time.Time) ([]sdk.Message, error)
 }
 
-// NewCmdList builds `weknora message list --session <id>`.
+// NewCmdList builds `lorelattice message list --session <id>`.
 func NewCmdList(f *cmdutil.Factory) *cobra.Command {
 	opts := &ListOptions{}
 	cmd := &cobra.Command{
@@ -71,8 +71,8 @@ func NewCmdList(f *cmdutil.Factory) *cobra.Command {
 		UsedFor:       "List messages in a session. Use the assistant message id from the latest turn to chain follow-ups (session ask), or --before <oldest created_at> to page further back.",
 		RequiredFlags: []string{"--session <session-id>"},
 		Examples: []string{
-			"weknora message list --session sess_abc",
-			"weknora message list --session sess_abc --limit 100 --before 2026-06-01T00:00:00Z",
+			"lorelattice message list --session sess_abc",
+			"lorelattice message list --session sess_abc --limit 100 --before 2026-06-01T00:00:00Z",
 		},
 		Output: "envelope.data is an array of Message objects (id, session_id, role, content, is_completed, created_at); meta.count is the number returned. To page further back, re-run with --before <oldest created_at>; a batch shorter than --limit means the start of history was reached",
 	})

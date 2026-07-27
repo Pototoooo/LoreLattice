@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-WeKnora MCP Server
+LoreLattice MCP Server
 
-A Model Context Protocol server that provides access to the WeKnora knowledge management API.
+A Model Context Protocol server that provides access to the LoreLattice knowledge management API.
 """
 
 import argparse
@@ -30,14 +30,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Configuration - Load from environment variables with defaults
-WEKNORA_BASE_URL = os.getenv("WEKNORA_BASE_URL", "http://localhost:8080/api/v1")
-WEKNORA_API_KEY = os.getenv("WEKNORA_API_KEY", "")
+LORELATTICE_BASE_URL = os.getenv("LORELATTICE_BASE_URL", "http://localhost:8080/api/v1")
+LORELATTICE_API_KEY = os.getenv("LORELATTICE_API_KEY", "")
 # Chat SSE read timeout in seconds. LLM responses can be slow; default 300s.
 try:
-    WEKNORA_CHAT_TIMEOUT = int(os.getenv("WEKNORA_CHAT_TIMEOUT", "300"))
+    LORELATTICE_CHAT_TIMEOUT = int(os.getenv("LORELATTICE_CHAT_TIMEOUT", "300"))
 except ValueError:
-    logger.warning("WEKNORA_CHAT_TIMEOUT is not a valid integer; falling back to 300s.")
-    WEKNORA_CHAT_TIMEOUT = 300
+    logger.warning("LORELATTICE_CHAT_TIMEOUT is not a valid integer; falling back to 300s.")
+    LORELATTICE_CHAT_TIMEOUT = 300
 
 
 def network_transport_auth_token() -> str:
@@ -97,19 +97,19 @@ class MCPAuthMiddleware:
         await self.app(scope, receive, send)
 
 
-class WeKnoraClient:
-    """Client for interacting with WeKnora API"""
+class LoreLatticeClient:
+    """Client for interacting with LoreLattice API"""
 
     def __init__(self, base_url: str, api_key: str):
-        """Initialize the WeKnora API client with base URL and authentication"""
+        """Initialize the LoreLattice API client with base URL and authentication"""
         self.base_url = base_url
         self.api_key = api_key
-        # SSL verification: enabled by default. Set WEKNORA_VERIFY_SSL=false to disable
+        # SSL verification: enabled by default. Set LORELATTICE_VERIFY_SSL=false to disable
         # (e.g. for self-signed certs in dev environments — NOT recommended for production).
-        self.verify_ssl = os.getenv("WEKNORA_VERIFY_SSL", "true").lower() != "false"
+        self.verify_ssl = os.getenv("LORELATTICE_VERIFY_SSL", "true").lower() != "false"
         if not self.verify_ssl:
             logger.warning(
-                "SSL certificate verification is DISABLED (WEKNORA_VERIFY_SSL=false). "
+                "SSL certificate verification is DISABLED (LORELATTICE_VERIFY_SSL=false). "
                 "This is insecure and should not be used in production."
             )
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -125,7 +125,7 @@ class WeKnoraClient:
         )
 
     def _request(self, method: str, endpoint: str, **kwargs) -> Dict[str, Any]:
-        """Make a request to the WeKnora API
+        """Make a request to the LoreLattice API
 
         Args:
             method: HTTP method (GET, POST, PUT, DELETE)
@@ -385,7 +385,7 @@ class WeKnoraClient:
         """POST to *url* with *body*, consume the SSE stream, and return the assembled result.
 
         Centralised helper used by both chat() and agent_chat().
-        Timeout: (10s connect, WEKNORA_CHAT_TIMEOUT read) — configurable via env var.
+        Timeout: (10s connect, LORELATTICE_CHAT_TIMEOUT read) — configurable via env var.
         
         Server-Sent Events (SSE) stream format:
           data: {"response_type": "answer", "content": "..."}
@@ -396,10 +396,10 @@ class WeKnoraClient:
         """
         try:
             # POST with stream=True to receive server-sent events incrementally
-            # Timeout: 10s to establish connection, WEKNORA_CHAT_TIMEOUT for reading response
+            # Timeout: 10s to establish connection, LORELATTICE_CHAT_TIMEOUT for reading response
             response = self.session.post(
                 url, json=body, stream=True,
-                timeout=(10, WEKNORA_CHAT_TIMEOUT),
+                timeout=(10, LORELATTICE_CHAT_TIMEOUT),
             )
             response.raise_for_status()
 
@@ -541,20 +541,20 @@ class WeKnoraClient:
 
 
 # Initialize MCP server instance
-app = Server("weknora-server")
-# Initialize WeKnora API client with configuration
-client = WeKnoraClient(WEKNORA_BASE_URL, WEKNORA_API_KEY)
+app = Server("lorelattice-server")
+# Initialize LoreLattice API client with configuration
+client = LoreLatticeClient(LORELATTICE_BASE_URL, LORELATTICE_API_KEY)
 
 
 # Tool definitions - Register all available tools for the MCP protocol
 @app.list_tools()
 async def handle_list_tools() -> list[types.Tool]:
-    """List all available WeKnora tools with their schemas"""
+    """List all available LoreLattice tools with their schemas"""
     return [
         # Tenant Management
         types.Tool(
             name="create_tenant",
-            description="Create a new tenant in WeKnora",
+            description="Create a new tenant in LoreLattice",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -1317,7 +1317,7 @@ async def handle_call_tool(
 def _init_options() -> InitializationOptions:
     """Build MCP InitializationOptions (shared across all transports)"""
     return InitializationOptions(
-        server_name="weknora-server",
+        server_name="lorelattice-server",
         server_version="1.0.0",
         capabilities=app.get_capabilities(
             notification_options=NotificationOptions(),
@@ -1422,7 +1422,7 @@ def main():
       2. MCP_TRANSPORT environment variable
       3. Default: stdio
     """
-    parser = argparse.ArgumentParser(description="WeKnora MCP Server")
+    parser = argparse.ArgumentParser(description="LoreLattice MCP Server")
     parser.add_argument(
         "--transport",
         choices=["stdio", "sse", "http"],

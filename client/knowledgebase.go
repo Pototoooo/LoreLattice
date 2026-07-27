@@ -1,4 +1,4 @@
-// Package client provides the implementation for interacting with the WeKnora API
+// Package client provides the implementation for interacting with the LoreLattice API
 // The KnowledgeBase related interfaces are used to manage knowledge bases
 // Knowledge bases are collections of knowledge entries that can be used for question-answering
 // They can also be searched and queried using hybrid search

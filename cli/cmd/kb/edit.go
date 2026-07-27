@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // kbEditFields enumerates the fields surfaced for `--format json` discovery on
@@ -45,7 +45,7 @@ type EditService interface {
 	UpdateKnowledgeBase(ctx context.Context, id string, req *sdk.UpdateKnowledgeBaseRequest) (*sdk.KnowledgeBase, error)
 }
 
-// NewCmdEdit builds `weknora kb update <id>`. At least one of --name /
+// NewCmdEdit builds `lorelattice kb update <id>`. At least one of --name /
 // --description must be provided.
 func NewCmdEdit(f *cmdutil.Factory) *cobra.Command {
 	opts := &EditOptions{}
@@ -105,7 +105,7 @@ to the user first.`,
 			}
 			// Build a retry command from the flags the user actually passed so
 			// agents can re-invoke with -y after explicit human approval.
-			retryCmd := cmdutil.BuildRetryArgv(c, []string{"weknora", "kb", "update", id}, "name", "description", "format")
+			retryCmd := cmdutil.BuildRetryArgv(c, []string{"lorelattice", "kb", "update", id}, "name", "description", "format")
 			if err := cmdutil.ConfirmWrite(f.Prompter(), opts.Yes, fopts.WantsJSON(), "update", "knowledge base", id, "kb.update", retryCmd); err != nil {
 				return err
 			}
@@ -122,8 +122,8 @@ to the user first.`,
 		RequiredFlags: []string{"<kb-id> (positional)", "--name or --description (at least one)"},
 		Output:        "envelope.data is the updated KnowledgeBase object (id, name, description)",
 		Examples: []string{
-			"weknora kb update kb_abc --name \"New Name\" -y",
-			"weknora kb update kb_abc --description \"Updated desc\" --format json -y",
+			"lorelattice kb update kb_abc --name \"New Name\" -y",
+			"lorelattice kb update kb_abc --description \"Updated desc\" --format json -y",
 		},
 		Warnings: []string{
 			"Requires explicit user approval (exit 10 / input.confirmation_required); never auto-add -y.",

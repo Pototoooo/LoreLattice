@@ -1,22 +1,22 @@
 {{/*
-Copyright 2025 Tencent
+Copyright 2025-2026 Pototoooo
 SPDX-License-Identifier: MIT
 
-WeKnora Frontend Web UI Deployment and Service.
+LoreLattice Frontend Web UI Deployment and Service.
 */}}
 {{- if .Values.frontend.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "weknora.fullname" . }}-frontend
+  name: {{ include "lorelattice.fullname" . }}-frontend
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "frontend" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "frontend" "context" .) | nindent 4 }}
 spec:
   replicas: {{ .Values.frontend.replicaCount }}
   selector:
     matchLabels:
-      {{- include "weknora.componentSelectorLabels" (dict "component" "frontend" "context" .) | nindent 6 }}
+      {{- include "lorelattice.componentSelectorLabels" (dict "component" "frontend" "context" .) | nindent 6 }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -25,17 +25,17 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "weknora.componentSelectorLabels" (dict "component" "frontend" "context" .) | nindent 8 }}
+        {{- include "lorelattice.componentSelectorLabels" (dict "component" "frontend" "context" .) | nindent 8 }}
     spec:
-      {{- include "weknora.imagePullSecrets" . | nindent 6 }}
-      serviceAccountName: {{ include "weknora.serviceAccountName" . }}
+      {{- include "lorelattice.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "lorelattice.serviceAccountName" . }}
       {{- with .Values.global.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: frontend
-          image: {{ include "weknora.frontend.image" . }}
+          image: {{ include "lorelattice.frontend.image" . }}
           imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
           {{- with .Values.frontend.securityContext }}
           securityContext:
@@ -99,11 +99,11 @@ metadata:
   name: frontend
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "frontend" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "frontend" "context" .) | nindent 4 }}
 spec:
   type: {{ .Values.frontend.service.type }}
   selector:
-    {{- include "weknora.componentSelectorLabels" (dict "component" "frontend" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentSelectorLabels" (dict "component" "frontend" "context" .) | nindent 4 }}
   ports:
     - name: http
       port: {{ .Values.frontend.service.port }}

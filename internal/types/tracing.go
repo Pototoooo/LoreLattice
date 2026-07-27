@@ -31,7 +31,7 @@ type TracingContext struct {
 	// The worker re-extracts it so its spans are children of the same trace —
 	// stitching the HTTP request and the async job into one LiteFuse tree. This
 	// is also what propagates a sop3 run's W3C trace_id into any asynq jobs
-	// WeKnora enqueues while serving sop3's agent-chat call.
+	// LoreLattice enqueues while serving sop3's agent-chat call.
 	LangfuseTraceparent string `json:"lf_traceparent,omitempty"`
 	// LangfuseUserID preserves the userId / tenant label across the async
 	// boundary so that orphan async traces (when no upstream trace id is

@@ -6,7 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // spySink records audit events for assertions.
@@ -127,7 +127,7 @@ func TestAuditSink_NopByDefault(t *testing.T) {
 	var _ AuditSink = nopSink{} // compile-time assertion
 	r := &Repository{}          // sink left nil
 	// Must not panic.
-	r.auditSink().EmitIndexCreated(context.Background(), "weknora_768", 768)
+	r.auditSink().EmitIndexCreated(context.Background(), "lorelattice_768", 768)
 	r.auditSink().EmitReindexExecuted(context.Background(), "a", "b", 3)
 }
 
@@ -147,7 +147,7 @@ func TestAuditSink_EmitIndexCreated_OnEnsureReady(t *testing.T) {
 		t.Fatalf("want 1 index_created event, got %d", len(spy.indexCreated))
 	}
 	got := spy.indexCreated[0]
-	if got.alias != "weknora_test_768" || got.dim != 768 {
+	if got.alias != "lorelattice_test_768" || got.dim != 768 {
 		t.Errorf("event mismatch: %+v", got)
 	}
 }

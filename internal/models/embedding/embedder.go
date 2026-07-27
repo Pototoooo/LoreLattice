@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/models/provider"
-	"github.com/Tencent/WeKnora/internal/models/utils/ollama"
-	"github.com/Tencent/WeKnora/internal/tracing/langfuse"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/models/provider"
+	"github.com/Pototoooo/lorelattice/internal/models/utils/ollama"
+	"github.com/Pototoooo/lorelattice/internal/tracing/langfuse"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // Embedder defines the interface for text vectorization
@@ -62,7 +62,7 @@ type Config struct {
 
 // ConfigFromModel 根据 types.Model 构造 embedding.Config。
 // 生产路径（从 DB 拉起）和测试连接路径（临时表单）共享这份映射。
-// appID / appSecret 是已解密的 WeKnoraCloud 凭证，调用方负责传入。
+// appID / appSecret 是已解密的 LoreLatticeCloud 凭证，调用方负责传入。
 func ConfigFromModel(m *types.Model, appID, appSecret string) Config {
 	if m == nil {
 		return Config{}
@@ -257,8 +257,8 @@ func newEmbedder(config Config, pooler EmbedderPooler, ollamaService *ollama.Oll
 			}
 			embedder, err = zhipuEmb, zErr
 			return embedder, err
-		case provider.ProviderWeKnoraCloud:
-			embedder, err = NewWeKnoraCloudEmbedder(config)
+		case provider.ProviderLoreLatticeCloud:
+			embedder, err = NewLoreLatticeCloudEmbedder(config)
 			return embedder, err
 		default:
 			// Use OpenAI-compatible embedder for other providers

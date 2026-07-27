@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	infra_web_search "github.com/Tencent/WeKnora/internal/infrastructure/web_search"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	infra_web_search "github.com/Pototoooo/lorelattice/internal/infrastructure/web_search"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 )
 
 // webSearchProviderService implements interfaces.WebSearchProviderService

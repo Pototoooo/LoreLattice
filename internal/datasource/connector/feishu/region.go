@@ -1,6 +1,6 @@
 package feishu
 
-import "github.com/Tencent/WeKnora/internal/types"
+import "github.com/Pototoooo/lorelattice/internal/types"
 
 // Open Platform API origins. Feishu and Lark are the same product deployed on
 // two isolated clouds; the wiki/docx/drive APIs this connector uses are

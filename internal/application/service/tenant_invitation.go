@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	apprepo "github.com/Tencent/WeKnora/internal/application/repository"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	apprepo "github.com/Pototoooo/lorelattice/internal/application/repository"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 )
 
 // Sentinel errors returned by tenantInvitationService. Callers compare
@@ -58,7 +58,7 @@ var (
 
 // defaultInvitationTTL is the lifetime of a pending invitation before
 // the lazy sweep transitions it to expired. Operator override is via
-// the WEKNORA_INVITATION_TTL env var (Go duration: "168h", "7d-ish");
+// the LORELATTICE_INVITATION_TTL env var (Go duration: "168h", "7d-ish");
 // keeping this out of TenantConfig avoids a yaml migration for a knob
 // that almost nobody is going to tweak.
 const defaultInvitationTTL = 7 * 24 * time.Hour
@@ -68,7 +68,7 @@ const defaultInvitationTTL = 7 * 24 * time.Hour
 // once per call; cost is negligible and beats a goroutine watching the
 // environment.
 func invitationTTL() time.Duration {
-	raw := os.Getenv("WEKNORA_INVITATION_TTL")
+	raw := os.Getenv("LORELATTICE_INVITATION_TTL")
 	if raw == "" {
 		return defaultInvitationTTL
 	}

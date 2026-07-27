@@ -9,15 +9,15 @@
 | 角色 | 举例 | 干什么 |
 |------|------|--------|
 | **A. 业务站点（宿主）** | `https://shop.example.com` | 你的商城 / 文档站；在这里粘贴 Widget 脚本或 iframe |
-| **B. Embed 页面源站** | `https://app.example.com` 或 `https://embed.example.com` | 提供 `embed.html`、`weknora-widget.js`；聊天 iframe 加载自这里 |
-| **C. WeKnora API** | 通常与 B 同域，如 `https://app.example.com/api` | 后端接口 |
+| **B. Embed 页面源站** | `https://app.example.com` 或 `https://embed.example.com` | 提供 `embed.html`、`lorelattice-widget.js`；聊天 iframe 加载自这里 |
+| **C. LoreLattice API** | 通常与 B 同域，如 `https://app.example.com/api` | 后端接口 |
 
 **默认（推荐入门）**：B 和主站管理后台都在 `https://app.example.com`，A 可以是任意第三方域名。
 
 ```
 shop.example.com          app.example.com
 ┌─────────────────┐       ┌──────────────────────────┐
-│ <script src=    │       │ /weknora-widget.js       │
+│ <script src=    │       │ /lorelattice-widget.js       │
 │  app.../widget> │──────►│ /embed/:channelId        │
 │                 │       │ /api/v1/embed/...        │
 │  (浮窗 iframe)   │◄──────│                          │
@@ -67,8 +67,8 @@ window.__RUNTIME_CONFIG__ = {
 `frontend/nginx.conf` 顶部有注释掉的示例。要点：
 
 - `server_name embed.example.com`
-- 只暴露：`/embed/*` → `embed.html`，`/weknora-widget.js`，`/assets/*`
-- `/api/` 反代到 WeKnora 后端（与主站相同后端即可）
+- 只暴露：`/embed/*` → `embed.html`，`/lorelattice-widget.js`，`/assets/*`
+- `/api/` 反代到 LoreLattice 后端（与主站相同后端即可）
 - **不要**在这个 server 上挂完整 `index.html` 管理 SPA（减少攻击面）
 
 主站 `server` 块可继续 `X-Frame-Options: SAMEORIGIN`，不影响第三方嵌 embed 子域的 iframe。
@@ -89,14 +89,14 @@ window.__RUNTIME_CONFIG__ = {
 
 ## Widget 跨域与 sandbox
 
-当宿主站 A 与 embed 源站 B **不同域**时，`weknora-widget.js` 会自动给内部 iframe 加上 `sandbox`（也可手动 `data-sandbox="true"`）。
+当宿主站 A 与 embed 源站 B **不同域**时，`lorelattice-widget.js` 会自动给内部 iframe 加上 `sandbox`（也可手动 `data-sandbox="true"`）。
 
 A 与 B 同域时保持默认即可，无需 `data-sandbox`。
 
 ## 检查清单
 
 - [ ] `EMBED_BASE_URL` 与真实访问地址一致（含 `https`）
-- [ ] embed 子域能打开 `/embed/<渠道ID>` 和 `/weknora-widget.js`
+- [ ] embed 子域能打开 `/embed/<渠道ID>` 和 `/lorelattice-widget.js`
 - [ ] embed 子域 `/api/` 能连到后端
 - [ ] 渠道白名单包含 embed 源站（及安全模式下的业务后端源站）
 - [ ] 管理端复制的 snippet 里 URL 已变为 embed 子域

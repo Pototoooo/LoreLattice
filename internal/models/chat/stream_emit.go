@@ -1,6 +1,6 @@
 package chat
 
-import "github.com/Tencent/WeKnora/internal/types"
+import "github.com/Pototoooo/lorelattice/internal/types"
 
 // thinkingEmitter owns the "reasoning then answer" hand-off that every
 // streaming Chat implementation shares: thinking chunks are forwarded as they

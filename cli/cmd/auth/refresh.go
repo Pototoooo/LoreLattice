@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 type RefreshOptions struct {
@@ -22,12 +22,12 @@ var authRefreshFields = []string{"profile"}
 // refreshResult is the typed payload emitted under data on success. Token
 // values are intentionally NOT included - emitting them would leak secrets
 // into stdout / agent transcripts. Agents needing to verify the new token
-// can re-run `weknora auth status` (live API check).
+// can re-run `lorelattice auth status` (live API check).
 type refreshResult struct {
 	Profile string `json:"profile"`
 }
 
-// NewCmdRefresh builds `weknora auth refresh`. Renews the JWT access
+// NewCmdRefresh builds `lorelattice auth refresh`. Renews the JWT access
 // token by spending the stored refresh_token via POST /auth/refresh -
 // the standard OAuth refresh-token grant.
 //
@@ -38,14 +38,14 @@ func NewCmdRefresh(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "refresh",
 		Short: "Renew the JWT access token using the stored refresh token",
-		Long: `Reads the refresh token previously stored by ` + "`weknora auth login`" + ` and
+		Long: `Reads the refresh token previously stored by ` + "`lorelattice auth login`" + ` and
 exchanges it for a new access + refresh token pair via POST /api/v1/auth/refresh.
 Both new tokens replace the existing entries in the OS keyring.
 
 API-key profiles are rejected with input.invalid_argument - they have no
 refresh semantic. Rotate the key in the server UI instead.`,
-		Example: `  weknora auth refresh                      # refresh the active profile
-  weknora --profile staging auth refresh   # refresh a specific profile`,
+		Example: `  lorelattice auth refresh                      # refresh the active profile
+  lorelattice --profile staging auth refresh   # refresh a specific profile`,
 		Args: cobra.NoArgs,
 		RunE: func(c *cobra.Command, _ []string) error {
 			fopts, err := cmdutil.CheckFormatFlag(c)
@@ -67,7 +67,7 @@ refresh semantic. Rotate the key in the server UI instead.`,
 						"authenticated via "+kind+" (stateless env credential): there is no stored JWT to refresh — env credentials are supplied fresh each call, so no refresh is needed")
 				}
 				return cmdutil.NewError(cmdutil.CodeAuthUnauthenticated,
-					"no active profile configured; run `weknora auth login` to set one up")
+					"no active profile configured; run `lorelattice auth login` to set one up")
 			}
 			prof, ok := cfg.Profiles[name]
 			if !ok {
@@ -79,9 +79,9 @@ refresh semantic. Rotate the key in the server UI instead.`,
 					fmt.Sprintf("profile %q has no host", name))
 			}
 			if prof.RefreshRef == "" {
-				hint := "api-key profiles can't be refreshed - rotate the key in the server UI and run `weknora auth login --with-token`"
+				hint := "api-key profiles can't be refreshed - rotate the key in the server UI and run `lorelattice auth login --with-token`"
 				if prof.APIKeyRef == "" {
-					hint = "no refresh token stored - run `weknora auth login` to authenticate"
+					hint = "no refresh token stored - run `lorelattice auth login` to authenticate"
 				}
 				return &cmdutil.Error{
 					Code:    cmdutil.CodeInputInvalidArgument,
@@ -104,8 +104,8 @@ refresh semantic. Rotate the key in the server UI instead.`,
 		UsedFor: "Renew the JWT access token for the active profile (override with the global --profile) using the stored refresh token. API-key profiles are rejected.",
 		Output:  "envelope.data has profile name that was refreshed",
 		Examples: []string{
-			"weknora auth refresh",
-			"weknora --profile staging auth refresh",
+			"lorelattice auth refresh",
+			"lorelattice --profile staging auth refresh",
 		},
 	})
 	return cmd
@@ -130,7 +130,7 @@ func runRefresh(ctx context.Context, opts *RefreshOptions, fopts *cmdutil.Format
 				"authenticated via "+kind+" (stateless env credential): there is no stored JWT to refresh — env credentials are supplied fresh each call, so no refresh is needed")
 		}
 		return cmdutil.NewError(cmdutil.CodeAuthUnauthenticated,
-			"no active profile configured; run `weknora auth login` to set one up")
+			"no active profile configured; run `lorelattice auth login` to set one up")
 	}
 	c, ok := cfg.Profiles[name]
 	if !ok {
@@ -142,9 +142,9 @@ func runRefresh(ctx context.Context, opts *RefreshOptions, fopts *cmdutil.Format
 			fmt.Sprintf("profile %q has no host", name))
 	}
 	if c.RefreshRef == "" {
-		hint := "api-key profiles can't be refreshed - rotate the key in the server UI and run `weknora auth login --with-token`"
+		hint := "api-key profiles can't be refreshed - rotate the key in the server UI and run `lorelattice auth login --with-token`"
 		if c.APIKeyRef == "" {
-			hint = "no refresh token stored - run `weknora auth login` to authenticate"
+			hint = "no refresh token stored - run `lorelattice auth login` to authenticate"
 		}
 		return &cmdutil.Error{
 			Code:    cmdutil.CodeInputInvalidArgument,

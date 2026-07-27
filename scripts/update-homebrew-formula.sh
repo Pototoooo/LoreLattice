@@ -16,8 +16,8 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 VERSION="${1:?Usage: $0 <version>  (e.g. v0.2.0)}"
 VERSION_BARE="${VERSION#v}"
-FORMULA="${ROOT_DIR}/Formula/weknora-lite.rb"
-REPO="Tencent/WeKnora"
+FORMULA="${ROOT_DIR}/Formula/lorelattice-lite.rb"
+REPO="Pototoooo/lorelattice"
 BASE_URL="https://github.com/${REPO}/releases/download/${VERSION}"
 
 if [ ! -f "${FORMULA}" ]; then
@@ -39,10 +39,10 @@ fetch_sha256() {
     echo "${sha}"
 }
 
-SHA_DARWIN_ARM64=$(fetch_sha256 "WeKnora-lite_${VERSION}_darwin_arm64.tar.gz")
-SHA_DARWIN_AMD64=$(fetch_sha256 "WeKnora-lite_${VERSION}_darwin_amd64.tar.gz")
-SHA_LINUX_ARM64=$(fetch_sha256  "WeKnora-lite_${VERSION}_linux_arm64.tar.gz")
-SHA_LINUX_AMD64=$(fetch_sha256  "WeKnora-lite_${VERSION}_linux_amd64.tar.gz")
+SHA_DARWIN_ARM64=$(fetch_sha256 "LoreLattice-lite_${VERSION}_darwin_arm64.tar.gz")
+SHA_DARWIN_AMD64=$(fetch_sha256 "LoreLattice-lite_${VERSION}_darwin_amd64.tar.gz")
+SHA_LINUX_ARM64=$(fetch_sha256  "LoreLattice-lite_${VERSION}_linux_arm64.tar.gz")
+SHA_LINUX_AMD64=$(fetch_sha256  "LoreLattice-lite_${VERSION}_linux_amd64.tar.gz")
 
 echo "  darwin_arm64 : ${SHA_DARWIN_ARM64}"
 echo "  darwin_amd64 : ${SHA_DARWIN_AMD64}"

@@ -7,9 +7,9 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
-	"github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/utils"
 )
 
 type graphConfigSummary struct {

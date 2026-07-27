@@ -1,13 +1,13 @@
-// Package main is the main package for the WeKnora server
+// Package main is the main package for the LoreLattice server
 // It contains the main function and the entry point for the server
 //
-// @title           WeKnora API
+// @title           LoreLattice API
 // @version         1.0
-// @description     WeKnora 知识库管理系统 API 文档
+// @description     LoreLattice 知识库管理系统 API 文档
 // @termsOfService  http://swagger.io/terms/
 //
-// @contact.name   WeKnora Github
-// @contact.url    https://github.com/Tencent/WeKnora
+// @contact.name   LoreLattice Github
+// @contact.url    https://github.com/Pototoooo/lorelattice
 //
 // @BasePath  /api/v1
 //
@@ -32,11 +32,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/Tencent/WeKnora/internal/config"
-	"github.com/Tencent/WeKnora/internal/container"
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/runtime"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/config"
+	"github.com/Pototoooo/lorelattice/internal/container"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/runtime"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 )
 
 func main() {

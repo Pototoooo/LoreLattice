@@ -84,12 +84,12 @@ export default {
     reopen: 'Обучение',
     steps: {
       welcome: {
-        title: 'Добро пожаловать в WeKnora',
+        title: 'Добро пожаловать в LoreLattice',
         desc: 'Несколько простых шагов познакомят вас с базами знаний, чатом и агентами. Нажмите «Далее», чтобы начать.',
       },
       knowledge: {
         title: 'Создайте базу знаний',
-        desc: 'С этого всё начинается: загружайте документы, веб-страницы или FAQ, и WeKnora автоматически разберёт и проиндексирует их. Нажмите здесь, чтобы открыть базы знаний.',
+        desc: 'С этого всё начинается: загружайте документы, веб-страницы или FAQ, и LoreLattice автоматически разберёт и проиндексирует их. Нажмите здесь, чтобы открыть базы знаний.',
       },
       chat: {
         title: 'Начните чат с ИИ',
@@ -1176,38 +1176,38 @@ export default {
       title: 'Недостаточно прав',
       desc: 'Ваша роль не позволяет открыть этот раздел настроек. Обратитесь к администратору пространства, чтобы запросить нужную роль.',
     },
-    weknoraCloud: {
-      title: 'WeKnora Cloud',
-      description: 'Настройте учётные данные APPID и APPSECRET для WeKnora Cloud. Данные используются для модельных сервисов и движка парсинга документов.',
+    lorelatticeCloud: {
+      title: 'LoreLattice Cloud',
+      description: 'Настройте учётные данные APPID и APPSECRET для LoreLattice Cloud. Данные используются для модельных сервисов и движка парсинга документов.',
       viewDocs: 'Документация',
       unconfigured: 'Учётные данные не настроены. Заполните APPID и APPSECRET.',
       configured: 'Учётные данные настроены, статус в норме.',
-      expired: 'Учётные данные WeKnora Cloud истекли',
+      expired: 'Учётные данные LoreLattice Cloud истекли',
       expiredDefault: 'Ключ шифрования изменился после перезапуска. Сохранённые данные не могут быть расшифрованы. Введите данные заново.',
       reconfigure: 'Перенастроить',
       appIdLabel: 'APPID',
-      appIdDesc: 'ID приложения WeKnora Cloud',
+      appIdDesc: 'ID приложения LoreLattice Cloud',
       appIdPlaceholder: 'Введите APPID',
       appSecretLabel: 'APPSECRET',
-      appSecretDesc: 'Секрет приложения WeKnora Cloud',
+      appSecretDesc: 'Секрет приложения LoreLattice Cloud',
       appSecretPlaceholder: 'Введите APPSECRET',
       saveHint: 'Данные будут проверены и зашифрованы перед сохранением.',
       saveBtn: 'Сохранить',
       usageTitle: 'Инструкция',
-      usageSteps: '1. Сохраните APPID и APPSECRET\n2. Добавьте chat, embedding, rerank и vlm в разделе «Облачные модели» ниже\n3. Парсинг: Настройки БЗ → Движок парсинга → WeKnora Cloud',
+      usageSteps: '1. Сохраните APPID и APPSECRET\n2. Добавьте chat, embedding, rerank и vlm в разделе «Облачные модели» ниже\n3. Парсинг: Настройки БЗ → Движок парсинга → LoreLattice Cloud',
       fillRequired: 'Заполните APPID и APPSECRET',
       saveSuccess: 'Учётные данные сохранены',
       saveFailed: 'Не удалось сохранить данные',
-      credentialConfigured: 'Учётные данные WeKnoraCloud настроены.',
+      credentialConfigured: 'Учётные данные LoreLatticeCloud настроены.',
       credentialExpired: 'Данные истекли. Перенастройте.',
-      credentialUnconfigured: 'Учётные данные WeKnoraCloud не настроены. Заполните APPID и APPSECRET.',
+      credentialUnconfigured: 'Учётные данные LoreLatticeCloud не настроены. Заполните APPID и APPSECRET.',
       checkingStatus: 'Проверка статуса...',
       goToSettings: 'Перейти в настройки',
-      modelHintConfigured: 'Учётные данные WeKnoraCloud настроены. Поддерживаемые модели см. в',
+      modelHintConfigured: 'Учётные данные LoreLatticeCloud настроены. Поддерживаемые модели см. в',
       modelHintDocsLink: 'документации API',
       modelsSection: {
         title: 'Облачные модели',
-        descReady: 'Зарегистрируйте четыре стандартные модели WeKnora Cloud для чата, поиска, реранкинга и зрения.',
+        descReady: 'Зарегистрируйте четыре стандартные модели LoreLattice Cloud для чата, поиска, реранкинга и зрения.',
         descPending: 'Сначала сохраните учётные данные выше, затем добавьте модели здесь.',
         statusAdded: 'Добавлена',
         statusPending: 'Нужны учётные данные',
@@ -1223,10 +1223,10 @@ export default {
       addModelsFailed: 'Не удалось добавить модели',
       addModelsEmbeddingFailed: 'Тест подключения Embedding не пройден; не удалось определить размерность вектора',
       addModelsDisplayName: {
-        chat: 'WeKnoraCloud Chat',
-        embedding: 'WeKnoraCloud Embedding',
-        rerank: 'WeKnoraCloud ReRank',
-        vllm: 'WeKnoraCloud Vision',
+        chat: 'LoreLatticeCloud Chat',
+        embedding: 'LoreLatticeCloud Embedding',
+        rerank: 'LoreLatticeCloud ReRank',
+        vllm: 'LoreLatticeCloud Vision',
       },
     },
     system: 'Настройки системы',
@@ -1377,8 +1377,8 @@ export default {
       needsConfig: 'Требует настройки',
       configurable: 'Настраиваемое',
       pathPrefix: 'Префикс пути (необязательно)',
-      pathPrefixPlaceholder: 'напр. weknora/images',
-      prefixPlaceholder: 'напр. weknora',
+      pathPrefixPlaceholder: 'напр. lorelattice/images',
+      prefixPlaceholder: 'напр. lorelattice',
       bucketName: 'Имя бакета',
       bucketSelectPlaceholder: 'Выберите или введите имя бакета',
       bucketPlaceholder: 'Имя бакета',
@@ -1681,7 +1681,7 @@ export default {
   },
   initialization: {
     title: 'Инициализация',
-    welcome: 'Добро пожаловать в WeKnora',
+    welcome: 'Добро пожаловать в LoreLattice',
     description: 'Пожалуйста, настройте систему перед началом работы',
     step1: 'Шаг 1: Настройка LLM модели',
     step2: 'Шаг 2: Настройка модели встраивания',
@@ -1903,11 +1903,11 @@ export default {
     backToLogin: 'Вернуться ко входу',
     registerNow: 'Зарегистрироваться',
     loginHint: 'Войдите, чтобы продолжить, или создайте аккаунт ниже, если вы впервые здесь.',
-    firstTime: 'Впервые в WeKnora?',
+    firstTime: 'Впервые в LoreLattice?',
     registerSuccess: 'Регистрация завершена. Войдите в систему',
     registerFailed: 'Ошибка регистрации',
     subtitle: 'RAG, ReAct-агент и Wiki — корпоративный фреймворк знаний на основе больших моделей',
-    registerSubtitle: 'Создайте аккаунт и начните работу с WeKnora',
+    registerSubtitle: 'Создайте аккаунт и начните работу с LoreLattice',
     emailPlaceholder: 'Введите адрес электронной почты',
     passwordPlaceholder: 'Введите пароль (8-32 символа, включая буквы и цифры)',
     confirmPasswordPlaceholder: 'Введите пароль ещё раз',
@@ -2219,9 +2219,9 @@ export default {
     loadingInfo: 'Загрузка данных...',
     retry: 'Повторить',
     versionLabel: 'Версия приложения',
-    versionDescription: 'Версия сервиса приложения (weknora-app)',
+    versionDescription: 'Версия сервиса приложения (lorelattice-app)',
     frontendVersionLabel: 'Версия UI',
-    frontendVersionDescription: 'Версия сборки UI (weknora-ui)',
+    frontendVersionDescription: 'Версия сборки UI (lorelattice-ui)',
     versionMismatch: 'Не совпадает с версией приложения',
     buildTimeLabel: 'Время сборки',
     buildTimeDescription: 'Время, когда система была собрана',
@@ -3043,7 +3043,7 @@ export default {
     builtinTag: 'Built-in'
   },
   createChat: {
-    title: 'Привет, я WeKnora — ваши знания всегда под рукой',
+    title: 'Привет, я LoreLattice — ваши знания всегда под рукой',
     newSessionTitle: 'Новая сессия',
     messages: {
       selectKnowledgeBase: 'Сначала выберите базу знаний',
@@ -5075,9 +5075,9 @@ export default {
           name: 'PaddleOCR-VL Cloud',
           desc: 'PaddleOCR-VL Cloud API',
         },
-        weknoracloud: {
-          name: 'WeKnora Cloud',
-          desc: 'Парсинг документов через WeKnora Cloud',
+        lorelatticecloud: {
+          name: 'LoreLattice Cloud',
+          desc: 'Парсинг документов через LoreLattice Cloud',
         },
         markitdown: {
           name: 'MarkItDown',
@@ -6269,7 +6269,7 @@ export default {
 	      capabilityMessageHistory: 'История сообщений',
 	      capabilityMessageHistoryHint: 'Позволяет искать историю чатов пространства и читать статистику истории. Не даёт доступ к настройкам пространства.',
 	      capabilityManageModels: 'Управление моделями',
-	      capabilityManageModelsHint: 'Управление конфигурациями моделей, учётными данными, проверками подключения и данными WeKnoraCloud.',
+	      capabilityManageModelsHint: 'Управление конфигурациями моделей, учётными данными, проверками подключения и данными LoreLatticeCloud.',
 	      capabilityManageMcpServices: 'Управление MCP-сервисами',
 	      capabilityManageMcpServicesHint: 'Управление MCP-сервисами, учётными данными, политиками подтверждения инструментов и OAuth-состоянием этого субъекта.',
 	      capabilityManageDatasources: 'Управление источниками данных',
@@ -6279,7 +6279,7 @@ export default {
 	      capabilityManageVectorStores: 'Управление инфраструктурой поиска',
 	      capabilityManageVectorStoresHint: 'Управление векторными хранилищами и проверками парсеров, чтения документов и storage engine.',
 	      capabilityManageStorageBackends: 'Управление хранилищами (backends)',
-	      capabilityManageStorageBackendsHint: 'Управление экземплярами объектных/файловых хранилищ (например, S3-совместимых или локальных): их CRUD, проверки подключения и выбор хранилища по умолчанию для арендатора.',
+	      capabilityManageStorageBackendsHint: 'Управление экземплярами объектных/файловых хранилищ (например, S3-совместимых или локальных): их CRUD, проверки подключения и выбор хранилища по умолчанию для рабочего пространства.',
 	      capabilityManageWebSearch: 'Управление веб-поиском',
 	      capabilityManageWebSearchHint: 'Управление провайдерами веб-поиска, учётными данными и проверками подключения.',
 	      capabilityRunEvaluations: 'Запуск оценок',
@@ -6317,7 +6317,7 @@ export default {
         'Любой, у кого есть API key, может подменить заголовок ID пользователя, выдать себя за другого внешнего пользователя и переиспользовать или перехватить его авторизацию MCP OAuth. Не используйте в браузере или ненадёжных клиентах; для пользовательских приложений выбирайте подписанный token.',
       signedRecommended: 'Рекомендуется для пользовательских приложений: ваш backend подписывает краткоживущий HS256 JWT для внешнего пользователя.',
       signedFlowDetail:
-        'HMAC secret храните только в WeKnora и на доверенном backend — не передавайте в запросах и не отдавайте браузеру. В заголовке запроса передаётся JWT, подписанный этим secret (меняется при каждой выдаче или после истечения), а не сам secret. JWT должен содержать sub (ID внешнего пользователя), tenant_id, aud=weknora и exp (не более 24 ч).',
+        'HMAC secret храните только в LoreLattice и на доверенном backend — не передавайте в запросах и не отдавайте браузеру. В заголовке запроса передаётся JWT, подписанный этим secret (меняется при каждой выдаче или после истечения), а не сам secret. JWT должен содержать sub (ID внешнего пользователя), tenant_id, aud=lorelattice и exp (не более 24 ч).',
       directHeader: 'Заголовок ID пользователя',
       requireDirectHeader: 'Требовать заголовок ID пользователя',
       requireDirectHeaderDesc:
@@ -6325,7 +6325,7 @@ export default {
       tokenHeader: 'Заголовок token',
       tokenHeaderDesc: 'Клиент передаёт JWT, подписанный backend, в этом фиксированном заголовке.',
       hmacSecret: 'HMAC secret',
-      hmacSecretDesc: 'Тот же secret, что в WeKnora; только для подписи JWT на backend — не отправляйте его в заголовке запроса.',
+      hmacSecretDesc: 'Тот же secret, что в LoreLattice; только для подписи JWT на backend — не отправляйте его в заголовке запроса.',
       secretConfigured: 'Secret настроен (повторно не показывается); введите новое значение для ротации',
       secretSavedCopyHint: 'Secret сохранён. Скопируйте его в backend сейчас — после ухода со страницы просмотреть его будет нельзя.',
       generateSecret: 'Сгенерировать secret',
@@ -6335,7 +6335,7 @@ export default {
       hmacSecretResetConfirmCancel: 'Отмена',
       tokenSignExample: 'Пример подписи JWT на backend (Go)',
       signedRequestStep0:
-        '# 0. Подпишите JWT на backend (HS256, aud=weknora, sub=ID пользователя, tenant_id={tenantId}, exp не более 24 ч)',
+        '# 0. Подпишите JWT на backend (HS256, aud=lorelattice, sub=ID пользователя, tenant_id={tenantId}, exp не более 24 ч)',
       signedRequestStep0Hint: '#    Передайте JWT в заголовке {headerName}, не отправляйте HMAC secret',
       requestExampleCreateSession: '# 1. Создать session',
       requestExampleAgentChat: '# 2. Agent-чат (SSE; замените <session_id> на id из шага 1)',
@@ -6413,7 +6413,7 @@ export default {
     chrome: {
       title: 'Помощник по знаниям',
       subtitle:
-        'Для self-hosted WeKnora: вопросы в боковой панели, клиппинг страниц и Markdown-заметки в базы знаний прямо при просмотре.',
+        'Для self-hosted LoreLattice: вопросы в боковой панели, клиппинг страниц и Markdown-заметки в базы знаний прямо при просмотре.',
       capabilitiesTitle: 'Возможности',
       capabilities: {
         qa: {
@@ -6448,7 +6448,7 @@ export default {
         },
         port: {
           title: 'Десктоп: фиксированный порт',
-          desc: 'В WeKnora Desktop задайте фиксированный порт API (например 37841) в API-информации.',
+          desc: 'В LoreLattice Desktop задайте фиксированный порт API (например 37841) в API-информации.',
         },
         install: {
           title: 'Установите расширение',
@@ -6467,9 +6467,9 @@ export default {
       storeMeta: 'Chrome Web Store · v1.0.0',
     },
     claw: {
-      title: 'WeKnora Skill',
+      title: 'LoreLattice Skill',
       subtitle:
-        'Импорт документов и гибридный поиск (вектор + ключевые слова) через REST API WeKnora — загрузки, URL, Markdown и поиск.',
+        'Импорт документов и гибридный поиск (вектор + ключевые слова) через REST API LoreLattice — загрузки, URL, Markdown и поиск.',
       capabilitiesTitle: 'Возможности Skill',
       capabilities: {
         upload: { title: 'Загрузка файлов', desc: 'PDF, Word, Excel и др. с автоматическим разбором.' },
@@ -6483,7 +6483,7 @@ export default {
         api: { title: 'API-учётные данные', desc: 'Скопируйте API Key и URL в «Настройки → API-информация».' },
         env: {
           title: 'Переменные окружения',
-          desc: 'Задайте WEKNORA_BASE_URL и WEKNORA_API_KEY в shell или ~/.zshrc / ~/.bashrc. Пример ниже использует текущий API URL — замените API Key на фактическое значение.',
+          desc: 'Задайте LORELATTICE_BASE_URL и LORELATTICE_API_KEY в shell или ~/.zshrc / ~/.bashrc. Пример ниже использует текущий API URL — замените API Key на фактическое значение.',
         },
         install: {
           title: 'Установка Skill',
@@ -6496,10 +6496,10 @@ export default {
       copyEnvSuccess: 'Пример переменных скопирован',
       copyCmdSuccess: 'Команда установки скопирована',
       ecosystemNote:
-        'Skill размещён на ClawHub ({\'@\'}lyingbug/weknora). Полная документация API — на странице ClawHub.',
+        'Skill размещён на ClawHub ({\'@\'}Pototoooo/lorelattice). Полная документация API — на странице ClawHub.',
       installCta: 'Открыть ClawHub',
-      installCtaHint: 'Установка WeKnora Skill · откроется в новой вкладке',
-      hubMeta: 'ClawHub · {\'@\'}lyingbug/weknora · MIT-0',
+      installCtaHint: 'Установка LoreLattice Skill · откроется в новой вкладке',
+      hubMeta: 'ClawHub · {\'@\'}Pototoooo/lorelattice · MIT-0',
     },
   },
   imOverview: {

@@ -10,8 +10,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
 )
 
 // downloadFields enumerates the fields surfaced for `--format json` discovery on
@@ -38,7 +38,7 @@ type DownloadService interface {
 	OpenKnowledgeFile(ctx context.Context, knowledgeID string) (string, io.ReadCloser, error)
 }
 
-// NewCmdDownload builds `weknora doc download <id>`. Positional id, output
+// NewCmdDownload builds `lorelattice doc download <id>`. Positional id, output
 // flag, `-` sentinel for stdout. Flags: `-O, --output <file>` for
 // destination, `--clobber` for overwrite control.
 func NewCmdDownload(f *cmdutil.Factory) *cobra.Command {
@@ -58,11 +58,11 @@ With --format json, on success emits a JSON envelope whose data has
 path, bytes, and filename fields. When output is stdout (--output -),
 the JSON envelope is suppressed because the raw bytes already occupy
 stdout.`,
-		Example: `  weknora doc download doc_abc                       # writes ./<server-name>
-  weknora doc download doc_abc -O report.pdf
-  weknora doc download doc_abc --output -            # stream to stdout (binary safe)
-  weknora doc download doc_abc -O report.pdf --clobber
-  weknora doc download doc_abc -O report.pdf --format json   # JSON envelope`,
+		Example: `  lorelattice doc download doc_abc                       # writes ./<server-name>
+  lorelattice doc download doc_abc -O report.pdf
+  lorelattice doc download doc_abc --output -            # stream to stdout (binary safe)
+  lorelattice doc download doc_abc -O report.pdf --clobber
+  lorelattice doc download doc_abc -O report.pdf --format json   # JSON envelope`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			fopts, err := cmdutil.CheckFormatFlag(c)
@@ -86,8 +86,8 @@ stdout.`,
 		RequiredFlags: []string{"<doc-id> (positional)"},
 		Output:        "with --format json (file output): envelope.data has path, bytes, filename; suppressed with --output - (raw bytes to stdout)",
 		Examples: []string{
-			"weknora doc download doc_abc --output ./manual.pdf",
-			"weknora doc download doc_abc --output - > manual.pdf",
+			"lorelattice doc download doc_abc --output ./manual.pdf",
+			"lorelattice doc download doc_abc --output - > manual.pdf",
 		},
 	})
 	return cmd

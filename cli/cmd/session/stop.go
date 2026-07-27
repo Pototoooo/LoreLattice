@@ -1,4 +1,4 @@
-// stop.go implements `weknora session stop` — cancel server-side generation
+// stop.go implements `lorelattice session stop` — cancel server-side generation
 // for a specific assistant message under a known session.
 //
 // Unlike Ctrl-C (which only drops the local connection while the server keeps
@@ -15,9 +15,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 var stopFields = []string{"session_id", "message_id", "stopped"}
@@ -42,7 +42,7 @@ type stopResult struct {
 	Stopped   bool   `json:"stopped"`
 }
 
-// NewCmdStop builds `weknora session stop <session-id> --message <id>`.
+// NewCmdStop builds `lorelattice session stop <session-id> --message <id>`.
 func NewCmdStop(f *cmdutil.Factory) *cobra.Command {
 	opts := &StopOptions{}
 	cmd := &cobra.Command{
@@ -53,7 +53,7 @@ session. Unlike Ctrl-C (which only drops the local connection while the server
 keeps generating and billing tokens), this tells the server to stop.
 
 Symmetric with 'session resume': both key on (session_id, message_id).`,
-		Example: `  weknora session stop sess_xyz --message msg_abc`,
+		Example: `  lorelattice session stop sess_xyz --message msg_abc`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			opts.SessionID = args[0]
@@ -83,7 +83,7 @@ Symmetric with 'session resume': both key on (session_id, message_id).`,
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
 		UsedFor:       "Stop server-side generation for an in-flight assistant message (counterpart to resume). The message_id comes from the init event of the chat / session ask / resume stream you're stopping.",
 		RequiredFlags: []string{"<session-id> (positional)", "--message (message_id from the init event of the stream you're stopping)"},
-		Examples:      []string{"weknora session stop sess_xyz --message msg_abc"},
+		Examples:      []string{"lorelattice session stop sess_xyz --message msg_abc"},
 		Output:        "envelope {session_id, message_id, stopped:true}",
 	})
 	return cmd

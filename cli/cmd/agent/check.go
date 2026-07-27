@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // AgentCheckResult is the deep-verification response for `agent check <id>`.
@@ -32,7 +32,7 @@ type AgentCheckService interface {
 
 var agentCheckFields = []string{"id", "reachable", "model_id", "kb_scope_all_reachable"}
 
-// NewCmdCheck builds `weknora agent check <id>`.
+// NewCmdCheck builds `lorelattice agent check <id>`.
 func NewCmdCheck(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "check <agent-id>",
@@ -44,11 +44,11 @@ Performs 1 + N HTTP calls:
   N   GET /kb/{kb_id} for each id in agent.config.knowledge_bases
       — sets kb_scope_all_reachable = true iff every probe succeeds
 
-Use 'weknora agent status <id>' for a fast read-only health snapshot
+Use 'lorelattice agent status <id>' for a fast read-only health snapshot
 (1 HTTP call, no KB probing). Use 'agent check' when you need to verify
 the agent's downstream dependencies are all reachable.`,
-		Example: `  weknora agent check ag_abc
-  weknora agent check ag_abc --format json`,
+		Example: `  lorelattice agent check ag_abc
+  lorelattice agent check ag_abc --format json`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			fopts, err := cmdutil.CheckFormatFlag(c)
@@ -71,7 +71,7 @@ the agent's downstream dependencies are all reachable.`,
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
 		UsedFor:       "verify a custom agent end-to-end: status plus kb_scope reachability",
 		RequiredFlags: []string{"<agent-id> (positional)"},
-		Examples:      []string{"weknora agent check agent_abc"},
+		Examples:      []string{"lorelattice agent check agent_abc"},
 		Output:        "envelope.data is {id, reachable, ...} with kb_scope reachability folded in",
 	})
 	return cmd

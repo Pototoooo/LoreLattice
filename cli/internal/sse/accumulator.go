@@ -1,5 +1,5 @@
 // Package sse provides helpers for consuming server-sent event streams from
-// the WeKnora SDK (KnowledgeQAStream, ContinueStream).
+// the LoreLattice SDK (KnowledgeQAStream, ContinueStream).
 //
 // Accumulator is the canonical sink: every callback event appends to a
 // buffered Content string and updates terminal-state fields like References
@@ -11,7 +11,7 @@ package sse
 import (
 	"strings"
 
-	sdk "github.com/Tencent/WeKnora/client"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // Accumulator buffers a KnowledgeQAStream callback sequence.

@@ -9,9 +9,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // CreateService is the narrow SDK surface this command depends on.
@@ -58,16 +58,16 @@ type createFlagSet struct {
 	kbsSet             bool
 }
 
-const agentCreateExample = `  weknora agent create "Support Bot" --model <model-id>
-  weknora agent create "Code Reviewer" --model <model-id> --system-prompt-file ./prompt.md --attach-kb kb_eng --attach-kb kb_arch
-  weknora agent create "From Template" --model <model-id> --from ag_existing
-  weknora agent create --generate-skeleton > my-agent.yaml
-  weknora agent create "Tuned" --model <model-id> --config-file ./my-agent.yaml`
+const agentCreateExample = `  lorelattice agent create "Support Bot" --model <model-id>
+  lorelattice agent create "Code Reviewer" --model <model-id> --system-prompt-file ./prompt.md --attach-kb kb_eng --attach-kb kb_arch
+  lorelattice agent create "From Template" --model <model-id> --from ag_existing
+  lorelattice agent create --generate-skeleton > my-agent.yaml
+  lorelattice agent create "Tuned" --model <model-id> --config-file ./my-agent.yaml`
 
 const agentCreateLong = `Create a new custom agent.
 
 --model is required (an agent without a model cannot invoke); discover a
-valid model id with 'weknora model list'. The 7
+valid model id with 'lorelattice model list'. The 7
 optional hot-path flags cover the most frequently set AgentConfig fields;
 for the remaining 27 use --config-file with a YAML or JSON document
 matching the AgentConfig schema (run --generate-skeleton to get a
@@ -84,7 +84,7 @@ AI agents: writes a new resource server-side. Failure surfaces as a
 typed code on stderr: input.invalid_argument (bad flags, bad file, or
 bad model), resource.not_found (--from <missing>), auth.unauthenticated.`
 
-// NewCmdCreate builds `weknora agent create <name> --model <id>`.
+// NewCmdCreate builds `lorelattice agent create <name> --model <id>`.
 func NewCmdCreate(f *cmdutil.Factory) *cobra.Command {
 	opts := &CreateOptions{}
 	var systemPromptFile, configFile string
@@ -222,9 +222,9 @@ func NewCmdCreate(f *cmdutil.Factory) *cobra.Command {
 		UsedFor:       "Create a new custom agent. --model is required and accepts a model id or name; --attach-kb (repeatable) accepts KB ids or names. Emits the created Agent object.",
 		RequiredFlags: []string{"<name> (positional)", "--model"},
 		Examples: []string{
-			`weknora agent create "Support Bot" --model gpt-4o`,
-			`weknora agent create "Support Bot" --model gpt-4o --attach-kb kb_eng --system-prompt "You are a support assistant."`,
-			`weknora agent create --generate-skeleton   # print a blank config to fill in (no --model needed)`,
+			`lorelattice agent create "Support Bot" --model gpt-4o`,
+			`lorelattice agent create "Support Bot" --model gpt-4o --attach-kb kb_eng --system-prompt "You are a support assistant."`,
+			`lorelattice agent create --generate-skeleton   # print a blank config to fill in (no --model needed)`,
 		},
 		Output: "envelope.data is the created Agent object with id, name, config",
 	})

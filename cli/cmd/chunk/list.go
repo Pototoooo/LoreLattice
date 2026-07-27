@@ -8,11 +8,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/output"
-	"github.com/Tencent/WeKnora/cli/internal/text"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
+	"github.com/Pototoooo/lorelattice/cli/internal/text"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 const (
@@ -72,11 +72,11 @@ AI agents: prefer 'search chunks' for retrieval tasks. Use 'chunk list'
 only when you need to enumerate / verify the chunking output of a
 specific document.`
 
-const chunkListExample = `  weknora chunk list --doc doc_abc
-  weknora chunk list --doc doc_abc --all-pages --page-size 100
-  weknora chunk list --doc doc_abc --format json | jq '.[] | {id, chunk_index}'`
+const chunkListExample = `  lorelattice chunk list --doc doc_abc
+  lorelattice chunk list --doc doc_abc --all-pages --page-size 100
+  lorelattice chunk list --doc doc_abc --format json | jq '.[] | {id, chunk_index}'`
 
-// NewCmdList builds `weknora chunk list --doc <doc-id>`.
+// NewCmdList builds `lorelattice chunk list --doc <doc-id>`.
 func NewCmdList(f *cmdutil.Factory) *cobra.Command {
 	opts := &ListOptions{}
 	cmd := &cobra.Command{
@@ -114,7 +114,7 @@ func NewCmdList(f *cmdutil.Factory) *cobra.Command {
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
 		UsedFor:       "List chunks of a specific document in stored order (admin/debug). Results come with meta.count; use --limit (1..10000) and --all-pages to paginate. Prefer 'search chunks' for RAG retrieval.",
 		RequiredFlags: []string{"--doc"},
-		Examples:      []string{"weknora chunk list --doc doc_abc --format json", "weknora chunk list --doc doc_abc --all-pages --format json"},
+		Examples:      []string{"lorelattice chunk list --doc doc_abc --format json", "lorelattice chunk list --doc doc_abc --all-pages --format json"},
 		Output:        "envelope.data is an array of Chunk objects with id, chunk_index, content, is_enabled; meta.count is the returned count, meta.total_count the document's full chunk count, meta.has_more true when --limit truncated",
 	})
 	return cmd

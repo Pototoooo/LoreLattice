@@ -13,10 +13,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/config"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/config"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // fakeListSvc captures the request args and returns canned responses.
@@ -38,7 +38,7 @@ func (f *fakeListSvc) ListKnowledgeWithFilter(_ context.Context, kbID string, pa
 }
 
 // chdirIsolated parks cwd in a fresh tempdir so Factory.ResolveKB doesn't pick
-// up a stray .weknora/project.yaml from the repo. Also clears WEKNORA_KB_ID
+// up a stray .lorelattice/project.yaml from the repo. Also clears LORELATTICE_KB_ID
 // for the duration of the test.
 func chdirIsolated(t *testing.T) {
 	t.Helper()
@@ -46,7 +46,7 @@ func chdirIsolated(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, os.Chdir(t.TempDir()))
 	t.Cleanup(func() { _ = os.Chdir(prev) })
-	t.Setenv("WEKNORA_KB_ID", "")
+	t.Setenv("LORELATTICE_KB_ID", "")
 }
 
 func TestList_Success_Text(t *testing.T) {
@@ -127,7 +127,7 @@ func TestList_HTTPError_500(t *testing.T) {
 
 // TestList_KBIDRequired drives the cobra layer to verify Factory.ResolveKB's
 // "no source supplied" path bubbles up as CodeKBIDRequired. Isolates cwd so
-// no project.yaml sneaks in, and clears WEKNORA_KB_ID.
+// no project.yaml sneaks in, and clears LORELATTICE_KB_ID.
 func TestList_KBIDRequired(t *testing.T) {
 	chdirIsolated(t)
 	_, _ = iostreams.SetForTest(t)

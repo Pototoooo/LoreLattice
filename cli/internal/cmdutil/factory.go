@@ -12,20 +12,20 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/config"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/projectlink"
-	"github.com/Tencent/WeKnora/cli/internal/prompt"
-	"github.com/Tencent/WeKnora/cli/internal/secrets"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/config"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/projectlink"
+	"github.com/Pototoooo/lorelattice/cli/internal/prompt"
+	"github.com/Pototoooo/lorelattice/cli/internal/secrets"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // Factory is the dependency container injected at command construction. Each
-// closure is lazy: --help / completion / `weknora version` must NOT trigger
+// closure is lazy: --help / completion / `lorelattice version` must NOT trigger
 // HTTP, keyring access, or filesystem I/O beyond the bare minimum.
 //
 // Four closures:
-//   - Config:   parses ~/.config/weknora/config.yaml (no network)
+//   - Config:   parses ~/.config/lorelattice/config.yaml (no network)
 //   - Client:   constructs the SDK client; only Secrets is sync.Once-cached,
 //     so callers should hold the returned *sdk.Client across
 //     multiple SDK calls within one invocation
@@ -39,7 +39,7 @@ import (
 // iostreams.IO. The bar to add a new closure is at least 2 commands sharing the
 // same dependency; resist factory bloat.
 //
-// Client returns a *sdk.Client (the WeKnora SDK). Commands that want narrow
+// Client returns a *sdk.Client (the LoreLattice SDK). Commands that want narrow
 // service interfaces declare them in their own files and let the real SDK
 // satisfy them implicitly via duck typing.
 type Factory struct {
@@ -112,10 +112,10 @@ func New() *Factory {
 // buildClient resolves the active profile, loads the credentials from secrets,
 // and constructs a *sdk.Client. Returns CodeAuthUnauthenticated when no
 // credentials are available so the user gets the right hint to run
-// `weknora auth login`.
+// `lorelattice auth login`.
 func buildClient(f *Factory) (*sdk.Client, error) {
-	// Env-credential injection: WEKNORA_TOKEN (bearer) or WEKNORA_API_KEY, with
-	// WEKNORA_HOST (or the active profile's host), builds an ephemeral client
+	// Env-credential injection: LORELATTICE_TOKEN (bearer) or LORELATTICE_API_KEY, with
+	// LORELATTICE_HOST (or the active profile's host), builds an ephemeral client
 	// that bypasses config.yaml + the keyring — the stateless headless / CI /
 	// agent path (no disk writes, no `auth login`).
 	if c, handled, err := buildClientFromEnv(f); handled {
@@ -132,19 +132,19 @@ func buildClient(f *Factory) (*sdk.Client, error) {
 		// an active profile) — an agent that execs retry_argv would loop. Point
 		// hint + retry_argv at the real first step: create a profile.
 		return nil, NewError(CodeAuthUnauthenticated, "no profile configured").
-			WithHint("add one first: `weknora profile add <name> --host <url> --use`, then `weknora auth login` (or set WEKNORA_API_KEY + WEKNORA_HOST for headless use)").
-			WithRetryArgv([]string{"weknora", "profile", "add", "--help"})
+			WithHint("add one first: `lorelattice profile add <name> --host <url> --use`, then `lorelattice auth login` (or set LORELATTICE_API_KEY + LORELATTICE_HOST for headless use)").
+			WithRetryArgv([]string{"lorelattice", "profile", "add", "--help"})
 	}
 	prof, ok := cfg.Profiles[profileName]
 	if !ok {
 		// If the user explicitly overrode the profile (via --profile flag or
-		// WEKNORA_PROFILE env), it's a bad argument - not a corrupt config file.
+		// LORELATTICE_PROFILE env), it's a bad argument - not a corrupt config file.
 		// The destructive "remove config.yaml" hint would be catastrophic for a typo.
 		if f.ProfileOverride != "" {
 			return nil, NewError(CodeInputInvalidArgument,
 				fmt.Sprintf("profile %q not configured", profileName)).
-				WithHint("list available profiles with `weknora profile list`").
-				WithRetryArgv([]string{"weknora", "profile", "list"})
+				WithHint("list available profiles with `lorelattice profile list`").
+				WithRetryArgv([]string{"lorelattice", "profile", "list"})
 		}
 		// ProfileOverride is empty: config.CurrentProfile points at a missing entry.
 		// That's a genuinely corrupt config file.
@@ -203,39 +203,39 @@ func buildClient(f *Factory) (*sdk.Client, error) {
 
 // EnvCredential reports whether stateless env credentials are in effect and
 // which kind. Used by `auth status` / `config view` so their host / profile
-// output reflects that the env credential (and WEKNORA_HOST) — not the config
+// output reflects that the env credential (and LORELATTICE_HOST) — not the config
 // profile — is what actually authenticated the client. Mirrors buildClientFromEnv's
-// precedence (WEKNORA_TOKEN wins over WEKNORA_API_KEY).
+// precedence (LORELATTICE_TOKEN wins over LORELATTICE_API_KEY).
 func EnvCredential() (active bool, kind string) {
-	if strings.TrimSpace(os.Getenv("WEKNORA_TOKEN")) != "" {
-		return true, "WEKNORA_TOKEN"
+	if strings.TrimSpace(os.Getenv("LORELATTICE_TOKEN")) != "" {
+		return true, "LORELATTICE_TOKEN"
 	}
-	if strings.TrimSpace(os.Getenv("WEKNORA_API_KEY")) != "" {
-		return true, "WEKNORA_API_KEY"
+	if strings.TrimSpace(os.Getenv("LORELATTICE_API_KEY")) != "" {
+		return true, "LORELATTICE_API_KEY"
 	}
 	return false, ""
 }
 
-// buildClientFromEnv builds an ephemeral SDK client from WEKNORA_TOKEN (bearer
-// JWT) or WEKNORA_API_KEY when either is set, bypassing config.yaml + the
+// buildClientFromEnv builds an ephemeral SDK client from LORELATTICE_TOKEN (bearer
+// JWT) or LORELATTICE_API_KEY when either is set, bypassing config.yaml + the
 // keyring entirely — the stateless path for headless / CI / agent use. Returns
 // handled=false (fall through to the profile path) when neither var is set.
 //
-// Host resolution: WEKNORA_HOST, else the active profile's host (so env creds
+// Host resolution: LORELATTICE_HOST, else the active profile's host (so env creds
 // can target an already-configured host without re-specifying it). When a token
 // is supplied, no 401→refresh transport is attached — env creds are ephemeral,
-// so a 401 propagates for the caller to supply a fresh token. WEKNORA_TOKEN
-// wins over WEKNORA_API_KEY if both are set.
+// so a 401 propagates for the caller to supply a fresh token. LORELATTICE_TOKEN
+// wins over LORELATTICE_API_KEY if both are set.
 func buildClientFromEnv(f *Factory) (client *sdk.Client, handled bool, err error) {
-	token := strings.TrimSpace(os.Getenv("WEKNORA_TOKEN"))
-	apiKey := strings.TrimSpace(os.Getenv("WEKNORA_API_KEY"))
+	token := strings.TrimSpace(os.Getenv("LORELATTICE_TOKEN"))
+	apiKey := strings.TrimSpace(os.Getenv("LORELATTICE_API_KEY"))
 	if token == "" && apiKey == "" {
 		return nil, false, nil
 	}
-	host := strings.TrimSpace(os.Getenv("WEKNORA_HOST"))
+	host := strings.TrimSpace(os.Getenv("LORELATTICE_HOST"))
 	if host == "" {
 		// Best-effort fallback to the active profile's host; ignore config
-		// errors so env creds + WEKNORA_HOST stay usable with no config at all.
+		// errors so env creds + LORELATTICE_HOST stay usable with no config at all.
 		if cfg, cerr := f.Config(); cerr == nil && cfg != nil {
 			if prof, ok := cfg.Profiles[cfg.CurrentProfile]; ok {
 				host = prof.Host
@@ -244,8 +244,8 @@ func buildClientFromEnv(f *Factory) (client *sdk.Client, handled bool, err error
 	}
 	if host == "" {
 		return nil, true, NewError(CodeInputInvalidArgument,
-			"WEKNORA_TOKEN / WEKNORA_API_KEY is set but no host is available").
-			WithHint("set WEKNORA_HOST (e.g. https://kb.example.com) or configure a profile host")
+			"LORELATTICE_TOKEN / LORELATTICE_API_KEY is set but no host is available").
+			WithHint("set LORELATTICE_HOST (e.g. https://kb.example.com) or configure a profile host")
 	}
 	if token != "" {
 		return sdk.NewClient(host, sdk.WithBearerToken(token)), true, nil
@@ -273,8 +273,8 @@ func AddIgnoredKBFlag(cmd *cobra.Command) {
 // 4-level fallback chain (highest to lowest):
 //  1. --kb flag (kb_<...> id passed through; anything else resolved via
 //     ListKnowledgeBases as a name → id lookup)
-//  2. WEKNORA_KB_ID env (always an explicit id)
-//  3. .weknora/project.yaml (walk-up from cwd)
+//  2. LORELATTICE_KB_ID env (always an explicit id)
+//  3. .lorelattice/project.yaml (walk-up from cwd)
 //  4. error: kb required
 func (f *Factory) ResolveKB(cmd *cobra.Command) (string, error) {
 	if v, _ := cmd.Flags().GetString("kb"); v != "" {
@@ -304,10 +304,10 @@ func (f *Factory) ResolveKBLocal(cmd *cobra.Command) (string, error) {
 
 // resolveKBFromEnvOrLink is the shared fallback tail of ResolveKB /
 // ResolveKBLocal (which differ only in how they treat the --kb flag): it reads
-// WEKNORA_KB_ID, then the walk-up .weknora/project.yaml link, and returns
+// LORELATTICE_KB_ID, then the walk-up .lorelattice/project.yaml link, and returns
 // CodeKBIDRequired when neither is set. Never calls the SDK.
 func (f *Factory) resolveKBFromEnvOrLink() (string, error) {
-	if v := os.Getenv("WEKNORA_KB_ID"); v != "" {
+	if v := os.Getenv("LORELATTICE_KB_ID"); v != "" {
 		return v, nil
 	}
 	cwd, err := os.Getwd()
@@ -325,7 +325,7 @@ func (f *Factory) resolveKBFromEnvOrLink() (string, error) {
 	return "", NewError(CodeKBIDRequired, "kb is required")
 }
 
-// ApplyLogLevel resolves --log-level / WEKNORA_LOG_LEVEL (in priority order)
+// ApplyLogLevel resolves --log-level / LORELATTICE_LOG_LEVEL (in priority order)
 // and applies the result to the SDK's debug logger. Intended to be called
 // from the root command's PersistentPreRunE so the resolved level is in
 // effect before any SDK call.
@@ -374,14 +374,14 @@ func refreshAccessToken(ctx context.Context, store secrets.Store, host, profileN
 
 // ActiveProfile returns the resolved profile name for this invocation:
 //  1. ProfileOverride (set by --profile flag in root PersistentPreRunE)
-//  2. WEKNORA_PROFILE env var
+//  2. LORELATTICE_PROFILE env var
 //  3. Config's CurrentProfile (the persisted active profile name)
 //  4. Empty string when nothing is configured (envelope omits the field).
 func (f *Factory) ActiveProfile() string {
 	if f.ProfileOverride != "" {
 		return f.ProfileOverride
 	}
-	if v := os.Getenv("WEKNORA_PROFILE"); v != "" {
+	if v := os.Getenv("LORELATTICE_PROFILE"); v != "" {
 		return v
 	}
 	if f.Config == nil {

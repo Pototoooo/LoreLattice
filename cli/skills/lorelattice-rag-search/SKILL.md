@@ -1,16 +1,16 @@
 ---
-name: weknora-rag-search
-description: Use when retrieving from or asking questions against a WeKnora knowledge base via the `weknora` CLI — and especially when unsure whether to use `chat`, `session ask`, or `search chunks` for a given goal.
+name: lorelattice-rag-search
+description: Use when retrieving from or asking questions against a LoreLattice knowledge base via the `lorelattice` CLI — and especially when unsure whether to use `chat`, `session ask`, or `search chunks` for a given goal.
 metadata:
   tested_against: v0.10
 ---
 
-# WeKnora — retrieval & RAG queries
+# LoreLattice — retrieval & RAG queries
 
-**REQUIRED BACKGROUND:** read the `weknora-shared` skill first (auth, `--kb`
+**REQUIRED BACKGROUND:** read the `lorelattice-shared` skill first (auth, `--kb`
 resolution, the JSON envelope, exit codes, streaming/NDJSON output).
 
-WeKnora gives you several ways to "ask about a knowledge base." Picking the wrong
+LoreLattice gives you several ways to "ask about a knowledge base." Picking the wrong
 one wastes turns or returns the wrong shape. Use the decision table.
 
 ## Pick the command by your goal
@@ -32,7 +32,7 @@ one wastes turns or returns the wrong shape. Use the decision table.
 2. **`chat` vs `session ask`.** `chat` = plain KB RAG Q&A. `session ask --agent
    <id>` = invoke a *configured custom agent* (it may scope its own KBs, call
    tools, do web search). If the user set up an agent for this, prefer it
-   (`weknora agent list` to find ids); otherwise `chat`.
+   (`lorelattice agent list` to find ids); otherwise `chat`.
 3. **One-shot vs multi-turn.** Both `chat` and `session ask` return a
    `data.session_id` in default JSON output. Pass `--session <id>` on the next
    call to continue the conversation. In NDJSON mode, read it from `init`.
@@ -40,9 +40,9 @@ one wastes turns or returns the wrong shape. Use the decision table.
 ## Safety / Gotchas
 
 - `chat`, `search chunks`, `search docs` need a KB: pass `--kb <id-or-name>`, or
-  set `WEKNORA_KB_ID`, or `weknora link` the directory (resolved in that order).
+  set `LORELATTICE_KB_ID`, or `lorelattice link` the directory (resolved in that order).
   If none resolves it's exit 1 (`local.kb_id_required`); a bad name is exit 1
-  (`local.kb_not_found`). Resolve names with `weknora kb list` / `search kb`.
+  (`local.kb_not_found`). Resolve names with `lorelattice kb list` / `search kb`.
   (`search kb` / `search sessions` are tenant-wide and take no `--kb`.)
 - `chat` / `session ask` return one buffered JSON envelope with answer
   events by default. Add `--reference` for indexed citations and `--verbose`
@@ -50,9 +50,9 @@ one wastes turns or returns the wrong shape. Use the decision table.
   text` for the live human-readable projection.
 - A stalled stream is not stopped by Ctrl-C (that just drops your local
   connection; the server keeps generating + billing). Stop it server-side:
-  `weknora session stop <session-id> --message <message-id>` (session_id from
+  `lorelattice session stop <session-id> --message <message-id>` (session_id from
   `data.session_id`, or from `init` under `--format ndjson`).
-  Re-attach to a stream with `weknora session resume <session-id>
+  Re-attach to a stream with `lorelattice session resume <session-id>
   --message <message-id>`.
 - `search chunks --limit` defaults to **8** (tuned for an LLM context window);
   the `search docs/kb/sessions` lists default to 30. Tune retrieval with
@@ -63,14 +63,14 @@ one wastes turns or returns the wrong shape. Use the decision table.
 
 ```bash
 # raw retrieval to reason over
-weknora search chunks "retry backoff policy" --kb engineering --limit 12
+lorelattice search chunks "retry backoff policy" --kb engineering --limit 12
 
 # grounded answer (human transcript)
-weknora chat "How do we handle retries?" --kb engineering --format text
+lorelattice chat "How do we handle retries?" --kb engineering --format text
 
 # continue the conversation (session id from data.session_id above)
-weknora chat "And the max attempts?" --kb engineering --session sess_abc
+lorelattice chat "And the max attempts?" --kb engineering --session sess_abc
 
 # answer via a custom agent
-weknora session ask --agent ag_123 "Summarize this quarter's incidents"
+lorelattice session ask --agent ag_123 "Summarize this quarter's incidents"
 ```

@@ -15,8 +15,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/Tencent/WeKnora/internal/im"
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/im"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 )
 
 // Compile-time checks.
@@ -72,8 +72,8 @@ func (a *Adapter) VerifyCallback(c *gin.Context) error {
 
 // telegramUpdate represents an incoming Telegram update (subset of fields).
 type telegramUpdate struct {
-	UpdateID int             `json:"update_id"`
-	Message  *telegramMsg    `json:"message"`
+	UpdateID int          `json:"update_id"`
+	Message  *telegramMsg `json:"message"`
 }
 
 type telegramMsg struct {
@@ -311,7 +311,7 @@ const minEditInterval = 500 * time.Millisecond
 type streamState struct {
 	mu        sync.Mutex
 	content   strings.Builder
-	msgID     string    // Telegram message ID of the "thinking" message
+	msgID     string // Telegram message ID of the "thinking" message
 	chatID    string
 	lastEdit  time.Time // last successful editMessageText timestamp
 	createdAt time.Time // for orphan stream detection

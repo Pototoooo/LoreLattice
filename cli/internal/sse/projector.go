@@ -6,8 +6,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/Tencent/WeKnora/cli/internal/format"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/format"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // ProjectedEvent is the bounded event representation shared by

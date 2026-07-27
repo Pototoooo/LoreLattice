@@ -1,5 +1,5 @@
 {{/*
-Copyright 2025 Tencent
+Copyright 2025-2026 Pototoooo
 SPDX-License-Identifier: MIT
 
 Neo4j Graph Database Deployment and Service.
@@ -10,32 +10,32 @@ Equivalent to: docker compose --profile neo4j
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "weknora.fullname" . }}-neo4j
+  name: {{ include "lorelattice.fullname" . }}-neo4j
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "graph" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "graph" "context" .) | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "weknora.componentSelectorLabels" (dict "component" "graph" "context" .) | nindent 6 }}
+      {{- include "lorelattice.componentSelectorLabels" (dict "component" "graph" "context" .) | nindent 6 }}
   # Use Recreate strategy for database to avoid data corruption
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        {{- include "weknora.componentSelectorLabels" (dict "component" "graph" "context" .) | nindent 8 }}
+        {{- include "lorelattice.componentSelectorLabels" (dict "component" "graph" "context" .) | nindent 8 }}
     spec:
-      {{- include "weknora.imagePullSecrets" . | nindent 6 }}
-      serviceAccountName: {{ include "weknora.serviceAccountName" . }}
+      {{- include "lorelattice.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "lorelattice.serviceAccountName" . }}
       {{- with .Values.global.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: neo4j
-          image: {{ include "weknora.neo4j.image" . }}
+          image: {{ include "lorelattice.neo4j.image" . }}
           imagePullPolicy: IfNotPresent
           {{- with .Values.neo4j.securityContext }}
           securityContext:
@@ -53,7 +53,7 @@ spec:
             - name: NEO4J_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "weknora.secretName" . }}
+                  name: {{ include "lorelattice.secretName" . }}
                   key: NEO4J_PASSWORD
             - name: NEO4J_AUTH
               value: "neo4j/$(NEO4J_PASSWORD)"
@@ -95,7 +95,7 @@ spec:
         - name: neo4j-data
           {{- if .Values.neo4j.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.neo4j.persistence.existingClaim | default (printf "%s-neo4j" (include "weknora.fullname" .)) }}
+            claimName: {{ .Values.neo4j.persistence.existingClaim | default (printf "%s-neo4j" (include "lorelattice.fullname" .)) }}
           {{- else }}
           emptyDir: {}
           {{- end }}
@@ -119,11 +119,11 @@ metadata:
   name: neo4j
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "weknora.componentLabels" (dict "component" "graph" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentLabels" (dict "component" "graph" "context" .) | nindent 4 }}
 spec:
   type: ClusterIP
   selector:
-    {{- include "weknora.componentSelectorLabels" (dict "component" "graph" "context" .) | nindent 4 }}
+    {{- include "lorelattice.componentSelectorLabels" (dict "component" "graph" "context" .) | nindent 4 }}
   ports:
     - name: http
       port: 7474

@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/output"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
 )
 
 type exitCodeRow struct {
@@ -23,8 +23,8 @@ func exitCodeRows() []exitCodeRow {
 	return []exitCodeRow{
 		{0, "success", "", "continue"},
 		{1, "typed local.* / operation.failed / unclassified", "local.*, operation.failed, operation.cancelled, server.session_create_failed, internal.error", "read stderr, decide retry/abort"},
-		{2, "flag / argument validation error (cobra parse: unknown flag, arg count, missing required flag)", "input.invalid_argument (same type as exit 5; distinguish by exit code)", "re-check weknora <cmd> --help"},
-		{3, "authentication / authorization", "auth.*", "re-auth (weknora auth login), then retry"},
+		{2, "flag / argument validation error (cobra parse: unknown flag, arg count, missing required flag)", "input.invalid_argument (same type as exit 5; distinguish by exit code)", "re-check lorelattice <cmd> --help"},
+		{3, "authentication / authorization", "auth.*", "re-auth (lorelattice auth login), then retry"},
 		{4, "resource not found", "resource.not_found", "verify the resource id"},
 		{5, "invalid input value (typed validation, not a parse error)", "input.* (other than confirmation_required)", "adjust args, retry"},
 		{6, "rate limited", "server.rate_limited", "back off, retry"},
@@ -35,11 +35,11 @@ func exitCodeRows() []exitCodeRow {
 	}
 }
 
-// newCmdExitCodes builds the `weknora exit-codes` help-topic command.
-// `weknora help exit-codes` renders Long for humans; running it directly
+// newCmdExitCodes builds the `lorelattice exit-codes` help-topic command.
+// `lorelattice help exit-codes` renders Long for humans; running it directly
 // emits the machine-readable matrix (json by default, per the agent-first
 // output contract). Listed in the command tree (not hidden) so humans have a
-// discoverable path to it via `weknora help`, not only the README.
+// discoverable path to it via `lorelattice help`, not only the README.
 func newCmdExitCodes() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "exit-codes",
@@ -66,7 +66,7 @@ func newCmdExitCodes() *cobra.Command {
 	cmdutil.AddFormatFlag(cmd, "code", "meaning", "error_types", "agent_action")
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
 		UsedFor:  "Machine-readable exit code matrix: what each code means and what to do next.",
-		Examples: []string{"weknora exit-codes", "weknora help exit-codes"},
+		Examples: []string{"lorelattice exit-codes", "lorelattice help exit-codes"},
 		Output:   "envelope.data is an array of {code, meaning, error_types, agent_action}",
 	})
 	cmd.Long = "Exit codes and the agent action for each:\n\n" + exitCodesLongTable()

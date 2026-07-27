@@ -136,7 +136,7 @@ curl --location 'http://localhost:8080/api/v1/knowledge-bases/kb-00000001/knowle
 --header 'X-API-Key: sk-xxxxx' \
 --header 'Content-Type: application/json' \
 --data '{
-    "url": "https://github.com/Tencent/WeKnora",
+    "url": "https://github.com/Pototoooo/lorelattice",
     "enable_multimodel": true
 }'
 ```
@@ -165,7 +165,7 @@ curl --location 'http://localhost:8080/api/v1/knowledge-bases/kb-00000001/knowle
         "type": "url",
         "title": "",
         "description": "",
-        "source": "https://github.com/Tencent/WeKnora",
+        "source": "https://github.com/Pototoooo/lorelattice",
         "channel": "web",
         "tag_id": "",
         "summary_status": "none",
@@ -295,7 +295,7 @@ curl --location 'http://localhost:8080/api/v1/knowledge-bases/kb-00000001/knowle
             "type": "url",
             "title": "",
             "description": "",
-            "source": "https://github.com/Tencent/WeKnora",
+            "source": "https://github.com/Pototoooo/lorelattice",
             "channel": "web",
             "tag_id": "tag-00000001",
             "summary_status": "none",
@@ -384,7 +384,7 @@ curl --location 'http://localhost:8080/api/v1/knowledge/batch?ids=9c8af585-ae15-
             "knowledge_base_id": "kb-00000001",
             "type": "url",
             "title": "",
-            "source": "https://github.com/Tencent/WeKnora",
+            "source": "https://github.com/Pototoooo/lorelattice",
             "parse_status": "pending",
             "enable_status": "disabled",
             "created_at": "2025-08-12T11:55:05.709266+08:00",
@@ -680,7 +680,7 @@ curl --location --request PUT 'http://localhost:8080/api/v1/knowledge/image/4c4e
 --header 'X-API-Key: sk-xxxxx' \
 --header 'Content-Type: application/json' \
 --data '{
-    "image_info": "{\"description\":\"产品架构图\",\"alt_text\":\"WeKnora 系统架构\"}"
+    "image_info": "{\"description\":\"产品架构图\",\"alt_text\":\"LoreLattice 系统架构\"}"
 }'
 ```
 

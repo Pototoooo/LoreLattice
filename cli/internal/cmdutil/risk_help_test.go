@@ -24,7 +24,7 @@ func TestSetAgentHelp_PrependsRiskWhenAnnotated(t *testing.T) {
 	var buf bytes.Buffer
 	cmd.SetOut(&buf)
 	cmd.SetErr(&buf)
-	t.Setenv("WEKNORA_AGENT_HELP", "")
+	t.Setenv("LORELATTICE_AGENT_HELP", "")
 
 	cmd.HelpFunc()(cmd, []string{})
 
@@ -47,7 +47,7 @@ func TestSetAgentHelp_NoRiskWhenUnannotated(t *testing.T) {
 	var buf bytes.Buffer
 	cmd.SetOut(&buf)
 	cmd.SetErr(&buf)
-	t.Setenv("WEKNORA_AGENT_HELP", "")
+	t.Setenv("LORELATTICE_AGENT_HELP", "")
 
 	cmd.HelpFunc()(cmd, []string{})
 
@@ -64,7 +64,7 @@ func TestSetAgentHelp_JSONPathUnaffectedByRisk(t *testing.T) {
 	var buf bytes.Buffer
 	cmd.SetOut(&buf)
 	cmd.SetErr(&buf)
-	t.Setenv("WEKNORA_AGENT_HELP", "1")
+	t.Setenv("LORELATTICE_AGENT_HELP", "1")
 
 	cmd.HelpFunc()(cmd, []string{})
 

@@ -5,11 +5,11 @@ storage:
 web:
   http: 0.0.0.0:5556
 staticClients:
-  - id: weknora
+  - id: lorelattice
     redirectURIs:
       - 'http://127.0.0.1:5173/api/v1/auth/oidc/callback'
       - 'http://127.0.0.1/api/v1/auth/oidc/callback'
-    name: 'WeKnora'
+    name: 'LoreLattice'
     # add a "secret" field here
 enablePasswordDB: true
 oauth2:

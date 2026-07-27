@@ -9,7 +9,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // statefulFeishu is a fake Feishu server whose per-node export outcome can be
@@ -71,7 +71,9 @@ func newStatefulFeishu(nodes []wikiNode) (*httptest.Server, *Config, *statefulFe
 		_ = json.NewDecoder(r.Body).Decode(&body)
 		writeJSON(w, exportTaskCreateResponse{
 			apiResponse: apiResponse{Code: 0},
-			Data:        struct{ Ticket string `json:"ticket"` }{Ticket: body.Token},
+			Data: struct {
+				Ticket string `json:"ticket"`
+			}{Ticket: body.Token},
 		})
 	})
 	// Export status poll: /open-apis/drive/v1/export_tasks/<ticket>?token=<objToken>
@@ -155,7 +157,7 @@ func lastCheckpointCursor(h *convergenceHandler, t *testing.T) *types.SyncCursor
 }
 
 // TestFetchStream_ResumeConvergesAfterTimeoutAndTransientFailure is the
-// end-to-end proof for Tencent/WeKnora#2136: a large-ish wiki that (a) hits a
+// end-to-end proof for Pototoooo/lorelattice#2136: a large-ish wiki that (a) hits a
 // transient per-node export failure and (b) is killed by the 2h task timeout
 // mid-traversal must, on the asynq retry, resume from the last checkpoint,
 // re-fetch only what is outstanding, retry the transiently-failed node, and end

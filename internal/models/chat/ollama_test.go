@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 )
 
 func TestResolveImageForOllamaRejectsInternalURL(t *testing.T) {

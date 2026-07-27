@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/errors"
-	"github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/errors"
+	"github.com/Pototoooo/lorelattice/internal/utils"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -297,22 +297,22 @@ func (c IndexConfig) GetIndexNameOrDefault(engineType RetrieverEngineType) strin
 		if c.CollectionPrefix != "" {
 			return c.CollectionPrefix
 		}
-		return "weknora_embeddings"
+		return "lorelattice_embeddings"
 	case MilvusRetrieverEngineType:
 		if c.CollectionName != "" {
 			return c.CollectionName
 		}
-		return "weknora_embeddings"
+		return "lorelattice_embeddings"
 	case TencentVectorDBRetrieverEngineType:
 		if c.CollectionName != "" {
 			return c.CollectionName
 		}
-		return "weknora_embeddings"
+		return "lorelattice_embeddings"
 	case WeaviateRetrieverEngineType:
 		if c.CollectionPrefix != "" {
 			return c.CollectionPrefix
 		}
-		return "Weknora_embeddings"
+		return "LoreLattice_embeddings"
 	case DorisRetrieverEngineType:
 		// Doris uses the prefix as the table base name; per-dimension tables are
 		// suffixed with _<dim> at runtime by the repository layer.
@@ -322,7 +322,7 @@ func (c IndexConfig) GetIndexNameOrDefault(engineType RetrieverEngineType) strin
 		if c.CollectionName != "" {
 			return c.CollectionName
 		}
-		return "weknora_embeddings"
+		return "lorelattice_embeddings"
 	default:
 		return c.IndexName
 	}
@@ -676,7 +676,7 @@ func GetVectorStoreTypes() []VectorStoreTypeInfo {
 				{Name: "password", Type: "string", Required: false, Sensitive: true, Description: "Password"},
 			},
 			IndexFields: []VectorStoreFieldInfo{
-				{Name: "index_name", Type: "string", Required: false, Description: "Index Name", Default: "weknora"},
+				{Name: "index_name", Type: "string", Required: false, Description: "Index Name", Default: "lorelattice"},
 				{Name: "number_of_shards", Type: "number", Required: false, Description: "Shards", Default: 4},
 				{Name: "number_of_replicas", Type: "number", Required: false, Description: "Replicas", Default: 1},
 			},
@@ -694,7 +694,7 @@ func GetVectorStoreTypes() []VectorStoreTypeInfo {
 				{Name: "use_tls", Type: "boolean", Required: false, Description: "Use TLS", Default: false},
 			},
 			IndexFields: []VectorStoreFieldInfo{
-				{Name: "collection_prefix", Type: "string", Required: false, Description: "Collection Prefix", Default: "weknora_embeddings"},
+				{Name: "collection_prefix", Type: "string", Required: false, Description: "Collection Prefix", Default: "lorelattice_embeddings"},
 				{Name: "shard_number", Type: "number", Required: false, Description: "Shard Number", Default: 1},
 				{Name: "replication_factor", Type: "number", Required: false, Description: "Replication Factor", Default: 1},
 			},
@@ -709,7 +709,7 @@ func GetVectorStoreTypes() []VectorStoreTypeInfo {
 				{Name: "password", Type: "string", Required: false, Sensitive: true, Description: "Password"},
 			},
 			IndexFields: []VectorStoreFieldInfo{
-				{Name: "collection_name", Type: "string", Required: false, Description: "Collection Name", Default: "weknora_embeddings"},
+				{Name: "collection_name", Type: "string", Required: false, Description: "Collection Name", Default: "lorelattice_embeddings"},
 				{Name: "shards_num", Type: "number", Required: false, Description: "Shards (write parallelism)", Default: 1},
 				{Name: "replica_number", Type: "number", Required: false, Description: "In-memory Replicas (read HA)", Default: 1},
 			},
@@ -721,10 +721,10 @@ func GetVectorStoreTypes() []VectorStoreTypeInfo {
 				{Name: "addr", Type: "string", Required: true, Description: "Address", Default: "http://localhost:8080"},
 				{Name: "username", Type: "string", Required: true, Description: "Username"},
 				{Name: "api_key", Type: "string", Required: true, Sensitive: true, Description: "API Key"},
-				{Name: "database", Type: "string", Required: false, Description: "Database", Default: "weknora"},
+				{Name: "database", Type: "string", Required: false, Description: "Database", Default: "lorelattice"},
 			},
 			IndexFields: []VectorStoreFieldInfo{
-				{Name: "collection_name", Type: "string", Required: false, Description: "Collection Name", Default: "weknora_embeddings"},
+				{Name: "collection_name", Type: "string", Required: false, Description: "Collection Name", Default: "lorelattice_embeddings"},
 				{Name: "shards_num", Type: "number", Required: false, Description: "Shards", Default: 1},
 				{Name: "replica_number", Type: "number", Required: false, Description: "Replicas", Default: tencentVectorDBReplicaNumber},
 			},
@@ -739,7 +739,7 @@ func GetVectorStoreTypes() []VectorStoreTypeInfo {
 				{Name: "api_key", Type: "string", Required: false, Sensitive: true, Description: "API Key"},
 			},
 			IndexFields: []VectorStoreFieldInfo{
-				{Name: "collection_prefix", Type: "string", Required: false, Description: "Collection Prefix", Default: "Weknora_embeddings"},
+				{Name: "collection_prefix", Type: "string", Required: false, Description: "Collection Prefix", Default: "LoreLattice_embeddings"},
 				{Name: "desired_shard_count", Type: "number", Required: false, Description: "Shard Count", Default: 1},
 				{Name: "replication_factor", Type: "number", Required: false, Description: "Replication Factor", Default: 1},
 			},
@@ -750,12 +750,12 @@ func GetVectorStoreTypes() []VectorStoreTypeInfo {
 			ConnectionFields: []VectorStoreFieldInfo{
 				{Name: "addr", Type: "string", Required: true, Description: "FE MySQL Address (host:port)", Default: "doris-fe:9030"},
 				{Name: "http_port", Type: "number", Required: false, Description: "FE HTTP Port (Stream Load)", Default: 8030},
-				{Name: "database", Type: "string", Required: true, Description: "Database", Default: "weknora"},
+				{Name: "database", Type: "string", Required: true, Description: "Database", Default: "lorelattice"},
 				{Name: "username", Type: "string", Required: false, Description: "Username", Default: "root"},
 				{Name: "password", Type: "string", Required: false, Sensitive: true, Description: "Password"},
 			},
 			IndexFields: []VectorStoreFieldInfo{
-				{Name: "collection_prefix", Type: "string", Required: false, Description: "Table Prefix", Default: "weknora_embeddings"},
+				{Name: "collection_prefix", Type: "string", Required: false, Description: "Table Prefix", Default: "lorelattice_embeddings"},
 				{Name: "buckets_num", Type: "number", Required: false, Description: "Buckets per table", Default: 10},
 				{Name: "replication_num", Type: "number", Required: false, Description: "Replication Num", Default: 1},
 			},
@@ -771,7 +771,7 @@ func GetVectorStoreTypes() []VectorStoreTypeInfo {
 					Description: "Skip TLS certificate verification. For self-signed dev clusters only — never enable in production."},
 			},
 			IndexFields: []VectorStoreFieldInfo{
-				{Name: "index_name", Type: "string", Required: false, Description: "Index Name", Default: "weknora"},
+				{Name: "index_name", Type: "string", Required: false, Description: "Index Name", Default: "lorelattice"},
 				{Name: "number_of_shards", Type: "number", Required: false, Description: "Shards", Default: 4, Min: floatPtr(1), Max: floatPtr(64)},
 				{Name: "number_of_replicas", Type: "number", Required: false, Description: "Replicas", Default: 1, Min: floatPtr(0), Max: floatPtr(10)},
 				{Name: "hnsw_m", Type: "number", Required: false, Description: "HNSW graph degree (M). Immutable after index creation.", Default: 16, Min: floatPtr(2), Max: floatPtr(100), Immutable: true},

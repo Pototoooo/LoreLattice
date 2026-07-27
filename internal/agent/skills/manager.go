@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/Tencent/WeKnora/internal/sandbox"
+	"github.com/Pototoooo/lorelattice/internal/sandbox"
 )
 
 // Manager manages skills lifecycle including discovery, loading, and script execution

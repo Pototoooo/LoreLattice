@@ -3,7 +3,7 @@ package repository
 import (
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -84,7 +84,7 @@ func reloadKB(t *testing.T, db *gorm.DB, id string) types.KnowledgeBase {
 }
 
 // TestKnowledgeBase_VectorStoreID_Save_Immutable verifies that db.Save(kb)
-// — which WeKnora's UpdateKnowledgeBase repository path uses today — does
+// — which LoreLattice's UpdateKnowledgeBase repository path uses today — does
 // NOT overwrite the vector_store_id column, thanks to the GORM
 // `<-:create` tag. This is the primary automated defense for the H1 review
 // finding (silent overwrite of the binding via full-struct UPDATE).

@@ -7,11 +7,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
 )
 
-// TestSchema_Index: `weknora schema` lists every leaf command with its purpose.
+// TestSchema_Index: `lorelattice schema` lists every leaf command with its purpose.
 func TestSchema_Index(t *testing.T) {
 	out, _ := iostreams.SetForTest(t)
 	root := NewRootCmd(cmdutil.New())

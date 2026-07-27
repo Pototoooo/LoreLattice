@@ -1,4 +1,4 @@
-// Package langfuse implements WeKnora's Langfuse/LiteFuse LLM tracing client on
+// Package langfuse implements LoreLattice's Langfuse/LiteFuse LLM tracing client on
 // top of the OpenTelemetry Go SDK. It records chat/embedding/rerank/VLM/ASR
 // generations plus the surrounding agent/HTTP/asynq spans as OTLP/HTTP spans
 // to a Langfuse v3+ or LiteFuse backend (POST /api/public/otel/v1/traces).
@@ -6,7 +6,7 @@
 // The integration is fully opt-in: when disabled (the default), every public
 // entry point is a cheap no-op, so callers can wire them unconditionally. A
 // W3C traceparent propagated from upstream callers (e.g. sop3) is inherited so
-// WeKnora's trace shares the upstream trace id — correlating runs across
+// LoreLattice's trace shares the upstream trace id — correlating runs across
 // services in the LiteFuse UI.
 package langfuse
 
@@ -24,7 +24,7 @@ import (
 //
 // In practice users enable Langfuse purely through environment variables —
 // Host / PublicKey / SecretKey — which matches every other Langfuse SDK and
-// keeps WeKnora's YAML config free of secrets.
+// keeps LoreLattice's YAML config free of secrets.
 type Config struct {
 	// Enabled is the master switch. If false the entire package is a no-op.
 	Enabled bool

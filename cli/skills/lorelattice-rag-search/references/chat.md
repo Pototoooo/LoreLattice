@@ -8,8 +8,8 @@ RAG, `session ask` invokes a custom agent.
 ## Commands & flags
 
 ```
-weknora chat "<query>" --kb <name-or-id> [--session <id>]
-weknora session ask "<query>" --agent <agent-id> [--session <id>]
+lorelattice chat "<query>" --kb <name-or-id> [--session <id>]
+lorelattice session ask "<query>" --agent <agent-id> [--session <id>]
 ```
 
 - `--kb` (chat) is required name-or-id. `--agent` (session ask) is required.
@@ -46,10 +46,10 @@ events through verbatim:
 
 ## Recovery
 
-- **Stop server-side generation:** `weknora session stop <session-id> --message
+- **Stop server-side generation:** `lorelattice session stop <session-id> --message
   <message-id>`. Ctrl-C only closes your local connection — the server keeps
   generating (and billing) until told to stop.
-- **Re-attach after a dropped connection:** `weknora session resume
+- **Re-attach after a dropped connection:** `lorelattice session resume
   <session-id> --message <message-id>`. The server replays the event log from
   index 0 then tails new events, so **dedupe by message_id** if you already
   consumed some events. Buffer TTL is ~1h (redis) or process-lifetime (memory).

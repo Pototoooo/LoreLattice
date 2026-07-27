@@ -459,7 +459,7 @@ export function testMultimodalFunction(testData: {
         formData.append('separators', JSON.stringify(testData.separators));
 
         // 获取鉴权Token
-        const token = localStorage.getItem('weknora_token');
+        const token = localStorage.getItem('lorelattice_token');
         const headers: Record<string, string> = {};
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
@@ -468,7 +468,7 @@ export function testMultimodalFunction(testData: {
         // 跨空间访问请求头：直接附，避免 short-circuit "selectedTenantId
         // === defaultTenantId 时不附" 在某些边角下让 header 静默丢失。
         // 与 utils/request.ts、api/chat/streame.ts 行为一致。
-        const selectedTenantId = localStorage.getItem('weknora_selected_tenant_id');
+        const selectedTenantId = localStorage.getItem('lorelattice_selected_tenant_id');
         if (selectedTenantId) {
             headers['X-Tenant-ID'] = selectedTenantId;
         }

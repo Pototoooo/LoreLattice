@@ -15,13 +15,13 @@
 
 | 名称 | 格式 | 谁持有 | 用途 |
 |------|------|--------|------|
-| 发布 Token | `em_…` | 仅你的服务端 | 向 WeKnora 换取短时令牌；在管理端「渠道密钥」查看 |
+| 发布 Token | `em_…` | 仅你的服务端 | 向 LoreLattice 换取短时令牌；在管理端「渠道密钥」查看 |
 | 会话 Token | `ems_…` | 访客浏览器（iframe 内） | 调聊天、上传等 embed API；约 30 分钟过期，Widget 会自动刷新 |
 
 ## 工作流程
 
 ```
-访客浏览器                 你的后端（shop 的服务器）              WeKnora
+访客浏览器                 你的后端（shop 的服务器）              LoreLattice
      │                              │                              │
      │ 1. 加载 Widget               │                              │
      │    data-token-endpoint       │                              │
@@ -38,12 +38,12 @@
 
 对应管理端「嵌入渠道 → 安全模式」里的两段代码：
 
-1. **页面脚本**：`data-token-endpoint="https://你的域名/weknora/embed-token"`（没有 `data-token`）
+1. **页面脚本**：`data-token-endpoint="https://你的域名/lorelattice/embed-token"`（没有 `data-token`）
 2. **服务端接口**：用发布 Token 调 exchange，把 `ems_…` 返回给前端
 
 ## 集成步骤
 
-### 第 1 步：在 WeKnora 创建渠道
+### 第 1 步：在 LoreLattice 创建渠道
 
 - 记下 **渠道 ID** 和 **发布 Token**（`em_…`）
 - 配置域名白名单（见下）
@@ -58,13 +58,13 @@
 **你必须做**：
 
 - 校验调用方是合法访客（Session Cookie、JWT 等），未登录返回 `401`
-- 用发布 Token 调 WeKnora exchange
+- 用发布 Token 调 LoreLattice exchange
 - 成功时返回 JSON：`{ "token": "<ems_…>", "expiresIn": 1800 }`
 
 **调 exchange 的约定**：
 
 ```http
-POST https://<weknora-host>/api/v1/embed/<channel_id>/exchange
+POST https://<lorelattice-host>/api/v1/embed/<channel_id>/exchange
 Authorization: Embed <发布 Token em_…>
 Origin: https://<你的业务站点>    ← 须与渠道白名单一致，否则 403
 ```
@@ -77,26 +77,26 @@ Origin: https://<你的业务站点>    ← 须与渠道白名单一致，否则
 
 ## 服务端示例
 
-以下 `<WEKNORA_HOST>`、`<CHANNEL_ID>` 替换为实际值；发布 Token 放环境变量 `WEKNORA_PUBLISH_TOKEN`，**不要**写进前端。
+以下 `<LORELATTICE_HOST>`、`<CHANNEL_ID>` 替换为实际值；发布 Token 放环境变量 `LORELATTICE_PUBLISH_TOKEN`，**不要**写进前端。
 
 ### Node.js（Express）
 
 ```javascript
-const WEKNORA_BASE = 'https://<WEKNORA_HOST>';
+const LORELATTICE_BASE = 'https://<LORELATTICE_HOST>';
 const CHANNEL_ID = '<CHANNEL_ID>';
 const ALLOWED_ORIGIN = 'https://shop.example.com'; // 与渠道白名单一致
 
-app.get('/weknora/embed-token', async (req, res) => {
+app.get('/lorelattice/embed-token', async (req, res) => {
   const hasSession = Boolean(req.cookies?.session_id);
   const auth = req.headers.authorization || '';
   if (!hasSession && !auth.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'unauthorized' });
   }
 
-  const r = await fetch(`${WEKNORA_BASE}/api/v1/embed/${CHANNEL_ID}/exchange`, {
+  const r = await fetch(`${LORELATTICE_BASE}/api/v1/embed/${CHANNEL_ID}/exchange`, {
     method: 'POST',
     headers: {
-      Authorization: 'Embed ' + process.env.WEKNORA_PUBLISH_TOKEN,
+      Authorization: 'Embed ' + process.env.LORELATTICE_PUBLISH_TOKEN,
       Origin: ALLOWED_ORIGIN,
     },
   });
@@ -117,8 +117,8 @@ func embedTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	req, _ := http.NewRequest(http.MethodPost,
-		"https://<WEKNORA_HOST>/api/v1/embed/<CHANNEL_ID>/exchange", nil)
-	req.Header.Set("Authorization", "Embed "+os.Getenv("WEKNORA_PUBLISH_TOKEN"))
+		"https://<LORELATTICE_HOST>/api/v1/embed/<CHANNEL_ID>/exchange", nil)
+	req.Header.Set("Authorization", "Embed "+os.Getenv("LORELATTICE_PUBLISH_TOKEN"))
 	req.Header.Set("Origin", "https://shop.example.com") // 与渠道白名单一致
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil || resp.StatusCode >= 300 {
@@ -172,11 +172,11 @@ func embedTokenHandler(w http.ResponseWriter, r *http.Request) {
 | exchange 返回 **401** / `publish token required` | 发布 Token 错误、已轮换，或误用了 `ems_` 会话 Token |
 | exchange 或聊天 API 返回 **403** `origin not allowed` | 白名单未包含当前请求的 `Origin`；服务端 exchange 记得手动加 `Origin` 头 |
 | iframe 一直「等待 Token」 | `token-endpoint` 未返回 `{ token, expiresIn }`，或 CORS 未允许 Widget 所在源站访问你的接口 |
-| 取令牌接口 **502** `mint failed` | WeKnora 不可达、渠道已停用，或 exchange 响应格式不对 |
+| 取令牌接口 **502** `mint failed` | LoreLattice 不可达、渠道已停用，或 exchange 响应格式不对 |
 | 访客随便就能聊 | 取令牌接口未做登录校验——在 exchange 前加 Session / JWT 检查 |
 
 ## 相关
 
 - 可选：embed 独立子域 → [embed-subdomain.md](./embed-subdomain.md)
-- Widget SDK 注释：`frontend/public/weknora-widget.js`
+- Widget SDK 注释：`frontend/public/lorelattice-widget.js`
 - 代码生成：`frontend/src/api/embed/index.ts`

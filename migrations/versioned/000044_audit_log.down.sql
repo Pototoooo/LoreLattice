@@ -5,14 +5,14 @@
 --         for development rollbacks, never for production.
 --
 -- Operators who really need to run this in a non-dev environment must
--- set the session-level GUC `weknora.allow_destructive_migration` to
+-- set the session-level GUC `lorelattice.allow_destructive_migration` to
 -- 'true' first. Otherwise the migration aborts before touching any data.
 DO $$
 BEGIN
-    IF coalesce(current_setting('weknora.allow_destructive_migration', true), 'false') <> 'true' THEN
+    IF coalesce(current_setting('lorelattice.allow_destructive_migration', true), 'false') <> 'true' THEN
         RAISE EXCEPTION
             '[Migration 000044 down] BLOCKED: refuse to drop audit_logs. '
-            'Set weknora.allow_destructive_migration = ''true'' in this session to override.';
+            'Set lorelattice.allow_destructive_migration = ''true'' in this session to override.';
     END IF;
     RAISE WARNING '[Migration 000044 down] Dropping audit_logs — durable history will be lost';
 END $$;

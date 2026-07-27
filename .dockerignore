@@ -27,7 +27,7 @@
 # 所以这里可以直接排除整个 frontend/ 目录。
 **/node_modules/
 frontend/
-WeKnora-Chrome-Extension/
+LoreLattice-Chrome-Extension/
 
 # 日志 / 临时文件
 logs/
@@ -37,8 +37,8 @@ temp/
 *.pid
 
 # 本地构建产物 / 二进制
-WeKnora
-WeKnora-lite
+LoreLattice
+LoreLattice-lite
 /server
 /dist/
 /build/

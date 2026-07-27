@@ -13,7 +13,7 @@ func TestFetchURLContentBlocksRedirectToLoopback(t *testing.T) {
 	internalHit := make(chan struct{}, 1)
 	internal := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		internalHit <- struct{}{}
-		fmt.Fprint(w, "<html><body>WEKNORA_INTERNAL_CANARY_178193</body></html>")
+		fmt.Fprint(w, "<html><body>LORELATTICE_INTERNAL_CANARY_178193</body></html>")
 	}))
 	defer internal.Close()
 
@@ -28,7 +28,7 @@ func TestFetchURLContentBlocksRedirectToLoopback(t *testing.T) {
 
 	got, err := FetchURLContent(context.Background(), attacker.URL+"/entry")
 	if err == nil {
-		if strings.Contains(got, "WEKNORA_INTERNAL_CANARY_178193") {
+		if strings.Contains(got, "LORELATTICE_INTERNAL_CANARY_178193") {
 			t.Fatalf("redirect followed to loopback, got %q", got)
 		}
 		t.Fatal("expected redirect to loopback to be blocked")

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 func TestFormatExistingTaxonomyForPrompt(t *testing.T) {
@@ -77,8 +77,8 @@ func TestCosineSimilarity(t *testing.T) {
 
 func TestSelectFoldersByVectors(t *testing.T) {
 	deeper := [][]string{
-		{"AI", "厂商"},   // 0
-		{"AI", "模型"},   // 1
+		{"AI", "厂商"}, // 0
+		{"AI", "模型"}, // 1
 		{"地理", "城市"}, // 2
 	}
 	folderVecs := [][]float32{

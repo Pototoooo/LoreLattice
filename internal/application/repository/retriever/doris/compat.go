@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 )
 
 const envDorisCompatMode = "DORIS_COMPAT_MODE"
@@ -16,13 +16,13 @@ const envDorisCompatMode = "DORIS_COMPAT_MODE"
 type dorisCompatMode string
 
 const (
-	dorisCompatModeAuto                   dorisCompatMode = "auto"
-	dorisCompatModeLegacy                 dorisCompatMode = "legacy"
-	dorisCompatModeInnerProductDuplicate  dorisCompatMode = "inner_product_duplicate"
+	dorisCompatModeAuto                  dorisCompatMode = "auto"
+	dorisCompatModeLegacy                dorisCompatMode = "legacy"
+	dorisCompatModeInnerProductDuplicate dorisCompatMode = "inner_product_duplicate"
 )
 
 type dorisCompatProbe struct {
-	innerProductApproximate  bool
+	innerProductApproximate   bool
 	cosineDistanceApproximate bool
 }
 

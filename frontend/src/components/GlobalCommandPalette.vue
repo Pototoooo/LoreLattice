@@ -400,7 +400,7 @@ const openChunk = (item: FlatChunkItem) => {
   // listens for instead; this also avoids reloading the KB list on every click.
   if (currentKbId === item.file.kbId) {
     window.dispatchEvent(
-      new CustomEvent('weknora:open-knowledge', {
+      new CustomEvent('lorelattice:open-knowledge', {
         detail: { kbId: item.file.kbId, knowledgeId: item.file.knowledgeId },
       }),
     )

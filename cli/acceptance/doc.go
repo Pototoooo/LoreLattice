@@ -7,5 +7,5 @@
 // Sub-packages:
 //
 //	contract/    - envelope JSON shape golden + error.code registry consistency
-//	e2e/         - real WeKnora server blackbox tests (testscript-style)
+//	e2e/         - real LoreLattice server blackbox tests (testscript-style)
 package acceptance

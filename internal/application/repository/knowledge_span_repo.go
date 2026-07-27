@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

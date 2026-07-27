@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### New Features
 
-- **NEW**: **Scoped Tenant API Keys & Principal Model** — the headline of this release. WeKnora now issues fine-grained, capability-scoped API keys that are first-class principals separate from human users (migrations `000064_principal_model`, `000065_tenant_api_keys`). Each key carries an explicit role plus capability grants (`manage_kbs` covering the full KB lifecycle, `manage_storage_backends`, member/space capabilities, etc.), can be restricted to specific knowledge bases, and updates its `last_used_at` under a throttle. Route-level guards (`DenyAPIKeyPrincipal`, `api_key_gate`) close IDOR/scope gaps, and a new **API Integration Playground** in the web UI lets owners mint, scope, and test keys interactively. MCP OAuth and embed sessions are now scoped per principal so external integrations stay isolated.
+- **NEW**: **Scoped Tenant API Keys & Principal Model** — the headline of this release. LoreLattice now issues fine-grained, capability-scoped API keys that are first-class principals separate from human users (migrations `000064_principal_model`, `000065_tenant_api_keys`). Each key carries an explicit role plus capability grants (`manage_kbs` covering the full KB lifecycle, `manage_storage_backends`, member/space capabilities, etc.), can be restricted to specific knowledge bases, and updates its `last_used_at` under a throttle. Route-level guards (`DenyAPIKeyPrincipal`, `api_key_gate`) close IDOR/scope gaps, and a new **API Integration Playground** in the web UI lets owners mint, scope, and test keys interactively. MCP OAuth and embed sessions are now scoped per principal so external integrations stay isolated.
 - **NEW**: **Runtime Task Queue Observability & Worker-Pool Governance** — a system-admin **Runtime Queues** dashboard exposes live queue depth, per-model concurrency stats, failed-task inspection, manual retry, and cursor-paginated task listings. The ingestion pipeline moves from a single aggregate worker pool to guaranteed per-stage pools (core / post-process / enrichment / maintenance) plus a shared elastic pool, with per-model background concurrency governors (`model.max_concurrency`) wrapping chat, embedding, rerank, and VLM calls. Wiki generation runs in its own independently governed pool. See [`docs/worker-pool-governance.md`](./docs/worker-pool-governance.md).
 - **NEW**: **Multi-Instance Storage Backends** — each workspace can register multiple object/file storage instances (`local` / `minio` / `cos` / `tos` / `s3` / `oss` / `ks3` / `obs`) and bind different knowledge bases to different instances, with a workspace-level default (migration `000068_storage_backends`). Ships a full CRUD + connectivity-test API and settings UI, credential masking on read, and hardened image-source protection for storage backends. See [`docs/api/storage-backend.md`](./docs/api/storage-backend.md).
 - **NEW**: **Session-Scoped Temporary Attachments** — attach images and documents to a chat session for one-off Q&A with asynchronous parsing (migration `000070_temporary_documents`). Enforces a combined image + attachment limit, normalizes temporary attachment IDs, persists attachment content across turns, and adds a chat attachment preview drawer.
@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file.
 - **NEW**: **@Skill / @MCP Mentions with Scoped Agent Runtime** — mention skills and MCP services inline in chat to scope the agent runtime for a single turn, with hardened `@mention` scope resolution and consolidated per-turn scoping across knowledge tools.
 - **NEW**: **Mid-Conversation MCP OAuth** — MCP services can prompt for and resume OAuth authorization mid-chat, driven by `AuthType` with auto-detection on test, an OAuth skip endpoint, and in-chat OAuth interaction cards aligned with the agent tool timeline.
 - **NEW**: **QQBot & Lark (Feishu International) IM Integration** — new QQBot instant-messaging platform integration and support for Feishu's international edition (Lark), including region-aware routing and reply-in-thread via the Feishu reply-message API.
-- **NEW**: **`weknora` CLI v0.10** (BREAKING) — an agent-first CLI refresh: new `model`, `message`, `config`, and `skills` command groups; `doc reparse` / `doc update`; `kb config` / `kb config set`; `session resume` (renamed from `continue`) and `session tool-approval`; agent-first chat and `session ask` output modes; typed SDK errors/enums and KB model config; hardened SSE reliability; schema and exit-code contracts.
+- **NEW**: **`lorelattice` CLI v0.10** (BREAKING) — an agent-first CLI refresh: new `model`, `message`, `config`, and `skills` command groups; `doc reparse` / `doc update`; `kb config` / `kb config set`; `session resume` (renamed from `continue`) and `session tool-approval`; agent-first chat and `session ask` output modes; typed SDK errors/enums and KB model config; hardened SSE reliability; schema and exit-code contracts.
 - **NEW**: **Redis TLS Support** — TLS connections to Redis with config surfaced at startup and hardened TLS tests (#1930).
 - **NEW**: **New Providers** — Requesty added as an OpenAI-compatible model provider; Keenable added as a configurable web search provider.
 - **NEW**: **Tenantless Provisioning & Gated Self-Service Workspaces** — OIDC/login provisioning can create users without a tenant, with gated self-service workspace creation and a workspace onboarding flow, unified under a shared `default_tenant_mode` policy.
@@ -32,7 +32,7 @@ All notable changes to this project will be documented in this file.
 - **IMPROVED**: **Terminology** — user-facing "tenant" labels renamed to "workspace" across the UI and i18n.
 - **IMPROVED**: **Chat streaming** — unified streaming wait indicators across chat and embed, follow-up suggestion loading and answer-toolbar timing polished, references drawer closed on session switch, and enforced retrieved-image output in answers.
 - **IMPROVED**: **Frontend resilience** — hardened settings `localStorage` load to prevent white-screen from corrupted state; shared document action menu and card-view components extracted; Wiki badge on KB cards; responsive doc filter bar.
-- **IMPROVED**: **Infrastructure config** — infrastructure host/port configurable via env vars in docker-compose; remote infrastructure supported via `.env.local`; `WEKNORA_MODEL_MAX_CONCURRENCY` defaulted to 32.
+- **IMPROVED**: **Infrastructure config** — infrastructure host/port configurable via env vars in docker-compose; remote infrastructure supported via `.env.local`; `LORELATTICE_MODEL_MAX_CONCURRENCY` defaulted to 32.
 - **IMPROVED**: **docreader** — SSRF utility and safe HTTP client added; legacy doc-payload detection; parser routing tests.
 
 ### Bug Fixes
@@ -65,7 +65,7 @@ All notable changes to this project will be documented in this file.
 
 ### New Features
 
-- **NEW**: **Website Embed Widget & Channels** — the headline of this release. Publish custom agents to external websites via embed channels with domain allowlists, per-minute / per-day rate limiting, and secure-mode token exchange (`em_…` publish token → short-lived `ems_…` session token). Ships `weknora-widget.js`, a standalone embed chat UI, visitor session management, and a unified **Integrations Center** for IM + embed channel editors with agent rebind and live preview. See [`docs/embed-secure-mode.md`](./docs/embed-secure-mode.md) and [`docs/embed-subdomain.md`](./docs/embed-subdomain.md).
+- **NEW**: **Website Embed Widget & Channels** — the headline of this release. Publish custom agents to external websites via embed channels with domain allowlists, per-minute / per-day rate limiting, and secure-mode token exchange (`em_…` publish token → short-lived `ems_…` session token). Ships `lorelattice-widget.js`, a standalone embed chat UI, visitor session management, and a unified **Integrations Center** for IM + embed channel editors with agent rebind and live preview. See [`docs/embed-secure-mode.md`](./docs/embed-secure-mode.md) and [`docs/embed-subdomain.md`](./docs/embed-subdomain.md).
 - **NEW**: **Chat Experience Overhaul** — unified markdown rendering pipeline with citation popovers, chunk caching, shared resource chips, and `@` mention browsing of recent files; RAG pipeline progress events surfaced in a dedicated timeline component; agent stream display refactor with tool-result rendering, thinking blocks, shimmer streaming tail, and typewriter effect; large tool outputs trimmed via agent-side persistence.
 - **NEW**: **Document Multi-Tag** — documents can carry multiple tags (`knowledge_tag_ids` many-to-many via migration `000063_knowledge_multi_tags`); tag manage drawer, redesigned tag chips / edit dialog, and unified document tag filter in the KB list.
 - **NEW**: **Batch Document Reparse** — `POST /knowledge/batch-reparse` re-queues parsing for multiple documents with optional `process_config`; async task UI refreshes after enqueue.
@@ -132,10 +132,10 @@ All notable changes to this project will be documented in this file.
 
 ### New Features
 
-- **NEW**: **Per-Upload Process Configuration & Upload Confirm Dialog** — the headline of this release. Every file / URL / folder upload can now carry a `process_config` (`KnowledgeProcessOverrides`) that overrides KB defaults for that batch only: parser engine rules, chunking, multimodal (VLM / ASR), question generation, graph extraction, and related flags. The Web UI adds an upload-confirm step so operators can review and tweak settings before enqueueing; the Go client and `weknora doc upload` accept the same JSON payload.
+- **NEW**: **Per-Upload Process Configuration & Upload Confirm Dialog** — the headline of this release. Every file / URL / folder upload can now carry a `process_config` (`KnowledgeProcessOverrides`) that overrides KB defaults for that batch only: parser engine rules, chunking, multimodal (VLM / ASR), question generation, graph extraction, and related flags. The Web UI adds an upload-confirm step so operators can review and tweak settings before enqueueing; the Go client and `lorelattice doc upload` accept the same JSON payload.
 - **NEW**: **Document Reparse with Process Config** — `POST /knowledge/:id/reparse` accepts an optional `process_config` body to re-run parsing with new settings while preserving the knowledge record; overrides are persisted on the knowledge metadata and merged with KB defaults via `ResolveProcessConfig`.
-- **NEW**: **`weknora` CLI v0.9** (BREAKING) — auth/profile model harmonization, resource-command cleanup, and bundled Agent Skills:
-  - **Bundled skills**: `weknora-rag-search` and `weknora-shared` skills ship in-tree with drift-guard parity tests.
+- **NEW**: **`lorelattice` CLI v0.9** (BREAKING) — auth/profile model harmonization, resource-command cleanup, and bundled Agent Skills:
+  - **Bundled skills**: `lorelattice-rag-search` and `lorelattice-shared` skills ship in-tree with drift-guard parity tests.
   - **`session stop`**: abort an in-flight agent run from the terminal.
   - **`--kb` resolver**: accepts KB name or id on `doc delete --all` and `search chunks` / `search docs` (required; no silent project-link fallback).
   - **Auth/profile**: `auth login` authenticates the active profile (use `profile add --use` first); `auth logout` / `auth refresh` drop `--name` — target another profile with global `--profile`.
@@ -191,7 +191,7 @@ All notable changes to this project will be documented in this file.
 - **NEW**: **System Admin & Platform Settings** — system-admin bootstrap/promotion with revocation safeguards, a consolidated single Settings panel merging system admin and settings, a platform audit log with polished audit drawers, and server-side system settings management.
 - **NEW**: **New-User Onboarding Guide** — an interactive spotlight/tour (`NewUserGuide`) with contextual guides for agent and knowledge-base creation, tenant-model-readiness hints, login hints for new users, and an improved backdrop/hole calculation, integrated into the user menu.
 - **NEW**: **Settings UI redesign** — model cards with type badges, redesigned vector-store / parser / storage-engine cards, redesigned web-search / MCP provider cards, brand logos replacing monogram badges, regrouped sidebar nav with a header pinned on scroll, and vector-store test moved into the card menu with a toast result.
-- **NEW**: **`weknora` CLI v0.7 / v0.8** (BREAKING) — agent-first wire contract and command-surface cleanup:
+- **NEW**: **`lorelattice` CLI v0.7 / v0.8** (BREAKING) — agent-first wire contract and command-surface cleanup:
   - **Command-surface rename**: `session ask`, `session continue-stream`, `doc fetch`, `doc create`, `doc delete --all`; `context` CRUD replaced by a `profile` cascade (`context` → `profile`); `agent invoke` / `kb empty` removed.
   - **`--format json` is now the default** with an NDJSON event stream (one JSON event per line) and symmetric envelope infrastructure.
   - **Agent safety nets**: `--dry-run` with risk metadata and validation parity across 19 mutations; `MCP Tool.Annotations` added to 10 tools (spec 2025-06-18).
@@ -268,15 +268,15 @@ All notable changes to this project will be documented in this file.
 
 ### New Features
 
-- **NEW**: **Tenant RBAC (Role-Based Access Control)** — the headline of this release (#1303). WeKnora now enforces a per-tenant role matrix on every mutating route, with per-KB resource ownership. Highlights:
+- **NEW**: **Tenant RBAC (Role-Based Access Control)** — the headline of this release (#1303). LoreLattice now enforces a per-tenant role matrix on every mutating route, with per-KB resource ownership. Highlights:
   - **4-tier role matrix**: `Owner` (one per tenant; can additionally delete the tenant) ⊃ `Admin` ⊃ `Contributor` (full owner of own resources, read-only on others) ⊃ `Viewer` (read-only). Two exceptions: cross-tenant superuser (`User.CanAccessAllTenants=true`) is implicit Admin in any tenant they switch into; API-Key-synthesized virtual users are pinned Admin in their owning tenant.
   - **Per-KB resource ownership**: `chunk → knowledge → kb → creator_id`; same chain applies to FAQ entries, generated questions, KB tags and wiki pages. `custom_agents.creator_id` + `custom_agents.runnable_by_viewer` (default true) control agent ownership and viewer-callability.
   - **Two guard families**: role guards (`Viewer()` / `Contributor()` / `Admin()` / `Owner()`) for tenant-level infra (models, vector stores, IM channels, …) and ownership guards (`OwnedKBOrAdmin()`, `OwnedAgentOrAdmin()`, `OwnedChunkKBOrAdmin()`, …) for resource writes. KB-access guard wired at the route layer for chunk / knowledge / knowledgebase routes (no per-handler helpers).
   - **Tenant members**: invite / remove / role-change endpoints; new `/leave` endpoint; per-tenant audit log with daily retention sweep (default 90 days, `audit_logs.created_at` indexed); `tenant_members` table now drives membership (lifted from per-user to per-tenant in Plan 3); cross-tenant share managed by source-tenant Admin+.
-  - **Configurable**: `tenant.enable_rbac` (default `true`); `false` enters an "audit-only" grace window. New env knobs `WEKNORA_TENANT_ENABLE_RBAC`, `WEKNORA_TENANT_MAX_PER_USER`. RBAC state logged at startup. See [`docs/RBAC说明.md`](./docs/RBAC说明.md).
+  - **Configurable**: `tenant.enable_rbac` (default `true`); `false` enters an "audit-only" grace window. New env knobs `LORELATTICE_TENANT_ENABLE_RBAC`, `LORELATTICE_TENANT_MAX_PER_USER`. RBAC state logged at startup. See [`docs/RBAC说明.md`](./docs/RBAC说明.md).
 - **NEW**: **Tenant Member Management & Multi-Workspace UX** — invite-only gate, member listing UI with role chips, tenant identity surfaces reworked; tenant switcher in the user menu; tenant switch always redirects to KB list and clears tenant-scoped client state; last-active workspace persisted across logins; pending invitations dialog with polling + global invitation bell; rich workspace-aware notifications on login / tenant switch (raw-message handling, styled chips, survives page reload); QuickNav entry for members; "leave workspace" surfaced in i18n.
 - **NEW**: **Self-Service Workspaces** — any user can create their own tenant (capped per user via env knob); creation dialog with i18n; tenant name + description editable inline; cross-tenant superuser mirrored as Admin role chip in the UI.
-- **NEW**: **`weknora` CLI v0.3 / v0.4 (GA)** — graduates from preview to GA with comprehensive verb-noun subtree coverage:
+- **NEW**: **`lorelattice` CLI v0.3 / v0.4 (GA)** — graduates from preview to GA with comprehensive verb-noun subtree coverage:
   - `agent` subtree: list / view / invoke / check / status / edit / delete / create (full agent CRUD with config rendering).
   - `chunk` subtree: list / view / delete (with curation rationale).
   - `session` subtree: list / view / delete.
@@ -286,7 +286,7 @@ All notable changes to this project will be documented in this file.
   - `auth`: new `refresh` and `token` verbs; transparent 401 retry transport.
   - `context` CRUD: add / list / remove / use.
   - `link` / `unlink` for project-level KB binding.
-  - `mcp serve` — curated stdio MCP server so AI clients (Claude Code, Cursor, …) can drive WeKnora directly; includes MCP `chunk_list` tool.
+  - `mcp serve` — curated stdio MCP server so AI clients (Claude Code, Cursor, …) can drive LoreLattice directly; includes MCP `chunk_list` tool.
   - **Globals**: `--format`, `--json` field-select, `--jq`, `--paginate`, `--all-pages` (canonical catch-up), `--input`, `--log-level`, `--from-url`, NDJSON output, bare-JSON output path, signal-aware contexts.
   - **Removed**: envelope infrastructure (errors → stderr); `--dry-run`; `internal/agent` aiclient package; v0.0 scaffolding.
 - **NEW**: **KB Retrieval Fan-out Across Vector Stores** — a single KB can now bind to multiple vector stores; retrieval engine fans out queries across all bound stores and merges results. KB editor validates bindings on create / copy / delete. Retriever resolution introduces a factory pattern for KB-scoped engine selection.
@@ -296,7 +296,7 @@ All notable changes to this project will be documented in this file.
 - **NEW**: **Huawei Cloud OBS** object storage joins Local / MinIO / AWS S3 / Volcengine TOS / Alibaba Cloud OSS / Kingsoft Cloud KS3 / Huawei OBS.
 - **NEW**: **vLLM URL configuration for MinerU** doc parser.
 - **NEW**: **Apache Doris compatibility modes** — configurable Doris compat modes with mode-switch guards.
-- **NEW**: **Docreader image URL whitelist** — trusted URLs can be served as-is without re-uploading into WeKnora storage.
+- **NEW**: **Docreader image URL whitelist** — trusted URLs can be served as-is without re-uploading into LoreLattice storage.
 - **NEW**: **Server-Side User Preferences** — per-user font / theme / memory-feature toggle persisted on the server; per-user KB pinning replaces tenant-wide pin model; "Shared by me" label across surfaces.
 - **NEW**: **User favorites & recents** under the user menu.
 - **NEW**: **`creator_name` on agents and knowledge bases** for visibility across surfaces.
@@ -323,7 +323,7 @@ All notable changes to this project will be documented in this file.
 - **IMPROVED**: `agent` exclude processing docs from prompt.
 - **IMPROVED**: LLM response — guard against empty `choices` and `message=None`.
 - **IMPROVED**: Configurable API proxy target for frontend dev environment.
-- **IMPROVED**: `DISABLE_REGISTRATION` now drives `registration_mode` too; removed redundant `WEKNORA_AUTH_REGISTRATION_MODE` env override.
+- **IMPROVED**: `DISABLE_REGISTRATION` now drives `registration_mode` too; removed redundant `LORELATTICE_AUTH_REGISTRATION_MODE` env override.
 - **IMPROVED**: Tenant RBAC + per-user tenant cap exposed as env knobs.
 - **IMPROVED**: Auth — JWT `tenant_id` claim honored in middleware; tenant-scoped client state cleared on tenant change.
 - **IMPROVED**: gin per-route logs silenced; env config banner emitted at startup.
@@ -376,13 +376,13 @@ All notable changes to this project will be documented in this file.
 ## [0.5.2] - 2026-05-13
 
 ### 🚀 New Features
-- **NEW**: `weknora` CLI v0.2 — the official command-line client lives under `cli/`. Mirrors the `gh` CLI `<noun> <verb>` convention with 10 top-level commands (`api`, `auth`, `chat`, `context`, `doc`, `doctor`, `kb`, `link`, `search`, `version`). Highlights:
+- **NEW**: `lorelattice` CLI v0.2 — the official command-line client lives under `cli/`. Mirrors the `gh` CLI `<noun> <verb>` convention with 10 top-level commands (`api`, `auth`, `chat`, `context`, `doc`, `doctor`, `kb`, `link`, `search`, `version`). Highlights:
   - Hybrid search and streaming RAG chat against any knowledge base.
-  - Project-level binding via `weknora link` writing `.weknora/project.yaml` (vercel/netlify pattern); subcommands auto-resolve `--kb` from the link.
+  - Project-level binding via `lorelattice link` writing `.lorelattice/project.yaml` (vercel/netlify pattern); subcommands auto-resolve `--kb` from the link.
   - Stable JSON envelope (`{ok, data, error, _meta, dry_run, risk}`) on every `--json` invocation; closed error-code registry enforced by an AST scanner test.
   - Agent affordance: `--dry-run` for write commands, exit-code 10 + `input.confirmation_required` for non-interactive destructive writes, per-command "AI agents:" guidance auto-shown when CLAUDECODE / CURSOR_AGENT is set. Operational contract in `cli/AGENTS.md`.
   - Multi-context auth (`login` / `logout` / `list` / `status`), OS keyring + 0600 file fallback for credentials, both API-key and password (JWT) modes.
-  - Health check via `weknora doctor` (4 statuses: ok / warn / fail / skip).
+  - Health check via `lorelattice doctor` (4 statuses: ok / warn / fail / skip).
   - See `cli/README.md` for install + 5-minute quickstart.
 - **NEW**: Adaptive 3-tier chunking — documents are now profiled before splitting and routed to one of three strategies: heading-aware (Markdown structure), heuristic (form-feeds, multilingual chapter markers DE/EN/ZH, all-caps titles, visual separators), or recursive (the modernized legacy splitter as a fallback). Auto-strategy is the new default for fresh KBs; existing KBs keep their previous behavior until the user opts in. See `docs/CHUNKING.md`.
 - **NEW**: Human-in-the-loop approval for MCP tool calls (#1173) — when an MCP tool is marked sensitive, the agent now pauses and surfaces a `ToolApprovalCard` in the chat UI. Approval state is persisted (so refreshing the page does not lose context), enforced per user, and hardened for concurrent multi-instance deployments. See `docs/zh/mcp-approval.md`.
@@ -466,7 +466,7 @@ All notable changes to this project will be documented in this file.
 ## [0.5.1] - 2026-04-30
 
 ### 🚀 New Features
-- **NEW**: WeChat Mini Program — added a lightweight mobile client (`miniprogram/`) for configuring WeKnora API access, selecting knowledge bases, importing URLs, and chatting from inside WeChat, extending WeKnora from desktop to mobile.
+- **NEW**: WeChat Mini Program — added a lightweight mobile client (`miniprogram/`) for configuring LoreLattice API access, selecting knowledge bases, importing URLs, and chatting from inside WeChat, extending LoreLattice from desktop to mobile.
 - **NEW**: Knowledge Base — document list view with multi-select, floating batch action bar, and batch delete to streamline managing large knowledge bases.
 - **NEW**: IM — tenant-wide IM Channels Overview entry under the user menu so administrators can inspect every IM channel of the tenant from a single page.
 - **NEW**: Sessions — keyword search across the conversation list, user-scoped pinning of important sessions, and clear IM-source visibility for chats originating from IM channels.
@@ -541,11 +541,11 @@ All notable changes to this project will be documented in this file.
 ## [0.4.0] - 2026-04-14
 
 ### 🚀 New Features
-- **NEW**: Cloud Knowledge Assistant — [WeKnora Platform](https://weknora.weixin.qq.com/platform), a cloud-hosted knowledge assistant service for quick onboarding without local deployment
-- **NEW**: WeKnora Cloud — WeKnora Cloud provider integration, providing hosted LLM models and document parsing capabilities, with credential management, status checks, and UI feedback
+- **NEW**: Configurable LoreLattice Cloud provider for deployments that define `LORELATTICE_CLOUD_BASE_URL`
+- **NEW**: LoreLattice Cloud — LoreLattice Cloud provider integration, providing hosted LLM models and document parsing capabilities, with credential management, status checks, and UI feedback
 - **NEW**: Chrome Extension — browser extension support with menu entry and quick access integration for seamless knowledge capture from web pages
 - **NEW**: WeChat IM Integration — WeChat channel adapter with QR code login and long-polling message support
-- **NEW**: ClawHub Skill — WeKnora Skill published on ClawHub platform, enabling document import, hybrid search, and knowledge management via the WeKnora REST API
+- **NEW**: ClawHub Skill — LoreLattice Skill published on ClawHub platform, enabling document import, hybrid search, and knowledge management via the LoreLattice REST API
 - **NEW**: Attachment Processing — file attachment support in chat pipeline with enhanced error handling, content formatting, and image/attachment metadata injection in queries
 - **NEW**: Azure OpenAI Provider — full Azure OpenAI support for chat, VLM, and embedding models with deployment name preservation, configurable dimensions parameter, provider registration with metadata, URL auto-detection, and frontend provider integration with i18n
 - **NEW**: Alibaba Cloud OSS Storage — object storage support via S3-compatible mode with configuration UI, connectivity test, status reporting, OSS TypeScript types, docreader OssStorage class, factory and container registration, and multi-language i18n (Korean, Russian)
@@ -582,7 +582,7 @@ All notable changes to this project will be documented in this file.
 ### 🔧 Refactoring
 - Replaced CryptoService with lightweight utils AES helpers, simplifying encryption logic across the codebase
 - Optimized OSS storage initialization, URL formatting, and security handling for improved S3 compatibility
-- Enhanced WeKnora Cloud internationalization and UI feedback for credential management operations
+- Enhanced LoreLattice Cloud internationalization and UI feedback for credential management operations
 
 ### 📚 Documentation
 - Added VectorStore CRUD API endpoint documentation with Swagger annotations
@@ -606,7 +606,7 @@ All notable changes to this project will be documented in this file.
 - Refined parent-child chunk replacement logic to only apply to text chunks whose parent is a parent_text chunk
 - Optimized login page rendering performance: removed all backdrop-filter blur, reduced animated elements, added GPU compositing hints and prefers-reduced-motion support
 - Unified NVIDIA API for both chat and VLM model types
-- Prompt language fallback now uses WEKNORA_LANGUAGE environment variable instead of hardcoded zh-CN, with language propagated through document and image processing pipelines
+- Prompt language fallback now uses LORELATTICE_LANGUAGE environment variable instead of hardcoded zh-CN, with language propagated through document and image processing pipelines
 - Fixed enable_thinking for Aliyun Qwen models in streaming mode
 - Enhanced document processing with metadata extraction and handling
 - Added header tracking for Markdown tables during chunking to preserve table context
@@ -945,7 +945,7 @@ All notable changes to this project will be documented in this file.
   - Enhanced KnowledgeQAStream parameters
   - Support for streaming response types and tool calls
 - **NEW**: System & Configuration
-  - Added `WEKNORA_VERSION` environment variable support
+  - Added `LORELATTICE_VERSION` environment variable support
   - APK mirror configuration support in Docker
   - Enhanced chunking separator options
   - FAQ two-level priority tag filtering
@@ -1156,7 +1156,7 @@ All notable changes to this project will be documented in this file.
 - **NEW**: Qdrant Vector Database Support
   - Full integration with Qdrant as retriever engine
   - Support for both vector similarity search and full-text keyword search
-  - Dynamic collection creation based on embedding dimensions (e.g., `weknora_embeddings_768`)
+  - Dynamic collection creation based on embedding dimensions (e.g., `lorelattice_embeddings_768`)
   - Multilingual tokenizer support for Chinese/Japanese/Korean text search
   - Professional Chinese word segmentation using jieba for keyword queries
 
@@ -1405,7 +1405,7 @@ All notable changes to this project will be documented in this file.
 - Improved initialization configuration handling
 
 ### 🛡️ Security Recommendations
-- Deploy WeKnora services in internal/private network environments
+- Deploy LoreLattice services in internal/private network environments
 - Avoid direct exposure to public internet
 - Configure proper firewall rules and access controls
 - Regular updates for security patches and improvements
@@ -1423,7 +1423,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.1.0] - 2025-09-08
 
-- Initial public release of WeKnora.
+- Initial public release of LoreLattice.
 - Web UI for knowledge upload, chat, configuration, and settings.
 - RAG pipeline with chunking, embedding, retrieval, reranking, and generation.
 - Initialization wizard for configuring models (LLM, embedding, rerank, retriever).
@@ -1433,27 +1433,27 @@ All notable changes to this project will be documented in this file.
 - Docker Compose for quick startup and service orchestration.
 - MCP server support for integrating with MCP-compatible clients.
 
-[0.5.0]: https://github.com/Tencent/WeKnora/tree/v0.5.0
-[0.4.0]: https://github.com/Tencent/WeKnora/tree/v0.4.0
-[0.3.6]: https://github.com/Tencent/WeKnora/tree/v0.3.6
-[0.3.5]: https://github.com/Tencent/WeKnora/tree/v0.3.5
-[0.3.4]: https://github.com/Tencent/WeKnora/tree/v0.3.4
-[0.3.3]: https://github.com/Tencent/WeKnora/tree/v0.3.3
-[0.3.2]: https://github.com/Tencent/WeKnora/tree/v0.3.2
-[0.3.1]: https://github.com/Tencent/WeKnora/tree/v0.3.1
-[0.3.0]: https://github.com/Tencent/WeKnora/tree/v0.3.0
-[0.2.10]: https://github.com/Tencent/WeKnora/tree/v0.2.10
-[0.2.9]: https://github.com/Tencent/WeKnora/tree/v0.2.9
-[0.2.8]: https://github.com/Tencent/WeKnora/tree/v0.2.8
-[0.2.7]: https://github.com/Tencent/WeKnora/tree/v0.2.7
-[0.2.6]: https://github.com/Tencent/WeKnora/tree/v0.2.6
-[0.2.5]: https://github.com/Tencent/WeKnora/tree/v0.2.5
-[0.2.4]: https://github.com/Tencent/WeKnora/tree/v0.2.4
-[0.2.3]: https://github.com/Tencent/WeKnora/tree/v0.2.3
-[0.2.2]: https://github.com/Tencent/WeKnora/tree/v0.2.2
-[0.2.1]: https://github.com/Tencent/WeKnora/tree/v0.2.1
-[0.2.0]: https://github.com/Tencent/WeKnora/tree/v0.2.0
-[0.1.4]: https://github.com/Tencent/WeKnora/tree/v0.1.4
-[0.1.3]: https://github.com/Tencent/WeKnora/tree/v0.1.3
-[0.1.2]: https://github.com/Tencent/WeKnora/tree/v0.1.2
-[0.1.0]: https://github.com/Tencent/WeKnora/tree/v0.1.0
+[0.5.0]: https://github.com/Pototoooo/lorelattice/tree/v0.5.0
+[0.4.0]: https://github.com/Pototoooo/lorelattice/tree/v0.4.0
+[0.3.6]: https://github.com/Pototoooo/lorelattice/tree/v0.3.6
+[0.3.5]: https://github.com/Pototoooo/lorelattice/tree/v0.3.5
+[0.3.4]: https://github.com/Pototoooo/lorelattice/tree/v0.3.4
+[0.3.3]: https://github.com/Pototoooo/lorelattice/tree/v0.3.3
+[0.3.2]: https://github.com/Pototoooo/lorelattice/tree/v0.3.2
+[0.3.1]: https://github.com/Pototoooo/lorelattice/tree/v0.3.1
+[0.3.0]: https://github.com/Pototoooo/lorelattice/tree/v0.3.0
+[0.2.10]: https://github.com/Pototoooo/lorelattice/tree/v0.2.10
+[0.2.9]: https://github.com/Pototoooo/lorelattice/tree/v0.2.9
+[0.2.8]: https://github.com/Pototoooo/lorelattice/tree/v0.2.8
+[0.2.7]: https://github.com/Pototoooo/lorelattice/tree/v0.2.7
+[0.2.6]: https://github.com/Pototoooo/lorelattice/tree/v0.2.6
+[0.2.5]: https://github.com/Pototoooo/lorelattice/tree/v0.2.5
+[0.2.4]: https://github.com/Pototoooo/lorelattice/tree/v0.2.4
+[0.2.3]: https://github.com/Pototoooo/lorelattice/tree/v0.2.3
+[0.2.2]: https://github.com/Pototoooo/lorelattice/tree/v0.2.2
+[0.2.1]: https://github.com/Pototoooo/lorelattice/tree/v0.2.1
+[0.2.0]: https://github.com/Pototoooo/lorelattice/tree/v0.2.0
+[0.1.4]: https://github.com/Pototoooo/lorelattice/tree/v0.1.4
+[0.1.3]: https://github.com/Pototoooo/lorelattice/tree/v0.1.3
+[0.1.2]: https://github.com/Pototoooo/lorelattice/tree/v0.1.2
+[0.1.0]: https://github.com/Pototoooo/lorelattice/tree/v0.1.0

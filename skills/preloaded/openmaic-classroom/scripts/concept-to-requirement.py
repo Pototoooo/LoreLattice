@@ -2,7 +2,7 @@
 """
 Concept Graph Material → OpenMAIC Requirement 转换器
 
-将 WeKnora wiki 知识图谱中的 concept 页面及其关联 entity 转换为
+将 LoreLattice wiki 知识图谱中的 concept 页面及其关联 entity 转换为
 结构化的 OpenMAIC 课程生成需求描述。两阶段转换：
   1. Concept Graph Material → Pedagogical Design JSON
   2. Pedagogical Design JSON → requirement string

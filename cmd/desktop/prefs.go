@@ -19,7 +19,7 @@ func desktopPrefsDir() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	dir := filepath.Join(cfg, "WeKnora Lite")
+	dir := filepath.Join(cfg, "LoreLattice Lite")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", err
 	}

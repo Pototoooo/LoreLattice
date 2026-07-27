@@ -375,7 +375,7 @@ curl --location 'http://localhost:8080/api/v1/initialization/extract/text-relati
 --header 'X-API-Key: sk-xxxxx' \
 --header 'Content-Type: application/json' \
 --data '{
-    "text": "WeKnora 是一个知识管理平台，支持多种文档格式的解析和检索。",
+    "text": "LoreLattice 是一个知识管理平台，支持多种文档格式的解析和检索。",
     "model_id": "model-00000001"
 }'
 ```
@@ -386,12 +386,12 @@ curl --location 'http://localhost:8080/api/v1/initialization/extract/text-relati
 {
     "data": {
         "entities": [
-            {"name": "WeKnora", "type": "Product"},
+            {"name": "LoreLattice", "type": "Product"},
             {"name": "知识管理平台", "type": "Concept"}
         ],
         "relations": [
             {
-                "source": "WeKnora",
+                "source": "LoreLattice",
                 "target": "知识管理平台",
                 "relation": "is_a"
             }

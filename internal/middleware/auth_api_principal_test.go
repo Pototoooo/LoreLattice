@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -58,7 +58,7 @@ func TestResolveAPIPrincipalSignedToken(t *testing.T) {
 	header.Set("X-External-User-Token", signedExternalUserToken(t, secret, jwt.MapClaims{
 		"sub":       "external-u1",
 		"tenant_id": float64(7),
-		"aud":       "weknora",
+		"aud":       "lorelattice",
 		"exp":       time.Now().Add(time.Minute).Unix(),
 	}))
 
@@ -84,7 +84,7 @@ func TestResolveAPIPrincipalSignedTokenRejectsWrongTenant(t *testing.T) {
 	header.Set("X-External-User-Token", signedExternalUserToken(t, secret, jwt.MapClaims{
 		"sub":       "external-u1",
 		"tenant_id": float64(8),
-		"aud":       "weknora",
+		"aud":       "lorelattice",
 		"exp":       time.Now().Add(time.Minute).Unix(),
 	}))
 
@@ -107,7 +107,7 @@ func TestResolveAPIPrincipalSignedTokenRejectsExpired(t *testing.T) {
 	header.Set("X-External-User-Token", signedExternalUserToken(t, secret, jwt.MapClaims{
 		"sub":       "external-u1",
 		"tenant_id": float64(7),
-		"aud":       "weknora",
+		"aud":       "lorelattice",
 		"exp":       time.Now().Add(-time.Minute).Unix(),
 	}))
 
@@ -158,7 +158,7 @@ func TestResolveAPIPrincipalSignedTokenRejectsLongLifetime(t *testing.T) {
 	header.Set("X-External-User-Token", signedExternalUserToken(t, secret, jwt.MapClaims{
 		"sub":       "external-u1",
 		"tenant_id": float64(7),
-		"aud":       "weknora",
+		"aud":       "lorelattice",
 		"exp":       time.Now().Add(48 * time.Hour).Unix(),
 	}))
 

@@ -3,7 +3,7 @@ package im
 import (
 	"context"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // CommandAction represents a service-level side effect that a command requests.

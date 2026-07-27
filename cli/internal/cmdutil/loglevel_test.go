@@ -11,7 +11,7 @@ func TestResolveLogLevel(t *testing.T) {
 	cases := []struct {
 		name     string
 		flagVal  string // "" means flag not set
-		envVal   string // WEKNORA_LOG_LEVEL
+		envVal   string // LORELATTICE_LOG_LEVEL
 		wantLvl  string
 		wantWarn bool
 	}{
@@ -22,7 +22,7 @@ func TestResolveLogLevel(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			t.Setenv("WEKNORA_LOG_LEVEL", tc.envVal)
+			t.Setenv("LORELATTICE_LOG_LEVEL", tc.envVal)
 
 			cmd := &cobra.Command{}
 			AddLogLevelFlag(cmd)

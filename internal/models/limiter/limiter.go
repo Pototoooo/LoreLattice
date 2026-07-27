@@ -21,7 +21,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
@@ -74,7 +74,7 @@ const (
 	// Redis under contention.
 	defaultPollInterval = 200 * time.Millisecond
 	// keyPrefix namespaces the semaphore ZSETs in Redis.
-	keyPrefix = "weknora:modelsem:"
+	keyPrefix = "lorelattice:modelsem:"
 )
 
 // acquireScript atomically prunes expired leases, counts live holders, and

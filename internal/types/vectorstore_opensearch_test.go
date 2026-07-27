@@ -36,7 +36,7 @@ func findField(t *testing.T, fields []VectorStoreFieldInfo, name string) VectorS
 // fields are omitempty so other engines' serialized IndexConfig is unchanged.
 func TestIndexConfig_OpenSearchFieldsOmittedForOtherEngines(t *testing.T) {
 	t.Run("omitted when unset", func(t *testing.T) {
-		b, err := json.Marshal(IndexConfig{IndexName: "weknora", NumberOfShards: 4})
+		b, err := json.Marshal(IndexConfig{IndexName: "lorelattice", NumberOfShards: 4})
 		require.NoError(t, err)
 		s := string(b)
 		assert.NotContains(t, s, "hnsw_m")
@@ -109,7 +109,7 @@ func TestBuildEnvVectorStores_OpenSearch(t *testing.T) {
 		"OPENSEARCH_ADDR":                 "https://os:9200",
 		"OPENSEARCH_USERNAME":             "admin",
 		"OPENSEARCH_PASSWORD":             "secret",
-		"OPENSEARCH_INDEX":                "weknora",
+		"OPENSEARCH_INDEX":                "lorelattice",
 		"OPENSEARCH_INSECURE_SKIP_VERIFY": "true",
 	})
 	stores := BuildEnvVectorStores("opensearch", lookup)
@@ -121,7 +121,7 @@ func TestBuildEnvVectorStores_OpenSearch(t *testing.T) {
 	assert.Equal(t, "admin", s.ConnectionConfig.Username)
 	assert.Equal(t, "secret", s.ConnectionConfig.Password)
 	assert.True(t, s.ConnectionConfig.InsecureSkipVerify)
-	assert.Equal(t, "weknora", s.IndexConfig.IndexName)
+	assert.Equal(t, "lorelattice", s.IndexConfig.IndexName)
 }
 
 // TestBuildEnvVectorStores_OpenSearch_InsecureDefaultsFalse verifies the TLS

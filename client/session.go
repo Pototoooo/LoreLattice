@@ -1,4 +1,4 @@
-// Package client provides the implementation for interacting with the WeKnora API
+// Package client provides the implementation for interacting with the LoreLattice API
 // The Session related interfaces are used to manage sessions for question-answering
 // Sessions can be created, retrieved, updated, deleted, and queried
 // They can also be used to generate titles for sessions

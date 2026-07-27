@@ -25,7 +25,7 @@ const (
 	DefaultTimeout     = 60 * time.Second
 	DefaultMemoryLimit = 256 * 1024 * 1024 // 256MB
 	DefaultCPULimit    = 1.0               // 1 CPU core
-	DefaultDockerImage = "wechatopenai/weknora-sandbox:latest"
+	DefaultDockerImage = "pototoooo/lorelattice-sandbox:latest"
 )
 
 // Common errors

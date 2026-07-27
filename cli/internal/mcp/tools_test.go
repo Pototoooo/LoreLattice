@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	sdk "github.com/Tencent/WeKnora/client"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // fakeSvc implements every narrow service interface ServiceClient embeds.
@@ -140,7 +140,7 @@ func (f *fakeSvc) ListKnowledgeChunks(_ context.Context, docID string, page, pag
 func newTestServer(t *testing.T, svc ServiceClient) (*mcpsdk.ClientSession, context.CancelFunc) {
 	t.Helper()
 	ctx, cancel := context.WithCancel(context.Background())
-	server := mcpsdk.NewServer(&mcpsdk.Implementation{Name: "weknora-test", Version: "v0.0.0-test"}, nil)
+	server := mcpsdk.NewServer(&mcpsdk.Implementation{Name: "lorelattice-test", Version: "v0.0.0-test"}, nil)
 	registerTools(server, svc)
 
 	st, ct := mcpsdk.NewInMemoryTransports()

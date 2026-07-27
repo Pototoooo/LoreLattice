@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // fetchKnowledgeData gets knowledge data in batch.

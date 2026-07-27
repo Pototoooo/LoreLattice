@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/hibiken/asynq"
 	"go.opentelemetry.io/otel/propagation"
 	oteltrace "go.opentelemetry.io/otel/trace"
@@ -20,7 +20,7 @@ import (
 // re-extracts it so worker-side spans are children of the same trace —
 // giving LiteFuse one stitched tree across the HTTP request and the async
 // processing. This also makes a sop3 run's traceparent propagate through to
-// any asynq jobs WeKnora enqueues while serving sop3's agent-chat call.
+// any asynq jobs LoreLattice enqueues while serving sop3's agent-chat call.
 //
 // Safe to call unconditionally: when Langfuse is disabled or no span is
 // present on ctx, it writes a zero-valued TracingContext — which round-trips

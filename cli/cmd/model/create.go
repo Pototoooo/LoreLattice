@@ -9,9 +9,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // modelCreateFields enumerates the fields surfaced for `--format json` discovery
@@ -78,14 +78,14 @@ func frontendModelType(t string) string {
 	}
 }
 
-// NewCmdCreate builds `weknora model create <name>`.
+// NewCmdCreate builds `lorelattice model create <name>`.
 func NewCmdCreate(f *cmdutil.Factory) *cobra.Command {
 	opts := &CreateOptions{}
 	cmd := &cobra.Command{
 		Use:   "create <name>",
 		Short: "Register a model (embedding / rerank / chat / VLLM / ASR)",
 		Long: `Register a model on the server so it can back a knowledge base's embedding /
-summary config (see 'weknora kb config set') or an agent (--model).
+summary config (see 'lorelattice kb config set') or an agent (--model).
 
 <name> is the model name as the provider knows it (e.g. "nomic-embed-text",
 "gpt-4o", "qwen2"). --type and --source are required.
@@ -99,7 +99,7 @@ Two modes:
   Remote (API):    --source remote --provider <name> [--api-key-stdin] [--base-url <url>]
                    Registered active and routed to the provider's API.
                    --provider is required and is validated against the server's
-                   live provider catalog (weknora api /api/v1/models/providers);
+                   live provider catalog (lorelattice api /api/v1/models/providers);
                    --base-url defaults to that provider's URL for the type when
                    omitted.
 
@@ -165,7 +165,7 @@ else goes through repeatable --param key=value.`,
 	}
 	cmd.Flags().StringVar(&opts.Type, "type", "", "Model type: "+strings.Join(modelTypeValues, " | ")+" (required; \"chat\" is accepted for KnowledgeQA)")
 	cmd.Flags().StringVar(&opts.Source, "source", "", "Where the model runs: "+strings.Join(createSourceValues, " | ")+" (required; local=Ollama, remote=provider API)")
-	cmd.Flags().StringVar(&opts.Provider, "provider", "", "Remote provider id, required+validated with --source remote (see `weknora api /api/v1/models/providers`)")
+	cmd.Flags().StringVar(&opts.Provider, "provider", "", "Remote provider id, required+validated with --source remote (see `lorelattice api /api/v1/models/providers`)")
 	cmd.Flags().StringVar(&opts.DisplayName, "display-name", "", "Human-friendly name (optional)")
 	cmd.Flags().StringVar(&opts.Description, "description", "", "Description (optional)")
 	cmd.Flags().StringVar(&opts.BaseURL, "base-url", "", "Model API base URL (e.g. http://localhost:11434 for Ollama)")
@@ -178,11 +178,11 @@ else goes through repeatable --param key=value.`,
 	cmdutil.AddFormatFlag(cmd, modelCreateFields...)
 	cmdutil.AddDryRunFlag(cmd, &opts.DryRun)
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
-		UsedFor:       "register a model (embedding/rerank/chat/VLLM/ASR) so a KB or agent can use it; capture .data.id to pass to `weknora kb config set` / `agent create --model`.",
+		UsedFor:       "register a model (embedding/rerank/chat/VLLM/ASR) so a KB or agent can use it; capture .data.id to pass to `lorelattice kb config set` / `agent create --model`.",
 		RequiredFlags: []string{"<name> (positional)", "--type", "--source (local|remote)", "--provider (when --source remote)"},
 		Examples: []string{
-			`weknora model create nomic-embed-text --type Embedding --source local --dimension 768   # Ollama (server pulls it)`,
-			`printf '%s' "$OPENAI_KEY" | weknora model create text-embedding-3-small --type Embedding --source remote --provider openai --dimension 1536 --api-key-stdin`,
+			`lorelattice model create nomic-embed-text --type Embedding --source local --dimension 768   # Ollama (server pulls it)`,
+			`printf '%s' "$OPENAI_KEY" | lorelattice model create text-embedding-3-small --type Embedding --source remote --provider openai --dimension 1536 --api-key-stdin`,
 		},
 		Output: "envelope.data is the created Model object with id, name, type, source, parameters",
 		Warnings: []string{

@@ -1,17 +1,17 @@
 /**
- * WeKnora embed widget SDK — floating chat launcher.
+ * LoreLattice embed widget SDK — floating chat launcher.
  *
  * Programmatic:
- *   WeKnora.init({ channel, token, position, primaryColor, title, baseUrl })
- *   WeKnora.open() | close() | toggle() | destroy()
- *   WeKnora.on('ready', fn) | off('ready', fn)
+ *   LoreLattice.init({ channel, token, position, primaryColor, title, baseUrl })
+ *   LoreLattice.open() | close() | toggle() | destroy()
+ *   LoreLattice.on('ready', fn) | off('ready', fn)
  *
  * Host context & actions (postMessage to iframe):
- *   WeKnora.setContext({ userId, page, ... })
+ *   LoreLattice.setContext({ userId, page, ... })
  *     Inject visitor/page context merged into each chat query.
- *   WeKnora.openWithQuery('How do I reset my password?')
+ *   LoreLattice.openWithQuery('How do I reset my password?')
  *     Opens the panel (if closed) and sends the query when the iframe is ready.
- *   WeKnora.setLocale('en-US')
+ *   LoreLattice.setLocale('en-US')
  *     Switch embed UI language (zh-CN | en-US | ko-KR | ru-RU).
  *
  * Secure mode (recommended): instead of `token`, pass `tokenEndpoint` — a URL on
@@ -26,8 +26,8 @@
 (function (global) {
   'use strict';
 
-  var HOST_SOURCE = 'weknora-host';
-  var EMBED_SOURCE = 'weknora-embed';
+  var HOST_SOURCE = 'lorelattice-host';
+  var EMBED_SOURCE = 'lorelattice-embed';
   var POSITIONS = ['bottom-right', 'bottom-left', 'top-right', 'top-left'];
   var DEFAULT_POSITION = 'bottom-right';
   var DEFAULT_COLOR = '#07C05F';
@@ -57,7 +57,7 @@
     var handlers = listeners[event];
     if (!handlers) return;
     handlers.slice().forEach(function (fn) {
-      try { fn(payload); } catch (e) { console.error('[WeKnora]', e); }
+      try { fn(payload); } catch (e) { console.error('[LoreLattice]', e); }
     });
   }
 
@@ -71,7 +71,7 @@
     // fetches a fresh token here and refreshes it before expiry.
     var tokenEndpoint = opts.tokenEndpoint || opts.token_endpoint || '';
     if (!channelId || (!staticToken && !tokenEndpoint)) {
-      console.warn('[WeKnora] channel and (token or tokenEndpoint) are required');
+      console.warn('[LoreLattice] channel and (token or tokenEndpoint) are required');
       return null;
     }
 
@@ -118,7 +118,7 @@
           return tok;
         })
         .catch(function (e) {
-          console.error('[WeKnora] failed to load token', e);
+          console.error('[LoreLattice] failed to load token', e);
           throw e;
         })
         .then(function (tok) { tokenInFlight = null; return tok; }, function (e) { tokenInFlight = null; throw e; });
@@ -132,7 +132,7 @@
     if (!baseUrl) {
       var script = document.currentScript;
       if (script && script.src) {
-        baseUrl = script.src.replace(/\/weknora-widget\.js.*$/, '');
+        baseUrl = script.src.replace(/\/lorelattice-widget\.js.*$/, '');
       } else {
         baseUrl = global.location ? global.location.origin : '';
       }
@@ -242,7 +242,7 @@
 
     function postHostPayload(type, payload) {
       if (!iframe.contentWindow) {
-        console.warn('[WeKnora] iframe not ready');
+        console.warn('[LoreLattice] iframe not ready');
         return false;
       }
       postToIframe({ source: HOST_SOURCE, type: type, payload: payload || {} });
@@ -256,7 +256,7 @@
         return;
       }
       if (tries >= 20) {
-        console.warn('[WeKnora] iframe not ready');
+        console.warn('[LoreLattice] iframe not ready');
         return;
       }
       setTimeout(function () { whenIframeReady(fn, tries + 1); }, 100);
@@ -264,7 +264,7 @@
 
     function setContext(ctx) {
       if (!ctx || typeof ctx !== 'object') {
-        console.warn('[WeKnora] setContext expects an object');
+        console.warn('[LoreLattice] setContext expects an object');
         return;
       }
       postHostPayload('set_context', ctx);
@@ -273,7 +273,7 @@
     function openWithQuery(query) {
       var text = String(query || '').trim();
       if (!text) {
-        console.warn('[WeKnora] openWithQuery requires a non-empty query');
+        console.warn('[LoreLattice] openWithQuery requires a non-empty query');
         return;
       }
       setOpen(true);
@@ -285,7 +285,7 @@
     function setLocale(locale) {
       var loc = String(locale || '').trim();
       if (!loc) {
-        console.warn('[WeKnora] setLocale requires a locale string');
+        console.warn('[LoreLattice] setLocale requires a locale string');
         return;
       }
       postHostPayload('set_locale', { locale: loc });
@@ -409,7 +409,7 @@
     setLocale: function (locale) { if (instance) instance.setLocale(locale); },
   };
 
-  global.WeKnora = api;
+  global.LoreLattice = api;
 
   var legacyScript = document.currentScript;
   if (legacyScript) {

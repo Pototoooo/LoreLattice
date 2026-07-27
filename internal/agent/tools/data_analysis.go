@@ -5,16 +5,16 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	filesvc "github.com/Tencent/WeKnora/internal/application/service/file"
+	filesvc "github.com/Pototoooo/lorelattice/internal/application/service/file"
 	"io"
 	"os"
 	"regexp"
 	"strings"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
-	"github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/utils"
 )
 
 var dataAnalysisTool = BaseTool{
@@ -618,7 +618,7 @@ func (t *DataAnalysisTool) materializeKnowledgeFile(ctx context.Context, knowled
 		suffix = "." + ext
 	}
 
-	tmp, err := os.CreateTemp("", "weknora-data-analysis-*"+suffix)
+	tmp, err := os.CreateTemp("", "lorelattice-data-analysis-*"+suffix)
 	if err != nil {
 		return "", noop, fmt.Errorf("failed to create temp file: %w", err)
 	}

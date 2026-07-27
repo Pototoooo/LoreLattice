@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/models/provider"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/models/provider"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -35,7 +35,7 @@ func TestResolveProvider(t *testing.T) {
 		{"azure reasoning", provider.ProviderAzureOpenAI, "gpt-5-mini", azureReasoningProvider{}},
 		{"moonshot fixed temp", provider.ProviderMoonshot, "moonshot-v1-8k", moonshotProvider{}},
 		{"moonshot other falls back", provider.ProviderMoonshot, "kimi-latest", baseProvider{}},
-		{"weknora cloud", provider.ProviderWeKnoraCloud, "anything", weKnoraCloudProvider{}},
+		{"lorelattice cloud", provider.ProviderLoreLatticeCloud, "anything", loreLatticeCloudProvider{}},
 		{"unknown falls back", provider.ProviderName("nope"), "x", baseProvider{}},
 	}
 	for _, tc := range cases {

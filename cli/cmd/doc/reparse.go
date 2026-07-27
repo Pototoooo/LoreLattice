@@ -6,10 +6,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/text"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/text"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // docReparseFields enumerates the fields surfaced for `--format json` discovery
@@ -27,7 +27,7 @@ type ReparseService interface {
 	ReparseKnowledge(ctx context.Context, id string) (*sdk.Knowledge, error)
 }
 
-// NewCmdReparse builds `weknora doc reparse <doc-id>`.
+// NewCmdReparse builds `lorelattice doc reparse <doc-id>`.
 func NewCmdReparse(f *cmdutil.Factory) *cobra.Command {
 	opts := &ReparseOptions{}
 	cmd := &cobra.Command{
@@ -36,7 +36,7 @@ func NewCmdReparse(f *cmdutil.Factory) *cobra.Command {
 		Long: `Re-trigger server-side parsing of a document — the recovery path when a
 document's parse_status is failed, or after its source changed. The document
 keeps its id; parsing restarts asynchronously, so follow with
-'weknora doc wait <doc-id>' to block until it reaches a terminal status.`,
+'lorelattice doc wait <doc-id>' to block until it reaches a terminal status.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			fopts, err := cmdutil.CheckFormatFlag(c)
@@ -64,10 +64,10 @@ keeps its id; parsing restarts asynchronously, so follow with
 		UsedFor:       "re-run parsing on a document (recovery after parse_status=failed, or a changed source)",
 		RequiredFlags: []string{"<doc-id> (positional)"},
 		Examples: []string{
-			"weknora doc reparse doc_abc",
-			"weknora doc reparse doc_abc --format json",
+			"lorelattice doc reparse doc_abc",
+			"lorelattice doc reparse doc_abc --format json",
 		},
-		Output: "envelope.data is the Knowledge object with parse_status reset to the re-processing state; poll `weknora doc wait <doc-id>` for completion",
+		Output: "envelope.data is the Knowledge object with parse_status reset to the re-processing state; poll `lorelattice doc wait <doc-id>` for completion",
 	})
 	return cmd
 }
@@ -91,6 +91,6 @@ func runReparse(ctx context.Context, opts *ReparseOptions, fopts *cmdutil.Format
 	if k.ParseStatus != "" {
 		fmt.Fprintf(w, "  parse_status: %s\n", k.ParseStatus)
 	}
-	fmt.Fprintf(w, "  next: weknora doc wait %s\n", id)
+	fmt.Fprintf(w, "  next: lorelattice doc wait %s\n", id)
 	return nil
 }

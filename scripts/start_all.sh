@@ -18,7 +18,7 @@ SCRIPT_NAME=$(basename "$0")
 
 # 显示帮助信息
 show_help() {
-    printf "%b\n" "${GREEN}WeKnora 启动脚本 v${VERSION}${NC}"
+    printf "%b\n" "${GREEN}LoreLattice 启动脚本 v${VERSION}${NC}"
     printf "%b\n" "${GREEN}用法:${NC} $0 [选项]"
     echo "选项:"
     echo "  -h, --help     显示帮助信息"
@@ -37,7 +37,7 @@ show_help() {
 
 # 显示版本信息
 show_version() {
-    printf "%b\n" "${GREEN}WeKnora 启动脚本 v${VERSION}${NC}"
+    printf "%b\n" "${GREEN}LoreLattice 启动脚本 v${VERSION}${NC}"
     exit 0
 }
 
@@ -312,7 +312,7 @@ check_platform() {
 
 # 预拉取沙箱镜像（Agent Skills 执行所需，仅拉取不启动）
 ensure_sandbox_image() {
-    local sandbox_image="wechatopenai/weknora-sandbox:${WEKNORA_VERSION:-latest}"
+    local sandbox_image="pototoooo/lorelattice-sandbox:${LORELATTICE_VERSION:-latest}"
 
     # 检查本地是否已存在沙箱镜像
     if docker image inspect "$sandbox_image" &> /dev/null; then
@@ -567,7 +567,7 @@ check_environment() {
     
     # 检查沙箱镜像
     log_info "检查沙箱镜像..."
-    local sandbox_image="wechatopenai/weknora-sandbox:${WEKNORA_VERSION:-latest}"
+    local sandbox_image="pototoooo/lorelattice-sandbox:${LORELATTICE_VERSION:-latest}"
     if docker image inspect "$sandbox_image" &> /dev/null; then
         log_success "沙箱镜像已就绪: $sandbox_image"
     else

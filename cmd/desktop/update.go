@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/handler"
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/handler"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 	"golang.org/x/mod/semver"
 )
@@ -50,14 +50,14 @@ func checkUpdate(ctx context.Context, currentVersion string, showUpToDate bool, 
 		}
 
 		client := &http.Client{Timeout: 10 * time.Second}
-		req, err := http.NewRequest("GET", "https://api.github.com/repos/Tencent/WeKnora/releases/latest", nil)
+		req, err := http.NewRequest("GET", "https://api.github.com/repos/Pototoooo/lorelattice/releases/latest", nil)
 		if err != nil {
 			logger.Warnf(context.Background(), "Check update failed: %v", err)
 			return
 		}
 
 		// Add User-Agent header which is required/recommended by GitHub API
-		req.Header.Set("User-Agent", "WeKnora-Lite-Desktop-App")
+		req.Header.Set("User-Agent", "LoreLattice-Lite-Desktop-App")
 
 		// Add Authorization header if GITHUB_TOKEN is present to increase rate limit
 		if token := os.Getenv("GITHUB_TOKEN"); token != "" {
@@ -119,7 +119,7 @@ func checkUpdate(ctx context.Context, currentVersion string, showUpToDate bool, 
 					return
 				}
 
-				msg := fmt.Sprintf("A new version of WeKnora Lite is available!\n\nCurrent version: %s\nLatest version: %s\n\nWould you like to download it now?", currentVersion, latestVersion)
+				msg := fmt.Sprintf("A new version of LoreLattice Lite is available!\n\nCurrent version: %s\nLatest version: %s\n\nWould you like to download it now?", currentVersion, latestVersion)
 				choice, _ := wailsruntime.MessageDialog(ctx, wailsruntime.MessageDialogOptions{
 					Type:          wailsruntime.InfoDialog,
 					Title:         "Update Available",
@@ -143,7 +143,7 @@ func checkUpdate(ctx context.Context, currentVersion string, showUpToDate bool, 
 			wailsruntime.MessageDialog(ctx, wailsruntime.MessageDialogOptions{
 				Type:          wailsruntime.InfoDialog,
 				Title:         "Up to Date",
-				Message:       fmt.Sprintf("You are using the latest version of WeKnora Lite.\n\nCurrent version: %s", currentVersion),
+				Message:       fmt.Sprintf("You are using the latest version of LoreLattice Lite.\n\nCurrent version: %s", currentVersion),
 				Buttons:       []string{"OK"},
 				DefaultButton: "OK",
 			})
@@ -280,7 +280,7 @@ func downloadAndInstall(ctx context.Context, url string, filename string, curren
 		choice, _ := wailsruntime.MessageDialog(ctx, wailsruntime.MessageDialogOptions{
 			Type:          wailsruntime.InfoDialog,
 			Title:         "Update Ready",
-			Message:       fmt.Sprintf("WeKnora Lite %s has been downloaded successfully.\n\nWould you like to restart and install the new version now?", latestVersion),
+			Message:       fmt.Sprintf("LoreLattice Lite %s has been downloaded successfully.\n\nWould you like to restart and install the new version now?", latestVersion),
 			Buttons:       []string{"Restart Now", "Later"},
 			DefaultButton: "Restart Now",
 		})
@@ -315,7 +315,7 @@ func desktopAboutVersion() string {
 // applyUpdateAndRestart applies the downloaded update and restarts the application
 func applyUpdateAndRestart(ctx context.Context, savePath string) {
 	if runtime.GOOS == "windows" {
-		scriptPath := filepath.Join(os.TempDir(), "weknora_update.bat")
+		scriptPath := filepath.Join(os.TempDir(), "lorelattice_update.bat")
 		execPath, err := os.Executable()
 		if err != nil {
 			logger.Warnf(context.Background(), "Failed to get executable path: %v", err)
@@ -351,7 +351,7 @@ del "%%~f0"
 					return
 				}
 
-				mountPoint := filepath.Join(os.TempDir(), "WeKnoraUpdateMount")
+				mountPoint := filepath.Join(os.TempDir(), "LoreLatticeUpdateMount")
 				os.MkdirAll(mountPoint, 0755)
 
 				cmdMount := exec.Command("hdiutil", "attach", savePath, "-mountpoint", mountPoint, "-nobrowse", "-quiet")
@@ -386,7 +386,7 @@ del "%%~f0"
 				}
 
 				appDir := filepath.Dir(appBundlePath)
-				scriptPath := filepath.Join(os.TempDir(), "weknora_update.sh")
+				scriptPath := filepath.Join(os.TempDir(), "lorelattice_update.sh")
 				scriptContent := fmt.Sprintf(`#!/bin/bash
 sleep 2
 if ! (rm -rf "%s" && cp -a "%s" "%s"); then

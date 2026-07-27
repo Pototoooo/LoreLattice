@@ -4,7 +4,7 @@
 # 执行后请直接在云控制台「制作镜像 / 创建快照 / 创建 AMI」，不要再 SSH 进来。
 set -euo pipefail
 
-WEKNORA_DIR="${WEKNORA_DIR:-/opt/WeKnora}"
+LORELATTICE_DIR="${LORELATTICE_DIR:-/opt/LoreLattice}"
 
 if [[ "${EUID}" -ne 0 ]]; then
   echo "[cleanup] 请使用 sudo 或 root 运行" >&2
@@ -17,26 +17,26 @@ if [[ "${ans}" != "YES" ]]; then
   exit 0
 fi
 
-echo "[cleanup] 1/8 停止 WeKnora 容器"
+echo "[cleanup] 1/8 停止 LoreLattice 容器"
 COMPOSE_PROJECT=""
-if [[ -d "${WEKNORA_DIR}" ]]; then
-  cd "${WEKNORA_DIR}"
-  # 优先用 compose ls 拿到真实 project 名 (默认是目录名小写, 如 weknora)
+if [[ -d "${LORELATTICE_DIR}" ]]; then
+  cd "${LORELATTICE_DIR}"
+  # 优先用 compose ls 拿到真实 project 名 (默认是目录名小写, 如 lorelattice)
   COMPOSE_PROJECT="$(docker compose ls --format json 2>/dev/null \
     | grep -oE '"Name":"[^"]+"' | head -1 | cut -d'"' -f4 || true)"
   docker compose down -v --remove-orphans || true
 fi
 
-echo "[cleanup] 2/8 清空 WeKnora 业务数据 + 首启 marker / 日志"
-if [[ -d "${WEKNORA_DIR}" ]]; then
-  rm -rf "${WEKNORA_DIR}/data"/* "${WEKNORA_DIR}/logs"/* 2>/dev/null || true
+echo "[cleanup] 2/8 清空 LoreLattice 业务数据 + 首启 marker / 日志"
+if [[ -d "${LORELATTICE_DIR}" ]]; then
+  rm -rf "${LORELATTICE_DIR}/data"/* "${LORELATTICE_DIR}/logs"/* 2>/dev/null || true
   # 故意不在这里重建 .env: 让镜像里 .env 缺失, 任何在 firstboot 之前
   # 起来的 docker compose 都会因找不到 .env 而失败, 避免明文默认密码
   # (postgres123!@# 之类) 把 postgres 数据卷初始化坏。
   # firstboot.sh 自己会从 .env.example 拷贝并替换密钥。
-  rm -f "${WEKNORA_DIR}/.env" "${WEKNORA_DIR}/.firstboot.done"
+  rm -f "${LORELATTICE_DIR}/.env" "${LORELATTICE_DIR}/.firstboot.done"
 fi
-rm -f /root/weknora-credentials.txt /var/log/weknora-firstboot.log
+rm -f /root/lorelattice-credentials.txt /var/log/lorelattice-firstboot.log
 
 echo "[cleanup] 3/8 清理残留 docker 卷与构建缓存"
 # 严格按 compose project 名前缀匹配, 避免误伤同宿主上其它 postgres/redis 卷。
@@ -46,7 +46,7 @@ if [[ -n "${COMPOSE_PROJECT}" ]]; then
 fi
 # 注意: 这里只清"卷 / 已停容器 / 构建缓存", 绝对不能清镜像。
 # 此前用过 `docker system prune -af --volumes`, 会把 prepare.sh 预拉的
-# wechatopenai/weknora-* 等镜像一并清掉, 导致基于镜像建出来的新实例
+# pototoooo/lorelattice-* 等镜像一并清掉, 导致基于镜像建出来的新实例
 # 在 firstboot 时还要重新从 Docker Hub 拉数 GB 镜像, 完全违背预装初衷。
 docker container prune -f      || true
 docker builder    prune -af    || true

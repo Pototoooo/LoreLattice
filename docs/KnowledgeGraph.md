@@ -1,4 +1,4 @@
-# WeKnora 知识图谱
+# LoreLattice 知识图谱
 
 ## 快速开始
 

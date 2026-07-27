@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Tencent/WeKnora/cli/internal/xdg"
+	"github.com/Pototoooo/lorelattice/cli/internal/xdg"
 )
 
 func TestPath_HonorsEnv(t *testing.T) {
@@ -17,7 +17,7 @@ func TestPath_HonorsEnv(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Path: %v", err)
 	}
-	want := filepath.Join(dir, "weknora", "config.yaml")
+	want := filepath.Join(dir, "lorelattice", "config.yaml")
 	if got != want {
 		t.Errorf("got %q, want %q", got, want)
 	}
@@ -32,8 +32,8 @@ func TestPath_FallsBackToHome(t *testing.T) {
 	if !filepath.IsAbs(got) {
 		t.Errorf("expected absolute path, got %q", got)
 	}
-	if !strings.Contains(got, ".cache") || !strings.Contains(got, "weknora") {
-		t.Errorf("expected ~/.cache/weknora prefix, got %q", got)
+	if !strings.Contains(got, ".cache") || !strings.Contains(got, "lorelattice") {
+		t.Errorf("expected ~/.cache/lorelattice prefix, got %q", got)
 	}
 }
 

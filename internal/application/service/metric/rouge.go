@@ -1,6 +1,6 @@
 package metric
 
-import "github.com/Tencent/WeKnora/internal/types"
+import "github.com/Pototoooo/lorelattice/internal/types"
 
 // reference: https://github.com/dd-Rebecca/rouge
 

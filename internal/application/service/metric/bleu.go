@@ -21,7 +21,7 @@ import (
 	"math"
 	"strings"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 type BLEUMetric struct {

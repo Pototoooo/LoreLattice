@@ -2,7 +2,7 @@
 
 # Show help
 help:
-	@echo "WeKnora Makefile 帮助"
+	@echo "LoreLattice Makefile 帮助"
 	@echo ""
 	@echo "基础命令:"
 	@echo "  build             构建应用"
@@ -11,9 +11,9 @@ help:
 	@echo "  clean             清理构建文件"
 	@echo ""
 	@echo "Docker 命令:"
-	@echo "  docker-build-app       构建应用 Docker 镜像 (wechatopenai/weknora-app)"
-	@echo "  docker-build-docreader 构建文档读取器镜像 (wechatopenai/weknora-docreader)"
-	@echo "  docker-build-frontend  构建前端镜像 (wechatopenai/weknora-ui)"
+	@echo "  docker-build-app       构建应用 Docker 镜像 (pototoooo/lorelattice-app)"
+	@echo "  docker-build-docreader 构建文档读取器镜像 (pototoooo/lorelattice-docreader)"
+	@echo "  docker-build-frontend  构建前端镜像 (pototoooo/lorelattice-ui)"
 	@echo "  docker-build-all       构建所有 Docker 镜像"
 	@echo "  docker-run            运行 Docker 容器"
 	@echo "  docker-stop           停止 Docker 容器"
@@ -65,11 +65,11 @@ help:
 	@echo "  package-mac-app   构建并打包 macOS 桌面应用 (.app)"
 
 # Go related variables
-BINARY_NAME=WeKnora
+BINARY_NAME=LoreLattice
 MAIN_PATH=./cmd/server
 
 # Docker related variables
-DOCKER_IMAGE=wechatopenai/weknora-app
+DOCKER_IMAGE=pototoooo/lorelattice-app
 DOCKER_TAG=latest
 
 # Platform detection
@@ -114,12 +114,12 @@ docker-build-app:
 
 # Build docreader Docker image
 docker-build-docreader:
-	docker build --platform $(PLATFORM) -f docker/Dockerfile.docreader -t wechatopenai/weknora-docreader:latest .
+	docker build --platform $(PLATFORM) -f docker/Dockerfile.docreader -t pototoooo/lorelattice-docreader:latest .
 
 # Build frontend Docker image
 docker-build-frontend:
 	./scripts/build_frontend_dist.sh
-	docker build --platform $(PLATFORM) -f frontend/Dockerfile -t wechatopenai/weknora-ui:latest frontend/
+	docker build --platform $(PLATFORM) -f frontend/Dockerfile -t pototoooo/lorelattice-ui:latest frontend/
 
 # Build all Docker images
 docker-build-all: docker-build-app docker-build-docreader docker-build-frontend
@@ -242,7 +242,7 @@ build-prod:
 	CGO_LDFLAGS="$$(if [ "$$(uname)" = 'Darwin' ]; then echo '-Wl,-no_warn_duplicate_libraries'; fi)" \
 	BUILD_TIME=$${BUILD_TIME:-unknown}; \
 	GO_VERSION=$${GO_VERSION:-unknown}; \
-	LDFLAGS="-X 'github.com/Tencent/WeKnora/internal/handler.Version=$$VERSION' -X 'github.com/Tencent/WeKnora/internal/handler.Edition=standard' -X 'github.com/Tencent/WeKnora/internal/handler.CommitID=$$COMMIT_ID' -X 'github.com/Tencent/WeKnora/internal/handler.BuildTime=$$BUILD_TIME' -X 'github.com/Tencent/WeKnora/internal/handler.GoVersion=$$GO_VERSION' -X 'google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn'"; \
+	LDFLAGS="-X 'github.com/Pototoooo/lorelattice/internal/handler.Version=$$VERSION' -X 'github.com/Pototoooo/lorelattice/internal/handler.Edition=standard' -X 'github.com/Pototoooo/lorelattice/internal/handler.CommitID=$$COMMIT_ID' -X 'github.com/Pototoooo/lorelattice/internal/handler.BuildTime=$$BUILD_TIME' -X 'github.com/Pototoooo/lorelattice/internal/handler.GoVersion=$$GO_VERSION' -X 'google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn'"; \
 	go build -ldflags="-w -s $$LDFLAGS" -o $(BINARY_NAME) $(MAIN_PATH)
 
 # Build Lite version (single binary, SQLite + in-memory queue)
@@ -283,14 +283,14 @@ download_spatial:
 
 clean-db:
 	@echo "Cleaning database..."
-	@if [ $$(docker volume ls -q -f name=weknora_postgres-data) ]; then \
-		docker volume rm weknora_postgres-data; \
+	@if [ $$(docker volume ls -q -f name=lorelattice_postgres-data) ]; then \
+		docker volume rm lorelattice_postgres-data; \
 	fi
-	@if [ $$(docker volume ls -q -f name=weknora_minio_data) ]; then \
-		docker volume rm weknora_minio_data; \
+	@if [ $$(docker volume ls -q -f name=lorelattice_minio_data) ]; then \
+		docker volume rm lorelattice_minio_data; \
 	fi
-	@if [ $$(docker volume ls -q -f name=weknora_redis_data) ]; then \
-		docker volume rm weknora_redis_data; \
+	@if [ $$(docker volume ls -q -f name=lorelattice_redis_data) ]; then \
+		docker volume rm lorelattice_redis_data; \
 	fi
 
 # Environment check

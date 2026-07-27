@@ -66,7 +66,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: WeKnora Version
+      label: LoreLattice Version
       description: |
         Please provide the concrete version number you are running, **not** `latest`, `main` or `master`.
         You can find it on the **Settings → System Info** page (both "App Version" and "UI Version" — if they differ, please report both).
@@ -79,7 +79,7 @@ body:
     id: deployment
     attributes:
       label: Deployment Method
-      description: How are you running WeKnora?
+      description: How are you running LoreLattice?
       options:
         - Docker Compose
         - Build from source

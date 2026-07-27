@@ -181,7 +181,7 @@ curl --location 'http://localhost:8080/api/v1/system/storage-engine-check' \
         "endpoint": "localhost:9000",
         "access_key": "minioadmin",
         "secret_key": "minioadmin",
-        "bucket": "weknora",
+        "bucket": "lorelattice",
         "use_ssl": false
     }
 }'

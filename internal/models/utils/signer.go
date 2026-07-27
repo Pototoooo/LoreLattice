@@ -16,7 +16,7 @@ const (
 	nonceLength = 16
 )
 
-// Sign 按 WeKnoraCloud 参考实现生成请求头。
+// Sign 按 LoreLatticeCloud 参考实现生成请求头。
 // appID: 上游 APPID
 // apiKey: 上游 API Key（当前沿用 AppSecret 字段承载）
 // requestID: 每次请求唯一的 UUID 字符串

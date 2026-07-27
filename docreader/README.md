@@ -1,6 +1,6 @@
 # DocReader Service
 
-DocReader 是 WeKnora 项目中负责文档解析和处理的 gRPC 服务。它支持多种文档格式的读取、OCR 识别、多模态处理等功能。
+DocReader 是 LoreLattice 项目中负责文档解析和处理的 gRPC 服务。它支持多种文档格式的读取、OCR 识别、多模态处理等功能。
 
 ## Docker Compose 环境变量配置
 
@@ -8,7 +8,7 @@ DocReader 是 WeKnora 项目中负责文档解析和处理的 gRPC 服务。它�
 
 ```yaml
 docreader:
-  image: wechatopenai/weknora-docreader:${WEKNORA_VERSION:-latest}
+  image: pototoooo/lorelattice-docreader:${LORELATTICE_VERSION:-latest}
   environment:
     - MINIO_ENDPOINT=minio:9000
     - MINIO_PUBLIC_ENDPOINT=http://localhost:${MINIO_PORT:-9000}
@@ -97,7 +97,7 @@ DocReader 支持多种存储后端：
 - `STORAGE_TYPE`: 设置为 `minio`
 - `MINIO_ACCESS_KEY_ID`: MinIO 访问密钥 ID（默认：minioadmin）
 - `MINIO_SECRET_ACCESS_KEY`: MinIO 访问密钥（默认：minioadmin）
-- `MINIO_BUCKET_NAME`: MinIO 存储桶名称（默认：WeKnora）
+- `MINIO_BUCKET_NAME`: MinIO 存储桶名称（默认：LoreLattice）
 - `MINIO_PATH_PREFIX`: 文件路径前缀
 - `MINIO_USE_SSL`: 是否使用 SSL（默认：false）
 
@@ -218,12 +218,12 @@ healthcheck:
 
 ```bash
 docker ps | grep docreader
-docker logs WeKnora-docreader
+docker logs LoreLattice-docreader
 ```
 
 ## 更多信息
 
 - 服务端口：50051（gRPC）
-- 容器名称：WeKnora-docreader
-- 网络：WeKnora-network
+- 容器名称：LoreLattice-docreader
+- 网络：LoreLattice-network
 - 重启策略：unless-stopped

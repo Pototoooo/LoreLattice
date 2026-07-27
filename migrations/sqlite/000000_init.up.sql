@@ -1,4 +1,4 @@
--- SQLite schema for WeKnora Lite (consolidated from all Postgres migrations)
+-- SQLite schema for LoreLattice Lite (consolidated from all Postgres migrations)
 
 CREATE TABLE IF NOT EXISTS tenants (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

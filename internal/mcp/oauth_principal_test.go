@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/mark3labs/mcp-go/client/transport"
 	"github.com/stretchr/testify/require"
 )
@@ -150,7 +150,7 @@ func TestManagedTokenStoreLeavesRefreshToOAuthRuntime(t *testing.T) {
 
 	token, err := store.GetToken(context.Background())
 	require.NoError(t, err)
-	require.True(t, token.ExpiresAt.IsZero(), "mcp-go must not race WeKnora's coordinated refresh")
+	require.True(t, token.ExpiresAt.IsZero(), "mcp-go must not race LoreLattice's coordinated refresh")
 	row, err := repo.GetTokenForPrincipal(context.Background(), 7, principal, "svc-1")
 	require.NoError(t, err)
 	require.False(t, row.ExpiresAt.IsZero(), "the database must retain the real expiry for preflight checks")

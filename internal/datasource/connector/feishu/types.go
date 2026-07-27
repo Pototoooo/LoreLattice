@@ -1,6 +1,6 @@
-// Package feishu implements the Feishu (飞书/Lark) data source connector for WeKnora.
+// Package feishu implements the Feishu (飞书/Lark) data source connector for LoreLattice.
 //
-// It syncs documents from Feishu Wiki spaces and cloud documents into WeKnora knowledge bases.
+// It syncs documents from Feishu Wiki spaces and cloud documents into LoreLattice knowledge bases.
 //
 // Feishu API docs:
 //   - Wiki spaces:      https://open.feishu.cn/document/server-docs/docs/wiki-v2/space/list
@@ -174,9 +174,9 @@ type exportTaskStatusResponse struct {
 			FileToken string `json:"file_token"`
 			FileSize  int64  `json:"file_size"`
 			// JobStatus: 0=success, 1=initializing, 2=processing
-			JobStatus    int    `json:"job_status"`
-			JobErrorMsg  string `json:"job_error_msg"`
-			FileName     string `json:"file_name"`
+			JobStatus   int    `json:"job_status"`
+			JobErrorMsg string `json:"job_error_msg"`
+			FileName    string `json:"file_name"`
 		} `json:"result"`
 	} `json:"data"`
 }

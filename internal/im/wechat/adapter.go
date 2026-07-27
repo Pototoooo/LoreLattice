@@ -22,8 +22,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/im"
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/im"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,7 +34,7 @@ const (
 	// defaultBotType is the bot_type for iLink get_bot_qrcode / get_qrcode_status.
 	defaultBotType = "3"
 	// channelVersion is sent in base_info with every API request.
-	channelVersion = "weknora-1.0.0"
+	channelVersion = "lorelattice-1.0.0"
 )
 
 var ilinkHTTPClient = &http.Client{Timeout: 30 * time.Second}
@@ -104,7 +104,7 @@ func (a *Adapter) SendReply(ctx context.Context, incoming *im.IncomingMessage, r
 		"msg": map[string]interface{}{
 			"from_user_id":  "",
 			"to_user_id":    incoming.UserID,
-			"client_id":     fmt.Sprintf("weknora_%d", time.Now().UnixNano()),
+			"client_id":     fmt.Sprintf("lorelattice_%d", time.Now().UnixNano()),
 			"message_type":  2, // BOT
 			"message_state": 2, // FINISH
 			"item_list": []map[string]interface{}{

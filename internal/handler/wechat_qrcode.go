@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/Tencent/WeKnora/internal/im/wechat"
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/im/wechat"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 	"github.com/gin-gonic/gin"
 )
 

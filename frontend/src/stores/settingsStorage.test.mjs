@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const SETTINGS_STORAGE_KEY = "WeKnora_settings";
+const SETTINGS_STORAGE_KEY = "LoreLattice_settings";
 const BUILTIN_QUICK_ANSWER_ID = "builtin-quick-answer";
 const BUILTIN_SMART_REASONING_ID = "builtin-smart-reasoning";
 

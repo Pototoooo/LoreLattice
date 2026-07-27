@@ -11,7 +11,7 @@ package errors
 
 const (
 	// ErrCodeDocReaderTimeout — DocReader RPC exceeded
-	// WEKNORA_DOCREADER_CALL_TIMEOUT (default 30m). Suggest splitting
+	// LORELATTICE_DOCREADER_CALL_TIMEOUT (default 30m). Suggest splitting
 	// large files or checking docreader load.
 	ErrCodeDocReaderTimeout = "DOCREADER_TIMEOUT"
 

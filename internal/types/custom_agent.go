@@ -194,13 +194,13 @@ type CustomAgentConfig struct {
 	AttachmentImageUnderstanding bool `yaml:"attachment_image_understanding" json:"attachment_image_understanding"`
 	// AttachmentOCRMaxPages caps how many pages of a scanned / image-only
 	// document this agent sends to the VLM for OCR. 0 falls back to the global
-	// default (WEKNORA_CHAT_ATTACHMENT_OCR_MAX_PAGES). More pages means higher
+	// default (LORELATTICE_CHAT_ATTACHMENT_OCR_MAX_PAGES). More pages means higher
 	// coverage but slower parsing and more VLM cost.
 	AttachmentOCRMaxPages int `yaml:"attachment_ocr_max_pages" json:"attachment_ocr_max_pages,omitempty"`
 	// AttachmentParseWaitTimeoutSec bounds, in seconds, how long a chat turn
 	// waits for this agent's still-parsing attachments before proceeding with
 	// only the finished ones. 0 falls back to the global default
-	// (WEKNORA_CHAT_ATTACHMENT_WAIT_TIMEOUT_SEC).
+	// (LORELATTICE_CHAT_ATTACHMENT_WAIT_TIMEOUT_SEC).
 	AttachmentParseWaitTimeoutSec int `yaml:"attachment_parse_wait_timeout_sec" json:"attachment_parse_wait_timeout_sec,omitempty"`
 
 	// ===== Data Analysis Settings =====

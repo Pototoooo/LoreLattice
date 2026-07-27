@@ -8,19 +8,19 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
 )
 
 // TestEveryLeafCommandHasAgentHelp enforces the agent-first contract: every
 // leaf (runnable, no subcommands) command must emit a structured AgentHelp JSON
-// blob under WEKNORA_AGENT_HELP=1, so an agent never has to scrape human prose.
+// blob under LORELATTICE_AGENT_HELP=1, so an agent never has to scrape human prose.
 // Drift guard in the spirit of the K6/K7 skill-parity tests: a new leaf command
 // added without SetAgentHelp fails CI here.
 //
 // Exemptions: cobra's generated `completion`/`help` subtrees carry no
 // domain semantics worth a machine blob.
 func TestEveryLeafCommandHasAgentHelp(t *testing.T) {
-	t.Setenv("WEKNORA_AGENT_HELP", "1")
+	t.Setenv("LORELATTICE_AGENT_HELP", "1")
 	root := NewRootCmd(cmdutil.New())
 
 	var missing []string
@@ -44,7 +44,7 @@ func TestEveryLeafCommandHasAgentHelp(t *testing.T) {
 	}
 }
 
-// renderAgentHelp runs a leaf's help under WEKNORA_AGENT_HELP=1 and decodes the
+// renderAgentHelp runs a leaf's help under LORELATTICE_AGENT_HELP=1 and decodes the
 // machine blob (used_for / output / examples) an agent would read.
 func renderAgentHelp(t *testing.T, c *cobra.Command) struct {
 	UsedFor  string   `json:"used_for"`
@@ -71,7 +71,7 @@ func renderAgentHelp(t *testing.T, c *cobra.Command) struct {
 // envelope (e.g. deletes emit {id, deleted:true}); an empty Output is a contract
 // gap, not a valid state. Sibling drift guard to the agent-help test above.
 func TestEveryLeafCommandDeclaresOutput(t *testing.T) {
-	t.Setenv("WEKNORA_AGENT_HELP", "1")
+	t.Setenv("LORELATTICE_AGENT_HELP", "1")
 	root := NewRootCmd(cmdutil.New())
 
 	var missing []string
@@ -91,7 +91,7 @@ func TestEveryLeafCommandDeclaresOutput(t *testing.T) {
 // TestEveryLeafCommandHasExample enforces that every leaf ships at least one
 // runnable example — agents learn invocation shape from examples, not prose.
 func TestEveryLeafCommandHasExample(t *testing.T) {
-	t.Setenv("WEKNORA_AGENT_HELP", "1")
+	t.Setenv("LORELATTICE_AGENT_HELP", "1")
 	root := NewRootCmd(cmdutil.New())
 
 	var missing []string

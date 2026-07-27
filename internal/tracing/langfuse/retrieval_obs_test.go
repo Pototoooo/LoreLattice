@@ -3,7 +3,7 @@ package langfuse
 import (
 	"testing"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 func TestSummarizeRetrieveOutput_countsAndPreviews(t *testing.T) {

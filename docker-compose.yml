@@ -1,10 +1,10 @@
 services:
   frontend:
-    image: wechatopenai/weknora-ui:${WEKNORA_VERSION:-latest}
+    image: pototoooo/lorelattice-ui:${LORELATTICE_VERSION:-latest}
     # Requires frontend/dist — run ./scripts/build_frontend_dist.sh before --build
     build:
       context: ./frontend
-    container_name: WeKnora-frontend
+    container_name: LoreLattice-frontend
     ports:
       - "${FRONTEND_PORT:-80}:80"
     environment:
@@ -21,17 +21,17 @@ services:
       app:
         condition: service_healthy
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     restart: unless-stopped
 
   app:
-    image: wechatopenai/weknora-app:${WEKNORA_VERSION:-latest}
+    image: pototoooo/lorelattice-app:${LORELATTICE_VERSION:-latest}
     build:
       context: .
       dockerfile: docker/Dockerfile.app
       args:
         - APK_MIRROR_ARG=${APK_MIRROR_ARG:-}
-    container_name: WeKnora-app
+    container_name: LoreLattice-app
     ports:
       - "${APP_PORT:-8080}:8080"
     volumes:
@@ -80,10 +80,12 @@ services:
       - TZ=${TZ:-Asia/Shanghai}
       # 文档处理语言（问题/摘要生成）。优先级：此环境变量（部署级覆盖，非空即生效）
       # > Accept-Language 请求头 > 内置默认值 (zh-CN)。留空则跟随请求方 Accept-Language。
-      - WEKNORA_LANGUAGE=${WEKNORA_LANGUAGE:-}
+      - LORELATTICE_LANGUAGE=${LORELATTICE_LANGUAGE:-}
+      # 可选签名云网关；默认关闭，避免隐式请求到外部品牌域名。
+      - LORELATTICE_CLOUD_BASE_URL=${LORELATTICE_CLOUD_BASE_URL:-}
       # gin 信任的代理 CIDR（逗号分隔）；显式设为空字符串则禁用代理信任。
       # 默认信任 loopback + 私网段（容器网络内 nginx 已覆盖）
-      # - WEKNORA_TRUSTED_PROXIES=${WEKNORA_TRUSTED_PROXIES:-}
+      # - LORELATTICE_TRUSTED_PROXIES=${LORELATTICE_TRUSTED_PROXIES:-}
       # 启动时自动执行数据库迁移；设为 false 禁用，默认启用
       - AUTO_MIGRATE=${AUTO_MIGRATE:-true}
       # 本地存储后端生成下载链接用的外部可达 URL（IM 渠道 local 后端必填）
@@ -100,21 +102,21 @@ services:
       - COS_TEMP_BUCKET_NAME=${COS_TEMP_BUCKET_NAME:-}
       - COS_TEMP_REGION=${COS_TEMP_REGION:-}
 
-      # 认证 / 租户 / RBAC / 审计
+      # 认证 / 空间 / RBAC / 审计
       # 禁止新用户注册（生产建议 true）
       - DISABLE_REGISTRATION=${DISABLE_REGISTRATION:-false}
       # 公开注册后的默认空间策略：create_personal（默认，自动创建个人空间）/ tenantless
-      - WEKNORA_AUTH_DEFAULT_TENANT_MODE=${WEKNORA_AUTH_DEFAULT_TENANT_MODE:-create_personal}
+      - LORELATTICE_AUTH_DEFAULT_TENANT_MODE=${LORELATTICE_AUTH_DEFAULT_TENANT_MODE:-create_personal}
       # 是否允许普通用户登录后主动创建空间（默认 true；false 仅能邀请加入，超管不受影响）
-      - WEKNORA_TENANT_SELF_SERVICE_CREATION_ENABLED=${WEKNORA_TENANT_SELF_SERVICE_CREATION_ENABLED:-true}
-      # 启用跨租户访问（需配合用户的 CanAccessAllTenants 权限；默认 false
-      - WEKNORA_TENANT_ENABLE_CROSS_TENANT_ACCESS=${WEKNORA_TENANT_ENABLE_CROSS_TENANT_ACCESS:-false}
+      - LORELATTICE_TENANT_SELF_SERVICE_CREATION_ENABLED=${LORELATTICE_TENANT_SELF_SERVICE_CREATION_ENABLED:-true}
+      # 启用跨空间访问（需配合用户的 CanAccessAllTenants 权限；默认 false
+      - LORELATTICE_TENANT_ENABLE_CROSS_TENANT_ACCESS=${LORELATTICE_TENANT_ENABLE_CROSS_TENANT_ACCESS:-false}
       # 新建空间默认存储配额（GB，默认 10）
-      - WEKNORA_TENANT_DEFAULT_STORAGE_QUOTA_GB=${WEKNORA_TENANT_DEFAULT_STORAGE_QUOTA_GB:-10}
-      # 租户邀请链接 TTL（Go duration，默认 168h=7 天）
-      - WEKNORA_INVITATION_TTL=${WEKNORA_INVITATION_TTL:-168h}
+      - LORELATTICE_TENANT_DEFAULT_STORAGE_QUOTA_GB=${LORELATTICE_TENANT_DEFAULT_STORAGE_QUOTA_GB:-10}
+      # 空间邀请链接 TTL（Go duration，默认 168h=7 天）
+      - LORELATTICE_INVITATION_TTL=${LORELATTICE_INVITATION_TTL:-168h}
       # 审计日志保留天数（0 禁用清理，默认 90）
-      - WEKNORA_AUDIT_RETENTION_DAYS=${WEKNORA_AUDIT_RETENTION_DAYS:-90}
+      - LORELATTICE_AUDIT_RETENTION_DAYS=${LORELATTICE_AUDIT_RETENTION_DAYS:-90}
       # 数据库设置
       - DB_DRIVER=${DB_DRIVER:-postgres}
       - DB_HOST=${DB_HOST:-postgres}
@@ -147,11 +149,11 @@ services:
       - ELASTICSEARCH_INDEX=${ELASTICSEARCH_INDEX:-}
       - QDRANT_HOST=${QDRANT_HOST:-qdrant}
       - QDRANT_PORT=${QDRANT_PORT:-6334}
-      - QDRANT_COLLECTION=${QDRANT_COLLECTION:-weknora_embeddings}
+      - QDRANT_COLLECTION=${QDRANT_COLLECTION:-lorelattice_embeddings}
       - QDRANT_API_KEY=${QDRANT_API_KEY:-}
       - QDRANT_USE_TLS=${QDRANT_USE_TLS:-false}
       - MILVUS_ADDRESS=${MILVUS_ADDRESS:-milvus:19530}
-      - MILVUS_COLLECTION=${MILVUS_COLLECTION:-weknora_embeddings}
+      - MILVUS_COLLECTION=${MILVUS_COLLECTION:-lorelattice_embeddings}
       - MILVUS_METRIC_TYPE=${MILVUS_METRIC_TYPE:-IP}
       - MILVUS_USERNAME=${MILVUS_USERNAME:-}
       - MILVUS_PASSWORD=${MILVUS_PASSWORD:-}
@@ -223,7 +225,7 @@ services:
       - S3_ACCESS_KEY=${S3_ACCESS_KEY:-}
       - S3_SECRET_KEY=${S3_SECRET_KEY:-}
       - S3_BUCKET_NAME=${S3_BUCKET_NAME:-}
-      - S3_PATH_PREFIX=${S3_PATH_PREFIX:-weknora/}
+      - S3_PATH_PREFIX=${S3_PATH_PREFIX:-lorelattice/}
       - S3_USE_SSL=${S3_USE_SSL:-true}
       - S3_FORCE_PATH_STYLE=${S3_FORCE_PATH_STYLE:-false}
       # ----- 华为云 OBS（STORAGE_TYPE=obs）-----
@@ -232,7 +234,7 @@ services:
       - OBS_ACCESS_KEY=${OBS_ACCESS_KEY:-}
       - OBS_SECRET_KEY=${OBS_SECRET_KEY:-}
       - OBS_BUCKET_NAME=${OBS_BUCKET_NAME:-}
-      - OBS_PATH_PREFIX=${OBS_PATH_PREFIX:-weknora/}
+      - OBS_PATH_PREFIX=${OBS_PATH_PREFIX:-lorelattice/}
       - OBS_USE_SSL=${OBS_USE_SSL:-true}
       - OBS_PROXY_DOMAIN=${OBS_PROXY_DOMAIN:-}
       # ----- 阿里云 OSS（STORAGE_TYPE=oss）-----
@@ -241,7 +243,7 @@ services:
       - OSS_ACCESS_KEY=${OSS_ACCESS_KEY:-}
       - OSS_SECRET_KEY=${OSS_SECRET_KEY:-}
       - OSS_BUCKET_NAME=${OSS_BUCKET_NAME:-}
-      - OSS_PATH_PREFIX=${OSS_PATH_PREFIX:-weknora/}
+      - OSS_PATH_PREFIX=${OSS_PATH_PREFIX:-lorelattice/}
       - OSS_TEMP_BUCKET_NAME=${OSS_TEMP_BUCKET_NAME:-}
       - OSS_TEMP_REGION=${OSS_TEMP_REGION:-}
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
@@ -251,9 +253,9 @@ services:
       - BATCH_EMBED_SIZE=${BATCH_EMBED_SIZE:-}
       # VLM 单次 HTTP 请求超时（秒，默认 180）
       - VLM_HTTP_TIMEOUT_SECONDS=${VLM_HTTP_TIMEOUT_SECONDS:-}
-      # LLM 流原始转储（排查上下文问题；1 启用，默认目录 ~/.weknora/investigate/llm-stream）
-      - WEKNORA_LLM_STREAM_RAW_DUMP=${WEKNORA_LLM_STREAM_RAW_DUMP:-}
-      - WEKNORA_LLM_STREAM_RAW_DUMP_DIR=${WEKNORA_LLM_STREAM_RAW_DUMP_DIR:-}
+      # LLM 流原始转储（排查上下文问题；1 启用，默认目录 ~/.lorelattice/investigate/llm-stream）
+      - LORELATTICE_LLM_STREAM_RAW_DUMP=${LORELATTICE_LLM_STREAM_RAW_DUMP:-}
+      - LORELATTICE_LLM_STREAM_RAW_DUMP_DIR=${LORELATTICE_LLM_STREAM_RAW_DUMP_DIR:-}
       - STREAM_MANAGER_TYPE=${STREAM_MANAGER_TYPE:-}
       - REDIS_ADDR=${REDIS_ADDR:-redis:6379}
       - REDIS_USERNAME=${REDIS_USERNAME:-}
@@ -264,9 +266,9 @@ services:
       - REDIS_TLS_SERVER_NAME=${REDIS_TLS_SERVER_NAME:-}
       - REDIS_TLS_INSECURE_SKIP_VERIFY=${REDIS_TLS_INSECURE_SKIP_VERIFY:-}
       # Redis 频道命名空间后缀（多部署共享同一 Redis 时隔离用）
-      - WEKNORA_REDIS_NAMESPACE=${WEKNORA_REDIS_NAMESPACE:-}
+      - LORELATTICE_REDIS_NAMESPACE=${LORELATTICE_REDIS_NAMESPACE:-}
       # Asynq 客户端 Redis 读写超时（毫秒，默认 500）
-      - WEKNORA_REDIS_OP_TIMEOUT_MS=${WEKNORA_REDIS_OP_TIMEOUT_MS:-}
+      - LORELATTICE_REDIS_OP_TIMEOUT_MS=${LORELATTICE_REDIS_OP_TIMEOUT_MS:-}
       # 知识图谱唯一开关是 NEO4J_ENABLE（见下方）。ENABLE_GRAPH_RAG 自 v0.1.6 起已被
       # NEO4J_ENABLE 取代，Go 主应用不再读取，此处不再透传。
       - NEO4J_ENABLE=${NEO4J_ENABLE:-}
@@ -275,7 +277,7 @@ services:
       - NEO4J_PASSWORD=${NEO4J_PASSWORD:-password}
       # 数据库中 API Key 等敏感字段落盘加密的 AES-256 主密钥（必须为 32 字节）。
       # 加密范围：tenants.api_key、模型 API key、向量库凭证、web search provider key、
-      # WeKnoraCloud.AppSecret 等。缺失或长度不对时，已加密字段无法解密（UI 显示为空，
+      # LoreLatticeCloud.AppSecret 等。缺失或长度不对时，已加密字段无法解密（UI 显示为空，
       # 需重新填写）。生产环境必须显式设置且妥善保管，丢失则所有加密数据不可恢复。
       # （TENANT_AES_KEY / CRYPTO_MASTER_KEY / CRYPTO_SALT 已废弃：v0.4.0 起加密统一
       #   改用 SYSTEM_AES_KEY，Go 主应用不再读取这三个变量。）
@@ -297,44 +299,44 @@ services:
       # File size limit (in MB)
       - MAX_FILE_SIZE_MB=${MAX_FILE_SIZE_MB:-50}
       # 文档处理任务总超时（Go duration，默认 2h）
-      - WEKNORA_DOCUMENT_PROCESS_TIMEOUT=${WEKNORA_DOCUMENT_PROCESS_TIMEOUT:-}
+      - LORELATTICE_DOCUMENT_PROCESS_TIMEOUT=${LORELATTICE_DOCUMENT_PROCESS_TIMEOUT:-}
       # 单次 DocReader RPC 超时（默认 30m，须小于上一项）
-      - WEKNORA_DOCREADER_CALL_TIMEOUT=${WEKNORA_DOCREADER_CALL_TIMEOUT:-}
+      - LORELATTICE_DOCREADER_CALL_TIMEOUT=${LORELATTICE_DOCREADER_CALL_TIMEOUT:-}
       # 知识库巡检回收（回收卡在 processing 的脏数据；false 禁用，不建议）
-      - WEKNORA_HOUSEKEEPING_ENABLED=${WEKNORA_HOUSEKEEPING_ENABLED:-}
+      - LORELATTICE_HOUSEKEEPING_ENABLED=${LORELATTICE_HOUSEKEEPING_ENABLED:-}
       # 自定义 Skills 目录（挂载后指定，免重建镜像）
-      - WEKNORA_SKILLS_DIR=${WEKNORA_SKILLS_DIR:-}
-      - WEKNORA_CHAT_ATTACHMENT_TTL_HOURS=${WEKNORA_CHAT_ATTACHMENT_TTL_HOURS:-24}
-      - WEKNORA_CHAT_ATTACHMENT_WAIT_TIMEOUT_SEC=${WEKNORA_CHAT_ATTACHMENT_WAIT_TIMEOUT_SEC:-60}
-      - WEKNORA_CHAT_ATTACHMENT_OCR_CONCURRENCY=${WEKNORA_CHAT_ATTACHMENT_OCR_CONCURRENCY:-8}
-      - WEKNORA_CHAT_ATTACHMENT_OCR_MAX_PAGES=${WEKNORA_CHAT_ATTACHMENT_OCR_MAX_PAGES:-8}
+      - LORELATTICE_SKILLS_DIR=${LORELATTICE_SKILLS_DIR:-}
+      - LORELATTICE_CHAT_ATTACHMENT_TTL_HOURS=${LORELATTICE_CHAT_ATTACHMENT_TTL_HOURS:-24}
+      - LORELATTICE_CHAT_ATTACHMENT_WAIT_TIMEOUT_SEC=${LORELATTICE_CHAT_ATTACHMENT_WAIT_TIMEOUT_SEC:-60}
+      - LORELATTICE_CHAT_ATTACHMENT_OCR_CONCURRENCY=${LORELATTICE_CHAT_ATTACHMENT_OCR_CONCURRENCY:-8}
+      - LORELATTICE_CHAT_ATTACHMENT_OCR_MAX_PAGES=${LORELATTICE_CHAT_ATTACHMENT_OCR_MAX_PAGES:-8}
       # Agent Skills Sandbox
-      - WEKNORA_SANDBOX_MODE=${WEKNORA_SANDBOX_MODE:-docker}
-      - WEKNORA_SANDBOX_TIMEOUT=${WEKNORA_SANDBOX_TIMEOUT:-60}
-      - WEKNORA_SANDBOX_DOCKER_IMAGE=${WEKNORA_SANDBOX_DOCKER_IMAGE:-wechatopenai/weknora-sandbox:${WEKNORA_VERSION:-latest}}
+      - LORELATTICE_SANDBOX_MODE=${LORELATTICE_SANDBOX_MODE:-docker}
+      - LORELATTICE_SANDBOX_TIMEOUT=${LORELATTICE_SANDBOX_TIMEOUT:-60}
+      - LORELATTICE_SANDBOX_DOCKER_IMAGE=${LORELATTICE_SANDBOX_DOCKER_IMAGE:-pototoooo/lorelattice-sandbox:${LORELATTICE_VERSION:-latest}}
       # Agent LLM call timeout
-      - WEKNORA_AGENT_LLM_TIMEOUT=${WEKNORA_AGENT_LLM_TIMEOUT:-}
-      - WEKNORA_AGENT_TOOL_APPROVAL_TIMEOUT=${WEKNORA_AGENT_TOOL_APPROVAL_TIMEOUT:-}
+      - LORELATTICE_AGENT_LLM_TIMEOUT=${LORELATTICE_AGENT_LLM_TIMEOUT:-}
+      - LORELATTICE_AGENT_TOOL_APPROVAL_TIMEOUT=${LORELATTICE_AGENT_TOOL_APPROVAL_TIMEOUT:-}
       # MCP 工具人工审批失败时是否放行（true 放行 / 默认 fail-close 拒绝）
-      - WEKNORA_AGENT_TOOL_APPROVAL_FAIL_OPEN=${WEKNORA_AGENT_TOOL_APPROVAL_FAIL_OPEN:-}
+      - LORELATTICE_AGENT_TOOL_APPROVAL_FAIL_OPEN=${LORELATTICE_AGENT_TOOL_APPROVAL_FAIL_OPEN:-}
       # Tenant / RBAC（详见 docs/RBAC说明.md 与 .env.example 注释）
-      # - WEKNORA_TENANT_ENABLE_RBAC: 是否启用空间角色强制鉴权（true / false），默认 true
-      # - WEKNORA_TENANT_MAX_OWNED_PER_USER: 单个非超管自助创建空间的上限
+      # - LORELATTICE_TENANT_ENABLE_RBAC: 是否启用空间角色强制鉴权（true / false），默认 true
+      # - LORELATTICE_TENANT_MAX_OWNED_PER_USER: 单个非超管自助创建空间的上限
       #   >0 强制限额；=0 走 handler 默认；<0 关闭限额（不建议共享部署使用）
-      # - WEKNORA_TENANT_AUTO_CREATE_API_KEY: 创建空间时自动生成 full_access API Key 并在响应中返回 token
+      # - LORELATTICE_TENANT_AUTO_CREATE_API_KEY: 创建空间时自动生成 full_access API Key 并在响应中返回 token
       #   （兼容旧版默认下发 API Key 行为，破坏性变更回退开关；true / false，默认 false）
-      - WEKNORA_TENANT_ENABLE_RBAC=${WEKNORA_TENANT_ENABLE_RBAC:-}
-      - WEKNORA_TENANT_MAX_OWNED_PER_USER=${WEKNORA_TENANT_MAX_OWNED_PER_USER:-}
-      - WEKNORA_TENANT_AUTO_CREATE_API_KEY=${WEKNORA_TENANT_AUTO_CREATE_API_KEY:-}
-      - WEKNORA_ASYNQ_CORE_CONCURRENCY=${WEKNORA_ASYNQ_CORE_CONCURRENCY:-8}
-      - WEKNORA_ASYNQ_POSTPROCESS_CONCURRENCY=${WEKNORA_ASYNQ_POSTPROCESS_CONCURRENCY:-2}
-      - WEKNORA_ASYNQ_ENRICHMENT_CONCURRENCY=${WEKNORA_ASYNQ_ENRICHMENT_CONCURRENCY:-12}
-      - WEKNORA_ASYNQ_MAINTENANCE_CONCURRENCY=${WEKNORA_ASYNQ_MAINTENANCE_CONCURRENCY:-4}
-      - WEKNORA_ASYNQ_SHARED_CONCURRENCY=${WEKNORA_ASYNQ_SHARED_CONCURRENCY:-6}
-      - WEKNORA_WIKI_ASYNQ_CONCURRENCY=${WEKNORA_WIKI_ASYNQ_CONCURRENCY:-8}
-      - WEKNORA_MODEL_MAX_CONCURRENCY=${WEKNORA_MODEL_MAX_CONCURRENCY:-32}
+      - LORELATTICE_TENANT_ENABLE_RBAC=${LORELATTICE_TENANT_ENABLE_RBAC:-}
+      - LORELATTICE_TENANT_MAX_OWNED_PER_USER=${LORELATTICE_TENANT_MAX_OWNED_PER_USER:-}
+      - LORELATTICE_TENANT_AUTO_CREATE_API_KEY=${LORELATTICE_TENANT_AUTO_CREATE_API_KEY:-}
+      - LORELATTICE_ASYNQ_CORE_CONCURRENCY=${LORELATTICE_ASYNQ_CORE_CONCURRENCY:-8}
+      - LORELATTICE_ASYNQ_POSTPROCESS_CONCURRENCY=${LORELATTICE_ASYNQ_POSTPROCESS_CONCURRENCY:-2}
+      - LORELATTICE_ASYNQ_ENRICHMENT_CONCURRENCY=${LORELATTICE_ASYNQ_ENRICHMENT_CONCURRENCY:-12}
+      - LORELATTICE_ASYNQ_MAINTENANCE_CONCURRENCY=${LORELATTICE_ASYNQ_MAINTENANCE_CONCURRENCY:-4}
+      - LORELATTICE_ASYNQ_SHARED_CONCURRENCY=${LORELATTICE_ASYNQ_SHARED_CONCURRENCY:-6}
+      - LORELATTICE_WIKI_ASYNQ_CONCURRENCY=${LORELATTICE_WIKI_ASYNQ_CONCURRENCY:-8}
+      - LORELATTICE_MODEL_MAX_CONCURRENCY=${LORELATTICE_MODEL_MAX_CONCURRENCY:-32}
       - APK_MIRROR_ARG=${APK_MIRROR_ARG:-}
-      - WEKNORA_BOOTSTRAP_SYSTEM_ADMIN_EMAIL=${WEKNORA_BOOTSTRAP_SYSTEM_ADMIN_EMAIL:-}
+      - LORELATTICE_BOOTSTRAP_SYSTEM_ADMIN_EMAIL=${LORELATTICE_BOOTSTRAP_SYSTEM_ADMIN_EMAIL:-}
       # ========== OIDC 认证（可选，OIDC_AUTH_ENABLE=true 启用，详见 .env.example）==========
       - OIDC_AUTH_ENABLE=${OIDC_AUTH_ENABLE:-false}
       - OIDC_AUTH_ISSUER_URL=${OIDC_AUTH_ISSUER_URL:-}
@@ -356,15 +358,15 @@ services:
       docreader:
         condition: service_healthy
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
   # Sandbox 镜像：仅用于 build/pull，非常驻服务；app 执行 Skills 时按需 docker run 该镜像，用毕即释
   sandbox:
-    image: wechatopenai/weknora-sandbox:${WEKNORA_VERSION:-latest}
-    container_name: WeKnora-sandbox
+    image: pototoooo/lorelattice-sandbox:${LORELATTICE_VERSION:-latest}
+    container_name: LoreLattice-sandbox
     build:
       context: .
       dockerfile: docker/Dockerfile.sandbox
@@ -374,15 +376,15 @@ services:
     restart: "no"
 
   docreader:
-    image: wechatopenai/weknora-docreader:${WEKNORA_VERSION:-latest}
+    image: pototoooo/lorelattice-docreader:${LORELATTICE_VERSION:-latest}
     build:
       context: .
       dockerfile: docker/Dockerfile.docreader
       args:
         - APT_MIRROR=${APT_MIRROR:-}
-    container_name: WeKnora-docreader
+    container_name: LoreLattice-docreader
     # docreader gRPC ships without auth/TLS and is only consumed by the app
-    # container over the WeKnora-network (DOCREADER_ADDR defaults to
+    # container over the LoreLattice-network (DOCREADER_ADDR defaults to
     # docreader:50051), so we don't publish 50051 to the host. `expose` keeps
     # the port reachable inside the compose network for documentation only.
     # If you need to call docreader from outside the host (e.g. for debugging),
@@ -472,7 +474,7 @@ services:
       retries: 3
       start_period: 60s
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -483,8 +485,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.odl-hybrid
-    image: weknora-odl-hybrid:local
-    container_name: WeKnora-odl-hybrid
+    image: lorelattice-odl-hybrid:local
+    container_name: LoreLattice-odl-hybrid
     profiles:
       - odl-hybrid
     expose:
@@ -492,13 +494,13 @@ services:
     environment:
       - ODL_HYBRID_EXTRA_ARGS=${ODL_HYBRID_EXTRA_ARGS:---no-ocr}
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     restart: unless-stopped
 
   # 修改的PostgreSQL配置
   postgres:
     image: paradedb/paradedb:v0.22.2-pg17
-    container_name: WeKnora-postgres
+    container_name: LoreLattice-postgres
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
@@ -506,7 +508,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
       interval: 10s # 增加时间间隔
@@ -519,11 +521,11 @@ services:
 
   redis:
     image: redis:7.0-alpine
-    container_name: WeKnora-redis
+    container_name: LoreLattice-redis
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
     restart: always
     networks:
-      - WeKnora-network
+      - LoreLattice-network
 
   # One-shot init: copy the read-only template settings.yml into a named volume
   # before searxng starts. Necessary because the searxng entrypoint sed-replaces
@@ -532,21 +534,21 @@ services:
   # working tree (and prevent re-templating on subsequent restarts).
   searxng-init:
     image: busybox:1.36
-    container_name: WeKnora-searxng-init
+    container_name: LoreLattice-searxng-init
     command: ["sh", "-c", "cp /template/settings.yml /etc/searxng/settings.yml && chmod 0644 /etc/searxng/settings.yml"]
     volumes:
       - ./docker/searxng/settings.yml:/template/settings.yml:ro
       - searxng_config:/etc/searxng
     restart: "no"
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     profiles:
       - searxng
       - full
 
   searxng:
     image: searxng/searxng:latest
-    container_name: WeKnora-searxng
+    container_name: LoreLattice-searxng
     # Bind to loopback by default; override SEARXNG_BIND=0.0.0.0 only after
     # rotating SEARXNG_SECRET and (optionally) re-enabling limiter in settings.yml.
     ports:
@@ -555,12 +557,12 @@ services:
       - searxng_config:/etc/searxng
     environment:
       - SEARXNG_BASE_URL=http://localhost:${SEARXNG_PORT:-8888}/
-      - INSTANCE_NAME=weknora-searxng
+      - INSTANCE_NAME=lorelattice-searxng
       # Default value lets `docker compose --profile searxng up` work zero-config.
       # Override via .env (e.g. `openssl rand -hex 32`) before exposing the
       # instance beyond the default 127.0.0.1 bind, since secret_key signs
       # image-proxy URLs and a shared default would be guessable by anyone.
-      - SEARXNG_SECRET=${SEARXNG_SECRET:-weknora-default-searxng-secret-rotate-before-exposing-publicly}
+      - SEARXNG_SECRET=${SEARXNG_SECRET:-lorelattice-default-searxng-secret-rotate-before-exposing-publicly}
     cap_drop:
       - ALL
     cap_add:
@@ -572,14 +574,14 @@ services:
       searxng-init:
         condition: service_completed_successfully
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     profiles:
       - searxng
       - full
 
   minio:
     image: minio/minio:RELEASE.2025-09-07T16-13-09Z
-    container_name: WeKnora-minio
+    container_name: LoreLattice-minio
     ports:
       - "${MINIO_PORT:-9000}:9000"
       - "${MINIO_CONSOLE_PORT:-9001}:9001"
@@ -595,14 +597,14 @@ services:
       timeout: 20s
       retries: 3
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     profiles:
       - minio
       - full
 
   neo4j:
     image: neo4j:2025.10.1
-    container_name: WeKnora-neo4j
+    container_name: LoreLattice-neo4j
     volumes:
       - neo4j-data:/data
     environment:
@@ -616,21 +618,21 @@ services:
       - "7687:7687"
     restart: always
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     profiles:
       - neo4j
       - full
 
   qdrant:
     image: qdrant/qdrant:v1.16.2
-    container_name: WeKnora-qdrant
+    container_name: LoreLattice-qdrant
     ports:
       - "${QDRANT_REST_PORT:-6333}:6333"
       - "${QDRANT_PORT:-6334}:6334"
     volumes:
       - qdrant_data:/qdrant/storage
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     restart: unless-stopped
     profiles:
       - qdrant
@@ -638,7 +640,7 @@ services:
 
   milvus:
     image: milvusdb/milvus:v2.6.11
-    container_name: WeKnora-milvus
+    container_name: LoreLattice-milvus
     security_opt:
       - seccomp:unconfined
     command: ["milvus", "run", "standalone"]
@@ -659,14 +661,14 @@ services:
     volumes:
       - milvus_data:/var/lib/milvus
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     restart: unless-stopped
     profiles:
       - milvus
 
   weaviate:
     image: semitechnologies/weaviate:1.28.4
-    container_name: WeKnora-weaviate
+    container_name: LoreLattice-weaviate
     environment:
       - PERSISTENCE_DATA_PATH=/var/lib/weaviate
       - CLUSTER_HOSTNAME=node1
@@ -682,7 +684,7 @@ services:
     volumes:
       - weaviate_data:/var/lib/weaviate
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     restart: unless-stopped
     profiles:
       - weaviate
@@ -694,7 +696,7 @@ services:
   # Stream Load partial_columns）。本 compose 使用 4.1 官方稳定 tag。
   #
   # 端口说明：
-  #   - 9030 (FE MySQL)：WeKnora 主链路读写、SQL 查询都走此端口。
+  #   - 9030 (FE MySQL)：LoreLattice 主链路读写、SQL 查询都走此端口。
   #   - 8030 (FE HTTP)：Stream Load partial update 入口。
   #   - 8040 (BE)     ：BE 心跳与数据传输；FE 会把 stream load 重定向到 BE。
   #
@@ -705,7 +707,7 @@ services:
   # ---------------------------------------------------------------------------
   doris-fe:
     image: apache/doris:fe-4.1.0
-    container_name: WeKnora-doris-fe
+    container_name: LoreLattice-doris-fe
     hostname: doris-fe
     environment:
       - FE_SERVERS=fe1:doris-fe:9010
@@ -717,14 +719,14 @@ services:
       - doris_fe_meta:/opt/apache-doris/fe/doris-meta
       - doris_fe_log:/opt/apache-doris/fe/log
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     restart: unless-stopped
     profiles:
       - doris
 
   doris-be:
     image: apache/doris:be-4.1.0
-    container_name: WeKnora-doris-be
+    container_name: LoreLattice-doris-be
     hostname: doris-be
     environment:
       - FE_SERVERS=fe1:doris-fe:9010
@@ -737,7 +739,7 @@ services:
       - doris_be_storage:/opt/apache-doris/be/storage
       - doris_be_log:/opt/apache-doris/be/log
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     restart: unless-stopped
     profiles:
       - doris
@@ -757,9 +759,9 @@ services:
   # ---------------------------------------------------------------------------
   # Langfuse 自建可观测栈 (opt-in via `--profile langfuse`)
   #
-  # 为了最小化资源占用，Langfuse 会复用 WeKnora 已有的 postgres 和 redis：
-  #   - postgres：在 WeKnora-postgres 中创建独立的 "langfuse" 数据库
-  #   - redis  ：复用 WeKnora-redis 的 DB 1（WeKnora 自己用 DB 0）
+  # 为了最小化资源占用，Langfuse 会复用 LoreLattice 已有的 postgres 和 redis：
+  #   - postgres：在 LoreLattice-postgres 中创建独立的 "langfuse" 数据库
+  #   - redis  ：复用 LoreLattice-redis 的 DB 1（LoreLattice 自己用 DB 0）
   # 需要新增的只有 Langfuse 应用自身 + ClickHouse（OLAP）+ 专用 MinIO（事件/媒体 S3）。
   #
   # 启用方式：
@@ -772,11 +774,11 @@ services:
   # 相关默认密码已写成占位符，生产部署务必用 openssl rand 重新生成！
   # ---------------------------------------------------------------------------
 
-  # 一次性初始化脚本：在已有的 WeKnora-postgres 里创建 langfuse 数据库（幂等，数据库已存在则跳过）
-  # 复用 WeKnora-postgres 的 ParadeDB 镜像，避免多拉一个 postgres 镜像
+  # 一次性初始化脚本：在已有的 LoreLattice-postgres 里创建 langfuse 数据库（幂等，数据库已存在则跳过）
+  # 复用 LoreLattice-postgres 的 ParadeDB 镜像，避免多拉一个 postgres 镜像
   langfuse-db-init:
     image: paradedb/paradedb:v0.22.2-pg17
-    container_name: WeKnora-langfuse-db-init
+    container_name: LoreLattice-langfuse-db-init
     depends_on:
       postgres:
         condition: service_healthy
@@ -788,7 +790,7 @@ services:
     command:
       - |
         set -e
-        echo "[langfuse-db-init] ensuring database '${LANGFUSE_DB_NAME:-langfuse}' exists in WeKnora-postgres..."
+        echo "[langfuse-db-init] ensuring database '${LANGFUSE_DB_NAME:-langfuse}' exists in LoreLattice-postgres..."
         # 先刷新现有库的 collation（镜像 ICU 2.36 与宿主 2.41 不匹配时必须做），否则 CREATE DATABASE 会失败
         psql -h postgres -U ${DB_USER} -d postgres -v ON_ERROR_STOP=0 -c "ALTER DATABASE template1 REFRESH COLLATION VERSION;" >/dev/null 2>&1 || true
         psql -h postgres -U ${DB_USER} -d postgres -v ON_ERROR_STOP=0 -c "ALTER DATABASE postgres REFRESH COLLATION VERSION;" >/dev/null 2>&1 || true
@@ -801,7 +803,7 @@ services:
         fi
         echo "[langfuse-db-init] done."
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     restart: "no"
     profiles:
       - langfuse
@@ -809,7 +811,7 @@ services:
 
   langfuse-clickhouse:
     image: clickhouse/clickhouse-server:24.8
-    container_name: WeKnora-langfuse-clickhouse
+    container_name: LoreLattice-langfuse-clickhouse
     restart: unless-stopped
     user: "101:101"
     environment:
@@ -826,14 +828,14 @@ services:
       retries: 10
       start_period: 10s
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     profiles:
       - langfuse
       - full
 
   langfuse-minio:
     image: minio/minio:RELEASE.2025-09-07T16-13-09Z
-    container_name: WeKnora-langfuse-minio
+    container_name: LoreLattice-langfuse-minio
     restart: unless-stopped
     entrypoint: sh
     # 启动前创建 `langfuse` 桶，Langfuse 开箱即用
@@ -854,17 +856,17 @@ services:
       timeout: 10s
       retries: 5
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     profiles:
       - langfuse
       - full
 
   langfuse-worker:
     image: langfuse/langfuse-worker:3
-    container_name: WeKnora-langfuse-worker
+    container_name: LoreLattice-langfuse-worker
     restart: unless-stopped
     depends_on: &langfuse-depends-on
-      # 复用 WeKnora 已有的 postgres/redis，需要先完成 langfuse 数据库的创建
+      # 复用 LoreLattice 已有的 postgres/redis，需要先完成 langfuse 数据库的创建
       langfuse-db-init:
         condition: service_completed_successfully
       redis:
@@ -899,10 +901,10 @@ services:
       # SALT / ENCRYPTION_KEY 生产环境务必重新生成：
       #   SALT: openssl rand -base64 32
       #   ENCRYPTION_KEY: openssl rand -hex 32
-      SALT: ${LANGFUSE_SALT:-weknora-langfuse-dev-salt-change-me}
+      SALT: ${LANGFUSE_SALT:-lorelattice-langfuse-dev-salt-change-me}
       ENCRYPTION_KEY: ${LANGFUSE_ENCRYPTION_KEY:-0000000000000000000000000000000000000000000000000000000000000000}
       NEXTAUTH_URL: ${LANGFUSE_NEXTAUTH_URL:-http://localhost:3000}
-      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-weknora-langfuse-dev-nextauth-secret-change-me}
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-lorelattice-langfuse-dev-nextauth-secret-change-me}
       TELEMETRY_ENABLED: ${LANGFUSE_TELEMETRY_ENABLED:-false}
       LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "false"
       CLICKHOUSE_URL: http://langfuse-clickhouse:8123
@@ -926,14 +928,14 @@ services:
       LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
       LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     profiles:
       - langfuse
       - full
 
   langfuse-web:
     image: langfuse/langfuse:3
-    container_name: WeKnora-langfuse-web
+    container_name: LoreLattice-langfuse-web
     restart: unless-stopped
     depends_on: *langfuse-depends-on
     ports:
@@ -968,7 +970,7 @@ services:
       LANGFUSE_INIT_USER_NAME: ${LANGFUSE_INIT_USER_NAME:-}
       LANGFUSE_INIT_USER_PASSWORD: ${LANGFUSE_INIT_USER_PASSWORD:-}
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     profiles:
       - langfuse
       - full
@@ -976,31 +978,31 @@ services:
   mcp:
     build:
       context: ./mcp-server
-    container_name: WeKnora-mcp
+    container_name: LoreLattice-mcp
     ports:
       - "${MCP_PORT:-8082}:8000"
     environment:
-      - WEKNORA_BASE_URL=http://app:8080/api/v1
-      - WEKNORA_API_KEY=${WEKNORA_API_KEY:-}
+      - LORELATTICE_BASE_URL=http://app:8080/api/v1
+      - LORELATTICE_API_KEY=${LORELATTICE_API_KEY:-}
       # HTTP/SSE 传输必填：mcp-server 启动时若缺少此项会拒绝启动（客户端以 Authorization: Bearer 携带）
       - MCP_SERVER_AUTH_TOKEN=${MCP_SERVER_AUTH_TOKEN:-}
-      # 调用 WeKnora REST 的读超时（秒，默认 300）
-      - WEKNORA_CHAT_TIMEOUT=${WEKNORA_CHAT_TIMEOUT:-300}
-      # 是否校验 WeKnora 后端 TLS 证书（默认 true；自签证书可设 false）
-      - WEKNORA_VERIFY_SSL=${WEKNORA_VERIFY_SSL:-true}
+      # 调用 LoreLattice REST 的读超时（秒，默认 300）
+      - LORELATTICE_CHAT_TIMEOUT=${LORELATTICE_CHAT_TIMEOUT:-300}
+      # 是否校验 LoreLattice 后端 TLS 证书（默认 true；自签证书可设 false）
+      - LORELATTICE_VERIFY_SSL=${LORELATTICE_VERIFY_SSL:-true}
       # 允许上传的目录白名单（逗号分隔；留空禁用文件上传工具）
       - MCP_ALLOWED_UPLOAD_DIRS=${MCP_ALLOWED_UPLOAD_DIRS:-}
     depends_on:
       app:
         condition: service_healthy
     networks:
-      - WeKnora-network
+      - LoreLattice-network
     restart: unless-stopped
     profiles:
       - full
 
 networks:
-  WeKnora-network:
+  LoreLattice-network:
     driver: bridge
 
 volumes:

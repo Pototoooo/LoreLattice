@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/types"
-	"github.com/Tencent/WeKnora/internal/types/interfaces"
+	"github.com/Pototoooo/lorelattice/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types/interfaces"
 	"github.com/mark3labs/mcp-go/client/transport"
 )
 
@@ -14,7 +14,7 @@ import (
 // scoped to a single (tenant, principal, service) tuple. The mcp-go OAuth handler
 // calls SaveToken after a successful authorization or refresh. Runtime MCP
 // transports receive the managedTokenStore wrapper below so refresh decisions
-// stay in WeKnora's coordinated lifecycle instead of the dependency.
+// stay in LoreLattice's coordinated lifecycle instead of the dependency.
 type dbTokenStore struct {
 	repo      interfaces.MCPOAuthRepository
 	tenantID  uint64
@@ -22,7 +22,7 @@ type dbTokenStore struct {
 	serviceID string
 }
 
-// managedTokenStore hides local expiry from mcp-go transports. WeKnora checks
+// managedTokenStore hides local expiry from mcp-go transports. LoreLattice checks
 // the persisted ExpiresAt before every operation and performs the coordinated
 // refresh itself; allowing the dependency to also auto-refresh would bypass
 // the cross-instance lease and collapse refresh failures into a generic

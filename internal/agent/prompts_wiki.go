@@ -52,7 +52,7 @@ Output format:
 // WikiSummaryPrompt generates a summary page for a newly ingested document.
 //
 // Filename and title are intentionally NOT passed to the LLM: documents
-// uploaded to WeKnora often carry filenames that say nothing about the
+// uploaded to LoreLattice often carry filenames that say nothing about the
 // content (e.g. scanned PDFs named after the scanner model "MX5280.pdf"),
 // and feeding such filenames to the model invites hallucinated summaries
 // when the actual extracted content is thin. The model must rely solely on

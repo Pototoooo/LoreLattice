@@ -15,19 +15,19 @@ import (
 // Path resolves an XDG-rooted file. envVar is one of "XDG_CONFIG_HOME" /
 // "XDG_CACHE_HOME" / "XDG_DATA_HOME". fallbackDir is the dot-prefixed dir
 // under $HOME used when the env var is unset (".config" / ".cache" / etc.).
-// parts join under "weknora/" inside the chosen root.
+// parts join under "lorelattice/" inside the chosen root.
 //
 // Honors the XDG vars on every OS, even macOS - where os.UserConfigDir
 // would otherwise return ~/Library/Application Support.
 func Path(envVar, fallbackDir string, parts ...string) (string, error) {
 	if x := os.Getenv(envVar); x != "" {
-		return filepath.Join(append([]string{x, "weknora"}, parts...)...), nil
+		return filepath.Join(append([]string{x, "lorelattice"}, parts...)...), nil
 	}
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", fmt.Errorf("locate home dir: %w", err)
 	}
-	return filepath.Join(append([]string{home, fallbackDir, "weknora"}, parts...)...), nil
+	return filepath.Join(append([]string{home, fallbackDir, "lorelattice"}, parts...)...), nil
 }
 
 // WriteAtomicYAML marshals v to YAML and writes it atomically at p with mode

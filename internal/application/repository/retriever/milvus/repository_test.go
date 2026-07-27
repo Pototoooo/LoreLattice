@@ -12,13 +12,13 @@ func TestUpdateChunkEnabledStatusInCollectionSkipsEmptyChunkIDs(t *testing.T) {
 
 	require.NoError(t, repo.updateChunkEnabledStatusInCollection(
 		context.Background(),
-		"weknora_embeddings_1024",
+		"lorelattice_embeddings_1024",
 		nil,
 		false,
 	))
 	require.NoError(t, repo.updateChunkEnabledStatusInCollection(
 		context.Background(),
-		"weknora_embeddings_1024",
+		"lorelattice_embeddings_1024",
 		[]string{},
 		true,
 	))

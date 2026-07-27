@@ -8,22 +8,26 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/logger"
 
-	"github.com/Tencent/WeKnora/internal/models/utils"
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/models/utils"
+	"github.com/Pototoooo/lorelattice/internal/types"
 	"github.com/google/uuid"
 )
 
-const (
-	weKnoraCloudReaderBaseURL = "https://weknora.weixin.qq.com/api/v1/doc"
+var (
+	loreLatticeCloudReaderBaseURL = strings.TrimRight(
+		strings.TrimSpace(os.Getenv("LORELATTICE_CLOUD_BASE_URL")),
+		"/",
+	) + "/api/v1/doc"
 )
 
-// WeKnoraCloudSignedDocumentReader implements the docreader HTTP protocol with WeKnoraCloud signing.
-type WeKnoraCloudSignedDocumentReader struct {
+// LoreLatticeCloudSignedDocumentReader implements the docreader HTTP protocol with LoreLatticeCloud signing.
+type LoreLatticeCloudSignedDocumentReader struct {
 	appID               string
 	apiKey              string
 	client              *http.Client
@@ -32,14 +36,17 @@ type WeKnoraCloudSignedDocumentReader struct {
 	pollTimeout         time.Duration
 }
 
-func NewWeKnoraCloudSignedDocumentReader(appID, apiKey string) (*WeKnoraCloudSignedDocumentReader, error) {
+func NewLoreLatticeCloudSignedDocumentReader(appID, apiKey string) (*LoreLatticeCloudSignedDocumentReader, error) {
+	if strings.TrimSpace(os.Getenv("LORELATTICE_CLOUD_BASE_URL")) == "" {
+		return nil, fmt.Errorf("LORELATTICE_CLOUD_BASE_URL is not configured")
+	}
 	if appID == "" {
-		return nil, fmt.Errorf("WeKnoraCloud appID is required")
+		return nil, fmt.Errorf("LoreLatticeCloud appID is required")
 	}
 	if apiKey == "" {
-		return nil, fmt.Errorf("WeKnoraCloud apiKey is required")
+		return nil, fmt.Errorf("LoreLatticeCloud apiKey is required")
 	}
-	return &WeKnoraCloudSignedDocumentReader{
+	return &LoreLatticeCloudSignedDocumentReader{
 		appID:               appID,
 		apiKey:              apiKey,
 		initialPollInterval: 500 * time.Millisecond,
@@ -56,23 +63,23 @@ func NewWeKnoraCloudSignedDocumentReader(appID, apiKey string) (*WeKnoraCloudSig
 	}, nil
 }
 
-func (p *WeKnoraCloudSignedDocumentReader) Reconnect(addr string) error {
+func (p *LoreLatticeCloudSignedDocumentReader) Reconnect(addr string) error {
 	return nil
 }
 
-func (p *WeKnoraCloudSignedDocumentReader) IsConnected() bool { return true }
+func (p *LoreLatticeCloudSignedDocumentReader) IsConnected() bool { return true }
 
-func (p *WeKnoraCloudSignedDocumentReader) ListEngines(ctx context.Context, overrides map[string]string) ([]types.ParserEngineInfo, error) {
+func (p *LoreLatticeCloudSignedDocumentReader) ListEngines(ctx context.Context, overrides map[string]string) ([]types.ParserEngineInfo, error) {
 	return []types.ParserEngineInfo{{
-		Name:        WeKnoraCloudEngineName,
-		Description: "WeKnoraCloud signed docreader",
+		Name:        LoreLatticeCloudEngineName,
+		Description: "LoreLatticeCloud signed docreader",
 		FileTypes:   []string{"docx", "doc", "pdf", "md", "markdown", "xlsx", "xls", "pptx", "ppt"},
 		Available:   true,
 	}}, nil
 }
 
-func (p *WeKnoraCloudSignedDocumentReader) Read(ctx context.Context, req *types.ReadRequest) (*types.ReadResult, error) {
-	logger.Infof(ctx, "[WeKnoraCloud] read start file=%q type=%q engine=%q hasURL=%v contentLen=%d requestID=%q",
+func (p *LoreLatticeCloudSignedDocumentReader) Read(ctx context.Context, req *types.ReadRequest) (*types.ReadResult, error) {
+	logger.Infof(ctx, "[LoreLatticeCloud] read start file=%q type=%q engine=%q hasURL=%v contentLen=%d requestID=%q",
 		req.FileName, req.FileType, req.ParserEngine, strings.TrimSpace(req.URL) != "", len(req.FileContent), req.RequestID)
 	body := httpReadRequest{
 		FileName:  req.FileName,
@@ -90,46 +97,46 @@ func (p *WeKnoraCloudSignedDocumentReader) Read(ctx context.Context, req *types.
 	}
 	jsonBody, err := json.Marshal(body)
 	if err != nil {
-		logger.Errorf(context.Background(), "[WeKnoraCloud] marshal read request: %v", err)
+		logger.Errorf(context.Background(), "[LoreLatticeCloud] marshal read request: %v", err)
 		return nil, fmt.Errorf("http marshal read request: %w", err)
 	}
-	httpReq, err := p.newSignedRequest(ctx, http.MethodPost, weKnoraCloudReaderBaseURL+"/reader", jsonBody)
+	httpReq, err := p.newSignedRequest(ctx, http.MethodPost, loreLatticeCloudReaderBaseURL+"/reader", jsonBody)
 	if err != nil {
-		logger.Errorf(context.Background(), "[WeKnoraCloud] signed read request: %v", err)
+		logger.Errorf(context.Background(), "[LoreLatticeCloud] signed read request: %v", err)
 		return nil, err
 	}
 	resp, err := p.client.Do(httpReq)
 	if err != nil {
-		logger.Errorf(context.Background(), "[WeKnoraCloud] http read request failed: %v", err)
+		logger.Errorf(context.Background(), "[LoreLatticeCloud] http read request failed: %v", err)
 		return nil, fmt.Errorf("http read failed: %w", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusAccepted && resp.StatusCode != http.StatusOK {
 		bodyBytes, _ := io.ReadAll(resp.Body)
-		logger.Errorf(context.Background(), "[WeKnoraCloud] http read unexpected status %d: %s", resp.StatusCode, string(bodyBytes))
+		logger.Errorf(context.Background(), "[LoreLatticeCloud] http read unexpected status %d: %s", resp.StatusCode, string(bodyBytes))
 		return nil, fmt.Errorf("http read status %d: %s", resp.StatusCode, string(bodyBytes))
 	}
-	var submit weKnoraCloudAsyncSubmitResponse
+	var submit loreLatticeCloudAsyncSubmitResponse
 	if err := json.NewDecoder(resp.Body).Decode(&submit); err != nil {
-		logger.Errorf(context.Background(), "[WeKnoraCloud] decode read submit response: %v", err)
+		logger.Errorf(context.Background(), "[LoreLatticeCloud] decode read submit response: %v", err)
 		return nil, fmt.Errorf("http decode read submit response: %w", err)
 	}
 	if strings.TrimSpace(submit.TaskID) == "" {
-		logger.Errorf(context.Background(), "[WeKnoraCloud] submit response missing task_id (status=%q message=%q)", submit.Status, submit.Message)
-		return nil, fmt.Errorf("weknoracloud docreader submit response missing task_id")
+		logger.Errorf(context.Background(), "[LoreLatticeCloud] submit response missing task_id (status=%q message=%q)", submit.Status, submit.Message)
+		return nil, fmt.Errorf("lorelatticecloud docreader submit response missing task_id")
 	}
-	logger.Infof(ctx, "[WeKnoraCloud] task submitted task_id=%s file=%q type=%q", submit.TaskID, req.FileName, req.FileType)
+	logger.Infof(ctx, "[LoreLatticeCloud] task submitted task_id=%s file=%q type=%q", submit.TaskID, req.FileName, req.FileType)
 	return p.pollTaskResult(ctx, submit.TaskID)
 }
 
-type weKnoraCloudAsyncSubmitResponse struct {
+type loreLatticeCloudAsyncSubmitResponse struct {
 	TaskID    string `json:"task_id"`
 	Status    string `json:"status"`
 	Message   string `json:"message"`
 	CreatedAt int64  `json:"created_at"`
 }
 
-type weKnoraCloudAsyncTaskResponse struct {
+type loreLatticeCloudAsyncTaskResponse struct {
 	TaskID    string            `json:"task_id"`
 	Status    string            `json:"status"`
 	Message   string            `json:"message"`
@@ -140,38 +147,38 @@ type weKnoraCloudAsyncTaskResponse struct {
 	UpdatedAt int64             `json:"updated_at"`
 }
 
-func (p *WeKnoraCloudSignedDocumentReader) pollTaskResult(ctx context.Context, taskID string) (*types.ReadResult, error) {
+func (p *LoreLatticeCloudSignedDocumentReader) pollTaskResult(ctx context.Context, taskID string) (*types.ReadResult, error) {
 	pollCtx := ctx
 	if _, ok := ctx.Deadline(); !ok && p.pollTimeout > 0 {
 		var cancel context.CancelFunc
 		pollCtx, cancel = context.WithTimeout(ctx, p.pollTimeout)
 		defer cancel()
 	}
-	statusURL := weKnoraCloudReaderBaseURL + "/" + taskID
+	statusURL := loreLatticeCloudReaderBaseURL + "/" + taskID
 	currentInterval := p.initialPollInterval
 	for {
 		httpReq, err := p.newSignedRequest(pollCtx, http.MethodGet, statusURL, nil)
 		if err != nil {
-			logger.Errorf(context.Background(), "[WeKnoraCloud] poll signed request task_id=%s: %v", taskID, err)
+			logger.Errorf(context.Background(), "[LoreLatticeCloud] poll signed request task_id=%s: %v", taskID, err)
 			return nil, err
 		}
 		resp, err := p.client.Do(httpReq)
 		if err != nil {
-			logger.Errorf(context.Background(), "[WeKnoraCloud] http poll task_id=%s failed: %v", taskID, err)
+			logger.Errorf(context.Background(), "[LoreLatticeCloud] http poll task_id=%s failed: %v", taskID, err)
 			return nil, fmt.Errorf("http poll task failed: %w", err)
 		}
-		var taskResp weKnoraCloudAsyncTaskResponse
+		var taskResp loreLatticeCloudAsyncTaskResponse
 		func() {
 			defer resp.Body.Close()
 			if resp.StatusCode != http.StatusOK {
 				bodyBytes, _ := io.ReadAll(resp.Body)
 				err = fmt.Errorf("http poll task status %d: %s", resp.StatusCode, string(bodyBytes))
-				logger.Errorf(context.Background(), "[WeKnoraCloud] poll task_id=%s status %d: %s", taskID, resp.StatusCode, string(bodyBytes))
+				logger.Errorf(context.Background(), "[LoreLatticeCloud] poll task_id=%s status %d: %s", taskID, resp.StatusCode, string(bodyBytes))
 				return
 			}
 			if decodeErr := json.NewDecoder(resp.Body).Decode(&taskResp); decodeErr != nil {
 				err = fmt.Errorf("http decode task response: %w", decodeErr)
-				logger.Errorf(context.Background(), "[WeKnoraCloud] poll task_id=%s decode response: %v", taskID, decodeErr)
+				logger.Errorf(context.Background(), "[LoreLatticeCloud] poll task_id=%s decode response: %v", taskID, decodeErr)
 			}
 		}()
 		if err != nil {
@@ -180,40 +187,40 @@ func (p *WeKnoraCloudSignedDocumentReader) pollTaskResult(ctx context.Context, t
 		switch taskResp.Status {
 		case "completed":
 			if taskResp.Result == nil {
-				logger.Infof(ctx, "[WeKnoraCloud] task_id=%s completed with no result payload", taskID)
+				logger.Infof(ctx, "[LoreLatticeCloud] task_id=%s completed with no result payload", taskID)
 				return &types.ReadResult{}, nil
 			}
 			res := fromHTTPReadResponse(taskResp.Result)
 			if res.Error != "" {
-				logger.Errorf(ctx, "[WeKnoraCloud] task_id=%s completed with result.error: %s", taskID, res.Error)
+				logger.Errorf(ctx, "[LoreLatticeCloud] task_id=%s completed with result.error: %s", taskID, res.Error)
 			} else {
-				logger.Debugf(ctx, "[WeKnoraCloud] task_id=%s completed ok markdownLen=%d", taskID, len(res.MarkdownContent))
+				logger.Debugf(ctx, "[LoreLatticeCloud] task_id=%s completed ok markdownLen=%d", taskID, len(res.MarkdownContent))
 			}
 			return res, nil
 		case "failed":
 			if taskResp.Error != "" {
-				logger.Errorf(context.Background(), "[WeKnoraCloud] task_id=%s failed: %s", taskID, taskResp.Error)
-				return nil, fmt.Errorf("weknoracloud docreader task failed: %s", taskResp.Error)
+				logger.Errorf(context.Background(), "[LoreLatticeCloud] task_id=%s failed: %s", taskID, taskResp.Error)
+				return nil, fmt.Errorf("lorelatticecloud docreader task failed: %s", taskResp.Error)
 			}
-			logger.Errorf(context.Background(), "[WeKnoraCloud] task_id=%s failed: %s", taskID, taskResp.Message)
-			return nil, fmt.Errorf("weknoracloud docreader task failed: %s", taskResp.Message)
+			logger.Errorf(context.Background(), "[LoreLatticeCloud] task_id=%s failed: %s", taskID, taskResp.Message)
+			return nil, fmt.Errorf("lorelatticecloud docreader task failed: %s", taskResp.Message)
 		case "cancelled":
 			if taskResp.Error != "" {
-				logger.Errorf(context.Background(), "[WeKnoraCloud] task_id=%s cancelled: %s", taskID, taskResp.Error)
-				return nil, fmt.Errorf("weknoracloud docreader task cancelled: %s", taskResp.Error)
+				logger.Errorf(context.Background(), "[LoreLatticeCloud] task_id=%s cancelled: %s", taskID, taskResp.Error)
+				return nil, fmt.Errorf("lorelatticecloud docreader task cancelled: %s", taskResp.Error)
 			}
-			logger.Errorf(context.Background(), "[WeKnoraCloud] task_id=%s cancelled", taskID)
-			return nil, fmt.Errorf("weknoracloud docreader task cancelled")
+			logger.Errorf(context.Background(), "[LoreLatticeCloud] task_id=%s cancelled", taskID)
+			return nil, fmt.Errorf("lorelatticecloud docreader task cancelled")
 		}
 		if err := pollCtx.Err(); err != nil {
-			logger.Errorf(ctx, "[WeKnoraCloud] poll task_id=%s aborted before sleep: %v", taskID, err)
+			logger.Errorf(ctx, "[LoreLatticeCloud] poll task_id=%s aborted before sleep: %v", taskID, err)
 			return nil, err
 		}
 
 		// Exponential backoff: multiply by 1.5 each time, cap at maxPollInterval
 		select {
 		case <-pollCtx.Done():
-			logger.Errorf(ctx, "[WeKnoraCloud] poll task_id=%s stopped: %v", taskID, pollCtx.Err())
+			logger.Errorf(ctx, "[LoreLatticeCloud] poll task_id=%s stopped: %v", taskID, pollCtx.Err())
 			return nil, pollCtx.Err()
 		case <-time.After(currentInterval):
 			// Update interval for next iteration
@@ -226,14 +233,14 @@ func (p *WeKnoraCloudSignedDocumentReader) pollTaskResult(ctx context.Context, t
 	}
 }
 
-func (p *WeKnoraCloudSignedDocumentReader) newSignedRequest(ctx context.Context, method, url string, body []byte) (*http.Request, error) {
+func (p *LoreLatticeCloudSignedDocumentReader) newSignedRequest(ctx context.Context, method, url string, body []byte) (*http.Request, error) {
 	requestID := uuid.New().String()
 	if len(body) == 0 {
 		body = []byte("{}")
 	}
 	httpReq, err := http.NewRequestWithContext(ctx, method, url, bytes.NewReader(body))
 	if err != nil {
-		logger.Errorf(context.Background(), "[WeKnoraCloud] http new request %s %s: %v", method, url, err)
+		logger.Errorf(context.Background(), "[LoreLatticeCloud] http new request %s %s: %v", method, url, err)
 		return nil, fmt.Errorf("http new request: %w", err)
 	}
 	httpReq.Header.Set("Content-Type", "application/json")

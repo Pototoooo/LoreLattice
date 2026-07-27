@@ -9,11 +9,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	"github.com/Tencent/WeKnora/cli/internal/output"
-	"github.com/Tencent/WeKnora/cli/internal/text"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
+	"github.com/Pototoooo/lorelattice/cli/internal/text"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // modelListFields enumerates the fields surfaced for `--format json` discovery
@@ -51,7 +51,7 @@ type ListService interface {
 	ListModels(ctx context.Context) ([]sdk.Model, error)
 }
 
-// NewCmdList builds `weknora model list`.
+// NewCmdList builds `lorelattice model list`.
 func NewCmdList(f *cmdutil.Factory) *cobra.Command {
 	opts := &ListOptions{}
 	cmd := &cobra.Command{
@@ -85,9 +85,9 @@ func NewCmdList(f *cmdutil.Factory) *cobra.Command {
 	cmdutil.SetAgentHelp(cmd, cmdutil.AgentHelp{
 		UsedFor: "discover model ids for `agent create --model` and a KB's embedding/summary model",
 		Examples: []string{
-			"weknora model list",
-			"weknora model list --type KnowledgeQA --format json",
-			"weknora model list --source local",
+			"lorelattice model list",
+			"lorelattice model list --type KnowledgeQA --format json",
+			"lorelattice model list --source local",
 		},
 		Output: "envelope.data is an array of Model objects (id, name, display_name, type, source, is_default); narrow it with --type / --source; meta.count is the returned count, meta.total_count is the full set and meta.has_more=true means --limit truncated it",
 	})

@@ -28,7 +28,7 @@
 
 1. 控制台 → 轻量应用服务器 → 选中已关机的实例
 2. 「更多」→「**制作镜像**」
-3. 镜像名建议带版本号：`weknora-v0.5.0-ubuntu2204`
+3. 镜像名建议带版本号：`lorelattice-v0.5.0-ubuntu2204`
 4. 等待 5–30 分钟（取决于系统盘大小）
 
 **云服务器 CVM**：
@@ -44,11 +44,11 @@
 强烈建议用新镜像创建一台测试实例，至少验证：
 
 - [ ] 能 SSH 进去（用控制台的默认密码 / 你导入的 key）
-- [ ] `systemctl status weknora-firstboot` 显示已成功执行（或已 disable + 文件被删）
-- [ ] `cat /root/weknora-credentials.txt` 里有随机密码
-- [ ] 浏览器打开公网 IP 能访问 WeKnora，能注册管理员
-- [ ] `docker compose -f /opt/WeKnora/docker-compose.yml ps` 全部 healthy
-- [ ] `cat /opt/WeKnora/.cloud-image-meta` 显示正确的版本
+- [ ] `systemctl status lorelattice-firstboot` 显示已成功执行（或已 disable + 文件被删）
+- [ ] `cat /root/lorelattice-credentials.txt` 里有随机密码
+- [ ] 浏览器打开公网 IP 能访问 LoreLattice，能注册管理员
+- [ ] `docker compose -f /opt/LoreLattice/docker-compose.yml ps` 全部 healthy
+- [ ] `cat /opt/LoreLattice/.cloud-image-meta` 显示正确的版本
 
 ## 共享给其他用户
 
@@ -91,7 +91,7 @@ Lighthouse 的镜像可以「共享给 CVM」，转成 CVM 自定义镜像后即
 7. 提交审核（云市场运营人员审核约 7 个工作日）
 8. 审核通过后，用户在云市场或购买 CVM 时即可选到你的镜像
 
-> WeKnora 是腾讯系开源项目（`Tencent/WeKnora`），如果想推动官方上架，建议在 [WeKnora GitHub Issues](https://github.com/Tencent/WeKnora/issues) 联系维护团队，而不是个人单独申请。
+> LoreLattice 由 Pototoooo 维护；如需推动云市场上架，请在 [LoreLattice GitHub Issues](https://github.com/Pototoooo/lorelattice/issues) 联系维护者。
 
 ## 注意事项
 

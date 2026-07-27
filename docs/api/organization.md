@@ -2,7 +2,7 @@
 
 [返回目录](./README.md)
 
-组织（Organization，又称"空间"）是 WeKnora 的多空间协作单元。一个用户可以创建/加入多个组织，并以 owner / admin / editor / viewer 的角色参与；知识库与智能体可以共享到组织内，组织成员根据角色获得相应的访问权限。
+组织（Organization，又称"空间"）是 LoreLattice 的多空间协作单元。一个用户可以创建/加入多个组织，并以 owner / admin / editor / viewer 的角色参与；知识库与智能体可以共享到组织内，组织成员根据角色获得相应的访问权限。
 
 本页文档覆盖以下六类接口：
 

@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Tencent/WeKnora/cli/internal/cmdutil"
-	"github.com/Tencent/WeKnora/cli/internal/iostreams"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/cmdutil"
+	"github.com/Pototoooo/lorelattice/cli/internal/iostreams"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 type fakeListSvc struct {
@@ -112,7 +112,10 @@ func TestModelList_SourceFilter(t *testing.T) {
 // TestModelList_InvalidEnum: a typo'd --type / --source is rejected up front
 // (input.invalid_argument) instead of silently returning an empty set.
 func TestModelList_InvalidEnum(t *testing.T) {
-	for _, tc := range []struct{ name string; opts ListOptions }{
+	for _, tc := range []struct {
+		name string
+		opts ListOptions
+	}{
 		{"type", ListOptions{Type: "bogus", Limit: 30}},
 		{"source", ListOptions{Source: "bogus", Limit: 30}},
 	} {

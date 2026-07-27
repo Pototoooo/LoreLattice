@@ -1,3 +1,3 @@
-module github.com/Tencent/WeKnora/client
+module github.com/Pototoooo/lorelattice/client
 
 go 1.24.2

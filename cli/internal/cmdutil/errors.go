@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Tencent/WeKnora/cli/internal/output"
-	sdk "github.com/Tencent/WeKnora/client"
+	"github.com/Pototoooo/lorelattice/cli/internal/output"
+	sdk "github.com/Pototoooo/lorelattice/client"
 )
 
 // ErrorCode is a namespaced stable identifier emitted on stderr in the
@@ -99,7 +99,7 @@ const (
 	// carries a stable code; distinct from input.* because the user supplied
 	// valid args and simply chose not to proceed.
 	CodeUserAborted ErrorCode = "local.user_aborted"
-	// CodeUploadFileNotFound marks a `weknora doc upload` invocation pointing at
+	// CodeUploadFileNotFound marks a `lorelattice doc upload` invocation pointing at
 	// a path that does not exist. Distinct from CodeLocalFileIO (permission /
 	// disk-fault) so the hint can name the actual culprit.
 	CodeUploadFileNotFound ErrorCode = "local.upload_file_not_found"
@@ -126,7 +126,7 @@ type Error struct {
 	Silent            bool
 	RetryArgv         []string // Directly-executable argv array, distinct from prose Hint
 	RetryAfterSeconds int      // HTTP Retry-After header semantics (transport-level retry hint)
-	Detail            any    // Structured detail for envelope.error.detail (e.g. unknown-subcommand available[])
+	Detail            any      // Structured detail for envelope.error.detail (e.g. unknown-subcommand available[])
 	Risk              *RiskInfo
 }
 
@@ -351,7 +351,7 @@ func matchPrefix(err error, prefix string) bool {
 	return strings.HasPrefix(string(e.Code), prefix)
 }
 
-// serverNotFoundRE matches the WeKnora server's structured error-envelope body
+// serverNotFoundRE matches the LoreLattice server's structured error-envelope body
 // for the typed "not found" code (1003 = ErrNotFound). Server's 1007 is the
 // generic ErrInternalServer bucket — including it would mis-classify every
 // validation / DB failure (e.g. SQLSTATE 22001 "value too long") as

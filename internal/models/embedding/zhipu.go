@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Tencent/WeKnora/internal/logger"
-	"github.com/Tencent/WeKnora/internal/models/provider"
-	secutils "github.com/Tencent/WeKnora/internal/utils"
+	"github.com/Pototoooo/lorelattice/internal/logger"
+	"github.com/Pototoooo/lorelattice/internal/models/provider"
+	secutils "github.com/Pototoooo/lorelattice/internal/utils"
 )
 
 // ZhipuEmbedder implements text vectorization functionality using Zhipu AI API

@@ -4,7 +4,7 @@ import (
 	"context"
 	"math"
 
-	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
 // ScoreNormalizer maps raw retriever scores to a common [0, 1] scale so that
@@ -96,6 +96,7 @@ type ScoreNormalizer interface {
 // "legacy/experimental, no standalone deployable instance"):
 //   - InfinityRetrieverEngineType
 //   - ElasticFaissRetrieverEngineType
+//
 // Their case labels below route to clamp01(score) defensively, but
 // production code never returns these engine types.
 //
