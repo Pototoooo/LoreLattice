@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 
+	"github.com/Pototoooo/lorelattice/internal/billing"
 	"github.com/Pototoooo/lorelattice/internal/config"
 	"github.com/Pototoooo/lorelattice/internal/errors"
 	"github.com/Pototoooo/lorelattice/internal/handler/dto"
@@ -440,6 +441,13 @@ func (h *TenantHandler) CreateTenant(c *gin.Context) {
 		createdTenant.ID,
 		secutils.SanitizeForLog(createdTenant.Name),
 	)
+
+	// Billing provisioning is deliberately asynchronous: workspace creation is
+	// durable even when MeterForge is temporarily unavailable, while all model
+	// calls fail closed until this account reaches active state.
+	if billingService := billing.Default(); billingService != nil {
+		billingService.ProvisionTenantAsync(createdTenant.ID, createdTenant.Name)
+	}
 
 	// data carries the created tenant. When the legacy auto-create-key
 	// behaviour is enabled we embed the plaintext token as data.api_key so

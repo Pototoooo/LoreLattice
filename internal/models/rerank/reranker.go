@@ -122,7 +122,8 @@ func NewReranker(config *RerankerConfig) (Reranker, error) {
 	if logger.LLMDebugEnabled() {
 		r = &debugReranker{inner: r}
 	}
-	return wrapRerankerLangfuse(r, nil)
+	r, err = wrapRerankerLangfuse(r, nil)
+	return wrapRerankerMeterForge(r, config), err
 }
 
 // customHeaderSetter 表示支持注入自定义 HTTP header 的 reranker 实现。

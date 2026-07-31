@@ -168,6 +168,10 @@
                     <TenantMembers />
                   </div>
 
+                  <div v-if="currentSection === 'billing'" class="section">
+                    <BillingSettings />
+                  </div>
+
                   <!-- 发布集成 -->
                   <div v-if="isIntegrationSection(currentSection)" class="section">
                     <IntegrationSettingsSection :tab="integrationTabFromSection(currentSection)" />
@@ -207,6 +211,7 @@ import ParserEngineSettings from './ParserEngineSettings.vue'
 import StorageEngineSettings from './StorageBackendSettings.vue'
 import LoreLatticeCloudSettings from './LoreLatticeCloudSettings.vue'
 import TenantMembers from './TenantMembers.vue'
+import BillingSettings from './BillingSettings.vue'
 import SystemSettings from '@/views/system/SystemSettings.vue'
 import RuntimeQueues from '@/views/system/RuntimeQueues.vue'
 import PlatformAPIKeys from '@/views/system/PlatformAPIKeys.vue'
@@ -273,6 +278,7 @@ const SECTION_MIN_ROLE: Record<string, RoleKey> = {
   userprofile: 'viewer',
   tenant: 'viewer',
   members: 'viewer',
+  billing: 'viewer',
 }
 
 const SYSTEM_ADMIN_SECTIONS = new Set(['system-global', 'runtime-queues', 'platform-api-keys', 'system-audit-log'])
@@ -351,6 +357,7 @@ const navItems = computed(() => {
     { key: 'userprofile', icon: 'user', label: t('userProfile.title') },
     { key: 'tenant', icon: 'user-circle', label: t('settings.tenantInfo') },
     { key: 'members', icon: 'usergroup', label: t('tenantMember.title') },
+    { key: 'billing', icon: 'money-circle', label: '套餐与用量' },
     ...integrationItems,
   ]
   // currentTenantRole 为空表示「membership 还没加载」—— 比起渲染整套
@@ -378,7 +385,7 @@ const navGroups = computed<NavGroup[]>(() => {
     {
       key: 'workspace',
       label: t('settings.navGroups.workspace'),
-      items: pickItems(['tenant', 'members', 'chathistory']),
+      items: pickItems(['tenant', 'members', 'billing', 'chathistory']),
     },
     {
       key: 'models_runtime',

@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Pototoooo/lorelattice/internal/billing"
 	"github.com/Pototoooo/lorelattice/internal/errors"
 	"github.com/Pototoooo/lorelattice/internal/event"
 	"github.com/Pototoooo/lorelattice/internal/logger"
@@ -545,11 +546,13 @@ func (h *Handler) setupSSEStream(reqCtx *qaRequestContext, generateTitle bool) *
 	// Write initial agent_query event
 	h.writeAgentQueryEvent(reqCtx.ctx, reqCtx.sessionID, reqCtx.assistantMessage.ID)
 
-	// Base context for async work: when using shared agent, use source tenant for model/KB/MCP resolution
-	baseCtx := reqCtx.ctx
+	// Base context for async work. SessionTenantID always remains the billing /
+	// message owner even when a shared agent switches TenantID to the resource
+	// tenant for model, KB and MCP resolution.
+	baseCtx := context.WithValue(reqCtx.ctx, types.SessionTenantIDContextKey, reqCtx.session.TenantID)
 	if reqCtx.effectiveTenantID != 0 && h.tenantService != nil {
 		if tenant, err := h.tenantService.GetTenantByID(reqCtx.ctx, reqCtx.effectiveTenantID); err == nil && tenant != nil {
-			baseCtx = context.WithValue(context.WithValue(reqCtx.ctx, types.TenantIDContextKey, reqCtx.effectiveTenantID), types.TenantInfoContextKey, tenant)
+			baseCtx = context.WithValue(context.WithValue(baseCtx, types.TenantIDContextKey, reqCtx.effectiveTenantID), types.TenantInfoContextKey, tenant)
 			logger.Infof(reqCtx.ctx, "Using effective tenant %d for shared agent (model/KB/MCP)", reqCtx.effectiveTenantID)
 		}
 	}
@@ -783,6 +786,16 @@ const (
 func (h *Handler) executeQA(reqCtx *qaRequestContext, mode qaMode, generateTitle bool) {
 	ctx := reqCtx.ctx
 	sessionID := reqCtx.sessionID
+
+	// Coarse preflight happens before either user or assistant messages are
+	// persisted. Provider wrappers perform the strict per-call reservation
+	// later, including every Agent loop and RAG-internal model call.
+	if billingService := billing.Default(); billingService != nil && billingService.Enabled() {
+		if err := billingService.CheckAccess(ctx, reqCtx.session.TenantID, billing.FeatureLLMTokens, 1); err != nil {
+			reqCtx.c.Error(billing.ToAppError(err))
+			return
+		}
+	}
 
 	// Persist the input-bar state used for this request so reopening the
 	// session can rehydrate agent / model / KB / web-search / MCP selections.

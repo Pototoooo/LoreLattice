@@ -50,6 +50,7 @@ import (
 	chatpipeline "github.com/Pototoooo/lorelattice/internal/application/service/chat_pipeline"
 	"github.com/Pototoooo/lorelattice/internal/application/service/file"
 	"github.com/Pototoooo/lorelattice/internal/application/service/retriever"
+	"github.com/Pototoooo/lorelattice/internal/billing"
 	"github.com/Pototoooo/lorelattice/internal/common"
 	"github.com/Pototoooo/lorelattice/internal/config"
 	"github.com/Pototoooo/lorelattice/internal/database"
@@ -112,6 +113,8 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(config.LoadConfig))
 	must(container.Provide(initLangfuse))
 	must(container.Provide(initDatabase))
+	must(container.Provide(billing.NewService))
+	must(container.Invoke(billing.StartService))
 	must(container.Provide(initFileService))
 	must(container.Provide(initRedisClient))
 	must(container.Provide(initAntsPool))
@@ -382,6 +385,7 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	must(container.Provide(handler.NewIMHandler))
 	must(container.Provide(handler.NewEmbedChannelHandler))
 	must(container.Provide(handler.NewLoreLatticeCloudHandler))
+	must(container.Provide(billing.NewHandler))
 	logger.Debugf(ctx, "[Container] HTTP handlers registered")
 
 	// Wire the chat package's local image resolver so multimodal chat can read

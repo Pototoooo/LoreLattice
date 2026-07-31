@@ -11,17 +11,18 @@ type ErrorCode int
 // System error codes
 const (
 	// Common error codes (1000-1999)
-	ErrBadRequest         ErrorCode = 1000
-	ErrUnauthorized       ErrorCode = 1001
-	ErrForbidden          ErrorCode = 1002
-	ErrNotFound           ErrorCode = 1003
-	ErrMethodNotAllowed   ErrorCode = 1004
-	ErrConflict           ErrorCode = 1005
-	ErrTooManyRequests    ErrorCode = 1006
-	ErrInternalServer     ErrorCode = 1007
-	ErrServiceUnavailable ErrorCode = 1008
-	ErrTimeout            ErrorCode = 1009
-	ErrValidation         ErrorCode = 1010
+	ErrBadRequest             ErrorCode = 1000
+	ErrUnauthorized           ErrorCode = 1001
+	ErrForbidden              ErrorCode = 1002
+	ErrNotFound               ErrorCode = 1003
+	ErrMethodNotAllowed       ErrorCode = 1004
+	ErrConflict               ErrorCode = 1005
+	ErrTooManyRequests        ErrorCode = 1006
+	ErrInternalServer         ErrorCode = 1007
+	ErrServiceUnavailable     ErrorCode = 1008
+	ErrTimeout                ErrorCode = 1009
+	ErrValidation             ErrorCode = 1010
+	ErrBillingPaymentRequired ErrorCode = 1011
 
 	// Tenant related error codes (2000-2099)
 	ErrTenantNotFound         ErrorCode = 2000

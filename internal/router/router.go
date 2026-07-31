@@ -11,6 +11,7 @@ import (
 	"time"
 
 	filesvc "github.com/Pototoooo/lorelattice/internal/application/service/file"
+	"github.com/Pototoooo/lorelattice/internal/billing"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
@@ -91,6 +92,7 @@ type RouterParams struct {
 	DataSourceCredentialsHandler *handler.DataSourceCredentialsHandler
 	LoreLatticeCloudHandler      *handler.LoreLatticeCloudHandler
 	WikiPageHandler              *handler.WikiPageHandler
+	BillingHandler               *billing.Handler
 }
 
 // NewRouter 创建新的路由
@@ -268,6 +270,7 @@ func NewRouter(params RouterParams) *gin.Engine {
 		RegisterDataSourceRoutes(v1, params.DataSourceHandler, params.DataSourceCredentialsHandler, rbacGuards)
 		RegisterLoreLatticeCloudRoutes(v1, params.LoreLatticeCloudHandler, rbacGuards)
 		RegisterWikiPageRoutes(v1, params.WikiPageHandler, rbacGuards)
+		RegisterBillingRoutes(v1, params.BillingHandler, rbacGuards)
 		RegisterChunkerDebugRoutes(v1, rbacGuards)
 
 		// Fail fast if any declared API-key policy points at a route
@@ -278,6 +281,24 @@ func NewRouter(params RouterParams) *gin.Engine {
 	}
 
 	return r
+}
+
+// RegisterBillingRoutes keeps the entire customer billing workflow inside
+// LoreLattice. These routes are intentionally JWT-only: workspace API keys are
+// useful for inference and ingestion, but must never expose financial actions.
+func RegisterBillingRoutes(v1 *gin.RouterGroup, handler *billing.Handler, g *rbacGuards) {
+	if handler == nil {
+		return
+	}
+	group := v1.Group("/billing")
+	group.GET("/overview", g.Viewer(), handler.Overview)
+	group.GET("/usage", g.Viewer(), handler.Usage)
+	group.GET("/plans", g.Owner(), handler.Plans)
+	group.GET("/invoices", g.Owner(), handler.Invoices)
+	group.POST("/top-ups", g.Owner(), handler.TopUp)
+	group.POST("/subscription/change", g.Owner(), handler.ChangeSubscription)
+	group.POST("/subscription/cancel", g.Owner(), handler.CancelSubscription)
+	group.POST("/subscription/unschedule-cancel", g.Owner(), handler.UnscheduleCancel)
 }
 
 // RegisterChunkerDebugRoutes wires the read-only chunker preview endpoint

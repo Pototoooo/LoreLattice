@@ -152,9 +152,10 @@ func NewChat(config *ChatConfig, ollamaService *ollama.OllamaService) (Chat, err
 	}
 	c, err = wrapChatDebug(c, err)
 	c, err = wrapChatLangfuse(c, err)
-	// Outermost: hold the per-model concurrency slot only around the real
-	// provider round-trip, so the wait is excluded from debug/langfuse timing.
-	return wrapChatConcurrency(c, config.MaxConcurrency, err)
+	// The concurrency wrapper stays around the provider round-trip. MeterForge
+	// reporting is applied last so its HTTP latency never holds a model slot.
+	c, err = wrapChatConcurrency(c, config.MaxConcurrency, err)
+	return wrapChatMeterForge(c, config, err)
 }
 
 // NewRemoteChat 根据 provider 创建远程聊天实例。
