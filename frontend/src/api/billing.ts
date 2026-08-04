@@ -6,6 +6,8 @@ export type BillingFeatureKey =
   | 'lorelattice_rerank_tokens'
   | 'lorelattice_asr_seconds'
 
+export type BillingMode = 'platform' | 'byok' | 'local' | 'included' | 'mixed'
+
 export interface BillingFeatureOverview {
   key: BillingFeatureKey
   name: string
@@ -26,6 +28,13 @@ export interface BillingOverview {
   period_ends_at?: string
   features: BillingFeatureOverview[]
   credit_balance_usd?: number
+  ai_credits: {
+    granted_usd: number
+    used_usd: number
+    remaining_usd?: number
+    currency: 'USD'
+  }
+  billing_modes: Array<{ mode: BillingMode; calls: number; cost_usd: number }>
   cancel_scheduled: boolean
 }
 
@@ -35,12 +44,32 @@ export interface BillingUsageRow {
   model: string
   provider: string
   operation: string
+  job_id: string
+  business_category: string
+  billing_mode: BillingMode
+  chargeable: boolean
+  price_version: string
   quantity?: number
   unit: string
   cost_usd?: number
   estimated: boolean
   status: string
   created_at: string
+}
+
+export interface BillingUsageJob {
+  id: string
+  business_category: string
+  billing_mode: BillingMode
+  call_count: number
+  chargeable_calls: number
+  cost_usd: number
+  estimated: boolean
+  status: string
+  models: string[]
+  providers: string[]
+  started_at: string
+  completed_at?: string
 }
 
 interface Response<T> {
@@ -53,6 +82,9 @@ export const getBillingOverview = () =>
 
 export const getBillingUsage = (limit = 50) =>
   get<Response<BillingUsageRow[]>>(`/api/v1/billing/usage?limit=${limit}`)
+
+export const getBillingUsageJobs = (limit = 50) =>
+  get<Response<BillingUsageJob[]>>(`/api/v1/billing/usage?view=jobs&limit=${limit}`)
 
 export const getBillingInvoices = () =>
   get<Response<{ data?: any[]; meta?: any }>>('/api/v1/billing/invoices')

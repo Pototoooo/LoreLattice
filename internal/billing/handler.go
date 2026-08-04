@@ -46,11 +46,11 @@ func (h *Handler) Overview(c *gin.Context) {
 func (h *Handler) Plans(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": []gin.H{
 		{
-			"key": PlanTrial, "name": "Trial", "version": 1, "duration_days": 30,
+			"key": PlanTrial, "name": "Trial", "version": 2, "duration_days": 30,
 			"promotional_credit_usd": trialCredit, "available_for_upgrade": false,
 		},
 		{
-			"key": PlanPro, "name": "Pro", "version": 1, "billing_cadence": "P1M",
+			"key": PlanPro, "name": "Pro", "version": 2, "billing_cadence": "P1M",
 			"available_for_upgrade": true,
 		},
 	}})
@@ -79,6 +79,15 @@ func (h *Handler) Usage(c *gin.Context) {
 		to = &value
 	}
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "100"))
+	if c.DefaultQuery("view", "calls") == "jobs" {
+		rows, err := h.service.UsageJobs(c.Request.Context(), tenantID, from, to, limit)
+		if err != nil {
+			writeBillingError(c, err)
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"success": true, "data": rows})
+		return
+	}
 	rows, err := h.service.Usage(
 		c.Request.Context(),
 		tenantID,

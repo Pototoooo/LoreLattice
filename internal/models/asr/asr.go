@@ -30,12 +30,14 @@ type ASR interface {
 
 // Config holds the configuration needed to create an ASR instance.
 type Config struct {
-	Source    types.ModelSource
-	BaseURL   string
-	ModelName string
-	APIKey    string
-	ModelID   string
-	Language  string // optional: specify language for transcription
+	Source      types.ModelSource
+	BaseURL     string
+	ModelName   string
+	APIKey      string
+	ModelID     string
+	Language    string // optional: specify language for transcription
+	Provider    string
+	ExtraConfig map[string]string
 	// CustomHeaders 允许在调用远程 API 时附加自定义 HTTP 请求头（类似 OpenAI Python SDK 的 extra_headers）。
 	CustomHeaders map[string]string
 }
@@ -53,6 +55,8 @@ func ConfigFromModel(m *types.Model) *Config {
 		BaseURL:       m.Parameters.BaseURL,
 		ModelName:     m.Name,
 		Source:        m.Source,
+		Provider:      m.Parameters.Provider,
+		ExtraConfig:   m.Parameters.ExtraConfig,
 		CustomHeaders: m.Parameters.CustomHeaders,
 	}
 }
@@ -63,5 +67,5 @@ func NewASR(config *Config) (ASR, error) {
 	raw, err := NewOpenAIASR(config)
 	var a ASR = raw
 	a, err = wrapASRLangfuse(a, err)
-	return wrapASRMeterForge(a), err
+	return wrapASRMeterForge(a, config), err
 }

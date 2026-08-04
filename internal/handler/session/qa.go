@@ -13,7 +13,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Pototoooo/lorelattice/internal/billing"
 	"github.com/Pototoooo/lorelattice/internal/errors"
 	"github.com/Pototoooo/lorelattice/internal/event"
 	"github.com/Pototoooo/lorelattice/internal/logger"
@@ -786,16 +785,6 @@ const (
 func (h *Handler) executeQA(reqCtx *qaRequestContext, mode qaMode, generateTitle bool) {
 	ctx := reqCtx.ctx
 	sessionID := reqCtx.sessionID
-
-	// Coarse preflight happens before either user or assistant messages are
-	// persisted. Provider wrappers perform the strict per-call reservation
-	// later, including every Agent loop and RAG-internal model call.
-	if billingService := billing.Default(); billingService != nil && billingService.Enabled() {
-		if err := billingService.CheckAccess(ctx, reqCtx.session.TenantID, billing.FeatureLLMTokens, 1); err != nil {
-			reqCtx.c.Error(billing.ToAppError(err))
-			return
-		}
-	}
 
 	// Persist the input-bar state used for this request so reopening the
 	// session can rehydrate agent / model / KB / web-search / MCP selections.

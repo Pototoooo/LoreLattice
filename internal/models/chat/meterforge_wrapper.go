@@ -34,6 +34,7 @@ type meterForgeChat struct {
 	inner    Chat
 	service  billingRuntime
 	provider string
+	mode     billing.BillingMode
 }
 
 func (w *meterForgeChat) GetModelName() string { return w.inner.GetModelName() }
@@ -157,7 +158,8 @@ func (w *meterForgeChat) reserve(
 	requestID, _ := types.RequestIDFromContext(ctx)
 	reservation, err := w.service.Reserve(ctx, tenantID, billing.FeatureLLMTokens, float64(quantity), billing.UsageMetadata{
 		ModelID: w.GetModelID(), ModelName: w.GetModelName(), Provider: w.provider,
-		Operation: operation, RequestID: requestID, Estimated: true,
+		Operation: operation, RequestID: requestID, JobID: requestID,
+		Category: "chat_agent", Mode: w.mode, Estimated: true,
 	})
 	return reservation, callOpts, billing.ToAppError(err)
 }
@@ -255,5 +257,6 @@ func wrapChatMeterForge(c Chat, config *ChatConfig, err error) (Chat, error) {
 	if service == nil || !service.Enabled() {
 		return c, nil
 	}
-	return &meterForgeChat{inner: c, service: service, provider: config.Provider}, nil
+	mode := billing.ResolveBillingMode(config.Source, config.APIKey, config.Provider, config.ExtraConfig)
+	return &meterForgeChat{inner: c, service: service, provider: config.Provider, mode: mode}, nil
 }

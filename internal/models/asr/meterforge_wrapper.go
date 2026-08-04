@@ -2,15 +2,23 @@ package asr
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"math"
+	"strconv"
 
 	"github.com/Pototoooo/lorelattice/internal/billing"
+	"github.com/Pototoooo/lorelattice/internal/models/resultcache"
 	"github.com/Pototoooo/lorelattice/internal/types"
 )
 
+var asrCache = resultcache.New[*TranscriptionResult]()
+
 type meterForgeASR struct {
-	inner   ASR
-	service *billing.Service
+	inner    ASR
+	service  *billing.Service
+	provider string
+	mode     billing.BillingMode
 }
 
 func (w *meterForgeASR) GetModelName() string { return w.inner.GetModelName() }
@@ -24,11 +32,17 @@ func (w *meterForgeASR) Transcribe(ctx context.Context, audio []byte, fileName s
 			HTTPStatus: 503, Feature: billing.FeatureASRSeconds,
 		})
 	}
+	digest := sha256.Sum256(audio)
+	cacheKey := resultcache.Key(strconv.FormatUint(tenantID, 10), w.GetModelID(), w.GetModelName(), fileName, hex.EncodeToString(digest[:]))
+	if cached, found := asrCache.Get(cacheKey); found {
+		return cloneTranscription(cached), nil
+	}
 	reserved := billing.EstimateAudioSeconds(audio)
 	requestID, _ := types.RequestIDFromContext(ctx)
 	reservation, err := w.service.Reserve(ctx, tenantID, billing.FeatureASRSeconds, reserved, billing.UsageMetadata{
-		ModelID: w.GetModelID(), ModelName: w.GetModelName(), Operation: "asr.transcribe",
-		RequestID: requestID, Estimated: true,
+		ModelID: w.GetModelID(), ModelName: w.GetModelName(), Provider: w.provider,
+		Operation: "asr.transcribe", RequestID: requestID, JobID: requestID,
+		Category: "audio_transcription", Mode: w.mode, Estimated: true,
 	})
 	if err != nil {
 		return nil, billing.ToAppError(err)
@@ -46,13 +60,24 @@ func (w *meterForgeASR) Transcribe(ctx context.Context, audio []byte, fileName s
 	if err := w.service.Complete(context.WithoutCancel(ctx), reservation, actual, estimated); err != nil {
 		return nil, err
 	}
+	asrCache.Set(cacheKey, cloneTranscription(result))
 	return result, nil
 }
 
-func wrapASRMeterForge(a ASR) ASR {
+func cloneTranscription(in *TranscriptionResult) *TranscriptionResult {
+	if in == nil {
+		return nil
+	}
+	copy := *in
+	copy.Segments = append([]Segment(nil), in.Segments...)
+	return &copy
+}
+
+func wrapASRMeterForge(a ASR, config *Config) ASR {
 	service := billing.Default()
-	if service == nil || !service.Enabled() || a == nil {
+	if service == nil || !service.Enabled() || a == nil || config == nil {
 		return a
 	}
-	return &meterForgeASR{inner: a, service: service}
+	mode := billing.ResolveBillingMode(config.Source, config.APIKey, config.Provider, config.ExtraConfig)
+	return &meterForgeASR{inner: a, service: service, provider: config.Provider, mode: mode}
 }

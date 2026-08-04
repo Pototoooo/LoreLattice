@@ -241,7 +241,7 @@ func (c *Client) CreateSubscription(ctx context.Context, customerKey, planKey st
 	var subscription subscriptionResource
 	err := c.do(ctx, http.MethodPost, "/api/v3/meterforge/subscriptions", map[string]any{
 		"customer":        map[string]string{"key": customerKey},
-		"plan":            map[string]any{"key": planKey, "version": 1},
+		"plan":            map[string]any{"key": planKey},
 		"settlement_mode": "credit_only",
 		"labels":          map[string]string{"application": "lorelattice"},
 	}, &subscription)
@@ -255,7 +255,7 @@ func (c *Client) ChangeSubscription(ctx context.Context, subscriptionID, custome
 	}
 	err := c.do(ctx, http.MethodPost, "/api/v3/meterforge/subscriptions/"+url.PathEscape(subscriptionID)+"/change", map[string]any{
 		"customer":        map[string]string{"key": customerKey},
-		"plan":            map[string]any{"key": planKey, "version": 1},
+		"plan":            map[string]any{"key": planKey},
 		"settlement_mode": "credit_only", "timing": "immediate",
 		"labels": map[string]string{"application": "lorelattice"},
 	}, &response)

@@ -20,24 +20,88 @@ import (
 const trialCredit = 0.36
 
 type Service struct {
-	db        *gorm.DB
-	config    Config
-	client    *Client
-	catalogMu sync.Mutex
-	catalogOK bool
-	features  map[FeatureKey]featureResource
-	plans     map[string]planResource
-	kick      chan struct{}
+	db           *gorm.DB
+	config       Config
+	client       *Client
+	catalogMu    sync.Mutex
+	catalogOK    bool
+	features     map[FeatureKey]featureResource
+	plans        map[string]planResource
+	kick         chan struct{}
+	pricing      *PriceCatalog
+	accessMu     sync.Mutex
+	entitlements map[string]cachedEntitlement
+	credits      map[string]cachedCredit
+}
+
+type cachedEntitlement struct {
+	value     entitlementValue
+	expiresAt time.Time
+}
+
+type cachedCredit struct {
+	value     float64
+	expiresAt time.Time
 }
 
 func NewService(db *gorm.DB) *Service {
 	cfg := LoadConfigFromEnv()
+	pricing, err := NewPriceCatalog(cfg.ModelPricingJSON)
+	if err != nil {
+		logger.Warnf(context.Background(), "[Billing] %v; using built-in prices", err)
+		pricing, _ = NewPriceCatalog("")
+	}
 	return &Service{
 		db: db, config: cfg, client: NewClient(cfg),
-		features: make(map[FeatureKey]featureResource),
-		plans:    make(map[string]planResource),
-		kick:     make(chan struct{}, 1),
+		features:     make(map[FeatureKey]featureResource),
+		plans:        make(map[string]planResource),
+		kick:         make(chan struct{}, 1),
+		pricing:      pricing,
+		entitlements: make(map[string]cachedEntitlement),
+		credits:      make(map[string]cachedCredit),
 	}
+}
+
+func (s *Service) entitlementValue(ctx context.Context, customerKey string, feature FeatureKey) (entitlementValue, error) {
+	key := customerKey + "\x00" + string(feature)
+	now := time.Now()
+	s.accessMu.Lock()
+	if cached, ok := s.entitlements[key]; ok && now.Before(cached.expiresAt) {
+		s.accessMu.Unlock()
+		return cached.value, nil
+	}
+	s.accessMu.Unlock()
+	value, err := s.client.EntitlementValue(ctx, customerKey, feature)
+	if err == nil && s.config.AccessCacheTTL > 0 {
+		s.accessMu.Lock()
+		s.entitlements[key] = cachedEntitlement{value: value, expiresAt: now.Add(s.config.AccessCacheTTL)}
+		s.accessMu.Unlock()
+	}
+	return value, err
+}
+
+func (s *Service) creditBalance(ctx context.Context, customerID string) (float64, error) {
+	now := time.Now()
+	s.accessMu.Lock()
+	if cached, ok := s.credits[customerID]; ok && now.Before(cached.expiresAt) {
+		s.accessMu.Unlock()
+		return cached.value, nil
+	}
+	s.accessMu.Unlock()
+	value, err := s.client.CreditBalance(ctx, customerID)
+	if err == nil && s.config.AccessCacheTTL > 0 {
+		s.accessMu.Lock()
+		s.credits[customerID] = cachedCredit{value: value, expiresAt: now.Add(s.config.AccessCacheTTL)}
+		s.accessMu.Unlock()
+	}
+	return value, err
+}
+
+func (s *Service) invalidateAccessCache() {
+	s.accessMu.Lock()
+	defer s.accessMu.Unlock()
+	clear(s.entitlements)
+	clear(s.credits)
 }
 
 func (s *Service) Enabled() bool { return s != nil && s.config.Enabled }
@@ -165,12 +229,15 @@ func (s *Service) BootstrapCatalog(ctx context.Context) error {
 		return fmt.Errorf("list plans: %w", err)
 	}
 	activePlan := func(key string) (planResource, bool) {
+		var latest planResource
+		found := false
 		for _, plan := range plans {
-			if plan.Key == key && plan.Version == 1 && plan.Status == "active" {
-				return plan, true
+			if plan.Key == key && plan.Status == "active" && (!found || plan.Version > latest.Version) {
+				latest = plan
+				found = true
 			}
 		}
-		return planResource{}, false
+		return latest, found
 	}
 	createPlan := func(key, name string, pro bool) (planResource, error) {
 		limits := make(map[FeatureKey]float64)
@@ -205,7 +272,7 @@ func (s *Service) BootstrapCatalog(ctx context.Context) error {
 		s.plans[spec.Key] = plan
 	}
 	s.catalogOK = true
-	logger.Infof(ctx, "[Billing] LoreLattice MeterForge catalog v1 is ready")
+	logger.Infof(ctx, "[Billing] LoreLattice MeterForge catalog is ready")
 	return nil
 }
 
@@ -358,14 +425,14 @@ func (s *Service) CheckAccess(ctx context.Context, tenantID uint64, feature Feat
 	if account.PlanKey == PlanTrial && account.TrialEndsAt != nil && !time.Now().UTC().Before(*account.TrialEndsAt) {
 		return billingError("token_limit_reached", "Trial 试用已到期，请升级 Pro", http.StatusPaymentRequired, feature, account.TrialEndsAt)
 	}
-	entitlement, err := s.client.EntitlementValue(ctx, account.MeterForgeCustomerKey, feature)
+	entitlement, err := s.entitlementValue(ctx, account.MeterForgeCustomerKey, feature)
 	if err != nil {
 		return billingError("billing_unavailable", "计费服务暂时不可用，请稍后重试", http.StatusServiceUnavailable, feature, account.PeriodEndsAt)
 	}
 	if !entitlement.HasAccess || entitlement.Balance+1e-9 < quantity {
 		return billingError("token_limit_reached", "本周期用量额度不足", http.StatusPaymentRequired, feature, account.PeriodEndsAt)
 	}
-	credit, err := s.client.CreditBalance(ctx, account.MeterForgeCustomerID)
+	credit, err := s.creditBalance(ctx, account.MeterForgeCustomerID)
 	if err != nil {
 		return billingError("billing_unavailable", "计费服务暂时不可用，请稍后重试", http.StatusServiceUnavailable, feature, account.PeriodEndsAt)
 	}
@@ -388,6 +455,41 @@ func (s *Service) Reserve(ctx context.Context, tenantID uint64, feature FeatureK
 	if !ok || quantity <= 0 {
 		return nil, fmt.Errorf("invalid billing reservation")
 	}
+	mode := meta.Mode
+	if !mode.Valid() {
+		// Backward-compatible default for callers compiled before billing modes.
+		mode = BillingModePlatform
+	}
+	if meta.JobID == "" {
+		meta.JobID = meta.RequestID
+	}
+	if meta.JobID == "" {
+		meta.JobID = uuid.NewString()
+	}
+	if meta.Category == "" {
+		meta.Category = BusinessCategoryForOperation(meta.Operation)
+	}
+	unitPrice, priceVersion := s.pricing.Resolve(feature, meta.Provider, meta.ModelName, mode)
+
+	// BYOK and local models must never be blocked by LoreLattice's prepaid
+	// wallet. They still create a durable local usage row for analytics.
+	if !mode.EnforcesQuota() {
+		now := time.Now().UTC()
+		reservation := &Reservation{
+			ID: uuid.NewString(), TenantID: tenantID, FeatureKey: string(feature),
+			EventType: def.EventType, MeterUnit: def.Unit,
+			ModelID: meta.ModelID, ModelName: meta.ModelName, Provider: meta.Provider,
+			Operation: meta.Operation, RequestID: meta.RequestID, JobID: meta.JobID,
+			BusinessCategory: meta.Category, BillingMode: string(mode),
+			Chargeable: false, PriceVersion: priceVersion,
+			ReservedQuantity: quantity, UnitPrice: unitPrice, ReservedCost: 0,
+			Estimated: meta.Estimated, Status: "reserved", PeriodStartedAt: now,
+		}
+		if err := s.db.WithContext(ctx).Create(reservation).Error; err != nil {
+			return nil, err
+		}
+		return reservation, nil
+	}
 	var result *Reservation
 	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var account Account
@@ -408,13 +510,16 @@ func (s *Service) Reserve(ctx context.Context, tenantID uint64, feature FeatureK
 			return err
 		}
 
-		entitlement, err := s.client.EntitlementValue(ctx, account.MeterForgeCustomerKey, feature)
+		entitlement, err := s.entitlementValue(ctx, account.MeterForgeCustomerKey, feature)
 		if err != nil {
 			return billingError("billing_unavailable", "计费服务暂时不可用，请稍后重试", http.StatusServiceUnavailable, feature, account.PeriodEndsAt)
 		}
-		remoteCredit, err := s.client.CreditBalance(ctx, account.MeterForgeCustomerID)
-		if err != nil {
-			return billingError("billing_unavailable", "计费服务暂时不可用，请稍后重试", http.StatusServiceUnavailable, feature, account.PeriodEndsAt)
+		remoteCredit := math.MaxFloat64
+		if mode.Chargeable() {
+			remoteCredit, err = s.creditBalance(ctx, account.MeterForgeCustomerID)
+			if err != nil {
+				return billingError("billing_unavailable", "计费服务暂时不可用，请稍后重试", http.StatusServiceUnavailable, feature, account.PeriodEndsAt)
+			}
 		}
 		if !entitlement.HasAccess {
 			return billingError("token_limit_reached", "本周期用量额度已耗尽", http.StatusPaymentRequired, feature, account.PeriodEndsAt)
@@ -423,15 +528,16 @@ func (s *Service) Reserve(ctx context.Context, tenantID uint64, feature FeatureK
 		var localQuantity float64
 		if err := tx.Model(&Reservation{}).
 			Select(`COALESCE(SUM(CASE WHEN status = 'reserved' THEN reserved_quantity WHEN status = 'completed' THEN actual_quantity ELSE 0 END), 0)`).
-			Where("tenant_id = ? AND feature_key = ? AND period_started_at = ? AND status IN ?",
-				tenantID, feature, *account.PeriodStartedAt, []string{"reserved", "completed"}).
+			Where("tenant_id = ? AND feature_key = ? AND period_started_at = ? AND billing_mode IN ? AND status IN ?",
+				tenantID, feature, *account.PeriodStartedAt,
+				[]string{string(BillingModePlatform), string(BillingModeIncluded)}, []string{"reserved", "completed"}).
 			Scan(&localQuantity).Error; err != nil {
 			return err
 		}
 		var localCost float64
 		if err := tx.Model(&Reservation{}).
 			Select(`COALESCE(SUM(CASE WHEN status = 'reserved' THEN reserved_cost WHEN status = 'completed' THEN actual_cost ELSE 0 END), 0)`).
-			Where("tenant_id = ? AND status IN ?", tenantID, []string{"reserved", "completed"}).
+			Where("tenant_id = ? AND chargeable = ? AND status IN ?", tenantID, true, []string{"reserved", "completed"}).
 			Scan(&localCost).Error; err != nil {
 			return err
 		}
@@ -442,17 +548,19 @@ func (s *Service) Reserve(ctx context.Context, tenantID uint64, feature FeatureK
 		if quantity > math.Min(math.Max(0, limit-localQuantity), entitlement.Balance)+1e-9 {
 			return billingError("token_limit_reached", "本周期用量额度不足", http.StatusPaymentRequired, feature, account.PeriodEndsAt)
 		}
-		cost := quantity * def.UnitPrice
+		cost := quantity * unitPrice
 		localCredit := math.Max(0, account.LocalCreditGranted-localCost)
-		if cost > math.Min(localCredit, remoteCredit)+1e-9 {
+		if mode.Chargeable() && cost > math.Min(localCredit, remoteCredit)+1e-9 {
 			return billingError("insufficient_credit", "预付余额不足，请充值后继续使用", http.StatusPaymentRequired, feature, account.PeriodEndsAt)
 		}
 		reservation := &Reservation{
 			ID: uuid.NewString(), TenantID: tenantID, FeatureKey: string(feature),
 			EventType: def.EventType, MeterUnit: def.Unit,
 			ModelID: meta.ModelID, ModelName: meta.ModelName, Provider: meta.Provider,
-			Operation: meta.Operation, RequestID: meta.RequestID,
-			ReservedQuantity: quantity, UnitPrice: def.UnitPrice,
+			Operation: meta.Operation, RequestID: meta.RequestID, JobID: meta.JobID,
+			BusinessCategory: meta.Category, BillingMode: string(mode),
+			Chargeable: mode.Chargeable(), PriceVersion: priceVersion,
+			ReservedQuantity: quantity, UnitPrice: unitPrice,
 			ReservedCost: cost, Estimated: meta.Estimated,
 			Status: "reserved", PeriodStartedAt: *account.PeriodStartedAt,
 		}
@@ -501,8 +609,10 @@ func (s *Service) Complete(ctx context.Context, reservation *Reservation, actual
 			"feature_key": reservation.FeatureKey, "model_id": reservation.ModelID,
 			"model": reservation.ModelName, "provider": reservation.Provider,
 			"operation": reservation.Operation, "request_id": reservation.RequestID,
+			"job_id": reservation.JobID, "business_category": reservation.BusinessCategory,
+			"billing_mode": reservation.BillingMode, "chargeable": reservation.Chargeable,
 			"estimated": estimated, "unit_price_usd": reservation.UnitPrice,
-			"cost_usd": actualCost,
+			"cost_usd": actualCost, "price_version": reservation.PriceVersion,
 		},
 	}
 	payload, err := json.Marshal(event)
@@ -519,6 +629,12 @@ func (s *Service) Complete(ctx context.Context, reservation *Reservation, actual
 			return result.Error
 		}
 		if result.RowsAffected == 0 {
+			return nil
+		}
+		// BYOK/local/included usage is intentionally kept in LoreLattice's
+		// analytics ledger only. Sending it through a priced MeterForge rate
+		// card would incorrectly debit the platform wallet.
+		if !reservation.Chargeable {
 			return nil
 		}
 		return tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&OutboxRow{
@@ -572,6 +688,7 @@ func (s *Service) FlushOutbox(ctx context.Context, limit int) error {
 		if err == nil {
 			_ = s.db.WithContext(ctx).Model(&OutboxRow{}).Where("id = ?", row.ID).
 				Updates(map[string]any{"status": "sent", "sent_at": now, "last_error": "", "updated_at": now}).Error
+			s.invalidateAccessCache()
 			continue
 		}
 		attempts := row.Attempts + 1
@@ -616,7 +733,7 @@ func (s *Service) ReconcileAccounts(ctx context.Context) error {
 		remoteUnavailable := false
 		var mismatchDetails string
 		for _, def := range orderedFeatureDefinitions() {
-			remote, err := s.client.EntitlementValue(ctx, account.MeterForgeCustomerKey, def.Key)
+			remote, err := s.entitlementValue(ctx, account.MeterForgeCustomerKey, def.Key)
 			if err != nil {
 				// Availability failures are handled fail-closed on every access
 				// check. Do not turn a transient outage into a ledger mismatch.

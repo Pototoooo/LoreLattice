@@ -36,6 +36,11 @@ type Reservation struct {
 	Provider         string     `gorm:"column:provider"`
 	Operation        string     `gorm:"column:operation"`
 	RequestID        string     `gorm:"column:request_id"`
+	JobID            string     `gorm:"column:job_id"`
+	BusinessCategory string     `gorm:"column:business_category"`
+	BillingMode      string     `gorm:"column:billing_mode"`
+	Chargeable       bool       `gorm:"column:chargeable"`
+	PriceVersion     string     `gorm:"column:price_version"`
 	ReservedQuantity float64    `gorm:"column:reserved_quantity"`
 	ActualQuantity   *float64   `gorm:"column:actual_quantity"`
 	UnitPrice        float64    `gorm:"column:unit_price"`
@@ -91,6 +96,9 @@ type UsageMetadata struct {
 	Operation string
 	RequestID string
 	Estimated bool
+	JobID     string
+	Category  string
+	Mode      BillingMode
 }
 
 type BillingError struct {

@@ -35,22 +35,22 @@ var FeatureDefinitions = map[FeatureKey]FeatureDefinition{
 	FeatureLLMTokens: {
 		Key: FeatureLLMTokens, Name: "LoreLattice LLM / VLM Tokens",
 		MeterSlug: "lorelattice_llm_tokens_total", EventType: "lorelattice.llm.tokens",
-		Unit: "token", UnitPrice: 0.0001, TrialLimit: 1000, ProLimit: 10000, ValueField: "$.quantity",
+		Unit: "token", UnitPrice: 0.0001, TrialLimit: 100000, ProLimit: 2000000, ValueField: "$.quantity",
 	},
 	FeatureEmbeddingTokens: {
 		Key: FeatureEmbeddingTokens, Name: "LoreLattice Embedding Tokens",
 		MeterSlug: "lorelattice_embedding_tokens_total", EventType: "lorelattice.embedding.tokens",
-		Unit: "token", UnitPrice: 0.00001, TrialLimit: 10000, ProLimit: 100000, ValueField: "$.quantity",
+		Unit: "token", UnitPrice: 0.00001, TrialLimit: 1000000, ProLimit: 20000000, ValueField: "$.quantity",
 	},
 	FeatureRerankTokens: {
 		Key: FeatureRerankTokens, Name: "LoreLattice Rerank Tokens",
 		MeterSlug: "lorelattice_rerank_tokens_total", EventType: "lorelattice.rerank.tokens",
-		Unit: "token", UnitPrice: 0.00002, TrialLimit: 5000, ProLimit: 50000, ValueField: "$.quantity",
+		Unit: "token", UnitPrice: 0.00002, TrialLimit: 250000, ProLimit: 5000000, ValueField: "$.quantity",
 	},
 	FeatureASRSeconds: {
 		Key: FeatureASRSeconds, Name: "LoreLattice ASR Seconds",
 		MeterSlug: "lorelattice_asr_seconds_total", EventType: "lorelattice.asr.seconds",
-		Unit: "second", UnitPrice: 0.0001, TrialLimit: 600, ProLimit: 6000, ValueField: "$.quantity",
+		Unit: "second", UnitPrice: 0.0001, TrialLimit: 18000, ProLimit: 360000, ValueField: "$.quantity",
 	},
 }
 
@@ -63,6 +63,8 @@ type Config struct {
 	Timeout                  time.Duration
 	OutboxInterval           time.Duration
 	DefaultCompletionReserve int
+	AccessCacheTTL           time.Duration
+	ModelPricingJSON         string
 }
 
 func LoadConfigFromEnv() Config {
@@ -75,6 +77,8 @@ func LoadConfigFromEnv() Config {
 		Timeout:                  envDuration("METERFORGE_TIMEOUT", 3*time.Second),
 		OutboxInterval:           envDuration("METERFORGE_OUTBOX_INTERVAL", 5*time.Second),
 		DefaultCompletionReserve: envInt("METERFORGE_DEFAULT_COMPLETION_RESERVE", 256),
+		AccessCacheTTL:           envDuration("METERFORGE_ACCESS_CACHE_TTL", 15*time.Second),
+		ModelPricingJSON:         strings.TrimSpace(os.Getenv("LORELATTICE_MODEL_PRICING_JSON")),
 	}
 	cfg.BaseURL = strings.TrimRight(cfg.BaseURL, "/")
 	return cfg
