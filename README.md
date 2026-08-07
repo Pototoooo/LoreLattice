@@ -10,7 +10,6 @@
 
 <p align="center">
   <a href="https://github.com/Pototoooo/LoreLattice/actions"><img alt="GitHub Actions" src="https://img.shields.io/github/actions/workflow/status/Pototoooo/LoreLattice/cli.yml?branch=main&label=CLI"></a>
-  <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-2f855a"></a>
   <img alt="Go" src="https://img.shields.io/badge/Go-1.24+-00ADD8?logo=go&logoColor=white">
   <img alt="Vue" src="https://img.shields.io/badge/Vue-3-42b883?logo=vuedotjs&logoColor=white">
   <img alt="Docker" src="https://img.shields.io/badge/Docker_Compose-ready-2496ED?logo=docker&logoColor=white">
@@ -192,8 +191,6 @@ npm run build
 - [Agent Skills](./docs/agent-skills.md)
 - [MCP 使用说明](./docs/MCP功能使用说明.md)
 - [Lite 单机模式](./docs/LITE.md)
-- [上游来源与许可边界](./UPSTREAM.md)
-- [LoreLattice 的差异与验证证据](./PROJECT_DIFF.md)
 
 ## 安全提示
 
@@ -201,12 +198,3 @@ npm run build
 - 公开部署前必须更换示例密码和加密密钥，并关闭公开注册或配置邀请策略。
 - `SYSTEM_AES_KEY` 应进入密码管理器；不要在实例运行后随意更换。
 - Agent Skills 和 MCP 工具应遵循最小权限，并为高风险工具保留人工审批。
-- 漏洞报告方式见 [SECURITY.md](./SECURITY.md)。
-
-## 项目来源
-
-LoreLattice 基于 [Tencent/WeKnora](https://github.com/Tencent/WeKnora) 的开源代码继续演进，不是腾讯官方发行版。仓库保留来源、许可证和历史可追溯性；本项目重点改造及不能归为个人贡献的边界见 [UPSTREAM.md](./UPSTREAM.md) 与 [PROJECT_DIFF.md](./PROJECT_DIFF.md)。
-
-## License
-
-本项目沿用上游许可要求，主体代码采用 MIT License；部分第三方组件适用其各自许可证。完整文本见 [LICENSE](./LICENSE)。
