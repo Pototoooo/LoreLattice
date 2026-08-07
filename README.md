@@ -1,300 +1,212 @@
 <p align="center">
-  <picture>
-    <img src="./docs/images/logo.png" alt="LoreLattice Logo" height="120"/>
-  </picture>
+  <img src="./docs/images/logo.png" alt="LoreLattice" height="112" />
+</p>
+
+<h1 align="center">LoreLattice</h1>
+
+<p align="center">
+  把文档、模型调用与 Agent 工作流放进一个可检索、可追踪、可自托管的知识空间。
 </p>
 
 <p align="center">
-    <a href="https://github.com/Pototoooo/lorelattice" target="_blank">
-        <img alt="Official Website" src="https://img.shields.io/badge/Official Website-LoreLattice-4e6b99">
-    </a>
-    <a href="https://github.com/Pototoooo/lorelattice/releases" target="_blank">
-        <img alt="Chrome Extension" src="https://img.shields.io/badge/Chrome Extension-LoreLattice-4285F4">
-    </a>
-    <a href="https://clawhub.ai/Pototoooo/lorelattice" target="_blank">
-        <img alt="ClawHub Skill" src="https://img.shields.io/badge/ClawHub Skill-LoreLattice-ff6b35">
-    </a>
-    <a href="./CHANGELOG.md">
-        <img alt="Version" src="https://img.shields.io/badge/version-0.7.0-2e6cc4?labelColor=d4eaf7">
-    </a>
+  <a href="https://github.com/Pototoooo/LoreLattice/actions"><img alt="GitHub Actions" src="https://img.shields.io/github/actions/workflow/status/Pototoooo/LoreLattice/cli.yml?branch=main&label=CLI"></a>
+  <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-2f855a"></a>
+  <img alt="Go" src="https://img.shields.io/badge/Go-1.24+-00ADD8?logo=go&logoColor=white">
+  <img alt="Vue" src="https://img.shields.io/badge/Vue-3-42b883?logo=vuedotjs&logoColor=white">
+  <img alt="Docker" src="https://img.shields.io/badge/Docker_Compose-ready-2496ED?logo=docker&logoColor=white">
 </p>
 
-<p align="center">
-| <b>English</b> | <a href="./README_CN.md"><b>简体中文</b></a> | <a href="./README_JA.md"><b>日本語</b></a> | <a href="./README_KO.md"><b>한국어</b></a> |
-</p>
+## 项目定位
 
-<p align="center">
-  <h4 align="center">
+LoreLattice 是一个面向个人与团队知识工作的自托管 AI 平台。它不是单独的聊天壳，也不是只负责向量检索的组件，而是把下面四条链路放在同一个工作空间内：
 
-  [Overview](#-overview) • [Architecture](#-architecture) • [Key Features](#-key-features) • [Getting Started](#-getting-started) • [API Reference](#-api-reference) • [Developer Guide](#-developer-guide)
-  
-  </h4>
-</p>
+1. **知识加工**：文件上传、解析、切块、向量化、图谱抽取与问题生成。
+2. **知识使用**：RAG 快速问答、引用回溯、全局搜索和自动 Wiki。
+3. **Agent 执行**：ReAct 推理、知识库检索、Web Search、MCP 与 Skills。
+4. **模型治理**：五类模型配置、BYOK、统一 AI Credits、调用明细与本地账本。
 
-# 💡 LoreLattice — Turn Documents into Living Knowledge with RAG, Agents and Auto-Wiki
+适合以下场景：
 
-## 📌 Overview
+- 为研究资料、产品文档或团队规范建立可追溯问答入口；
+- 从大量原始文档生成互相链接的 Wiki 页面和关系图；
+- 让 Agent 在明确的知识库、工具和权限范围内完成多步骤任务；
+- 对 Chat、Embedding、Rerank、VLM、ASR 的使用量做统一观察；
+- 在本地或私有网络中替换模型、向量库、解析器与对象存储。
 
-[**LoreLattice**](https://github.com/Pototoooo/lorelattice) is an open-source, LLM-powered knowledge framework built for enterprise-grade document understanding, semantic retrieval, and autonomous reasoning.
+## 五类模型分别做什么
 
-It is organized around three core capabilities: **RAG-based Quick Q&A** for everyday lookups, a **ReAct Agent** that autonomously orchestrates retrieval, MCP tools and web search to handle complex multi-step tasks, and a brand-new **Wiki Mode** in which agents distill raw documents into a self-maintaining, interlinked markdown knowledge base with an interactive knowledge graph. Combined with multi-source ingestion (Feishu / Notion / Yuque / RSS, and growing), **website embed widgets** for publishing agents to external sites, **scoped API keys with a principal model** for programmatic integrations, **multi-instance storage backends** per workspace for flexible data placement, 20+ LLM provider integrations, full Langfuse observability plus a **runtime task-queue dashboard with worker-pool governance**, **enterprise-ready multi-workspace RBAC** (4-tier role matrix + per-resource ownership + per-workspace audit log), and a fully self-hostable modular architecture, LoreLattice turns scattered documents into a queryable, reasoning-capable, continuously evolving knowledge asset.
+LoreLattice 把模型按职责拆开配置，而不是要求一个模型完成所有事情。
 
-The framework supports auto-syncing knowledge from Feishu, Notion, and Yuque (more data sources coming soon), handles 10+ document formats including PDF, Word, images, and Excel, and can serve Q&A directly through IM channels like WeCom, Feishu, Slack, and Telegram. It is compatible with major LLM providers including OpenAI, DeepSeek, Qwen (Alibaba Cloud), Zhipu, Hunyuan, Gemini, MiniMax, NVIDIA, and Ollama. Its fully modular design allows swapping LLMs, vector databases, and storage backends, with support for local and private cloud deployment ensuring complete data sovereignty. LoreLattice also integrates with **Langfuse** for comprehensive observability into agent reasoning, token usage, and pipeline tracing.
+| 配置项 | 主要职责 | 典型调用时机 |
+|---|---|---|
+| KnowledgeQA | 对话生成、RAG 答案、Agent 推理、Wiki 内容生成 | 提问、Agent 执行、Wiki 后处理 |
+| Embedding | 把文档块和查询转换为向量 | 文档入库、语义检索 |
+| Rerank | 对初步召回结果重新排序 | 生成答案前筛选上下文 |
+| VLLM | 理解图片、扫描页与图表 | 多模态解析、图片问答 |
+| ASR | 把音频转换为文本 | 音频文件解析 |
 
+如果模型平台同时提供这五类 API，同一个 API Key 可以复用；但每个职责仍需在模型管理页分别建立配置。只做纯文本文档问答时，可以先配置 KnowledgeQA、Embedding 和 Rerank，再按需要补充 VLLM、ASR。
 
-## ✨ Latest Updates
+## 核心调用链
 
-- **v0.7.0** — Fine-grained **scoped API keys & principal model** (capability-level grants + per-KB restriction + API integration playground); **runtime task-queue observability dashboard & worker-pool governance** (per-stage pools + per-model concurrency governors + failed-task inspection/retry); **multi-instance storage backends** (multiple storage instances per workspace, per-KB binding, default instance); **session-scoped temporary attachments** (async image/doc parsing + combined limits); question & follow-up suggestions; stable resource registry with LLM-context alias compaction; `@Skill / @MCP` mentions with scoped agent runtime; mid-conversation MCP OAuth; QQBot & Lark (Feishu International) IM integration; Redis TLS; Requesty model provider + Keenable web search; tenantless provisioning & gated self-service workspaces; admin password reset; knowledge base duplicate flow; `lorelattice` CLI v0.10. Plus broad security hardening (SSRF, secret redaction, SQL validation, IDOR). See [`CHANGELOG.md`](./CHANGELOG.md).
-- **v0.6.3** — Website embed widget & Integrations Center (secure-mode token exchange + rate limits); chat experience overhaul (citation popovers, RAG pipeline progress, streaming markdown); document multi-tag & batch reparse; Wiki folders & hierarchy navigation; RSS data source; MCP OAuth2; EPUB / MHTML parsing; agent model-readiness checks; model test debugger; session source filter; workspace deletion UI. See [`CHANGELOG.md`](./CHANGELOG.md).
-- **v0.6.2** — Per-upload process configuration with upload-confirm dialog; document reparse with `process_config`; `lorelattice` CLI v0.9 (bundled Agent Skills, `session stop`, auth/profile harmonization); KB marquee multi-select; HNSW index for 1024-dim pgvector embeddings; chat resources store refactor; Langfuse-only tracing (Jaeger removed). See [`CHANGELOG.md`](./CHANGELOG.md).
-- **v0.6.1** — Document parsing trace timeline (Langfuse-style span tree with stage-by-stage progress + stop-parse); OpenSearch vector store driver; declarative built-in models via YAML; system admin & consolidated platform settings + audit log; new-user onboarding guide; settings UI redesign; `lorelattice` CLI v0.7 / v0.8 (agent-first wire contract, NDJSON, `--dry-run`); OpenDataLoader + PaddleOCR-VL parsers; MCP server multi-transport (stdio / SSE / HTTP); per-model thinking-mode config; Tencent LKEAP rerank + native Gemini embeddings + MiniMax-M3. See [`CHANGELOG.md`](./CHANGELOG.md).
-- **v0.6.0** — Workspace RBAC (4-tier role matrix `Owner` / `Admin` / `Contributor` / `Viewer` + per-KB ownership + per-workspace audit log), workspace member management & multi-workspace UX, self-service workspaces; `lorelattice` CLI v0.4 GA with `mcp serve`; KB retrieval fan-out across vector stores; AES-256-GCM credential encryption + docreader gRPC TLS + Token; Zhipu embedder + Huawei OBS; server-side user preferences; Go 1.26.0. See [`docs/RBAC说明.md`](./docs/RBAC说明.md) and [`CHANGELOG.md`](./CHANGELOG.md).
-- **v0.5.2** — Wiki ingest scales to 40k-document KBs (task queue + DLQ); MCP human-in-the-loop tool approval; Anthropic / Apache Doris / Tencent VectorDB / KS3 / SearXNG backends; adaptive 3-tier chunking with live preview; global ⌘K command palette; Yuque connector + WeChat Mini Program; `lorelattice` CLI preview.
-- **v0.5.1** — Knowledge-base batch management; workspace-wide IM channels overview; session search + user-scoped pinning; unified Model / Web Search / MCP settings cards; per-agent LLM timeout; desktop workspace switching.
-- **v0.5.0** — Wiki Mode GA — agents auto-generate structured, interlinked Markdown wiki pages with a knowledge graph; wiki browser + visual graph in the UI.
-- **v0.4.0** — LoreLattice Cloud (hosted LLM + parsing); Chrome Extension; ClawHub Skill; WeChat IM; attachment processing; Azure OpenAI / Alibaba OSS; Notion connector; Baidu + Ollama web search; VectorStore management.
-- **v0.3.6** — ASR (audio); Feishu data-source auto-sync; OIDC; IM quote-reply context + thread-based sessions; document summarization; Tavily search; parallel tool calling; agent @mention scope restriction.
-- **v0.3.5** — Telegram / DingTalk / Mattermost IM; IM slash commands + QA queue; suggested questions; VLM auto-describe MCP tool images; Novita AI; channel tracking.
-- **v0.3.4** — WeCom / Feishu / Slack IM; multimodal image support; NVIDIA model API; Weaviate; AWS S3; AES-256-GCM API-key encryption; built-in MCP service; hybrid-search optimization; `final_answer` tool.
-- **v0.3.3** — Parent-child chunking; KB pinning; fallback response; passage cleaning for rerank; storage auto-creation; Milvus.
-- **v0.3.2** — Knowledge Search entry; per-source parser & storage engine config; image rendering in local storage; document preview; Volcengine TOS; Mermaid rendering; batch session management; memory graph preview.
-- **v0.3.0** — Shared Space; Agent Skills + sandboxed execution; custom agents; Data Analyst agent; thinking mode; Bing / Google web search; API Key auth; Helm chart; Korean i18n; Qdrant.
-- **v0.2.0** — Agent Mode (ReACT); multi-type knowledge bases (FAQ + document); conversation strategy config; DuckDuckGo web search; MCP tool integration; new UI with agent mode switching; MQ async task management.
+```mermaid
+flowchart LR
+    U["Web / CLI / API"] --> G["LoreLattice API"]
+    G --> W["Workspace & RBAC"]
+    G --> K["Knowledge Pipeline"]
+    G --> A["RAG / Agent / Wiki"]
 
+    K --> P["Parser"]
+    P --> C["Chunk & Metadata"]
+    C --> E["Embedding"]
+    E --> V["Vector Store"]
 
-## 📱 Interface Showcase
+    A --> R["Retrieve"]
+    R --> RR["Rerank"]
+    RR --> L["KnowledgeQA"]
+    A --> T["MCP / Skills / Web Search"]
 
-<table>
-  <tr>
-    <td colspan="2" align="center"><b>💬 Intelligent Q&A Conversation</b><br/><img src="./docs/images/qa.png" alt="Intelligent Q&A Conversation" width="100%"></td>
-  </tr>
-  <tr>
-    <td width="50%" align="center"><b>📖 Wiki Browser</b><br/><img src="./docs/images/wiki-browser.png" alt="Wiki Browser" width="100%"></td>
-    <td width="50%" align="center"><b>🕸️ Wiki Knowledge Graph</b><br/><img src="./docs/images/wiki-graph.png" alt="Wiki Knowledge Graph" width="100%"></td>
-  </tr>
-  <tr>
-    <td width="50%" align="center"><b>🤖 Agent Mode · Tool Call Process</b><br/><img src="./docs/images/agent-qa.png" alt="Agent Mode Tool Call Process" width="100%"></td>
-    <td width="50%" align="center"><b>⚙️ Conversation Settings</b><br/><img src="./docs/images/settings.png" alt="Conversation Settings" width="100%"></td>
-  </tr>
-  <tr>
-    <td colspan="2" align="center"><b>🔭 Observability · Langfuse Tracing</b><br/><img src="./docs/images/langfuse.png" alt="Observability Langfuse Tracing" width="100%"></td>
-  </tr>
-</table>
-
-## 🏗️ Architecture
-
-![lorelattice-architecture.png](./docs/images/architecture.png)
-
-Fully modular pipeline from document parsing, vectorization, and retrieval to LLM inference — every component is swappable and extensible. Supports local / private cloud deployment with full data sovereignty and a zero-barrier Web UI for quick onboarding.
-
-## 🧩 Feature Overview
-
-**Intelligent Conversation**
-
-| Capability | Details |
-|------------|---------|
-| Intelligent Reasoning | ReACT progressive multi-step reasoning, autonomously orchestrating knowledge retrieval, MCP tools, and web search |
-| Quick Q&A | RAG-based Q&A over knowledge bases for fast and accurate answers |
-| Wiki Mode | Agent-driven auto-generation of structured, interlinked markdown Wiki pages from raw documents |
-| Tool Calling | Built-in tools, MCP tools (incl. OAuth2 remote services, mid-conversation OAuth), web search; `@Skill / @MCP` mentions to scope the agent runtime per turn |
-| Conversation Strategy | Online Prompt editing, retrieval threshold tuning, multi-turn context awareness, per-agent citation output toggle |
-| Suggested Questions | Auto-generated question suggestions and after-answer follow-ups based on knowledge base content |
-| Temporary Attachments | Session-scoped image / document uploads with async parsing for one-off Q&A, with a combined image + attachment limit |
-| Citations & RAG Progress | Inline citation popovers and a references drawer (web / KB source distinction), shared markdown rendering, and stage-by-stage RAG pipeline progress in chat |
-| Session Management | Filter and group sidebar sessions by source (Web / IM / Embed), with inline session-title rename |
-
-**Knowledge Management**
-
-| Capability | Details |
-|------------|---------|
-| Knowledge Base Types | FAQ / Document / Wiki with folder import, URL import, multi-tag management, and online entry |
-| Per-Upload Process Config | Override parser, chunking, multimodal (VLM / ASR), graph extraction, and question generation per upload batch via upload-confirm dialog or `process_config` API; reparse with new settings |
-| Batch Reparse | Re-queue parsing for multiple documents at once with optional per-batch `process_config` |
-| Data Source Import | Auto-sync from Feishu / Notion / Yuque / RSS feeds (more data sources coming soon); incremental and full sync |
-| Document Formats | PDF / Word / Txt / Markdown / HTML / EPUB / MHTML / Images / CSV / Excel / PPT / JSON |
-| Retrieval Strategies | BM25 sparse / Dense retrieval / GraphRAG / parent-child chunking / HNSW-accelerated pgvector (1024-dim) / multi-dimensional indexing |
-| Batch Selection | Marquee drag-select multiple documents in the KB list for batch operations |
-| E2E Testing | Full-pipeline visualization with recall hit rate, BLEU / ROUGE metric evaluation |
-
-**Integrations & Extensions**
-
-| Capability | Details |
-|------------|---------|
-| LLMs | OpenAI / Azure OpenAI / Anthropic (Claude) / DeepSeek / Qwen (Alibaba Cloud) / Zhipu / Hunyuan / Doubao (Volcengine) / Gemini / MiniMax / NVIDIA / Novita AI / SiliconFlow / OpenRouter / Requesty / Ollama |
-| Embeddings | Ollama / BGE / GTE / Zhipu / OpenAI-compatible APIs |
-| Vector DBs | PostgreSQL (pgvector) / Elasticsearch / OpenSearch / Milvus / Weaviate / Qdrant / Apache Doris / Tencent VectorDB |
-| Object Storage | Local / MinIO / AWS S3 / Volcengine TOS / Alibaba Cloud OSS / Kingsoft Cloud KS3 / Huawei Cloud OBS; **multiple storage instances per workspace** with per-KB binding and a default instance |
-| IM Channels | WeCom / Feishu / Lark (Feishu International) / QQBot / Slack / Telegram / DingTalk / Mattermost / WeChat |
-| Website Embed | Publish agents via embed widget with domain allowlists, rate limits, and secure-mode token exchange |
-| Web Search | DuckDuckGo / Bing / Google / Tavily / Baidu / Ollama / SearXNG / Keenable / Zhipu AI |
-| API Integration | Scoped API keys (capability-level grants + per-KB restriction + throttled last-used tracking) with an API integration playground; MCP OAuth and embed sessions isolated per principal |
-
-**Platform**
-
-| Capability | Details |
-|------------|---------|
-| Deployment | Local / Docker / Kubernetes (Helm) with private and offline support |
-| UI | Web UI / RESTful API / CLI (`lorelattice`) / Chrome Extension / Website Embed Widget / WeChat Mini Program |
-| Access Control | Workspace RBAC with 4-tier role matrix (Owner / Admin / Contributor / Viewer), per-KB resource ownership, per-workspace audit log, invite-only workspaces, tenantless provisioning & gated self-service workspace creation, admin password reset (session revocation), cross-workspace superuser, scoped API keys |
-| Security | AES-256-GCM at-rest encryption for API keys and MCP / data-source credentials with graceful key rotation; gRPC TLS + Token between app and docreader; Redis TLS; SSRF-safe HTTP client (data sources, URL import, redirect chains); secret redaction in responses; sandbox isolation for agent skills |
-| Observability | Integrated Langfuse (sole tracing backend) for ReAct loops, token tracking, tool calls, and pipeline tracing; built-in Langfuse-style document parsing trace timeline with stage-by-stage progress; system-admin runtime task-queue dashboard (queue depth, per-model concurrency, failed-task inspection & manual retry) |
-| Task Management | MQ async tasks with per-stage worker-pool governance (core / post-process / enrichment / maintenance + elastic shared pool, plus an independent Wiki pool) and per-model background concurrency governors; automatic database migration on version upgrade |
-| Model Management | Centralized config, declarative built-in models via YAML, per-knowledge-base model selection, per-model thinking-mode and embedding-dimension overrides, interactive model test debugger, multi-workspace built-in model sharing, LoreLattice Cloud hosted models and parsing |
-
-## 🧩 Chrome Extension
-
-[**LoreLattice Chrome Extension**](https://github.com/Pototoooo/lorelattice/releases) lets you capture web content directly into your LoreLattice knowledge base. Select text, images, or entire pages in the browser and save them as knowledge entries with one click — no copy-paste or file upload needed.
-
-
-## 📱 WeChat Mini Program
-
-The [LoreLattice Mini Program](./miniprogram/README.md) provides a lightweight mobile client for configuring LoreLattice API access, selecting knowledge bases, importing URLs, and asking knowledge chat from WeChat.
-
-
-## 🦞 ClawHub Skill
-
-[**LoreLattice ClawHub Skill**](https://clawhub.ai/Pototoooo/lorelattice) is a LoreLattice skill published on the ClawHub platform. Once installed, it enables document import (file / URL / Markdown), hybrid search (vector + keyword) across knowledge bases, and knowledge entry management — all through the LoreLattice REST API.
-
-- **Document Import** — Upload files, import web pages, or write Markdown knowledge via the agent
-- **Hybrid Search** — Search within or across knowledge bases with vector + keyword retrieval
-- **Knowledge Management** — List, browse, edit, and delete knowledge entries programmatically
-
-## ⌨️ Command-Line Interface
-
-`lorelattice` is the official CLI for driving the API from a terminal or an AI
-agent. It is **agent-first**: every command emits a stable JSON envelope by
-default (with typed error codes mapped to exit codes), and `--format text`
-renders for humans. It also serves a curated MCP tool surface
-(`lorelattice mcp serve`) and ships bundled Agent Skills.
-
-```bash
-lorelattice profile add prod --host https://kb.example.com --use
-lorelattice auth login
-lorelattice kb list
-lorelattice link --kb my-knowledge-base    # bind the current directory
-lorelattice doc upload notes.md
-lorelattice chat "summarise the design doc"
+    E --> B["Usage & Billing Wrapper"]
+    RR --> B
+    L --> B
+    B --> BL["Local Ledger"]
+    B --> MF["MeterForge - optional"]
 ```
 
-For headless / CI use, set `LORELATTICE_API_KEY` + `LORELATTICE_HOST` and skip
-`auth login` entirely — no credentials written to disk.
+知识库回答不是“模型直接阅读全部文件”。系统先检索候选内容，再由 Rerank 选择更相关的上下文，最后交给 KnowledgeQA 生成带来源的答案。Wiki 模式则在文档解析完成后继续生成结构化页面、目录和页面引用图。
 
-See [`cli/README.md`](./cli/README.md) for install + 5-minute quickstart and
-[`cli/AGENTS.md`](./cli/AGENTS.md) for the operational contract AI agents rely on.
+## 快速启动
 
-## 🚀 Getting Started
+### 1. 准备环境
 
-### 🛠 Prerequisites
+- Docker Desktop 或 Docker Engine + Compose
+- Git
+- 至少一组可用模型配置；首次启动本身不要求提前填写模型 Key
 
-- [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
-- [Git](https://git-scm.com/)
-
-### 📦 Installation & Launch
+### 2. 克隆与创建本地配置
 
 ```bash
-git clone https://github.com/Pototoooo/lorelattice.git
+git clone https://github.com/Pototoooo/LoreLattice.git
 cd LoreLattice
-cp .env.example .env   # Edit .env as needed, see comments in the file
-docker compose up -d   # Start core services
+cp .env.example .env
 ```
 
-Once started, visit **http://localhost** to get started.
+首次启动前至少修改 `.env` 中的数据库密码、Redis 密码、`JWT_SECRET` 和 `SYSTEM_AES_KEY`。其中 `SYSTEM_AES_KEY` 必须是 32 字节，并且丢失后无法解密数据库里保存的模型凭证。
 
-> To use a local Ollama model, run `ollama serve > /dev/null 2>&1 &` first.
-
-### 🔧 Optional Services (Docker Compose Profiles)
-
-Add `--profile` flags to enable additional components. Multiple profiles can be combined:
-
-| Profile | Description | Command |
-|---------|-------------|---------|
-| _(default)_ | Core services | `docker compose up -d` |
-| `full` | All features | `docker compose --profile full up -d` |
-| `neo4j` | Knowledge Graph (Neo4j) | `docker compose --profile neo4j up -d` |
-| `minio` | Object Storage (MinIO) | `docker compose --profile minio up -d` |
-| `langfuse` | Tracing (Langfuse) | `docker compose --profile langfuse up -d` |
-
-Combine profiles: `docker compose --profile neo4j --profile minio up -d`
-
-Stop services: `docker compose down`
-
-### 🌐 Service URLs
-
-| Service | URL |
-|---------|-----|
-| Web UI | `http://localhost` |
-| Backend API | `http://localhost:8080` |
-| Langfuse Tracing | `http://localhost:3000` |
-
-## MCP Server
-
-Please refer to the [MCP Configuration Guide](./mcp-server/MCP_CONFIG.md) for the necessary setup.
-
-
-## 📘 API Reference
-
-Troubleshooting FAQ: [Troubleshooting FAQ](./docs/QA.md)
-
-Detailed API documentation is available at: [API Docs](./docs/api/README.md)
-
-Product plans and upcoming features: [Roadmap](./docs/ROADMAP.md)
-
-## 🧭 Developer Guide
-
-### ⚡ Fast Development Mode (Recommended)
-
-If you need to frequently modify code, **you don't need to rebuild Docker images every time**! Use fast development mode:
+可用下面的命令生成本地随机值：
 
 ```bash
-# Start infrastructure
+openssl rand -hex 32   # JWT_SECRET
+openssl rand -hex 16   # SYSTEM_AES_KEY: 32 个 ASCII 字符
+```
+
+不要提交 `.env`。仓库只保留带注释的 `.env.example`。
+
+### 3. 启动核心服务
+
+```bash
+docker compose up -d
+```
+
+核心服务包括：
+
+- `frontend`：Web UI，默认端口 `80`
+- `app`：Go API 与后台任务，默认端口 `8080`
+- `docreader`：文档解析服务
+- `postgres`：业务数据与 pgvector
+- `redis`：流式消息与异步任务队列
+
+### 4. 验证
+
+```bash
+docker compose ps
+curl http://localhost:8080/health
+```
+
+健康接口返回 `{"status":"ok"}` 后，打开 [http://localhost](http://localhost)，创建账户并进入设置页配置模型。
+
+## 推荐的首次使用顺序
+
+1. 在 **设置 → 模型管理** 中配置 KnowledgeQA、Embedding、Rerank。
+2. 新建一个普通文档知识库，上传一份 Markdown 或 PDF。
+3. 等待解析完成，在快速问答中验证答案和引用来源。
+4. 新建 Wiki 知识库，观察“文档 → 页面 → 页面引用图”的生成过程。
+5. 打开智能体，为它限定知识库和工具，再进行多步骤问题测试。
+6. 在 **套餐与用量** 中检查 BYOK 调用是否被记录为“不扣费”。
+
+## AI Credits 与 BYOK
+
+LoreLattice 将模型调用分为四种计费语义：
+
+| 模式 | 含义 | 是否消耗平台额度 |
+|---|---|---:|
+| `platform` | 平台提供并承担成本的模型 | 是 |
+| `included` | 套餐中包含的模型调用 | 是 |
+| `byok` | 用户提供 API Key | 否 |
+| `local` | Ollama 等本地模型 | 否 |
+
+BYOK 和本地模型仍会记录调用次数与 Token，便于分析使用量，但不会从 AI Credits 重复扣费。MeterForge 是可选的外部计量/订阅组件；远端计费暂时不可用时，页面会回退到本地账本，平台代付调用则保持 fail-closed。
+
+## 可替换组件
+
+- **模型平台**：OpenAI-compatible API、SiliconFlow、Qwen、DeepSeek、智谱、Ollama 等。
+- **向量检索**：PostgreSQL/pgvector、Qdrant、Milvus、Weaviate、Elasticsearch、OpenSearch 等。
+- **解析器**：内置 DocReader、OpenDataLoader、PaddleOCR-VL 等。
+- **存储**：Local、MinIO、S3、COS、OSS、TOS、OBS、KS3。
+- **工具与渠道**：MCP、Agent Skills、Web Search、网页嵌入与多种 IM 渠道。
+
+可选组件通过 Compose profile 或设置页启用，不建议第一次运行时一次性启动全部服务。
+
+## 开发与验证
+
+```bash
+# 基础依赖
 make dev-start
 
-# Start backend (new terminal)
+# 后端热更新
 make dev-app
 
-# Start frontend (new terminal)
+# 前端开发服务器
 make dev-frontend
 ```
 
-**Development Advantages:**
-- ✅ Frontend modifications auto hot-reload (no restart needed)
-- ✅ Backend modifications quick restart (5-10 seconds, supports Air hot-reload)
-- ✅ No need to rebuild Docker images
-- ✅ Support IDE breakpoint debugging
+常用检查：
 
-**Detailed Documentation:** [Development Environment Quick Start](./docs/开发指南.md)
+```bash
+go test ./internal/application/service ./internal/billing ./internal/models/chat
+cd frontend
+npm ci
+npm run test
+npm run type-check
+npm run build
+```
 
+前端构建要求 Node.js 20.19+，项目验证环境使用 Node.js 24。
 
-## 🤝 Contributing
+## 文档入口
 
-Welcome to submit [Issues](https://github.com/Pototoooo/lorelattice/issues) or Pull Requests.
+- [内置模型配置](./docs/BUILTIN_MODELS.md)
+- [开发指南](./docs/开发指南.md)
+- [常见问题](./docs/QA.md)
+- [知识图谱](./docs/KnowledgeGraph.md)
+- [Agent Skills](./docs/agent-skills.md)
+- [MCP 使用说明](./docs/MCP功能使用说明.md)
+- [Lite 单机模式](./docs/LITE.md)
+- [上游来源与许可边界](./UPSTREAM.md)
+- [LoreLattice 的差异与验证证据](./PROJECT_DIFF.md)
 
-**Process:** Fork → Create branch → Commit changes → Open PR
+## 安全提示
 
-**Standards:** Format code with `gofmt`, follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat:` / `fix:` / `docs:` / `test:` / `refactor:`)
+- 不要提交模型 Key、`.env`、数据库导出或容器 inspect 文件。
+- 公开部署前必须更换示例密码和加密密钥，并关闭公开注册或配置邀请策略。
+- `SYSTEM_AES_KEY` 应进入密码管理器；不要在实例运行后随意更换。
+- Agent Skills 和 MCP 工具应遵循最小权限，并为高风险工具保留人工审批。
+- 漏洞报告方式见 [SECURITY.md](./SECURITY.md)。
 
-## 🔒 Security Notice
+## 项目来源
 
-**Important:** Starting from v0.1.3, LoreLattice includes login authentication functionality to enhance system security. For production deployments, we strongly recommend:
+LoreLattice 基于 [Tencent/WeKnora](https://github.com/Tencent/WeKnora) 的开源代码继续演进，不是腾讯官方发行版。仓库保留来源、许可证和历史可追溯性；本项目重点改造及不能归为个人贡献的边界见 [UPSTREAM.md](./UPSTREAM.md) 与 [PROJECT_DIFF.md](./PROJECT_DIFF.md)。
 
-- Deploy LoreLattice services in internal/private network environments rather than public internet
-- Avoid exposing the service directly to public networks to prevent potential information leakage
-- Configure proper firewall rules and access controls for your deployment environment
-- Regularly update to the latest version for security patches and improvements
+## License
 
-## 👥 Contributors
-
-Thanks to these excellent contributors:
-
-[![Contributors](https://contrib.rocks/image?repo=Pototoooo/lorelattice)](https://github.com/Pototoooo/lorelattice/graphs/contributors)
-
-
-## 📈 Project Statistics
-
-<a href="https://www.star-history.com/#Pototoooo/lorelattice&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Pototoooo/lorelattice&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Pototoooo/lorelattice&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Pototoooo/lorelattice&type=date&legend=top-left" />
- </picture>
-</a>
+本项目沿用上游许可要求，主体代码采用 MIT License；部分第三方组件适用其各自许可证。完整文本见 [LICENSE](./LICENSE)。

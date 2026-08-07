@@ -1,5 +1,11 @@
 # Changelog
 
+> [!NOTE]
+> Entries through the inherited v0.7.0 line are retained for upstream traceability.
+> LoreLattice-specific product differences and verification evidence are tracked in
+> [`PROJECT_DIFF.md`](./PROJECT_DIFF.md); provenance is documented in [`UPSTREAM.md`](./UPSTREAM.md).
+
+
 All notable changes to this project will be documented in this file.
 
 ## [0.7.0] - 2026-07-17
