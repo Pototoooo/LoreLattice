@@ -147,6 +147,13 @@ const (
 	// materially prolonging task runtime when the remote is genuinely down.
 	wikiLLMMaxAttempts = 3
 
+	// wikiLLMMaxTokens leaves enough room for reasoning models to finish their
+	// private reasoning and still emit the requested JSON/Markdown payload.
+	// SiliconFlow reasoning models default to a 4096-token thinking budget; an
+	// unspecified/small completion limit can therefore end before any answer is
+	// produced, which previously surfaced as an empty JSON parse error.
+	wikiLLMMaxTokens = 8192
+
 	// wikiLLMBackoffBase is the base delay for the exponential backoff
 	// between retry attempts. The nth retry waits base << (n-1) — so with
 	// a 2s base we wait 2s, 4s, 8s between attempts.
@@ -2389,17 +2396,23 @@ func (s *wikiIngestService) generateWithTemplate(ctx context.Context, chatModel 
 		}, &chat.ChatOptions{
 			Temperature: 0.3,
 			Thinking:    &thinking,
+			MaxTokens:   wikiLLMMaxTokens,
 		})
 		if err == nil {
-			return unmaskImageURLs(response.Content, urlMap), nil
-		}
-		lastErr = err
+			if incompleteErr := incompleteWikiLLMResponse(response); incompleteErr == nil {
+				return unmaskImageURLs(response.Content, urlMap), nil
+			} else {
+				lastErr = incompleteErr
+			}
+		} else {
+			lastErr = err
 
-		// Abort immediately on non-retryable errors (4xx except 408/429,
-		// parse/marshal failures, tool-side bugs, etc.). Retrying a
-		// hard "invalid arguments" error just wastes the model's budget.
-		if !isTransientLLMError(ctx, err) {
-			return "", fmt.Errorf("LLM call failed: %w", err)
+			// Abort immediately on non-retryable errors (4xx except 408/429,
+			// parse/marshal failures, tool-side bugs, etc.). Retrying a hard
+			// "invalid arguments" error just wastes the model's budget.
+			if !isTransientLLMError(ctx, err) {
+				return "", fmt.Errorf("LLM call failed: %w", err)
+			}
 		}
 		if attempt == wikiLLMMaxAttempts {
 			break
@@ -2415,6 +2428,20 @@ func (s *wikiIngestService) generateWithTemplate(ctx context.Context, chatModel 
 		}
 	}
 	return "", fmt.Errorf("LLM call failed after %d attempts: %w", wikiLLMMaxAttempts, lastErr)
+}
+
+func incompleteWikiLLMResponse(response *types.ChatResponse) error {
+	if response == nil {
+		return errors.New("LLM returned a nil response")
+	}
+	if strings.EqualFold(strings.TrimSpace(response.FinishReason), "length") {
+		return fmt.Errorf("LLM output was truncated (finish_reason=%s)", response.FinishReason)
+	}
+	if strings.TrimSpace(response.Content) == "" {
+		return fmt.Errorf("LLM returned empty content (finish_reason=%s, reasoning_chars=%d)",
+			response.FinishReason, utf8.RuneCountInString(response.ReasoningContent))
+	}
+	return nil
 }
 
 // isTransientLLMError reports whether an error from the chat provider

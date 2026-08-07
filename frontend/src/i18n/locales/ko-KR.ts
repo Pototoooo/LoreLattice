@@ -292,7 +292,7 @@ export default {
         },
         done: {
           title: "분석 후 사용 가능",
-          desc: "문서가 색인되면 대화에서 @로 이 지식 베이스를 지정해 출처가 포함된 답변을 받을 수 있습니다.",
+          desc: "문서가 색인되면 대화에서 {'@'}로 이 지식 베이스를 지정해 출처가 포함된 답변을 받을 수 있습니다.",
         },
       },
     },
@@ -300,7 +300,7 @@ export default {
       steps: {
         kb: {
           title: "지식 범위 선택",
-          desc: "@를 눌러 지식 베이스나 파일을 선택하세요. 선택한 범위만 사용해 답변합니다. 선택하지 않으면 현재 에이전트 설정이 적용됩니다.",
+          desc: "{'@'}를 눌러 지식 베이스나 파일을 선택하세요. 선택한 범위만 사용해 답변합니다. 선택하지 않으면 현재 에이전트 설정이 적용됩니다.",
         },
         input: {
           title: "질문 입력",
@@ -1846,7 +1846,7 @@ export default {
     title: "가입 완료",
     subtitle: "「{tenant}」에 초대되었습니다",
     email: "이메일",
-    emailPlaceholder: "your@example.com",
+    emailPlaceholder: "your{'@'}example.com",
     emailHint: "본인이 사용하는 이메일이면 됩니다.",
     emailInvalid: "유효한 이메일을 입력해 주세요",
     username: "표시 이름",

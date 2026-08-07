@@ -515,6 +515,26 @@ func TestParseCompletionResponse_CachedTokens(t *testing.T) {
 	})
 }
 
+func TestParseCompletionResponse_PreservesReasoningContent(t *testing.T) {
+	c := newTestRemoteChat(t)
+	resp := &openai.ChatCompletionResponse{
+		Choices: []openai.ChatCompletionChoice{{
+			Message: openai.ChatCompletionMessage{
+				Role:             "assistant",
+				Content:          `{"entities":[],"concepts":[]}`,
+				ReasoningContent: "private reasoning",
+			},
+			FinishReason: openai.FinishReasonStop,
+		}},
+	}
+
+	got, err := c.parseCompletionResponse(resp)
+	require.NoError(t, err)
+	require.NotNil(t, got)
+	assert.Equal(t, `{"entities":[],"concepts":[]}`, got.Content)
+	assert.Equal(t, "private reasoning", got.ReasoningContent)
+}
+
 // TestTokenUsage_CachedTokensJSONOmitempty ensures the new CachedTokens field
 // stays out of serialized payloads when it is zero. This keeps logs and API
 // responses unchanged for providers that never report cache hits.

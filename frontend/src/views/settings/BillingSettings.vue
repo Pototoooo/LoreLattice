@@ -9,6 +9,9 @@
     </div>
 
     <t-alert v-if="errorMessage" theme="error" :message="errorMessage" />
+    <t-alert v-if="overview?.financial_status === 'local_fallback'" theme="warning"
+      :message="overview.financial_warning || '远端计费暂时不可用，当前显示本地账本余额。'" />
+    <t-alert v-if="partialWarning" theme="warning" :message="partialWarning" />
     <div v-else-if="loading && !overview" class="loading-state">正在读取套餐与用量…</div>
 
     <template v-if="overview">
@@ -185,6 +188,7 @@ const invoices = ref<any[]>([])
 const loading = ref(false)
 const actionLoading = ref('')
 const errorMessage = ref('')
+const partialWarning = ref('')
 const topUpAmounts = [1, 5, 10] as const
 const isOwner = computed(() => authStore.hasRole('owner') || authStore.canAccessAllTenants)
 const statusText = computed(() => {
@@ -198,26 +202,37 @@ const statusText = computed(() => {
 async function loadAll() {
   loading.value = true
   errorMessage.value = ''
+  partialWarning.value = ''
   try {
-    const [overviewResponse, usageResponse, jobsResponse] = await Promise.all([
-      getBillingOverview(),
-      getBillingUsage(),
-      getBillingUsageJobs(),
-    ])
+    const overviewResponse = await getBillingOverview()
     overview.value = overviewResponse.data
-    usage.value = usageResponse.data || []
-    jobs.value = jobsResponse.data || []
-    if (isOwner.value) {
-      const invoiceResponse = await getBillingInvoices()
-      invoices.value = invoiceResponse.data?.data || []
-    } else {
-      invoices.value = []
-    }
   } catch (error: any) {
     errorMessage.value = error?.message || '读取套餐与用量失败'
-  } finally {
     loading.value = false
+    return
   }
+
+  const [usageResult, jobsResult, invoiceResult] = await Promise.allSettled([
+    getBillingUsage(),
+    getBillingUsageJobs(),
+    isOwner.value ? getBillingInvoices() : Promise.resolve(null),
+  ])
+  const unavailable: string[] = []
+  if (usageResult.status === 'fulfilled') usage.value = usageResult.value.data || []
+  else { usage.value = []; unavailable.push('模型调用明细') }
+  if (jobsResult.status === 'fulfilled') jobs.value = jobsResult.value.data || []
+  else { jobs.value = []; unavailable.push('AI 作业记录') }
+  if (!isOwner.value) invoices.value = []
+  else if (invoiceResult.status === 'fulfilled' && invoiceResult.value) {
+    invoices.value = invoiceResult.value.data?.data || []
+  } else {
+    invoices.value = []
+    unavailable.push('账单')
+  }
+  if (unavailable.length) {
+    partialWarning.value = `${unavailable.join('、')}暂时不可用，套餐与余额仍可正常查看。`
+  }
+  loading.value = false
 }
 
 async function runAction(key: string, action: () => Promise<any>, success: string) {

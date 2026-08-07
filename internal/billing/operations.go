@@ -40,6 +40,8 @@ type BillingModeOverview struct {
 type Overview struct {
 	Enabled               bool                  `json:"enabled"`
 	Status                string                `json:"status"`
+	FinancialStatus       string                `json:"financial_status"`
+	FinancialWarning      string                `json:"financial_warning,omitempty"`
 	PlanKey               string                `json:"plan_key"`
 	PlanName              string                `json:"plan_name"`
 	TrialEndsAt           *time.Time            `json:"trial_ends_at,omitempty"`
@@ -66,7 +68,7 @@ func (s *Service) Overview(ctx context.Context, tenantID uint64, includeFinancia
 		return nil, billingError("billing_not_ready", "计费账户正在开通", http.StatusServiceUnavailable, "", nil)
 	}
 	result := &Overview{
-		Enabled: true, Status: account.Status, PlanKey: account.PlanKey,
+		Enabled: true, Status: account.Status, FinancialStatus: "not_requested", PlanKey: account.PlanKey,
 		PlanName:    map[string]string{PlanTrial: "Trial", PlanPro: "Pro"}[account.PlanKey],
 		TrialEndsAt: account.TrialEndsAt, PeriodStartedAt: account.PeriodStartedAt,
 		PeriodEndsAt: account.PeriodEndsAt, CancelScheduled: account.Status == "cancel_scheduled",
@@ -134,15 +136,22 @@ func (s *Service) Overview(ctx context.Context, tenantID uint64, includeFinancia
 		})
 	}
 	if includeFinancial {
-		balance, err := s.creditBalance(ctx, account.MeterForgeCustomerID)
-		if err != nil {
-			return nil, billingError("billing_unavailable", "计费服务暂时不可用", http.StatusServiceUnavailable, "", account.PeriodEndsAt)
-		}
 		localBalance, err := s.localAvailableCredit(ctx, tenantID, account.LocalCreditGranted)
 		if err != nil {
 			return nil, err
 		}
-		balance = math.Min(balance, localBalance)
+		balance := localBalance
+		remoteBalance, remoteErr := s.creditBalance(ctx, account.MeterForgeCustomerID)
+		if remoteErr != nil {
+			// The local reservation ledger remains authoritative enough for a
+			// read-only overview. Platform calls still fail closed in Reserve,
+			// while BYOK/local usage must not lose its billing page entirely.
+			result.FinancialStatus = "local_fallback"
+			result.FinancialWarning = "远端计费暂时不可用，当前显示本地账本余额；平台托管模型调用会保护性暂停，BYOK 与本地模型不受影响。"
+		} else {
+			result.FinancialStatus = "live"
+			balance = math.Min(remoteBalance, localBalance)
+		}
 		result.CreditBalanceUSD = &balance
 		result.AICredits.RemainingUSD = &balance
 	}

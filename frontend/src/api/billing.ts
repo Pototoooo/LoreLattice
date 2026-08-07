@@ -21,6 +21,8 @@ export interface BillingFeatureOverview {
 export interface BillingOverview {
   enabled: boolean
   status: string
+  financial_status: 'live' | 'local_fallback' | 'not_requested'
+  financial_warning?: string
   plan_key: 'lorelattice_trial' | 'lorelattice_pro' | ''
   plan_name: string
   trial_ends_at?: string

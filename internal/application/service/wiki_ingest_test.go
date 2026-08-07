@@ -329,20 +329,53 @@ func TestGenerateWithTemplateMasksImageURLsBeforeLLM(t *testing.T) {
 	if !strings.Contains(got, realURL) {
 		t.Fatalf("returned content does not contain restored real URL: %q", got)
 	}
+	if model.opts == nil || model.opts.MaxTokens != wikiLLMMaxTokens {
+		t.Fatalf("wiki call MaxTokens = %v, want %d", model.opts, wikiLLMMaxTokens)
+	}
+	if model.opts.Thinking == nil || *model.opts.Thinking {
+		t.Fatalf("wiki call must explicitly disable thinking, opts = %#v", model.opts)
+	}
+}
+
+func TestIncompleteWikiLLMResponse(t *testing.T) {
+	tests := []struct {
+		name     string
+		response *types.ChatResponse
+		wantErr  bool
+	}{
+		{name: "complete", response: &types.ChatResponse{Content: `{}`}, wantErr: false},
+		{name: "nil", response: nil, wantErr: true},
+		{name: "empty after reasoning", response: &types.ChatResponse{ReasoningContent: "thinking", FinishReason: "stop"}, wantErr: true},
+		{name: "truncated", response: &types.ChatResponse{Content: `{"entities": [`, FinishReason: "length"}, wantErr: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := incompleteWikiLLMResponse(tt.response)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("incompleteWikiLLMResponse() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }
 
 type templateCaptureChatModel struct {
 	prompt   string
 	response string
+	opts     *chat.ChatOptions
 }
 
 func (m *templateCaptureChatModel) Chat(
 	_ context.Context,
 	messages []chat.Message,
-	_ *chat.ChatOptions,
+	opts *chat.ChatOptions,
 ) (*types.ChatResponse, error) {
 	if len(messages) > 0 {
 		m.prompt = messages[0].Content
+	}
+	if opts != nil {
+		copied := *opts
+		m.opts = &copied
 	}
 	return &types.ChatResponse{Content: m.response}, nil
 }
