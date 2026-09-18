@@ -1,0 +1,1 @@
+{"ok":true,"data":{"retrieval_ready":true,"embedding":{"configured":true,"model_name":"text-embedding-v4","source":"remote","dimension":1024},"llm":{"configured":true,"model_name":"qwen3.7-plus","source":"remote"},"rerank":{"enabled":false},"multimodal":{"enabled":false}}}

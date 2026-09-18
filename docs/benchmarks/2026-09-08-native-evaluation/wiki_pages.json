@@ -1,0 +1,796 @@
+{
+  "pages": [
+    {
+      "id": "14052418-3c8a-42cb-92f5-49196ee8c4fc",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/linux",
+      "title": "Linux",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# Linux\n\nLinux is a popular, free, multi-tasking [[entity/unix|UNIX]]-like operating system widely used in computing environments. It is classified as a \"UNIX type\" operating system, meaning it adheres to the standards and behaviors established by UNIX, ensuring compatibility with many UNIX tools and methodologies. Like its predecessor, it is capable of running multiple applications and services concurrently.\n\nFor users seeking to install a non-Windows operating system on their personal computer for daily use, Linux is often the recommended choice. These systems provide a robust alternative to proprietary operating systems, offering stability, security, and a wide range of software support. Among the various options available, [[entity/ubuntu|Ubuntu]] and [[entity/linux-mint|Linux Mint]] stand out as the most popular distributions. The popularity of these distributions stems from their user-friendly interfaces and extensive community support, making them ideal candidates for those transitioning away from Windows.\n\nWhile Linux dominates the open-source desktop landscape, there are other notable open-source operating systems, such as [[entity/freebsd|FreeBSD]]. Although FreeBSD utilizes a different kernel compared to Linux, the user experience on a desktop PC is remarkably similar. This similarity arises because FreeBSD shares much of the same software ecosystem found in typical Linux distributions. Users familiar with Linux will find the transition to FreeBSD relatively smooth, as the applications and tools they rely on are largely compatible or have direct equivalents. [[entity/chrome-os|Chrome OS]] is also mentioned as an alternative operating system in the broader discussion of non-Windows platforms.",
+      "summary": "Linux is a popular, free, multi-tasking Unix-like operating system recommended for PC users seeking alternatives to Windows, with Ubuntu and Linux Mint being notable distributions.",
+      "aliases": [],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/Linux",
+      "depth": 2,
+      "source_refs": [
+        "d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0",
+        "ee9f60e3-062c-49cb-bad4-d8ccd3e8083c"
+      ],
+      "chunk_refs": [
+        "de4d8f59-f1aa-4b30-b550-3af5f6b476d0",
+        "8d80d166-f494-4478-bab7-85fca180df81"
+      ],
+      "in_links": [
+        "summary/ee9f60e3-062c-49cb-bad4-d8ccd3e8083c",
+        "concept/unix-like-operating-system",
+        "concept/open-source-operating-system",
+        "entity/ubuntu",
+        "entity/linux-mint",
+        "concept/multi-tasking-operating-system",
+        "entity/freebsd",
+        "concept/command-line-interface"
+      ],
+      "out_links": [
+        "entity/unix",
+        "entity/ubuntu",
+        "entity/linux-mint",
+        "entity/freebsd",
+        "entity/chrome-os"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:21.26532+08:00",
+      "updated_at": "2026-09-08T11:09:58.751737+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e55db4a1-be32-4187-91b6-dcd04c833533",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/unix",
+      "title": "UNIX",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# UNIX\n\nUNIX is a robust operating system designed to function across a wide variety of computer hardware architectures. It is fundamentally characterized as a [[concept/multi-tasking-operating-system|Multi-tasking Operating System]], allowing it to handle multiple processes simultaneously. Its primary interface for user interaction and system management is through a [[concept/command-line-interface|Command-line Interface]] (CLI), which provides powerful control over system resources and operations.\n\nThe unique architecture of UNIX allows it to serve dual roles in computing infrastructure. It operates effectively as a standalone, independent operating system for individual machines, while also possessing the capabilities of a [[concept/network-operating-system|Network Operating System]] (NOS). This dual nature enables it to manage network resources, facilitate communication between different systems, and support distributed computing environments. Due to this flexibility, UNIX is frequently referred to as a \"multi-purpose operating system.\"",
+      "summary": "UNIX is a multi-tasking, command-line operating system that functions as both an independent and network OS across various hardware architectures.",
+      "aliases": [],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/UNIX",
+      "depth": 2,
+      "source_refs": [
+        "ee9f60e3-062c-49cb-bad4-d8ccd3e8083c"
+      ],
+      "chunk_refs": [
+        "8d80d166-f494-4478-bab7-85fca180df81"
+      ],
+      "in_links": [
+        "summary/ee9f60e3-062c-49cb-bad4-d8ccd3e8083c",
+        "concept/network-operating-system",
+        "concept/multi-tasking-operating-system",
+        "entity/linux",
+        "concept/command-line-interface"
+      ],
+      "out_links": [
+        "concept/multi-tasking-operating-system",
+        "concept/command-line-interface",
+        "concept/network-operating-system"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:11.564749+08:00",
+      "updated_at": "2026-09-08T11:09:58.751199+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "d0b271e0-d1df-404d-ab02-7e5dec14f597",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/dos",
+      "title": "DOS",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# DOS\n\nDOS (Disk Operating System, 磁盘操作系统) is one of the first major operating systems for personal computers. It served as the primary software layer that managed hardware resources and provided a platform for running applications during the initial era of personal computing.\n\nUnlike modern graphical user interfaces, DOS operated on a text-based paradigm. When a computer running DOS was powered on, the screen displayed a command prompt, typically appearing as `c:\\>`, indicating the current drive and directory. This visual cue signaled that the system was ready to accept input.\n\n## User Interaction\n\nThe system relied entirely on a [[concept/command-line-interface|命令行界面]] (Command-Line Interface, or CLI). There were no menus to click or buttons to press. To perform any action, such as launching a program, navigating directories, or managing files, the user had to manually type specific instructions.\n\nFor example, to launch a word processing application, a user had to know the exact path and filename of the executable program. A typical command might look like `c:\\>wp\\wp.exe`, where:\n*   `c:\\>` is the prompt indicating readiness.\n*   `wp\\` specifies the subdirectory named \"wp\".\n*   `wp.exe` is the executable file name.\n\nThis requirement for precise syntax meant that users needed to memorize command structures and file paths. While this presented a steeper learning curve compared to later graphical systems, it offered a direct way to control the computer's operations.",
+      "summary": "DOS is an early personal computer operating system that uses a text-based command-line interface, requiring users to type commands at a prompt like c:\\> to manage files and run applications.",
+      "aliases": [
+        "磁盘操作系统",
+        "Disk Operating System"
+      ],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/DOS",
+      "depth": 2,
+      "source_refs": [
+        "9286e345-411e-42bf-8083-02c97dac28b2"
+      ],
+      "chunk_refs": [
+        "26937b6a-2bd4-4a8c-840a-fc2edd325cbe"
+      ],
+      "in_links": [
+        "concept/command-line-interface"
+      ],
+      "out_links": [
+        "concept/command-line-interface"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:08:54.051868+08:00",
+      "updated_at": "2026-09-08T11:09:58.750733+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "96d7ea7f-7482-4b19-930d-d0f91dfa4530",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "concept/command-line-interface",
+      "title": "命令行界面",
+      "page_type": "concept",
+      "status": "published",
+      "content": "# 命令行界面\n\n**命令行界面**（Command-Line Interface，简称 CLI）是一种基于文本的用户界面方法。在此环境中，用户通过在提示符下键入命令来执行程序和管理文件，而不是使用图形元素（如图标、窗口或鼠标交互）。\n\n## 核心特征\n\n*   **文本交互**：界面完全依赖文本输出和输入，没有可点击的菜单或按钮。\n*   **命令提示符**：系统通过命令提示符（例如 `c:\\>`）指示当前驱动器、目录以及准备接收输入的状态。\n*   **手动指令**：所有操作（如启动应用程序、导航目录或管理文件）都必须通过手动输入特定的指令来完成。\n*   **精确语法**：用户需要记忆命令结构和文件路径。例如，要启动字处理程序，用户需输入类似 `wp\\wp.exe` 的命令，其中指定了子目录和可执行文件名。\n\n## 应用背景\n\n命令行界面是早期个人计算机操作系统（如 [[entity/dos|DOS]]）的主要交互模式，也是 [[entity/unix|UNIX]] 和 [[entity/linux|Linux]] 等系统进行系统管理和资源控制的核心接口。虽然现代操作系统多采用图形用户界面（GUI），但命令行界面因其直接和强大的控制能力，在计算历史和高级系统管理中仍占据重要地位。",
+      "summary": "命令行界面是一种基于文本的用户交互方式，用户通过在提示符下输入特定命令来执行程序和管理文件，区别于图形用户界面。",
+      "aliases": [
+        "CLI"
+      ],
+      "folder_id": "7b22a03e-ef48-45a3-8af8-9cc9455407a9",
+      "category_path": [
+        "计算机概念",
+        "用户界面"
+      ],
+      "wiki_path": "concept/计算机概念/用户界面/命令行界面",
+      "depth": 2,
+      "source_refs": [
+        "9286e345-411e-42bf-8083-02c97dac28b2",
+        "ee9f60e3-062c-49cb-bad4-d8ccd3e8083c"
+      ],
+      "chunk_refs": [
+        "26937b6a-2bd4-4a8c-840a-fc2edd325cbe",
+        "8d80d166-f494-4478-bab7-85fca180df81"
+      ],
+      "in_links": [
+        "entity/unix"
+      ],
+      "out_links": [
+        "entity/dos",
+        "entity/unix",
+        "entity/linux"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:32.300186+08:00",
+      "updated_at": "2026-09-08T11:09:58.749909+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "07e0a893-d2f4-483b-b3e9-2e5867df6d8f",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/freebsd",
+      "title": "FreeBSD",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# FreeBSD\n\nFreeBSD is an open-source operating system. Although it utilizes a different kernel compared to [[entity/linux|Linux]], the user experience on a desktop PC is remarkably similar. This similarity arises because FreeBSD shares much of the same software ecosystem found in typical Linux distributions. Users familiar with Linux will find the transition to FreeBSD relatively smooth, as the applications and tools they rely on are largely compatible or have direct equivalents.",
+      "summary": "FreeBSD is an open-source operating system that uses a different kernel than Linux but shares much of the same software ecosystem, offering a similar desktop experience.",
+      "aliases": [],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/FreeBSD",
+      "depth": 2,
+      "source_refs": [
+        "d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0"
+      ],
+      "chunk_refs": [
+        "de4d8f59-f1aa-4b30-b550-3af5f6b476d0"
+      ],
+      "in_links": [
+        "concept/unix-like-operating-system",
+        "concept/open-source-operating-system",
+        "entity/linux"
+      ],
+      "out_links": [
+        "entity/linux"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:23.868812+08:00",
+      "updated_at": "2026-09-08T11:09:58.747635+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e8934982-e4de-40f5-b27f-b33036c90ae0",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/chrome-os",
+      "title": "Chrome OS",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# Chrome OS\n\nChrome OS (referred to as \"铬操作系统\" in some sources) is an operating system mentioned in the context of alternative PC operating systems. It is listed alongside other major non-Windows operating systems, indicating its relevance in the broader discussion of alternative computing platforms.",
+      "summary": "Chrome OS is an operating system mentioned as an alternative to Windows for personal computers, listed alongside Linux and FreeBSD in discussions of non-Windows computing platforms.",
+      "aliases": [
+        "铬操作系统"
+      ],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/Chrome OS",
+      "depth": 2,
+      "source_refs": [
+        "d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0"
+      ],
+      "chunk_refs": [
+        "de4d8f59-f1aa-4b30-b550-3af5f6b476d0"
+      ],
+      "in_links": [
+        "concept/open-source-operating-system",
+        "entity/linux"
+      ],
+      "out_links": null,
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:26.198088+08:00",
+      "updated_at": "2026-09-08T11:09:58.74713+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e9162105-356d-48b1-aa90-dcf3ed886d08",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/linux-mint",
+      "title": "Linux Mint",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# [[entity/linux|Linux]] Mint\n\nLinux Mint is a widely used Linux distribution cited as a top choice for personal computer installations. Along with [[entity/ubuntu|Ubuntu]], it is identified as one of the most popular distributions within the Linux ecosystem.\n\nThese systems provide a robust alternative to proprietary operating systems, offering stability, security, and a wide range of software support. Their popularity stems from user-friendly interfaces and extensive community support, making them ideal candidates for those transitioning away from Windows.",
+      "summary": "Linux Mint is a popular Linux distribution recommended for personal computers as a user-friendly, stable, and secure alternative to proprietary operating systems.",
+      "aliases": [
+        "Mint"
+      ],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/Linux Mint",
+      "depth": 2,
+      "source_refs": [
+        "d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0"
+      ],
+      "chunk_refs": [
+        "de4d8f59-f1aa-4b30-b550-3af5f6b476d0"
+      ],
+      "in_links": [
+        "summary/d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0",
+        "concept/open-source-operating-system",
+        "entity/ubuntu",
+        "entity/linux"
+      ],
+      "out_links": [
+        "entity/linux",
+        "entity/ubuntu"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:08:44.311364+08:00",
+      "updated_at": "2026-09-08T11:09:58.746107+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "27fea669-9bb5-4d41-ada2-e6985abe71dd",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/ubuntu",
+      "title": "Ubuntu",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# Ubuntu\n\nUbuntu is a popular [[entity/linux|Linux]] distribution. It is recommended for users seeking to install a non-Windows operating system on their personal computer for daily use. Along with [[entity/linux-mint|Linux Mint]], it stands out as one of the most popular choices within the Linux ecosystem.",
+      "summary": "Ubuntu is a popular Linux distribution recommended for users seeking a non-Windows operating system for daily use on personal computers.",
+      "aliases": [],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/Ubuntu",
+      "depth": 2,
+      "source_refs": [
+        "d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0"
+      ],
+      "chunk_refs": [
+        "de4d8f59-f1aa-4b30-b550-3af5f6b476d0"
+      ],
+      "in_links": [
+        "summary/d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0",
+        "concept/open-source-operating-system",
+        "entity/linux-mint",
+        "entity/linux"
+      ],
+      "out_links": [
+        "entity/linux",
+        "entity/linux-mint"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:08:41.454444+08:00",
+      "updated_at": "2026-09-08T11:09:58.745619+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "aff59c6d-dac0-4140-8ed5-770ea622f1f2",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "concept/multi-tasking-operating-system",
+      "title": "Multi-tasking Operating System",
+      "page_type": "concept",
+      "status": "published",
+      "content": "# Multi-tasking Operating System\n\n**Multi-tasking Operating System**: An operating system capability allowing multiple tasks or processes to be executed concurrently on a computer.\n\n[[entity/unix|UNIX]] is a multi-tasking command-line operating system implemented on many different types of computers. Because it functions as both an independent operating system and a network operating system, UNIX is sometimes referred to as a multi-purpose operating system. [[entity/linux|Linux]] is a popular, free, multi-tasking UNIX-type operating system.",
+      "summary": "A multi-tasking operating system enables the concurrent execution of multiple processes or tasks, a capability found in systems like UNIX and Linux.",
+      "aliases": [],
+      "folder_id": "9cc538f4-65ef-4aca-826f-2f560d547960",
+      "category_path": [
+        "计算机概念",
+        "操作系统特性"
+      ],
+      "wiki_path": "concept/计算机概念/操作系统特性/Multi-tasking Operating System",
+      "depth": 2,
+      "source_refs": [
+        "ee9f60e3-062c-49cb-bad4-d8ccd3e8083c"
+      ],
+      "chunk_refs": [
+        "8d80d166-f494-4478-bab7-85fca180df81"
+      ],
+      "in_links": [
+        "summary/ee9f60e3-062c-49cb-bad4-d8ccd3e8083c",
+        "entity/unix"
+      ],
+      "out_links": [
+        "entity/unix",
+        "entity/linux"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:14.806947+08:00",
+      "updated_at": "2026-09-08T11:09:58.740632+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "67c38541-9a82-41ea-9b25-3af8391adcd9",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "concept/network-operating-system",
+      "title": "Network Operating System",
+      "page_type": "concept",
+      "status": "published",
+      "content": "# Network Operating System\n\nA Network Operating System is an operating system designed to support workstations, personal computers, and older terminals connected on a local area network.\n\n[[entity/unix|UNIX]] is a multi-tasking command-line operating system implemented on many different types of computers. Because it functions as both an independent operating system and a network operating system, UNIX is referred to as a multi-purpose operating system.",
+      "summary": "A Network Operating System supports workstations, personal computers, and terminals on a local area network. UNIX is cited as an example that functions as both an independent and network operating system.",
+      "aliases": [
+        "NOS"
+      ],
+      "folder_id": "f3aae82c-aeba-495a-baf2-60e5436de193",
+      "category_path": [
+        "计算机概念",
+        "操作系统类型"
+      ],
+      "wiki_path": "concept/计算机概念/操作系统类型/Network Operating System",
+      "depth": 2,
+      "source_refs": [
+        "ee9f60e3-062c-49cb-bad4-d8ccd3e8083c"
+      ],
+      "chunk_refs": [
+        "8d80d166-f494-4478-bab7-85fca180df81"
+      ],
+      "in_links": [
+        "summary/ee9f60e3-062c-49cb-bad4-d8ccd3e8083c",
+        "entity/unix"
+      ],
+      "out_links": [
+        "entity/unix"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:08:47.153704+08:00",
+      "updated_at": "2026-09-08T11:09:58.740025+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "a7eb3319-bfb1-4d31-b1a9-06d05f757582",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "concept/graphical-user-interface",
+      "title": "Graphical User Interface",
+      "page_type": "concept",
+      "status": "published",
+      "content": "# Graphical User Interface\n\nA Graphical User Interface (GUI) is a visual way for users to interact with electronic devices using windows, icons, and menus instead of text-based commands. Unlike command-line interfaces that require users to type text-based commands, the GUI allows users to interact through graphical icons and visual indicators. This approach significantly lowers the barrier to entry for new users and enhances productivity for experienced users by making interactions more intuitive.\n\nThe interface utilizes several key visual metaphors:\n\n*   **Windows**: Rectangular areas on the screen that display the content of applications or files.\n*   **Icons**: Small pictures that represent files, folders, applications, or other objects.",
+      "summary": "A visual interface allowing users to interact with electronic devices through graphical icons and visual indicators, contrasting with text-based command-line systems.",
+      "aliases": [
+        "GUI"
+      ],
+      "folder_id": "7b22a03e-ef48-45a3-8af8-9cc9455407a9",
+      "category_path": [
+        "计算机概念",
+        "用户界面"
+      ],
+      "wiki_path": "concept/计算机概念/用户界面/Graphical User Interface",
+      "depth": 2,
+      "source_refs": [
+        "95bc02d7-d130-4725-8e15-97455995ba58"
+      ],
+      "chunk_refs": [
+        "fa42ce75-8712-4904-822e-68d9d9fbd93d"
+      ],
+      "in_links": [
+        "entity/mac-os",
+        "entity/macintosh"
+      ],
+      "out_links": null,
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:35.971657+08:00",
+      "updated_at": "2026-09-08T11:09:58.736395+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "0cb34743-1270-4d7e-b1f4-6bc45899ebd0",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/mac-os",
+      "title": "Mac OS",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# Mac OS\n\nMac OS is the formal designation for the operating system developed by [[entity/apple|Apple]] specifically for its line of personal computers. As the core software platform for these machines, it manages hardware resources and provides essential services for computer programs. The system is intrinsically linked to the [[entity/macintosh|Macintosh]] hardware ecosystem, often referred to simply as Mac, ensuring a cohesive experience between the physical device and the software environment.\n\n## User Interface Design\n\nA defining characteristic of Mac OS is its reliance on a [[concept/graphical-user-interface|Graphical User Interface]] (GUI). Unlike command-line interfaces that require users to type text-based commands, the GUI allows users to interact with electronic devices through graphical icons and visual indicators. This approach significantly lowers the barrier to entry for new users and enhances productivity for experienced users by making interactions more intuitive.\n\nThe interface utilizes several key visual metaphors:\n\n*   **Windows**: Rectangular areas on the screen that display the content of applications or files.\n*   **Icons**: Small pictures that represent files, folders, applications, or other objects.\n*   **Consistency**: One of the most notable features of the Graphical User Interface in Mac OS is the uniformity across the platform. All applications running on Macintosh computers share a similar look and feel. This consistency means that once a user learns how to interact with one application, they can easily transfer those skills to other software within the ecosystem.\n\n## Integration with Macintosh Hardware\n\nThe operating system is designed exclusively for Macintosh computers. This tight integration between Mac OS and the underlying hardware allows for optimized performance and stability. By controlling both the hardware and the software, Apple ensures that the Graphical User Interface elements, such as windows and icons, render smoothly and respond quickly to user inputs.\n\nThe standardization of the user interface across all applications on the Macintosh platform reinforces the brand identity and user experience. Whether a user is editing documents, browsing the web, or creating graphics, the fundamental interaction models remain consistent, reducing the learning curve associated with adopting new software tools.",
+      "summary": "Mac OS is the official operating system for Apple Macintosh computers, featuring a graphical user interface with consistent visual elements across all applications.",
+      "aliases": [
+        "Mac 操作系统",
+        "Apple Macintosh 操作系统"
+      ],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/Mac OS",
+      "depth": 2,
+      "source_refs": [
+        "95bc02d7-d130-4725-8e15-97455995ba58"
+      ],
+      "chunk_refs": [
+        "fa42ce75-8712-4904-822e-68d9d9fbd93d"
+      ],
+      "in_links": [
+        "summary/95bc02d7-d130-4725-8e15-97455995ba58",
+        "entity/apple",
+        "entity/macintosh"
+      ],
+      "out_links": [
+        "entity/apple",
+        "entity/macintosh",
+        "concept/graphical-user-interface"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:02.241838+08:00",
+      "updated_at": "2026-09-08T11:09:58.735899+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "d7c2f793-b687-4086-ad26-eb545f2f3c44",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/apple",
+      "title": "Apple",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# Apple\n\nApple is the technology company that develops and owns the [[entity/macintosh|Macintosh]] computer line and its associated [[entity/mac-os|Mac OS]] operating system.\n\nMac OS 是 Apple Macintosh 操作系统的正式名称。 Mac OS 具有图形用户界面 (GUI)，该界面利用窗口、图标和运行在 Macintosh 计算机上的所有应用程序都具有类似的用户界面。",
+      "summary": "Apple is the technology company that develops and owns the Macintosh computer line and its associated Mac OS operating system.",
+      "aliases": [],
+      "folder_id": "80a60aa9-8e6e-4b3e-8926-3b5e35224847",
+      "category_path": [
+        "科技公司"
+      ],
+      "wiki_path": "entity/科技公司/Apple",
+      "depth": 1,
+      "source_refs": [
+        "95bc02d7-d130-4725-8e15-97455995ba58"
+      ],
+      "chunk_refs": [
+        "fa42ce75-8712-4904-822e-68d9d9fbd93d"
+      ],
+      "in_links": [
+        "summary/95bc02d7-d130-4725-8e15-97455995ba58",
+        "entity/mac-os",
+        "entity/macintosh"
+      ],
+      "out_links": [
+        "entity/macintosh",
+        "entity/mac-os"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:04.49854+08:00",
+      "updated_at": "2026-09-08T11:09:58.735194+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "c4484edb-c3e6-4aae-9ce7-c356a53c09d6",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/macintosh",
+      "title": "Macintosh",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# Macintosh\n\nMacintosh is a line of personal computers designed and sold by [[entity/apple|Apple]], which serves as the hardware platform for the [[entity/mac-os|Mac OS]] operating system.\n\nMac OS is the formal designation for the operating system developed by Apple specifically for Macintosh computers. The system features a [[concept/graphical-user-interface|Graphical User Interface]] (GUI) that relies on visual elements like windows and icons. A key design principle is the consistent user interface across all applications running on Macintosh hardware, ensuring that all applications share a similar look and feel.",
+      "summary": "Macintosh is a line of personal computers designed and sold by Apple, serving as the hardware platform for the Mac OS operating system with a consistent graphical user interface.",
+      "aliases": [
+        "Mac"
+      ],
+      "folder_id": "e06c9bca-f168-4587-8e36-cafe75306065",
+      "category_path": [
+        "硬件产品"
+      ],
+      "wiki_path": "entity/硬件产品/Macintosh",
+      "depth": 1,
+      "source_refs": [
+        "95bc02d7-d130-4725-8e15-97455995ba58"
+      ],
+      "chunk_refs": [
+        "fa42ce75-8712-4904-822e-68d9d9fbd93d"
+      ],
+      "in_links": [
+        "summary/95bc02d7-d130-4725-8e15-97455995ba58",
+        "entity/mac-os",
+        "entity/apple"
+      ],
+      "out_links": [
+        "entity/apple",
+        "entity/mac-os",
+        "concept/graphical-user-interface"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:07.403654+08:00",
+      "updated_at": "2026-09-08T11:09:58.733984+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "2318d6b4-2487-4f87-a445-810ff68cd13e",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "concept/unix-like-operating-system",
+      "title": "Unix-like operating system",
+      "page_type": "concept",
+      "status": "published",
+      "content": "# Unix-like operating system\n\nA Unix-like operating system is a category of operating systems that behave similarly to Unix, including [[entity/linux|Linux]] and [[entity/freebsd|FreeBSD]].\n\nLinux is a Unix-like operating system. Other open-source operating systems include FreeBSD. FreeBSD uses a different kernel, but it uses most of the same software found in typical Linux distributions. The experience of using FreeBSD on a desktop PC is very similar to that of Linux.",
+      "summary": "A Unix-like operating system is a category of systems behaving similarly to Unix, including Linux and FreeBSD, which share similar software ecosystems despite kernel differences.",
+      "aliases": [
+        "类 Unix 操作系统"
+      ],
+      "folder_id": "f3aae82c-aeba-495a-baf2-60e5436de193",
+      "category_path": [
+        "计算机概念",
+        "操作系统类型"
+      ],
+      "wiki_path": "concept/计算机概念/操作系统类型/Unix-like operating system",
+      "depth": 2,
+      "source_refs": [
+        "d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0"
+      ],
+      "chunk_refs": [
+        "de4d8f59-f1aa-4b30-b550-3af5f6b476d0"
+      ],
+      "in_links": [
+        "summary/d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0",
+        "concept/open-source-operating-system"
+      ],
+      "out_links": [
+        "entity/linux",
+        "entity/freebsd"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:08:35.389586+08:00",
+      "updated_at": "2026-09-08T11:09:58.714094+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "0e810968-b8ff-4aaa-9ac1-10c72978073a",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "concept/open-source-operating-system",
+      "title": "Open-source operating system",
+      "page_type": "concept",
+      "status": "published",
+      "content": "# Open-source operating system\n\nOpen-source operating systems are software platforms whose source code is publicly accessible.\n\n*   **[[entity/linux|Linux]]**: A [[concept/unix-like-operating-system|Unix-like operating system]] often recommended for users seeking a non-Windows OS for daily PC use. [[entity/ubuntu|Ubuntu]] and [[entity/linux-mint|Linux Mint]] are the most popular distributions within this ecosystem.\n*   **[[entity/freebsd|FreeBSD]]**: An open-source operating system that uses a different kernel compared to Linux. However, it shares much of the same software ecosystem, resulting in a desktop experience very similar to typical Linux distributions.\n*   **[[entity/chrome-os|Chrome OS]]**: Also mentioned as an alternative operating system in the broader landscape of non-Windows platforms.",
+      "summary": "This page defines open-source operating systems as platforms with publicly accessible source code, highlighting Linux distributions like Ubuntu and Mint, as well as FreeBSD.",
+      "aliases": [
+        "开源操作系统"
+      ],
+      "folder_id": "f3aae82c-aeba-495a-baf2-60e5436de193",
+      "category_path": [
+        "计算机概念",
+        "操作系统类型"
+      ],
+      "wiki_path": "concept/计算机概念/操作系统类型/Open-source operating system",
+      "depth": 2,
+      "source_refs": [
+        "d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0"
+      ],
+      "chunk_refs": [
+        "de4d8f59-f1aa-4b30-b550-3af5f6b476d0"
+      ],
+      "in_links": [
+        "summary/d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0"
+      ],
+      "out_links": [
+        "entity/linux",
+        "concept/unix-like-operating-system",
+        "entity/ubuntu",
+        "entity/linux-mint",
+        "entity/freebsd",
+        "entity/chrome-os"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:08:39.220608+08:00",
+      "updated_at": "2026-09-08T11:09:58.710724+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "d48d03c5-352d-4ded-ad90-39e36880565a",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "index",
+      "title": "Index",
+      "page_type": "index",
+      "status": "published",
+      "content": "# Wiki 索引\n\n本页面为自动更新的索引页，随新文档的添加而动态同步。近期新增内容涵盖了 DOS、Mac OS、UNIX 及 Linux 等主流操作系统的概述与对比，显著丰富了本站在计算平台领域的知识范围。",
+      "summary": "# Wiki 索引\n\n本页面为自动更新的索引页，随新文档的添加而动态同步。近期新增内容涵盖了 DOS、Mac OS、UNIX 及 Linux 等主流操作系统的概述与对比，显著丰富了本站在计算平台领域的知识范围。",
+      "aliases": null,
+      "wiki_path": "index/Index",
+      "source_refs": null,
+      "chunk_refs": null,
+      "in_links": null,
+      "out_links": null,
+      "page_metadata": null,
+      "version": 2,
+      "created_at": "2026-09-08T11:09:56.8062+08:00",
+      "updated_at": "2026-09-08T11:09:58.684172+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "5e8a0dec-1cb5-47c5-8cf2-15bf167531f6",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "summary/95bc02d7-d130-4725-8e15-97455995ba58",
+      "title": "native-passage-1 - Summary",
+      "page_type": "summary",
+      "status": "published",
+      "content": "## Overview of Mac OS\n\n[[entity/mac-os|Mac OS]] serves as the formal designation for the operating system developed by [[entity/apple|Apple]] specifically for its line of personal computers. As the core software platform for these machines, it manages hardware resources and provides essential services for computer programs. The system is intrinsically linked to the [[entity/macintosh|Macintosh]] hardware ecosystem, often referred to simply as Mac, ensuring a cohesive experience between the physical device and the software environment.\n\n## User Interface Design\n\nA defining characteristic of [[entity/mac-os|Mac OS]] is its reliance on a [[concept/graphical-user-interface|Graphical User Interface]] (GUI). Unlike command-line interfaces that require users to type text-based commands, the GUI allows users to interact with electronic devices through graphical icons and visual indicators. This approach significantly lowers the barrier to entry for new users and enhances productivity for experienced users by making interactions more intuitive.\n\nThe interface utilizes several key visual metaphors:\n\n*   **Windows**: Rectangular areas on the screen that display the content of applications or files.\n*   **Icons**: Small pictures that represent files, folders, applications, or other objects.\n*   **Consistency**: One of the most notable features of the [[concept/graphical-user-interface|Graphical User Interface]] in [[entity/mac-os|Mac OS]] is the uniformity across the platform. All applications running on [[entity/macintosh|Macintosh]] computers share a similar look and feel. This consistency means that once a user learns how to interact with one application, they can easily transfer those skills to other software within the ecosystem.\n\n## Integration with Macintosh Hardware\n\nThe operating system is designed exclusively for [[entity/macintosh|Macintosh]] computers. This tight integration between [[entity/mac-os|Mac OS]] and the underlying hardware allows for optimized performance and stability. By controlling both the hardware and the software, [[entity/apple|Apple]] ensures that the [[concept/graphical-user-interface|Graphical User Interface]] elements, such as windows and icons, render smoothly and respond quickly to user inputs.\n\nThe standardization of the user interface across all applications on the [[entity/macintosh|Macintosh]] platform reinforces the brand identity and user experience. Whether a user is editing documents, browsing the web, or creating graphics, the fundamental interaction models remain consistent, reducing the learning curve associated with adopting new software tools.\n\n## Key Takeaways\n\n*   [[entity/mac-os|Mac OS]] is the official name of the operating system for [[entity/macintosh|Macintosh]] computers produced by [[entity/apple|Apple]].\n*   The system features a [[concept/graphical-user-interface|Graphical User Interface]] (GUI) that relies on visual elements like windows and icons.\n*   A key design principle is the consistent user interface across all applications running on [[entity/macintosh|Macintosh]] hardware.\n*   The integration of [[entity/mac-os|Mac OS]] with [[entity/macintosh|Macintosh]] computers ensures a unified and intuitive user experience.",
+      "summary": "This document outlines Mac OS, the official operating system for Apple Macintosh computers, highlighting its graphical user interface and consistent application design.",
+      "aliases": [],
+      "wiki_path": "summary/native-passage-1 - Summary",
+      "source_refs": [
+        "95bc02d7-d130-4725-8e15-97455995ba58"
+      ],
+      "chunk_refs": [],
+      "in_links": null,
+      "out_links": [
+        "entity/mac-os",
+        "entity/apple",
+        "entity/macintosh",
+        "concept/graphical-user-interface"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:32.310072+08:00",
+      "updated_at": "2026-09-08T11:09:36.005659+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "4b004639-9eaa-4a2f-9260-61a56464dd91",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "summary/ee9f60e3-062c-49cb-bad4-d8ccd3e8083c",
+      "title": "native-passage-2 - Summary",
+      "page_type": "summary",
+      "status": "published",
+      "content": "## Overview of UNIX Operating System\n\n[[entity/unix|UNIX]] is a robust operating system designed to function across a wide variety of computer hardware architectures. It is fundamentally characterized as a [[concept/multi-tasking-operating-system|Multi-tasking Operating System]], allowing it to handle multiple processes simultaneously. Furthermore, its primary interface for user interaction and system management is through a [[concept/command-line-interface|Command-line Interface]] (also known as CLI), which provides powerful control over system resources and operations.\n\n### Versatility and Classification\n\nThe unique architecture of [[entity/unix|UNIX]] allows it to serve dual roles in computing infrastructure. It operates effectively as a standalone, independent operating system for individual machines, while also possessing the capabilities of a [[concept/network-operating-system|Network Operating System]] (NOS). This dual nature enables it to manage network resources, facilitate communication between different systems, and support distributed computing environments.\n\nDue to this flexibility and its ability to function both independently and within networked structures, [[entity/unix|UNIX]] is frequently referred to as a \"multi-purpose operating system.\" This designation highlights its adaptability to different computational needs, ranging from single-user workstations to complex server environments requiring extensive network management.\n\n## Introduction to Linux\n\n[[entity/linux|Linux]] is identified as a prominent variant within the broader family of UNIX-like systems. It shares the core architectural principles of [[entity/unix|UNIX]], including its multi-tasking capabilities and general operational philosophy. However, [[entity/linux|Linux]] distinguishes itself through its accessibility and distribution model.\n\n### Key Characteristics of Linux\n\n*   **Popularity**: [[entity/linux|Linux]] has gained widespread adoption across various sectors, including personal computing, enterprise servers, and embedded systems.\n*   **Cost**: It is described as a \"free\" operating system, implying that it is typically available without licensing fees, often associated with open-source development models.\n*   **Functionality**: Like its predecessor, it is a [[concept/multi-tasking-operating-system|Multi-tasking Operating System]], capable of running multiple applications and services concurrently.\n*   **Classification**: It is explicitly categorized as a \"UNIX type\" operating system, meaning it adheres to the standards and behaviors established by [[entity/unix|UNIX]], ensuring compatibility with many UNIX tools and methodologies.\n\n## Comparative Context\n\nWhile [[entity/unix|UNIX]] represents the foundational standard for multi-tasking, command-line driven, and network-capable operating systems, [[entity/linux|Linux]] serves as a highly accessible and popular implementation of these concepts. The relationship between the two underscores the evolution of operating system technology, where the robust features of [[entity/unix|UNIX]]—such as its status as a [[concept/network-operating-system|Network Operating System]] and its reliance on a [[concept/command-line-interface|Command-line Interface]]—have been preserved and extended in the [[entity/linux|Linux]] ecosystem.\n\nBoth systems rely on the efficiency of text-based commands via the [[concept/command-line-interface|CLI]] for advanced system administration, although modern distributions of [[entity/linux|Linux]] often include graphical interfaces for ease of use. Despite these user interface enhancements, the underlying multi-tasking kernel and network capabilities remain central to their operation.\n\n## Key Takeaways\n\n*   [[entity/unix|UNIX]] is a multi-tasking operating system that operates via a [[concept/command-line-interface|Command-line Interface]].\n*   [[entity/unix|UNIX]] functions as both an independent operating system and a [[concept/network-operating-system|Network Operating System]], earning it the title of a multi-purpose OS.\n*   [[entity/linux|Linux]] is a popular and free operating system that is classified as a UNIX-type system.\n*   Both [[entity/unix|UNIX]] and [[entity/linux|Linux]] support multi-tasking, allowing for efficient handling of multiple processes.\n*   The versatility of [[entity/unix|UNIX]] allows it to be implemented on many different types of computer hardware.",
+      "summary": "This document defines UNIX as a versatile multi-tasking command-line and network operating system, while introducing Linux as a popular, free UNIX-type alternative for various computing environments.",
+      "aliases": [],
+      "wiki_path": "summary/native-passage-2 - Summary",
+      "source_refs": [
+        "ee9f60e3-062c-49cb-bad4-d8ccd3e8083c"
+      ],
+      "chunk_refs": [],
+      "in_links": null,
+      "out_links": [
+        "entity/unix",
+        "concept/multi-tasking-operating-system",
+        "concept/command-line-interface",
+        "concept/network-operating-system",
+        "entity/linux"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:26.206592+08:00",
+      "updated_at": "2026-09-08T11:09:36.003844+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "3a7c3beb-0e8d-4c73-a8d4-a890102e5bb2",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "summary/d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0",
+      "title": "native-passage-3 - Summary",
+      "page_type": "summary",
+      "status": "published",
+      "content": "## Overview of Non-Windows Operating Systems\n\nFor users seeking to install a non-Windows operating system on their personal computer for daily use, [[entity/linux|Linux]] is often the recommended choice. Among the various options available, [[entity/ubuntu|Ubuntu]] and [[entity/linux-mint|Linux Mint]] stand out as the most popular distributions. These systems provide a robust alternative to proprietary operating systems, offering stability, security, and a wide range of software support.\n\n## Linux and Unix-like Systems\n\n[[entity/linux|Linux]] is classified as a [[concept/unix-like-operating-system|Unix-like operating system]]. It serves as the foundation for numerous distributions that cater to different user needs, from beginners to advanced developers. The popularity of [[entity/ubuntu|Ubuntu]] and [[entity/linux-mint|Linux Mint]] stems from their user-friendly interfaces and extensive community support, making them ideal candidates for those transitioning away from Windows.\n\n## FreeBSD: A Close Alternative\n\nWhile [[entity/linux|Linux]] dominates the open-source desktop landscape, there are other notable [[concept/open-source-operating-system|open-source operating systems]], such as [[entity/freebsd|FreeBSD]]. Although [[entity/freebsd|FreeBSD]] utilizes a different kernel compared to [[entity/linux|Linux]], the user experience on a desktop PC is remarkably similar. This similarity arises because [[entity/freebsd|FreeBSD]] shares much of the same software ecosystem found in typical [[entity/linux|Linux]] distributions. Users familiar with [[entity/linux|Linux]] will find the transition to [[entity/freebsd|FreeBSD]] relatively smooth, as the applications and tools they rely on are largely compatible or have direct equivalents.\n\n## Other Mentions\n\nThe document also briefly references [[entity/chrome-os|Chrome OS]] (referred to as \"铬操作系统\" in the source text). While less detail is provided regarding its specific features in this context, it is listed alongside other major non-Windows operating systems, indicating its relevance in the broader discussion of alternative computing platforms.\n\n## Key Takeaways\n\n*   **Recommended Choice**: [[entity/linux|Linux]] is suggested for users wanting a practical non-Windows OS for their PC.\n*   **Popular Distributions**: [[entity/ubuntu|Ubuntu]] and [[entity/linux-mint|Linux Mint]] are identified as the most popular choices within the [[entity/linux|Linux]] ecosystem.\n*   **System Classification**: [[entity/linux|Linux]] is a [[concept/unix-like-operating-system|Unix-like operating system]].\n*   **FreeBSD Similarity**: [[entity/freebsd|FreeBSD]] uses a different kernel but offers a desktop experience very similar to [[entity/linux|Linux]] due to shared software availability.\n*   **Open Source Landscape**: Both [[entity/linux|Linux]] and [[entity/freebsd|FreeBSD]] are part of the broader category of [[concept/open-source-operating-system|open-source operating systems]].\n*   **Other Options**: [[entity/chrome-os|Chrome OS]] is also mentioned as an alternative operating system.",
+      "summary": "This document compares popular non-Windows operating systems, highlighting Linux distributions like Ubuntu and Mint, and noting the similarities between FreeBSD and Linux despite kernel differences.",
+      "aliases": [],
+      "wiki_path": "summary/native-passage-3 - Summary",
+      "source_refs": [
+        "d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0"
+      ],
+      "chunk_refs": [],
+      "in_links": null,
+      "out_links": [
+        "entity/linux",
+        "entity/ubuntu",
+        "entity/linux-mint",
+        "concept/unix-like-operating-system",
+        "concept/open-source-operating-system",
+        "entity/freebsd",
+        "entity/chrome-os"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:14.81713+08:00",
+      "updated_at": "2026-09-08T11:09:35.999752+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "bbe1f069-7bd2-4b02-b5de-1eb5b2cfecca",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "summary/9286e345-411e-42bf-8083-02c97dac28b2",
+      "title": "native-passage-4 - Summary",
+      "page_type": "summary",
+      "status": "published",
+      "content": "## Overview of DOS\n\n[[entity/dos|DOS]], also known as the Disk Operating System, represents one of the foundational operating systems developed for early personal computers. It served as the primary software layer that managed hardware resources and provided a platform for running applications during the initial era of personal computing. Unlike modern graphical user interfaces that rely on icons, windows, and mouse interactions, [[entity/dos|DOS]] operated on a fundamentally different paradigm that required direct textual interaction from the user.\n\n### The User Experience\n\nWhen a computer running [[entity/dos|DOS]] was powered on, the user was not greeted with a visual desktop environment. Instead, the screen displayed a stark, text-based interface known as a command prompt. This prompt typically appeared as `c:\\>`, indicating the current drive (C:) and directory (the root directory, represented by the backslash). This visual cue signaled that the system was ready to accept input from the user.\n\nThe experience was purely textual. There were no menus to click or buttons to press. To perform any action, such as launching a program, navigating directories, or managing files, the user had to manually type specific instructions. This method of interaction defines the core usability model of the system.\n\n### Command-Line Interface\n\nThe interaction model described above is technically referred to as a [[concept/command-line-interface|命令行界面]] (Command-Line Interface, or CLI). In this environment, every operation must be explicitly stated through text commands entered at the prompt. \n\nFor example, to launch a word processing application, a user could not simply double-click an icon. Instead, they had to know the exact path and filename of the executable program. A typical command might look like `c:\\>wp\\wp.exe`. In this instance:\n*   `c:\\>` is the prompt indicating readiness.\n*   `wp\\` specifies the subdirectory named \"wp\".\n*   `wp.exe` is the executable file name.\n\nThis requirement for precise syntax meant that users needed to memorize command structures and file paths. While this presented a steeper learning curve compared to later graphical systems, it offered a direct and powerful way to control the computer's operations. The [[concept/command-line-interface|命令行界面]] remains a critical concept in computing history, illustrating the evolution from text-based control to the visual metaphors used in contemporary operating systems.\n\n## Key Takeaways\n\n*   **Historical Significance**: [[entity/dos|DOS]] was one of the first major operating systems for personal computers, establishing early standards for PC software interaction.\n*   **Text-Based Interaction**: The system did not use a graphical user interface; instead, it relied entirely on text output and input.\n*   **Command Prompt**: Users interacted with the system via a command prompt (e.g., `c:\\>`), which indicated the current working directory and readiness for input.\n*   **Manual Command Entry**: All tasks, including launching applications, required typing specific commands and file paths, such as `wp\\wp.exe`.\n*   **CLI Definition**: This mode of operation is defined as a [[concept/command-line-interface|命令行界面]], distinguishing it from modern Graphical User Interfaces (GUIs).",
+      "summary": "This document provides a brief overview of DOS, an early personal computer operating system characterized by its command-line interface where users interact via text commands at a prompt.",
+      "aliases": [],
+      "wiki_path": "summary/native-passage-4 - Summary",
+      "source_refs": [
+        "9286e345-411e-42bf-8083-02c97dac28b2"
+      ],
+      "chunk_refs": [],
+      "in_links": null,
+      "out_links": [
+        "entity/dos",
+        "concept/command-line-interface"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:08:39.236051+08:00",
+      "updated_at": "2026-09-08T11:09:35.987466+08:00",
+      "deleted_at": null
+    }
+  ],
+  "total": 21,
+  "page": 1,
+  "page_size": 200,
+  "total_pages": 1
+}

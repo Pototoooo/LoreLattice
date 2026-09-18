@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/workspace/benchmarks/scripts/generate_regression_fixtures.py", line 88, in <module>
+    paths = (create_docx(), *create_presentations())
+  File "/workspace/benchmarks/scripts/generate_regression_fixtures.py", line 79, in create_presentations
+    raise RuntimeError(
+RuntimeError: LibreOffice conversion failed: exit=0 stdout='convert /workspace/testdata/rag_test/pptx/en_marker.pptx -> /workspace/testdata/rag_test/ppt_old/en_marker.ppt using filter : MS PowerPoint 97\n' stderr=''

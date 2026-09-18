@@ -1,0 +1,13 @@
+group,metric,value,unit,scope
+retrieval,hybrid_hit_at_8,0.9916666666666667,rate,"120 queries, top8"
+retrieval,hybrid_mrr_at_8,0.93125,rate,"120 queries, top8"
+retrieval,keyword_hit_at_8,1,rate,"120 queries, top8"
+answer,adjudicated_exact_pass,0.9833333333333333,rate,"Codex review, 120 queries"
+answer,relevant_citation,1.0,rate,controlled final set
+answer,all_declared_sources_cited,0.9583333333333334,rate,controlled final set
+agent,repeat_expected_fact,1.0,rate,20 sequential repetitions
+agent,repeat_duplicate_free,1.0,rate,20 sequential repetitions
+agent,unknown_grounded_refusal,1.0,rate,5 unknown queries
+performance,api_completed_requests,6134,count,10/100/300 target RPS
+performance,api_p95_ms,6.418149999999993,ms,local authenticated read
+performance,frontend_static_p95_ms,5.094,ms,local static shell

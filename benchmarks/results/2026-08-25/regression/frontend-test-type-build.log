@@ -1,0 +1,460 @@
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm-run-all2@8.0.4',
+npm WARN EBADENGINE   required: { node: '^20.5.0 || >=22.0.0', npm: '>= 10' },
+npm WARN EBADENGINE   current: { node: 'v24.19.0', npm: '8.19.4' }
+npm WARN EBADENGINE }
+npm WARN deprecated @types/dompurify@3.2.0: This is a stub types definition. dompurify provides its own type definitions, so you do not need this installed.
+
+added 384 packages in 2m
+
+44 packages are looking for funding
+  run `npm fund` for details
+
+> lorelattice-ui@0.7.0 test
+> tsx --test
+
+✔ complete UI refresh is loaded before the app mounts (0.593292ms)
+✔ Figma desktop geometry and reusable component states stay represented (0.122083ms)
+✔ all final Figma product modules have a styled production surface (0.202833ms)
+✔ platform layout provides a stable app-level header around every route (0.071667ms)
+✔ selecting an agent leaves web search off until the user enables it (0.514292ms)
+✔ does not insert a separate status row while the first suggestions are loading (0.481917ms)
+✔ keeps the existing follow-up card visible while regenerating (0.0765ms)
+✔ carries the lightbulb into the expanding question card (0.071667ms)
+✔ citation pills use compact baseline-aligned source styling (1.380833ms)
+✔ shared timeline styles do not add a detached loading row (0.48775ms)
+✔ in-progress step titles get the streaming shimmer sweep (0.16675ms)
+✔ shimmer is disabled under reduced motion (0.09325ms)
+✔ hides Ollama unavailable tip while configuring a remote model (0.424791ms)
+✔ shows Ollama unavailable tip only for local non-rerank models (0.071792ms)
+✔ does not show Ollama unavailable tip before status is known or when Ollama is available (0.061417ms)
+✔ resolveSessionOrigin distinguishes web, IM, and embed sessions (1.225042ms)
+✔ configuredPlatforms returns distinct platform keys in first-seen order (0.111458ms)
+✔ groupSessionsBySource orders web, configured IM, then embed channels (0.228459ms)
+✔ groupSessions date mode keeps pinned sessions in their own bucket (1.674416ms)
+✔ classifyDateBucket buckets recent sessions as today (0.119542ms)
+✔ shouldShowSessionSourceBadge is off when channels use separate folders (0.056791ms)
+✔ bucketVisible hides channel buckets until count is known (0.515625ms)
+✔ bucketVisible hides channel buckets with zero sessions after probe (0.079792ms)
+✔ bucketVisible shows channel buckets with sessions after probe (0.058459ms)
+✔ prependSessionToWebBucket inserts new session at front and bumps total (0.469ms)
+✔ prependSessionToWebBucket is idempotent for existing session (0.070833ms)
+✔ buildBucketDefinitions hides channel buckets unless admin (0.175708ms)
+✔ shouldShowSessionSourceFilter hides when no channel buckets (0.645292ms)
+✔ buildSessionSourceOptions puts web first then channels (0.1585ms)
+✔ findSessionBucketKey locates session bucket (0.106292ms)
+✔ normalizeSessionTitleDraft trims whitespace and collapses inner runs (2.262292ms)
+✔ normalizeSessionTitleDraft rejects blank titles after trimming (0.110541ms)
+✔ normalizeSessionTitleDraft caps long titles at 80 characters (0.068125ms)
+✔ reveals Chinese text in compact phrase groups (3.115333ms)
+✔ waits for a complete English word instead of revealing letter by letter (0.389959ms)
+✔ uses punctuation as a natural reveal boundary (0.070833ms)
+✔ never splits a surrogate pair (0.055ms)
+✔ all locale messages compile without vue-i18n syntax errors (549.779375ms)
+✔ user-facing locale values use workspace terminology (21.725666ms)
+✔ public documentation uses workspace terminology (87.492375ms)
+✔ isStoredSettingsRecord rejects non-object JSON values (0.446667ms)
+✔ cloneSettings deep-clones nested structures (0.447916ms)
+✔ loadAndReconcileSettings returns deep-cloned defaults when key is missing (0.139083ms)
+✔ loadAndReconcileSettings resets invalid JSON and removes corrupted key (0.097ms)
+✔ loadAndReconcileSettings resets non-object JSON such as null (0.077792ms)
+✔ loadAndReconcileSettings keeps valid stored settings (0.086709ms)
+✔ isQuickAnswerAgentId treats builtin quick-answer as RAG mode (0.431291ms)
+✔ isAgentStreamAgentId prefers selectedAgentId for builtins (0.086ms)
+✔ reconcileBuiltinAgentMode repairs drifted localStorage flags (0.081417ms)
+✔ does not treat an unrelated built-in chat model as agent configuration (7.57275ms)
+✔ accepts the chat model explicitly configured on the agent (0.120292ms)
+✔ rejects a configured chat model that no longer exists (0.062666ms)
+✔ requires rerank when knowledge_search has a knowledge-base scope (0.066167ms)
+✔ does not require rerank when knowledge bases are disabled (0.057167ms)
+✔ does not require rerank for wiki-only tools (0.048667ms)
+✔ matches backend default-tool behavior (0.058292ms)
+✔ resolveAgentNotReadySection opens model config for model issues (0.060208ms)
+✔ resolveAgentNotReadySection opens tools config when only tools are missing (0.060167ms)
+✔ resolveAgentNotReadyHighlight returns the first missing item (0.099041ms)
+✔ getAgentNotReadyReasonKeys flags missing chat model (0.432208ms)
+✔ getAgentNotReadyReasonKeys requires rerank only in agent mode with KB search (0.058208ms)
+✔ getAgentNotReadyReasonKeys does not treat current shared context as shared without sourceTenantId (0.055458ms)
+✔ getAgentNotReadyReasonKeys treats empty allowed_tools as ready via backend defaults (0.067833ms)
+✔ canLocallyConfigureAgent is false for shared agents (0.047542ms)
+✔ getAgentToolIconName maps rag pipeline tools (0.519125ms)
+✔ getAgentToolIconName maps Wiki tools to semantic search and reading icons (0.720958ms)
+✔ getQueryText joins unique query strings (0.448625ms)
+✔ getQueryText parses JSON-encoded queries string (0.178084ms)
+✔ getWikiPageText supports persisted slugs arrays (0.42525ms)
+✔ getKnowledgeSearchSummaryHtml includes file count when present (0.478833ms)
+✔ getRagPipelineStepTitle uses query-aware search labels (0.282417ms)
+✔ getRagPipelineStepTitle uses web labels when search_source is web (0.142625ms)
+✔ getRagPipelineStepTitle uses attachment parsing labels (0.378666ms)
+✔ resolveAgentWebSearchProviderId uses explicit agent provider (0.486417ms)
+✔ resolveAgentWebSearchProviderId falls back to tenant default (0.076584ms)
+✔ resolveAgentWebSearchProviderId returns null when default missing (0.057084ms)
+✔ isAgentWebSearchReady requires enabled flag and resolvable provider (0.068875ms)
+✔ isTenantWebSearchReady checks default provider only (0.065292ms)
+✔ resolveAttachmentParsingCounts prefers structured tool_data (2.146375ms)
+✔ resolveAttachmentParsingCounts falls back to legacy output text (0.222083ms)
+✔ getAttachmentParsingSummaryHtml renders parsed count (0.118792ms)
+✔ getAttachmentParsingSummaryHtml renders skipped count (0.062708ms)
+✔ resolveAttachmentFileType prefers explicit file_type (6.43225ms)
+✔ isPreviewableAttachment requires id and supported type (0.093333ms)
+✔ preprocessMathDelimiters converts escaped math delimiters for marked-katex (0.794917ms)
+✔ replaceIncompleteImageWithPlaceholder hides an unfinished streaming image (0.095292ms)
+✔ normalizeFullwidthMarkdownImageParentheses repairs localized image delimiters (0.26775ms)
+✔ normalizeFullwidthMarkdownImageParentheses preserves literal examples in code (0.08125ms)
+✔ renderChatMarkdown safely renders an image with fullwidth parentheses (5.991208ms)
+✔ renderChatMarkdown hides an unfinished fullwidth-parenthesis image while streaming (4.581625ms)
+✔ normalizeLegacyImageContextMarkup converts copied image XML to Markdown (5.0735ms)
+✔ normalizeLegacyImageContextMarkup keeps original Markdown when present (0.400584ms)
+✔ normalizeLegacyImageContextMarkup hides an unfinished XML block while streaming (0.321042ms)
+✔ normalizeLegacyImageContextMarkup preserves literal image XML in code (0.564167ms)
+✔ renderChatMarkdown renders leaked legacy image XML through the safe image renderer (8.403625ms)
+✔ stripIncompleteCitationTag hides only an unfinished streaming citation tail (0.590208ms)
+✔ stripTrailingStreamingHorizontalRule hides an ambiguous trailing rule only mid-stream (2.052833ms)
+✔ closeDanglingStreamingEmphasis closes unfinished inline markers without false positives (0.401625ms)
+✔ renderChatMarkdown renders an unfinished bold line as bold immediately while streaming (6.373916ms)
+✔ repairFlankingEmphasis bolds punctuation-adjacent emphasis CommonMark would drop (0.963875ms)
+✔ renderChatMarkdown bolds punctuation-adjacent emphasis both mid-stream and when complete (0.293875ms)
+✔ stripTrailingStreamingListMarker hides a content-less trailing list/underline marker (0.0545ms)
+✔ renderChatMarkdown does not flash a setext heading when a nested bullet dash streams in (1.418ms)
+✔ renderChatMarkdown streams a bold ordered list without literal-marker flicker (0.357208ms)
+✔ markStandaloneStrongParagraphs tags only paragraphs that are entirely one bold run (0.111625ms)
+✔ renderChatMarkdown does not give a text-heavy paragraph the strong-title margin mid-stream (0.482166ms)
+✔ renderChatMarkdown preserves citations, math, and sanitized output through one shared pipeline (3.987ms)
+✔ resolveCitationChunkId maps context index to retrieval chunk UUID (0.12975ms)
+✔ renderChatMarkdown preserves chunk UUIDs when escapeMarkdown strips UUIDs from prose (0.323167ms)
+✔ renderChatMarkdown resolves indexed chunk_id when knowledge references are provided (0.160042ms)
+✔ joinCitationTagsToPreviousLine removes blank lines before citation tags (0.103292ms)
+✔ joinCitationTagsToPreviousLine inlines consecutive citation tags across single newlines (0.066709ms)
+✔ renderChatMarkdown inlines consecutive citation tags across newlines (0.304417ms)
+✔ joinCitationTagsToPreviousLine appends an indented citation to the preceding list item (0.098208ms)
+✔ renderChatMarkdown renders a citation after a list item inline in that item (0.260083ms)
+✔ joinCitationTagsToPreviousLine does not merge citations onto fenced code closing delimiter (0.0795ms)
+✔ joinCitationTagsToPreviousLine does not merge citations onto an unlabeled closing fence on a single newline (0.051792ms)
+✔ applyStreamingTailFade wraps the trailing text run (0.064583ms)
+✔ applyStreamingTailFade skips whitespace-only runs and fades the last list item (0.045666ms)
+✔ applyStreamingTailFade is a no-op for empty content (0.047916ms)
+✔ renderChatMarkdown adds the tail fade only while streaming (0.116459ms)
+✔ renderChatMarkdown keeps an unlabeled fenced code block closed when a citation immediately follows (0.250125ms)
+✔ renderChatMarkdown keeps fenced code blocks closed when citations follow (0.227125ms)
+✔ collapseStandaloneCitationParagraphs merges citations across empty paragraphs (0.108375ms)
+✔ makeCitationCacheKey combines scope and chunkId (0.457708ms)
+✔ get/set are isolated per scope (0.099791ms)
+✔ clearCitationChunkCache clears one scope or all (0.065917ms)
+✔ groupGrepChunkResults merges chunks from the same document (0.858583ms)
+✔ groupGrepChunkResults keeps FAQ entries separate (0.093541ms)
+✔ countGrepDocuments prefers document_count from backend (0.080834ms)
+✔ countGrepDocuments prefers knowledge_results length when document_count absent (0.060292ms)
+✔ getKnowledgeChunksSummaryHtml joins chunk range and page (0.499667ms)
+✔ latest attempt uses failed knowledge status even when root span is done (0.548709ms)
+✔ latest attempt keeps finalizing distinct from a completed root span (0.128208ms)
+✔ historical attempt keeps its own root status (0.082541ms)
+✔ parse status maps completed and processing into timeline vocabulary (0.056125ms)
+✔ groups graph chunks and reports their wall-clock duration (3.161458ms)
+✔ keeps graph group live while any graph chunk is running (0.171084ms)
+✔ surfaces a failed graph chunk on the aggregate graph row (0.09ms)
+✔ keeps the aggregate running until all graph chunks are terminal (0.072791ms)
+✔ leaves postprocess unchanged when it has no graph chunks (0.054375ms)
+✔ markdownDomPurifyConfig FORBID_TAGS includes script (0.454958ms)
+✔ ALLOWED_URI_REGEXP allows s3:// and rejects javascript: (0.285667ms)
+✔ chat markdown links always open in a new tab (0.129834ms)
+✔ synthesizeRagPipelineToolEvents builds completed retrieval steps (0.930041ms)
+✔ synthesizeRagPipelineToolEvents marks web-only references as web search (0.131667ms)
+✔ synthesizeRagPipelineToolEvents skips retrieval when there are no references (0.171583ms)
+✔ ensureRagPipelineHistoryStream does not invent retrieval for attachment-only turns (0.205917ms)
+✔ ensureRagPipelineHistoryStream restores quick-answer history after reload (0.093459ms)
+✔ ensureRagPipelineHistoryStream keeps existing pipeline events (0.065541ms)
+✔ RAG_TIMELINE_TOOL_NAMES includes attachment prep tools (0.054042ms)
+✔ buildReferenceList separates web and document references (4.212875ms)
+✔ buildReferenceList aggregates chunks from the same document (0.591958ms)
+✔ buildReferenceSections keeps tool results in their own section (0.115625ms)
+✔ resolveReferenceHighlightKey matches web url (0.155875ms)
+✔ resolveReferenceHighlightKey matches any chunk merged into a document item (0.094958ms)
+✔ resolveReferenceHighlightKey falls back to document title and knowledge base (0.083459ms)
+✔ normalizeReferenceUrl trims trailing slash (0.054166ms)
+✔ buildReferenceList uses domain instead of raw url title (0.112291ms)
+✔ buildReferenceList prefers metadata title for web references (0.10225ms)
+✔ formatReferenceSnippet strips markdown noise from preview text (0.212208ms)
+✔ getDomainFromUrl strips www prefix (0.0575ms)
+✔ protectProviderImageSrcInHTML uses a placeholder src for provider images (0.872708ms)
+✔ protectProviderImageSrcInHTML uses a placeholder src for storage-backend images (0.144834ms)
+✔ protectProviderImageSrcInHTML uses a placeholder src for resource references (0.075208ms)
+✔ collectAllSessionMessages walks backwards and returns chronological unique messages (9.436666ms)
+✔ buildSessionMarkdown exports visible conversation content without internal citation tags (2.482667ms)
+✔ defaultThinkingControl matches backend provider adapters (0.484667ms)
+✔ agent steps use compact muted timeline styling (3.250959ms)
+✔ expanded agent step log keeps model thinking in the tool timeline (0.239667ms)
+✔ streaming log renders reasoning alongside tool calls (0.268875ms)
+✔ expanded model reasoning stays inline without a separate thinking title (0.59325ms)
+✔ streaming tool log uses the same timeline structure (0.252083ms)
+✔ final done row uses an existing common translation key (0.163084ms)
+✔ tool rows use line icon names instead of legacy asset masks (0.197292ms)
+✔ rag mode delegates pre-answer loading to pipeline and adds no row after answer starts (0.137209ms)
+✔ rag mode keeps model thinking out of the answer stream component (0.266875ms)
+✔ only the collapsed root summary shows an expand chevron (0.825875ms)
+✔ pending tool rows do not render an extra axis dot (0.305833ms)
+✔ agent mode shows a native placeholder before answer whenever nothing is pending (0.221292ms)
+✔ in-chat OAuth polling is bound to the newly opened authorization attempt (0.578416ms)
+✔ settings OAuth polling cannot accept a pre-existing token as fresh authorization (0.084875ms)
+✔ OAuth status API sends the attempt id to the backend (0.067916ms)
+✔ settings distinguishes refreshable tokens from usable authorization (0.072041ms)
+✔ rag pipeline uses agent-style timeline structure (0.696084ms)
+✔ rag pipeline persists and collapses after the answer arrives (0.156708ms)
+✔ rag pipeline toggles expand and collapse from the root header (0.091708ms)
+✔ only the collapsed root summary shows an expand chevron (0.100666ms)
+✔ rag pipeline opens references from search steps and the drawer composable (0.08075ms)
+✔ rag pipeline uses a native pending step and lets the thinking title shimmer while pending (0.092417ms)
+✔ done row appears only after the full turn completes (0.115417ms)
+✔ rag pipeline renders model thinking inside the timeline before the done row (0.087584ms)
+✔ clickable timeline headers use pointer cursor (0.225458ms)
+✔ collapsed summary uses compact spacing before the answer (0.169542ms)
+✔ rag pipeline auto-scrolls capped thinking detail while streaming (0.112ms)
+✔ rag pipeline includes attachment prep steps on the timeline (0.061416ms)
+✔ non-agent actions wait for the typewriter buffer to finish (0.51075ms)
+✔ agent actions reuse the fully-rendered answer state (0.116708ms)
+✔ follow-up loading is shown compactly inside both answer toolbars (0.1215ms)
+✔ follow-up suggestions wait until the answer is fully rendered (0.088458ms)
+✔ reference document links open in a new tab (0.886333ms)
+✔ wiki drawer navigation and citation fallbacks open in a new tab (0.196792ms)
+✔ agent citations recover drawer references from retrieval tool events (0.447417ms)
+✔ citation highlighting waits for drawer entry and only scrolls its own body (0.0865ms)
+✔ references drawer smoothly shifts the chat area while opening (0.161125ms)
+✔ timeline references neutralize brand colors via local css variables (0.553458ms)
+✔ doc header uses right/down chevron on the outer title only (0.089542ms)
+✔ uses a compact flat dialog with selected and available sections (0.498333ms)
+✔ defines the short dialog heading in every supported locale (0.127667ms)
+✔ renders an empty list when there are no knowledge bases (0.883959ms)
+✔ keeps a single owned KB (the case that always worked) (0.1665ms)
+✔ renders every owned KB once when there are two or more (#795 regression) (0.101792ms)
+✔ does not emit a KB twice when it is both owned and shared back (0.088792ms)
+✔ renders exactly one card per KB when several owned KBs are also shared back (0.075208ms)
+✔ collapses the same KB shared through multiple orgs into one card (0.076709ms)
+✔ keeps the most-privileged permission when collapsing duplicate shares (0.076042ms)
+✔ guarantees unique keys across a mixed owned + shared set (0.136667ms)
+✔ orders pinned (newest first) → own → teammate → shared(editable first) (0.127084ms)
+✔ drops shared rows whose knowledge_base is null (0.104375ms)
+✔ isSharedKbEditable treats admin/editor as editable, others read-only (0.058833ms)
+✔ refreshes wiki status when a polled document leaves an in-flight state (0.437667ms)
+✔ does not refresh wiki status for ordinary in-flight polling updates (0.066375ms)
+✔ reviewing join requests refreshes local and cached global organization data (0.569792ms)
+✔ appends a cursor page without changing backend order (0.745ms)
+✔ deduplicates overlap from a surviving cursor anchor (0.083666ms)
+ℹ tests 225
+ℹ suites 0
+ℹ pass 225
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1643.708208
+
+> lorelattice-ui@0.7.0 type-check
+> vue-tsc --build
+
+
+> lorelattice-ui@0.7.0 build-only
+> vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 6305 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/embed.html                                                                  1.30 kB │ gzip:   0.62 kB
+dist/assets/lorelattice-BvNF6irf.png                                             4.17 kB
+dist/assets/KaTeX_Size3-Regular-CTq5MqoE.woff                                    4.42 kB
+dist/assets/setting-green-DefSxwiq.svg                                           4.44 kB │ gzip:   1.91 kB
+dist/assets/setting-DtqrLomv.svg                                                 4.45 kB │ gzip:   1.91 kB
+dist/assets/screenshot-4-Co67p2yg.svg                                            4.48 kB │ gzip:   1.34 kB
+dist/assets/google-3AsHcpwv.svg                                                  4.53 kB │ gzip:   1.62 kB
+dist/index.html                                                                  4.68 kB │ gzip:   1.93 kB
+dist/assets/searxng-BrM4fgdN.svg                                                 4.88 kB │ gzip:   2.21 kB
+dist/assets/KaTeX_Size4-Regular-Dl5lxZxV.woff2                                   4.93 kB
+dist/assets/screenshot-1-B0KsU7b6.svg                                            4.99 kB │ gzip:   1.37 kB
+dist/assets/KaTeX_Size2-Regular-Dy4dx90m.woff2                                   5.21 kB
+dist/assets/screenshot-2-Cv-EZO8I.svg                                            5.30 kB │ gzip:   1.34 kB
+dist/assets/KaTeX_Size1-Regular-mCD8mA8B.woff2                                   5.47 kB
+dist/assets/screenshot-3-CmqAqVEt.svg                                            5.72 kB │ gzip:   1.41 kB
+dist/assets/upload-mask-CIOl-lgj.svg                                             5.74 kB │ gzip:   1.76 kB
+dist/assets/KaTeX_Size4-Regular-BF-4gkZK.woff                                    5.98 kB
+dist/assets/KaTeX_Size2-Regular-oD1tc_U0.woff                                    6.19 kB
+dist/assets/mattermost-CevsdWTW.svg                                              6.41 kB │ gzip:   2.76 kB
+dist/assets/KaTeX_Size1-Regular-C195tn64.woff                                    6.50 kB
+dist/assets/KaTeX_Caligraphic-Regular-Di6jR-x-.woff2                             6.91 kB
+dist/assets/KaTeX_Caligraphic-Bold-Dq_IR9rO.woff2                                6.91 kB
+dist/assets/bing-DJKffo03.svg                                                    7.20 kB │ gzip:   3.38 kB
+dist/assets/KaTeX_Size3-Regular-DgpXs0kz.ttf                                     7.59 kB
+dist/assets/KaTeX_Caligraphic-Regular-CTRA-rTL.woff                              7.66 kB
+dist/assets/KaTeX_Caligraphic-Bold-BEiXGLvX.woff                                 7.72 kB
+dist/assets/duckduckgo-caOmA7Jt.svg                                              8.28 kB │ gzip:   2.98 kB
+dist/assets/ollama-D9ekPUdx.svg                                                  8.57 kB │ gzip:   3.91 kB
+dist/assets/favicon-BvJGqNv-.ico                                                 9.33 kB
+dist/assets/KaTeX_Script-Regular-D3wIWfF6.woff2                                  9.64 kB
+dist/assets/datasource-feishu-C4OMrjCW.ico                                       9.66 kB
+dist/assets/KaTeX_SansSerif-Regular-DDBCnlJ7.woff2                              10.34 kB
+dist/assets/KaTeX_Size4-Regular-DWFBv043.ttf                                    10.36 kB
+dist/assets/upload-D7pOedRD.svg                                                 10.43 kB │ gzip:   2.99 kB
+dist/assets/KaTeX_Script-Regular-D5yQViql.woff                                  10.59 kB
+dist/assets/yunzhijia-CVzWnRC0.svg                                              10.76 kB │ gzip:   8.15 kB
+dist/assets/qdrant-C6FPtPsb.svg                                                 10.85 kB │ gzip:   4.51 kB
+dist/assets/milvus-BeOqAIDr.svg                                                 11.18 kB │ gzip:   4.59 kB
+dist/assets/KaTeX_Fraktur-Regular-CTYiF6lA.woff2                                11.32 kB
+dist/assets/KaTeX_Fraktur-Bold-CL6g_b3V.woff2                                   11.35 kB
+dist/assets/KaTeX_Size2-Regular-B7gKUWhC.ttf                                    11.51 kB
+dist/assets/sqlite-DoHKUGJO.svg                                                 11.62 kB │ gzip:   4.88 kB
+dist/assets/KaTeX_SansSerif-Italic-C3H0VqGB.woff2                               12.03 kB
+dist/assets/opensearch-CVUWUB1b.svg                                             12.07 kB │ gzip:   4.95 kB
+dist/assets/KaTeX_SansSerif-Bold-D1sUS0GD.woff2                                 12.22 kB
+dist/assets/KaTeX_Size1-Regular-Dbsnue_I.ttf                                    12.23 kB
+dist/assets/KaTeX_SansSerif-Regular-CS6fqUqJ.woff                               12.32 kB
+dist/assets/KaTeX_Caligraphic-Regular-wX97UBjC.ttf                              12.34 kB
+dist/assets/KaTeX_Caligraphic-Bold-ATXxdsX0.ttf                                 12.37 kB
+dist/assets/KaTeX_Fraktur-Regular-Dxdc4cR9.woff                                 13.21 kB
+dist/assets/postgres-CrKK9N4f.svg                                               13.22 kB │ gzip:   6.22 kB
+dist/assets/KaTeX_Fraktur-Bold-BsDP51OF.woff                                    13.30 kB
+dist/assets/KaTeX_Typewriter-Regular-CO6r4hn1.woff2                             13.57 kB
+dist/assets/KaTeX_SansSerif-Italic-DN2j7dab.woff                                14.11 kB
+dist/assets/KaTeX_SansSerif-Bold-DbIhKOiC.woff                                  14.41 kB
+dist/assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff                              16.03 kB
+dist/assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2                                16.40 kB
+dist/assets/KaTeX_Math-Italic-t53AETM-.woff2                                    16.44 kB
+dist/assets/KaTeX_Script-Regular-C5JkGWo-.ttf                                   16.65 kB
+dist/assets/KaTeX_Main-BoldItalic-DxDJ3AOS.woff2                                16.78 kB
+dist/assets/KaTeX_Main-Italic-NWA7e6Wa.woff2                                    16.99 kB
+dist/assets/KaTeX_Math-BoldItalic-iY-2wyZ7.woff                                 18.67 kB
+dist/assets/KaTeX_Math-Italic-DA0__PXp.woff                                     18.75 kB
+dist/assets/KaTeX_Main-BoldItalic-SpSLRI95.woff                                 19.41 kB
+dist/assets/KaTeX_SansSerif-Regular-BNo7hRIc.ttf                                19.44 kB
+dist/assets/KaTeX_Fraktur-Regular-CB_wures.ttf                                  19.57 kB
+dist/assets/KaTeX_Fraktur-Bold-BdnERNNW.ttf                                     19.58 kB
+dist/assets/KaTeX_Main-Italic-BMLOBm91.woff                                     19.68 kB
+dist/assets/KaTeX_SansSerif-Italic-YYjJ1zSn.ttf                                 22.36 kB
+dist/assets/KaTeX_SansSerif-Bold-CFMepnvq.ttf                                   24.50 kB
+dist/assets/KaTeX_Main-Bold-Cx986IdX.woff2                                      25.32 kB
+dist/assets/KaTeX_Main-Regular-B22Nviop.woff2                                   26.27 kB
+dist/assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf                               27.56 kB
+dist/assets/KaTeX_AMS-Regular-BQhdFMY1.woff2                                    28.08 kB
+dist/assets/KaTeX_Main-Bold-Jm3AIy58.woff                                       29.91 kB
+dist/assets/KaTeX_Main-Regular-Dr94JaBh.woff                                    30.77 kB
+dist/assets/KaTeX_Math-BoldItalic-B3XSjfu4.ttf                                  31.20 kB
+dist/assets/KaTeX_Math-Italic-flOr_0UB.ttf                                      31.31 kB
+dist/assets/datasource-notion-BcmA6aa5.ico                                      32.04 kB
+dist/assets/KaTeX_Main-BoldItalic-DzxPMmG6.ttf                                  32.97 kB
+dist/assets/KaTeX_AMS-Regular-DMm9YOAa.woff                                     33.52 kB
+dist/assets/KaTeX_Main-Italic-3WenGoN9.ttf                                      33.58 kB
+dist/assets/KaTeX_Main-Bold-waoOVXN0.ttf                                        51.34 kB
+dist/assets/KaTeX_Main-Regular-ypZvNtVU.ttf                                     53.58 kB
+dist/assets/KaTeX_AMS-Regular-DRggAlZN.ttf                                      63.63 kB
+dist/assets/lorelattice-mark-Dqj4anay.png                                       73.19 kB
+dist/assets/think-BeVQQp84.gif                                                 342.33 kB
+dist/assets/botanswer_loading-B46raelc.gif                                     555.93 kB
+dist/assets/TencentSans-WDRJHEmO.ttf                                         8,537.66 kB
+dist/assets/useResourcePins-DpPucpJ1.css                                         0.96 kB │ gzip:   0.36 kB
+dist/assets/AgentAvatar-BZEGtFmB.css                                             1.02 kB │ gzip:   0.38 kB
+dist/assets/organization-green-DQGfLmEO.css                                      1.37 kB │ gzip:   0.44 kB
+dist/assets/vendor-highlight-BiJVEjr2.css                                        1.42 kB │ gzip:   0.61 kB
+dist/assets/ContentPopup-C467gddv.css                                            1.68 kB │ gzip:   0.59 kB
+dist/assets/embed-Dl3k8s47.css                                                   2.09 kB │ gzip:   0.61 kB
+dist/assets/WorkspaceOnboarding-tLcl89rG.css                                     2.29 kB │ gzip:   0.78 kB
+dist/assets/MyInvitationsDialog-FEsokweq.css                                     2.47 kB │ gzip:   0.68 kB
+dist/assets/deepThink-ByvBI8ZT.css                                               3.10 kB │ gzip:   0.89 kB
+dist/assets/contextualGuides-C3uOwOHU.css                                        3.56 kB │ gzip:   0.97 kB
+dist/assets/card-list-badge-BleHGgXl.css                                         4.58 kB │ gzip:   1.08 kB
+dist/assets/RagPipelineProgress-BoETAMZR.css                                     4.98 kB │ gzip:   1.26 kB
+dist/assets/docInfo-CeSWbhcd.css                                                 6.09 kB │ gzip:   1.27 kB
+dist/assets/creatChat-B1JdxuzM.css                                               6.83 kB │ gzip:   1.59 kB
+dist/assets/FollowUpSuggestions-B5Pi3KpT.css                                     7.99 kB │ gzip:   1.85 kB
+dist/assets/Login-B-iSgso8.css                                                  26.69 kB │ gzip:   4.99 kB
+dist/assets/KnowledgeBaseList-BotcZmCo.css                                      28.66 kB │ gzip:   4.66 kB
+dist/assets/vendor-markdown-CfVKi3_s.css                                        29.27 kB │ gzip:   8.05 kB
+dist/assets/EmbedChatCore-iQEBGn3A.css                                          34.15 kB │ gzip:   5.80 kB
+dist/assets/useKnowledgeBaseCreationNavigation-92CpqeCB.css                     42.45 kB │ gzip:   6.55 kB
+dist/assets/index-CFzYwhnI.css                                                  51.89 kB │ gzip:   7.80 kB
+dist/assets/OrganizationList-BpYAWLwK.css                                       52.56 kB │ gzip:   7.46 kB
+dist/assets/KnowledgeBaseEditorModal-CgBEio56.css                               56.60 kB │ gzip:   8.68 kB
+dist/assets/AgentList-DCMtnfBC.css                                              57.26 kB │ gzip:   8.73 kB
+dist/assets/index-BaO7yjxp.css                                                  64.91 kB │ gzip:  10.52 kB
+dist/assets/AgentStreamDisplay-CHp08c-T.css                                    151.29 kB │ gzip:  15.13 kB
+dist/assets/KnowledgeBase-BB7ZV_LZ.css                                         194.11 kB │ gzip:  26.34 kB
+dist/assets/Settings-D6dlClQU.css                                              213.95 kB │ gzip:  27.28 kB
+dist/assets/tdesign-icon-offline-yKup-SFk.css                                  468.80 kB │ gzip:  53.19 kB
+dist/assets/main-BxlAU2Yk.css                                                  531.47 kB │ gzip:  62.76 kB
+dist/assets/lorelattice-mark-CrFT4t9w.js                                         0.06 kB │ gzip:   0.08 kB
+dist/assets/more-DLIUpHyd.js                                                     0.26 kB │ gzip:   0.24 kB
+dist/assets/useHighlight-CVLhA0Sa.js                                             0.75 kB │ gzip:   0.42 kB
+dist/assets/sessionTitleEdit-vSEEHY57.js                                         0.82 kB │ gzip:   0.47 kB
+dist/assets/sending-aircraft-D3uth3Mp.js                                         0.82 kB │ gzip:   0.46 kB
+dist/assets/vector-store-1XptjHFm.js                                             0.87 kB │ gzip:   0.35 kB
+dist/assets/ContextualGuide.vue_vue_type_script_setup_true_lang-bUrqREcO.js      1.12 kB │ gzip:   0.61 kB
+dist/assets/invitations-Dxt0eXZX.js                                              1.27 kB │ gzip:   0.51 kB
+dist/assets/agent-D-EHdnbC.js                                                    1.31 kB │ gzip:   0.51 kB
+dist/assets/Frame3718-DBacJbod.js                                                1.39 kB │ gzip:   0.53 kB
+dist/assets/deepThink-R8CgLKtF.js                                                1.71 kB │ gzip:   0.84 kB
+dist/assets/AgentAvatar-wVGTEYTy.js                                              2.08 kB │ gzip:   1.11 kB
+dist/assets/index-09IEyNt2.js                                                    2.12 kB │ gzip:   0.59 kB
+dist/assets/ContentPopup-DU3CKZkt.js                                             2.35 kB │ gzip:   1.09 kB
+dist/assets/tool-capabilities-Bzq-4y8Q.js                                        2.69 kB │ gzip:   0.98 kB
+dist/assets/index-D_1uIFgn.js                                                    3.19 kB │ gzip:   0.96 kB
+dist/assets/zoom-D459htBQ.js                                                     3.35 kB │ gzip:   1.42 kB
+dist/assets/WorkspaceOnboarding-D4qqxGmR.js                                      3.54 kB │ gzip:   1.43 kB
+dist/assets/useKnowledgeBase-DTq4OC2I.js                                         3.61 kB │ gzip:   1.61 kB
+dist/assets/docInfo-B7DZrk_z.js                                                  4.71 kB │ gzip:   2.02 kB
+dist/assets/agent-tool-display-DH5Lfqej.js                                       4.81 kB │ gzip:   1.56 kB
+dist/assets/creatChat-BKBHWkk-.js                                                5.96 kB │ gzip:   2.63 kB
+dist/assets/useResourcePins--R9Tq2-q.js                                          6.07 kB │ gzip:   2.41 kB
+dist/assets/organization-green-DxXm0SzH.js                                       7.07 kB │ gzip:   2.74 kB
+dist/assets/MyInvitationsDialog-C5NldEL1.js                                      7.98 kB │ gzip:   2.79 kB
+dist/assets/RagPipelineProgress-zScjEXoz.js                                      9.23 kB │ gzip:   2.78 kB
+dist/assets/contextualGuides-CN9p3q1T.js                                         9.39 kB │ gzip:   3.50 kB
+dist/assets/card-list-badge-BTCNXEFp.js                                         10.28 kB │ gzip:   3.39 kB
+dist/assets/security-DdCuhQNw.js                                                10.91 kB │ gzip:   3.86 kB
+dist/assets/index-C0u_-wxh.js                                                   11.15 kB │ gzip:   3.64 kB
+dist/assets/EmbedChatCore-BJbmf2uY.js                                           30.05 kB │ gzip:  10.37 kB
+dist/assets/ziliao-FnuIqfQB.js                                                  36.36 kB │ gzip:   7.40 kB
+dist/assets/index-D8b0RtzH.js                                                   50.06 kB │ gzip:  17.06 kB
+dist/assets/KnowledgeBaseList-B4e_woqm.js                                       51.60 kB │ gzip:  12.46 kB
+dist/assets/embed-Btpd20Nl.js                                                   51.70 kB │ gzip:  17.73 kB
+dist/assets/settings-BS4ukEFF.js                                                59.68 kB │ gzip:  14.97 kB
+dist/assets/FollowUpSuggestions-Bu_Oa5_H.js                                     65.14 kB │ gzip:  22.79 kB
+dist/assets/OrganizationList-BRe0d5Q5.js                                        74.79 kB │ gzip:  18.17 kB
+dist/assets/index-BiTUTs9A.js                                                   82.79 kB │ gzip:  25.97 kB
+dist/assets/useKnowledgeBaseCreationNavigation-B8tDvWHh.js                      83.13 kB │ gzip:  25.65 kB
+dist/assets/AgentStreamDisplay-C92IMjIA.js                                     101.11 kB │ gzip:  27.53 kB
+dist/assets/KnowledgeBaseEditorModal-DvVqcna6.js                               123.53 kB │ gzip:  32.69 kB
+dist/assets/Login-pCZbwvQa.js                                                  125.42 kB │ gzip:  37.02 kB
+dist/assets/main-DObgcu7f.js                                                   162.39 kB │ gzip:  51.89 kB
+dist/assets/AgentList-CpWyVmO0.js                                              170.91 kB │ gzip:  37.05 kB
+dist/assets/docx-preview-DskjkOU3.js                                           172.34 kB │ gzip:  50.39 kB
+dist/assets/vendor-markdown-CxA3LRJ6.js                                        301.55 kB │ gzip:  90.15 kB
+dist/assets/KnowledgeBase-LhoUS9EG.js                                          342.37 kB │ gzip:  99.12 kB
+dist/assets/Settings-DPd4meth.js                                               482.06 kB │ gzip: 125.31 kB
+dist/assets/xlsx-X-X5Jt5r.js                                                   493.82 kB │ gzip: 161.04 kB
+dist/assets/vendor-highlight-Cz3B6uZb.js                                     1,095.85 kB │ gzip: 361.71 kB
+dist/assets/index-DCTDUkhC.js                                                1,430.52 kB │ gzip: 459.66 kB
+dist/assets/tdesign-icon-offline-yMik6OgH.js                                 2,623.15 kB │ gzip: 741.98 kB
+dist/assets/vendor-mermaid-Bkyya5d_.js                                       2,901.82 kB │ gzip: 793.11 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 23.10s
+real 163.94
+user 75.22
+sys 20.70
+          2931408896  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             1317958  page reclaims
+               12263  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                2807  messages sent
+                2462  messages received
+                2735  signals received
+               22986  voluntary context switches
+              534540  involuntary context switches
+            33773318  instructions retired
+            23685893  cycles elapsed
+             1212728  peak memory footprint

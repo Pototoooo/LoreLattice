@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+"""Build a frozen pilot set for concept, relationship and wiki-navigation questions."""
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+
+CASES = [
+    {
+        "id": "WIKI-001", "category": "concept_relation",
+        "question": "请解释游标提前提交、乱序消息、数据新鲜度和结果数量守恒之间的因果关系，并说明这套关系为何能帮助避免同步数据遗漏。",
+        "required_term_groups": [["游标提前提交"], ["乱序"], ["数据新鲜度"], ["结果数量守恒", "数量守恒"], ["遗漏", "跳过"]],
+        "anchor_pages": ["concept/cursor-premature-commit", "concept/data-freshness"],
+        "expected_wiki_pages": ["concept/cursor-premature-commit", "concept/data-freshness", "concept/result-count-conservation"],
+    },
+    {
+        "id": "WIKI-002", "category": "concept_relation",
+        "question": "从公司经营视角解释 ARR、年度经常性收入与 NRR 的区别和关系：它们分别衡量什么，为什么不能混为一谈？",
+        "required_term_groups": [["ARR"], ["订阅收入", "订阅"], ["一次性实施费", "一次性"], ["NRR"], ["现有客户", "客户收入"], ["留存", "流失"]],
+        "anchor_pages": ["concept/annual-recurring-revenue", "concept/net-revenue-retention"],
+        "expected_wiki_pages": ["concept/annual-recurring-revenue", "concept/arr", "concept/net-revenue-retention", "concept/nrr"],
+    },
+    {
+        "id": "WIKI-003", "category": "concept_relation",
+        "question": "请梳理 Wiki 2.0 与多跳问答、重复回答阻断、平台可靠性以及负责人之间的关系，形成一张文字版目标地图。",
+        "required_term_groups": [["Wiki 2.0", "Wiki2.0"], ["多跳"], ["重复回答"], ["可靠性"], ["宋岚"], ["顾临川"]],
+        "anchor_pages": ["entity/wiki-2-0"],
+        "expected_wiki_pages": ["entity/wiki-2-0", "concept/multi-hop-qa", "concept/agent-duplicate-response-block", "entity/song-lan", "entity/gu-linchuan"],
+    },
+    {
+        "id": "WIKI-004", "category": "concept_relation",
+        "question": "从数据分级出发，说明数据脱敏、最小权限和外部共享管控如何组成一条完整的数据保护链路。",
+        "required_term_groups": [["数据分级"], ["数据脱敏", "脱敏"], ["最小权限"], ["外部共享"], ["L0", "L1", "L2", "L3"], ["审批", "授权"]],
+        "anchor_pages": ["concept/data-classification"],
+        "expected_wiki_pages": ["concept/data-classification", "concept/data-masking", "concept/least-privilege-principle", "concept/external-sharing-control"],
+    },
+    {
+        "id": "WIKI-005", "category": "entity_network",
+        "question": "P1/P2 事故中 Incident Commander、Operations Lead 和 Communications Lead 如何分工协作？请说明三者的职责边界和配合关系。",
+        "required_term_groups": [["Incident Commander", "IC"], ["Operations Lead", "OL"], ["Communications Lead", "CL"], ["目标", "优先级", "决策"], ["技术排查", "变更操作"], ["时间线", "状态页", "客户更新"]],
+        "anchor_pages": ["entity/incident-commander", "entity/operations-lead", "entity/communications-lead"],
+        "expected_wiki_pages": ["entity/incident-commander", "entity/operations-lead", "entity/communications-lead"],
+    },
+    {
+        "id": "WIKI-006", "category": "entity_network",
+        "question": "请概括公司执行委员会的组织关系：由谁主持，产品、技术、运营、财务、营收和人力职能分别由哪些成员覆盖？",
+        "required_term_groups": [["周牧"], ["宋岚"], ["顾临川"], ["林澈"], ["沈宁"], ["唐骁"], ["许棠"]],
+        "anchor_pages": ["concept/executive-committee", "entity/zhou-mu"],
+        "expected_wiki_pages": ["concept/executive-committee", "entity/zhou-mu", "entity/song-lan", "entity/gu-linchuan", "entity/lin-che", "entity/shen-ning", "entity/tang-xiao", "entity/xu-tang"],
+    },
+    {
+        "id": "WIKI-007", "category": "entity_network",
+        "question": "连接器健康中心在 AtlasDesk 生态中承担什么作用？请按平台接入、状态监控、同步告警和恢复目标梳理它与主要数据源的关系。",
+        "required_term_groups": [["连接器健康中心"], ["状态", "健康"], ["同步", "告警"], ["恢复点", "RPO"], ["飞书"], ["企业微信"], ["SharePoint"], ["Confluence"], ["S3", "Amazon S3"]],
+        "anchor_pages": ["concept/connector-health-center"],
+        "expected_wiki_pages": ["concept/connector-health-center", "entity/feishu", "entity/wechat-work", "entity/sharepoint", "entity/confluence", "entity/amazon-s3"],
+    },
+    {
+        "id": "WIKI-008", "category": "entity_network",
+        "question": "以财务部为中心，梳理年度预算、成本中心、采购审批、云资源成本预警、合同付款和差旅报销之间的治理关系。",
+        "required_term_groups": [["年度预算", "预算"], ["成本中心"], ["采购审批"], ["云资源", "成本预警"], ["合同", "付款"], ["差旅", "报销"]],
+        "anchor_pages": ["entity/finance-department"],
+        "expected_wiki_pages": ["entity/finance-department", "concept/annual-budget-and-quarterly-rolling-forecast", "concept/cost-center", "concept/procurement-approval-threshold", "concept/cloud-resource-cost-warning-mechanism", "concept/contract-acceptance-and-payment-compliance", "concept/travel-and-expense-reimbursement-standard"],
+    },
+    {
+        "id": "WIKI-009", "category": "overview_navigation",
+        "question": "请把北辰同步延迟事故整理成关系链：客户与系统、技术根因、影响、响应角色和整改负责人之间分别是什么关系？",
+        "required_term_groups": [["北辰"], ["SAP"], ["游标提前提交"], ["数据新鲜度", "同步延迟"], ["贺简"], ["蒋屿"], ["韩川"], ["郑禾"]],
+        "anchor_pages": ["entity/beichen-sync-delay-incident"],
+        "expected_wiki_pages": ["entity/beichen-sync-delay-incident", "entity/sap", "concept/cursor-premature-commit", "concept/data-freshness", "entity/he-jian", "entity/jiang-yu", "entity/han-chuan", "entity/zheng-he"],
+    },
+    {
+        "id": "WIKI-010", "category": "overview_navigation",
+        "question": "请给出标准交付模型的概念地图：七个阶段如何串联，阶段准出、权限迁移、验收问题集、变更管理和护航移交分别在流程中承担什么作用？",
+        "required_term_groups": [["发现"], ["设计"], ["配置"], ["迁移"], ["验证"], ["上线"], ["护航"], ["阶段准出"], ["权限迁移"], ["验收问题"], ["变更管理"]],
+        "anchor_pages": ["concept/biao-zhun-jiao-fu-mo-xing"],
+        "expected_wiki_pages": ["concept/biao-zhun-jiao-fu-mo-xing", "concept/jie-duan-zhun-chu-tiao-jian", "concept/quan-xian-qian-yi-ce-lve", "concept/biao-zhun-yan-shou-wen-ti-ji", "concept/bian-geng-guan-li", "concept/hu-hang-yu-yi-jiao"],
+    },
+    {
+        "id": "WIKI-011", "category": "summary_navigation",
+        "question": "请先找到并阅读《公司概况与组织决策机制》的 Summary 页面，再沿页面关系说明公司、执行委员会、决策权限矩阵和文档优先级体系如何连接。",
+        "required_term_groups": [["棱镜云图科技"], ["执行委员会"], ["决策权限矩阵"], ["文档优先级", "优先级体系"], ["周牧"]],
+        "anchor_pages": ["summary/93639dd6-f7d6-4d29-bc4f-013c7d5726bf"],
+        "expected_wiki_pages": ["summary/93639dd6-f7d6-4d29-bc4f-013c7d5726bf", "entity/prism-atlas-tech", "concept/executive-committee", "concept/decision-authority-matrix", "concept/document-priority-hierarchy"],
+    },
+    {
+        "id": "WIKI-012", "category": "summary_navigation",
+        "question": "请先找到并阅读《AI模型使用与知识质量治理规范》的 Summary 页面，再梳理模型分级、上线评测、Agent行为约束、人工复核和异常下线之间的治理闭环。",
+        "required_term_groups": [["模型分级"], ["上线评测"], ["Agent", "智能体"], ["人工复核"], ["异常", "下线"]],
+        "anchor_pages": ["summary/2b6265dd-c6c2-48c6-a047-f7088c178978"],
+        "expected_wiki_pages": ["summary/2b6265dd-c6c2-48c6-a047-f7088c178978", "concept/model-tiering-and-whitelist", "concept/go-live-evaluation-thresholds", "concept/agent-behavior-guidelines", "concept/human-review-mechanism", "concept/anomaly-monitoring-and-takedown-process"],
+    },
+]
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for case in CASES:
+        row = {**case, "answerable": True, "dataset": "wiki_strength_v1", "version": "2026-09-01"}
+        rows.append(row)
+    args.output.write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows), encoding="utf-8")
+    print(f"DATASET_RESULT=PASS cases={len(rows)} output={args.output}")
+
+
+if __name__ == "__main__":
+    main()

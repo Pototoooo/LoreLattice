@@ -1,0 +1,25 @@
+MODE_RESULT hybrid {"all_sources_at_8": 0.975, "errors": 0, "evidence_term_recall_at_8": 0.975, "hit_at_1": 0.8833333333333333, "hit_at_3": 0.9833333333333333, "hit_at_5": 0.9916666666666667, "hit_at_8": 0.9916666666666667, "latency_ms": {"max": 1301.515, "mean": 447.70613333333336, "p50": 406.64250000000004, "p95": 653.1616999999998, "p99": 1197.72393}, "mrr_at_8": 0.93125, "queries": 120, "source_recall_at_1": 0.7875, "source_recall_at_3": 0.9416666666666667, "source_recall_at_5": 0.9708333333333333, "source_recall_at_8": 0.9833333333333333, "successful": 120}
+MODE_RESULT vector {"all_sources_at_8": 0.9583333333333334, "errors": 0, "evidence_term_recall_at_8": 0.9708333333333333, "hit_at_1": 0.85, "hit_at_3": 0.9583333333333334, "hit_at_5": 0.975, "hit_at_8": 0.9916666666666667, "latency_ms": {"max": 548.869, "mean": 262.43653333333333, "p50": 238.08350000000002, "p95": 407.23569999999995, "p99": 454.87754000000007}, "mrr_at_8": 0.9072222222222223, "queries": 120, "source_recall_at_1": 0.7666666666666667, "source_recall_at_3": 0.9125, "source_recall_at_5": 0.9375, "source_recall_at_8": 0.975, "successful": 120}
+MODE_RESULT keyword {"all_sources_at_8": 0.975, "errors": 0, "evidence_term_recall_at_8": 0.9791666666666666, "hit_at_1": 0.8916666666666667, "hit_at_3": 0.9583333333333334, "hit_at_5": 0.9833333333333333, "hit_at_8": 1, "latency_ms": {"max": 154.26, "mean": 130.213425, "p50": 127.7, "p95": 147.70735000000002, "p99": 152.76693}, "mrr_at_8": 0.9316071428571429, "queries": 120, "source_recall_at_1": 0.7916666666666666, "source_recall_at_3": 0.9333333333333333, "source_recall_at_5": 0.9666666666666667, "source_recall_at_8": 0.9875, "successful": 120}
+BENCHMARK_RESULT {"dataset_queries": 120, "independent_facts": 60, "kb_id": "b68cc4f9-71d8-4f25-93a6-d8c1f90c3dae", "top_k": 8, "wall_seconds": 25.598451834000002, "workers": 4}
+real 26.57
+user 0.53
+sys 0.21
+            23576576  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                3467  page reclaims
+                 446  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                2929  messages sent
+                3320  messages received
+                   0  signals received
+                 985  voluntary context switches
+                5076  involuntary context switches
+          2951798799  instructions retired
+          1815697276  cycles elapsed
+            21479808  peak memory footprint
+EXIT_STATUS=0

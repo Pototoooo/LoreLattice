@@ -1,0 +1,14 @@
+{
+  "data": {
+    "id": "39167097-1375-4718-b28f-65756ad64ed7",
+    "title": "native-eval-hybrid-2",
+    "description": "",
+    "tenant_id": 10004,
+    "user_id": "1b18c530-f65f-4d5e-bc3e-4e752531f78e",
+    "is_pinned": false,
+    "created_at": "2026-09-08T14:01:35.829714721+08:00",
+    "updated_at": "2026-09-08T14:01:35.829714929+08:00",
+    "deleted_at": null
+  },
+  "success": true
+}

@@ -1,0 +1,100 @@
+{
+  "data": {
+    "id": "9758f652-e107-48ae-bb2f-4283127a2224",
+    "name": "native-eval-hybrid-20260908",
+    "description": "",
+    "avatar": "",
+    "is_builtin": false,
+    "tenant_id": 10004,
+    "created_by": "1b18c530-f65f-4d5e-bc3e-4e752531f78e",
+    "config": {
+      "agent_mode": "smart-reasoning",
+      "agent_type": "hybrid-rag-wiki",
+      "system_prompt": "",
+      "system_prompt_id": "hybrid_rag_wiki_agent",
+      "context_template": "",
+      "model_id": "cb425145-111f-4150-a02d-f5a67ca61bd4",
+      "rerank_model_id": "266160fe-ec66-42de-a138-1a2950c1d867",
+      "temperature": 0,
+      "max_completion_tokens": 4096,
+      "thinking": false,
+      "citation_enabled": true,
+      "max_iterations": 30,
+      "llm_call_timeout": 120,
+      "allowed_tools": [
+        "wiki_search",
+        "wiki_read_page",
+        "knowledge_search",
+        "grep_chunks",
+        "list_knowledge_chunks",
+        "get_document_info",
+        "wiki_flag_issue"
+      ],
+      "mcp_selection_mode": "none",
+      "mcp_services": null,
+      "skills_selection_mode": "none",
+      "selected_skills": null,
+      "kb_selection_mode": "selected",
+      "knowledge_bases": [
+        "fed4ec72-0043-49ac-b350-19a4c5a3a581"
+      ],
+      "retrieve_kb_only_when_mentioned": false,
+      "retain_retrieval_history": false,
+      "image_upload_enabled": false,
+      "vlm_model_id": "",
+      "audio_upload_enabled": false,
+      "asr_model_id": "",
+      "image_storage_provider": "",
+      "supported_file_types": null,
+      "attachment_image_understanding": false,
+      "data_analysis_enabled": false,
+      "faq_priority_enabled": false,
+      "faq_direct_answer_threshold": 0,
+      "faq_score_boost": 0,
+      "web_search_enabled": false,
+      "web_search_max_results": 5,
+      "web_fetch_enabled": false,
+      "multi_turn_enabled": true,
+      "history_turns": 5,
+      "embedding_top_k": 10,
+      "keyword_threshold": 0.3,
+      "vector_threshold": 0.5,
+      "rerank_top_k": 10,
+      "rerank_threshold": 0.3,
+      "enable_query_expansion": false,
+      "enable_rewrite": false,
+      "rewrite_prompt_system": "",
+      "rewrite_prompt_user": "",
+      "fallback_strategy": "fixed",
+      "fallback_response": "",
+      "fallback_prompt": "",
+      "question_suggestions": {
+        "starters": {
+          "enabled": true,
+          "mode": "hybrid",
+          "items": [],
+          "count": 6
+        },
+        "follow_ups": {
+          "enabled": false,
+          "mode": "hybrid",
+          "count": 3,
+          "categories": [
+            "clarify",
+            "deepen",
+            "action"
+          ],
+          "max_context_turns": 2,
+          "suppress_on_fallback": true,
+          "suppress_when_answer_asks_question": true,
+          "knowledge_fallback": true,
+          "allow_regenerate": false
+        }
+      }
+    },
+    "created_at": "2026-09-08T11:07:05.454322924+08:00",
+    "updated_at": "2026-09-08T11:07:05.454323008+08:00",
+    "deleted_at": null
+  },
+  "success": true
+}

@@ -1,0 +1,22 @@
+{
+  "captured_at": "2026-08-25T15:18:46.803807+08:00",
+  "benchmark_commit": "f0eca422ed78f396d3f9a8c5dd26d0bf100028a7",
+  "branch": "newBee/benchmark-evidence",
+  "os": "macOS-26.5.2-arm64-arm-64bit",
+  "arch": "arm64",
+  "cpu_model": "Apple M1 Pro",
+  "logical_cpu": 8,
+  "memory_bytes": 17179869184,
+  "go": "go version go1.26.4 darwin/arm64",
+  "node_system": "v16.20.2",
+  "python_system": "Python 3.9.6",
+  "docker": "Docker version 29.5.3, build d1c06ef",
+  "k6": "k6 v2.0.0 (commit/devel, go1.26.3, darwin/arm64)",
+  "deployed_images": {
+    "app": "sha256:8bc652f3780f6550d9a8075dd096e72a24adb77fe9c486a962b2b21aa9e34f7d",
+    "frontend": "sha256:b26d563e6fafbaa2b91f724757ff73737fed067cd9944972b3a046f84f60ff40",
+    "docreader": "sha256:dc0b22e276c10ce09bcd22fd0886324a6a581b63f09bf8e4ac5e1b26b5973708",
+    "postgres": "sha256:af585013f97f622715de01e48d00558f7edf17055d7b40deafc9f98ca8d99a56",
+    "redis": "sha256:c9d92d840fd011c908f040592857c724ae6d877f2aba5c40ad963276507386b2"
+  }
+}

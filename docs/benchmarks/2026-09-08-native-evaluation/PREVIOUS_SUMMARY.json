@@ -1,0 +1,523 @@
+{
+  "protocol": {
+    "dataset": "four_class_v1",
+    "raw_runs": 96,
+    "cases": 16,
+    "repeats": 2,
+    "modes": [
+      "rag",
+      "wiki",
+      "hybrid"
+    ],
+    "categories": [
+      "single_hop_factual",
+      "local_synthesis",
+      "multi_hop",
+      "global_thematic"
+    ],
+    "accuracy": "all frozen fact groups present",
+    "completeness": "mean frozen fact-group coverage",
+    "retrieval_recall": "expected source documents retrieved / expected source documents",
+    "citation_recall": "expected source documents represented by final citations / expected source documents",
+    "tokens": "cumulative API-reported usage across every Agent LLM round"
+  },
+  "overall": {
+    "rag": {
+      "runs": 32,
+      "execution_complete_rate": 1.0,
+      "strict_accuracy": 0.6875,
+      "mean_completeness": 0.9337662337662338,
+      "mean_retrieval_recall": 0.9921875,
+      "mean_citation_recall": 0.64296875,
+      "tool_error_free_rate": 1,
+      "mean_tool_calls": 4.25,
+      "rerank_path_rate": 0.34375,
+      "mean_prompt_tokens": 67516.25,
+      "mean_completion_tokens": 1216.625,
+      "mean_total_tokens": 68732.875,
+      "median_total_tokens": 44823.0,
+      "p95_total_tokens": 204369.94999999998,
+      "mean_cached_tokens": 47892.0,
+      "latency_ms": {
+        "mean": 31958.730375,
+        "p50": 27412.2085,
+        "p95": 67118.29520000001,
+        "max": 90249.89
+      }
+    },
+    "wiki": {
+      "runs": 32,
+      "execution_complete_rate": 1.0,
+      "strict_accuracy": 0.65625,
+      "mean_completeness": 0.9470779220779221,
+      "mean_retrieval_recall": 0.9330729166666667,
+      "mean_citation_recall": 0.8880208333333334,
+      "tool_error_free_rate": 1,
+      "mean_tool_calls": 3.5,
+      "rerank_path_rate": 0.0,
+      "mean_prompt_tokens": 56680.71875,
+      "mean_completion_tokens": 1407.9375,
+      "mean_total_tokens": 58088.65625,
+      "median_total_tokens": 42888.5,
+      "p95_total_tokens": 152990.84999999998,
+      "mean_cached_tokens": 20912.0,
+      "latency_ms": {
+        "mean": 34639.5175625,
+        "p50": 34508.207500000004,
+        "p95": 78169.24035,
+        "max": 83768.823
+      }
+    },
+    "hybrid": {
+      "runs": 32,
+      "execution_complete_rate": 1.0,
+      "strict_accuracy": 0.71875,
+      "mean_completeness": 0.9577922077922078,
+      "mean_retrieval_recall": 0.95234375,
+      "mean_citation_recall": 0.58046875,
+      "tool_error_free_rate": 0.9375,
+      "mean_tool_calls": 5.71875,
+      "rerank_path_rate": 0.0625,
+      "mean_prompt_tokens": 114558.53125,
+      "mean_completion_tokens": 1391.90625,
+      "mean_total_tokens": 115950.4375,
+      "median_total_tokens": 82996.0,
+      "p95_total_tokens": 262299.6,
+      "mean_cached_tokens": 50800.0,
+      "latency_ms": {
+        "mean": 37823.23575,
+        "p50": 38546.504,
+        "p95": 79524.33465,
+        "max": 98963.654
+      }
+    }
+  },
+  "category": {
+    "single_hop_factual": {
+      "rag": {
+        "runs": 8,
+        "execution_complete_rate": 1.0,
+        "strict_accuracy": 1.0,
+        "mean_completeness": 1.0,
+        "mean_retrieval_recall": 1.0,
+        "mean_citation_recall": 0.375,
+        "tool_error_free_rate": 1,
+        "mean_tool_calls": 2.0,
+        "rerank_path_rate": 0.0,
+        "mean_prompt_tokens": 23682.5,
+        "mean_completion_tokens": 245.0,
+        "mean_total_tokens": 23927.5,
+        "median_total_tokens": 23573.0,
+        "p95_total_tokens": 26468.399999999998,
+        "mean_cached_tokens": 14144.0,
+        "latency_ms": {
+          "mean": 9187.505125,
+          "p50": 9006.4525,
+          "p95": 10917.137,
+          "max": 10951.101
+        }
+      },
+      "wiki": {
+        "runs": 8,
+        "execution_complete_rate": 1.0,
+        "strict_accuracy": 1.0,
+        "mean_completeness": 1.0,
+        "mean_retrieval_recall": 1.0,
+        "mean_citation_recall": 0.875,
+        "tool_error_free_rate": 1,
+        "mean_tool_calls": 2.5,
+        "rerank_path_rate": 0.0,
+        "mean_prompt_tokens": 26961.0,
+        "mean_completion_tokens": 390.25,
+        "mean_total_tokens": 27351.25,
+        "median_total_tokens": 21330.0,
+        "p95_total_tokens": 53213.99999999998,
+        "mean_cached_tokens": 15408.0,
+        "latency_ms": {
+          "mean": 11902.3455,
+          "p50": 10007.411,
+          "p95": 20079.584599999995,
+          "max": 23159.544
+        }
+      },
+      "hybrid": {
+        "runs": 8,
+        "execution_complete_rate": 1.0,
+        "strict_accuracy": 1.0,
+        "mean_completeness": 1.0,
+        "mean_retrieval_recall": 1.0,
+        "mean_citation_recall": 0.5,
+        "tool_error_free_rate": 1,
+        "mean_tool_calls": 2.5,
+        "rerank_path_rate": 0.0,
+        "mean_prompt_tokens": 29597.375,
+        "mean_completion_tokens": 289.375,
+        "mean_total_tokens": 29886.75,
+        "median_total_tokens": 28730.0,
+        "p95_total_tokens": 37015.7,
+        "mean_cached_tokens": 21952.0,
+        "latency_ms": {
+          "mean": 10334.8765,
+          "p50": 9959.271,
+          "p95": 13116.63645,
+          "max": 13253.519
+        }
+      }
+    },
+    "local_synthesis": {
+      "rag": {
+        "runs": 8,
+        "execution_complete_rate": 1.0,
+        "strict_accuracy": 1.0,
+        "mean_completeness": 1.0,
+        "mean_retrieval_recall": 1.0,
+        "mean_citation_recall": 0.75,
+        "tool_error_free_rate": 1,
+        "mean_tool_calls": 2.125,
+        "rerank_path_rate": 0.375,
+        "mean_prompt_tokens": 27083.875,
+        "mean_completion_tokens": 961.25,
+        "mean_total_tokens": 28045.125,
+        "median_total_tokens": 23617.5,
+        "p95_total_tokens": 39457.34999999999,
+        "mean_cached_tokens": 15936.0,
+        "latency_ms": {
+          "mean": 23080.386,
+          "p50": 23277.936,
+          "p95": 28867.142799999998,
+          "max": 29465.934
+        }
+      },
+      "wiki": {
+        "runs": 8,
+        "execution_complete_rate": 1.0,
+        "strict_accuracy": 1.0,
+        "mean_completeness": 1.0,
+        "mean_retrieval_recall": 1.0,
+        "mean_citation_recall": 1.0,
+        "tool_error_free_rate": 1,
+        "mean_tool_calls": 2.375,
+        "rerank_path_rate": 0.0,
+        "mean_prompt_tokens": 28353.25,
+        "mean_completion_tokens": 1203.125,
+        "mean_total_tokens": 29556.375,
+        "median_total_tokens": 26186.5,
+        "p95_total_tokens": 43165.85,
+        "mean_cached_tokens": 15360.0,
+        "latency_ms": {
+          "mean": 26948.319625,
+          "p50": 26952.216999999997,
+          "p95": 35442.8692,
+          "max": 36359.522
+        }
+      },
+      "hybrid": {
+        "runs": 8,
+        "execution_complete_rate": 1.0,
+        "strict_accuracy": 1.0,
+        "mean_completeness": 1.0,
+        "mean_retrieval_recall": 1.0,
+        "mean_citation_recall": 0.75,
+        "tool_error_free_rate": 1,
+        "mean_tool_calls": 4.0,
+        "rerank_path_rate": 0.125,
+        "mean_prompt_tokens": 59688.0,
+        "mean_completion_tokens": 1230.25,
+        "mean_total_tokens": 60918.25,
+        "median_total_tokens": 67452.5,
+        "p95_total_tokens": 83860.2,
+        "mean_cached_tokens": 36160.0,
+        "latency_ms": {
+          "mean": 30053.39875,
+          "p50": 30384.326500000003,
+          "p95": 38918.563,
+          "max": 39389.635
+        }
+      }
+    },
+    "multi_hop": {
+      "rag": {
+        "runs": 8,
+        "execution_complete_rate": 1.0,
+        "strict_accuracy": 0.375,
+        "mean_completeness": 0.8375,
+        "mean_retrieval_recall": 1.0,
+        "mean_citation_recall": 0.85,
+        "tool_error_free_rate": 1,
+        "mean_tool_calls": 4.75,
+        "rerank_path_rate": 0.0,
+        "mean_prompt_tokens": 68872.125,
+        "mean_completion_tokens": 1228.375,
+        "mean_total_tokens": 70100.5,
+        "median_total_tokens": 71525.0,
+        "p95_total_tokens": 84481.75,
+        "mean_cached_tokens": 46288.0,
+        "latency_ms": {
+          "mean": 34329.9615,
+          "p50": 32779.070999999996,
+          "p95": 49698.997899999995,
+          "max": 53865.421
+        }
+      },
+      "wiki": {
+        "runs": 8,
+        "execution_complete_rate": 1.0,
+        "strict_accuracy": 0.625,
+        "mean_completeness": 0.9409090909090909,
+        "mean_retrieval_recall": 0.8916666666666666,
+        "mean_citation_recall": 0.8833333333333333,
+        "tool_error_free_rate": 1,
+        "mean_tool_calls": 3.875,
+        "rerank_path_rate": 0.0,
+        "mean_prompt_tokens": 63083.625,
+        "mean_completion_tokens": 1751.125,
+        "mean_total_tokens": 64834.75,
+        "median_total_tokens": 55227.0,
+        "p95_total_tokens": 100380.59999999999,
+        "mean_cached_tokens": 23472.0,
+        "latency_ms": {
+          "mean": 39911.558875,
+          "p50": 38858.8995,
+          "p95": 47807.85215,
+          "max": 47873.698
+        }
+      },
+      "hybrid": {
+        "runs": 8,
+        "execution_complete_rate": 1.0,
+        "strict_accuracy": 0.5,
+        "mean_completeness": 0.9318181818181819,
+        "mean_retrieval_recall": 1.0,
+        "mean_citation_recall": 0.7,
+        "tool_error_free_rate": 0.75,
+        "mean_tool_calls": 8.625,
+        "rerank_path_rate": 0.125,
+        "mean_prompt_tokens": 182356.875,
+        "mean_completion_tokens": 1732.75,
+        "mean_total_tokens": 184089.625,
+        "median_total_tokens": 111441.5,
+        "p95_total_tokens": 473002.69999999984,
+        "mean_cached_tokens": 80704.0,
+        "latency_ms": {
+          "mean": 51383.593,
+          "p50": 45573.92,
+          "p95": 85342.67739999997,
+          "max": 98963.654
+        }
+      }
+    },
+    "global_thematic": {
+      "rag": {
+        "runs": 8,
+        "execution_complete_rate": 1.0,
+        "strict_accuracy": 0.375,
+        "mean_completeness": 0.8975649350649351,
+        "mean_retrieval_recall": 0.96875,
+        "mean_citation_recall": 0.596875,
+        "tool_error_free_rate": 1,
+        "mean_tool_calls": 8.125,
+        "rerank_path_rate": 1.0,
+        "mean_prompt_tokens": 150426.5,
+        "mean_completion_tokens": 2431.875,
+        "mean_total_tokens": 152858.375,
+        "median_total_tokens": 162111.0,
+        "p95_total_tokens": 228940.1,
+        "mean_cached_tokens": 115200.0,
+        "latency_ms": {
+          "mean": 61237.068875,
+          "p50": 58595.1945,
+          "p95": 82481.32744999998,
+          "max": 90249.89
+        }
+      },
+      "wiki": {
+        "runs": 8,
+        "execution_complete_rate": 1.0,
+        "strict_accuracy": 0.0,
+        "mean_completeness": 0.8474025974025974,
+        "mean_retrieval_recall": 0.840625,
+        "mean_citation_recall": 0.79375,
+        "tool_error_free_rate": 1,
+        "mean_tool_calls": 5.25,
+        "rerank_path_rate": 0.0,
+        "mean_prompt_tokens": 108325.0,
+        "mean_completion_tokens": 2287.25,
+        "mean_total_tokens": 110612.25,
+        "median_total_tokens": 90756.0,
+        "p95_total_tokens": 198079.3,
+        "mean_cached_tokens": 29408.0,
+        "latency_ms": {
+          "mean": 59795.84625,
+          "p50": 54025.760500000004,
+          "p95": 82504.57225,
+          "max": 83768.823
+        }
+      },
+      "hybrid": {
+        "runs": 8,
+        "execution_complete_rate": 1.0,
+        "strict_accuracy": 0.375,
+        "mean_completeness": 0.8993506493506493,
+        "mean_retrieval_recall": 0.809375,
+        "mean_citation_recall": 0.371875,
+        "tool_error_free_rate": 1,
+        "mean_tool_calls": 7.75,
+        "rerank_path_rate": 0.0,
+        "mean_prompt_tokens": 186591.875,
+        "mean_completion_tokens": 2315.25,
+        "mean_total_tokens": 188907.125,
+        "median_total_tokens": 210037.0,
+        "p95_total_tokens": 268182.69999999995,
+        "mean_cached_tokens": 64384.0,
+        "latency_ms": {
+          "mean": 59521.07475,
+          "p50": 54606.279500000004,
+          "p95": 80169.60605,
+          "max": 81298.831
+        }
+      }
+    }
+  },
+  "pairwise": {
+    "overall": {
+      "wiki_vs_rag": {
+        "comparisons": 32,
+        "wins": 5,
+        "ties": 23,
+        "losses": 4,
+        "win_rate_all": 0.15625,
+        "win_rate_non_tie": 0.5555555555555556,
+        "mean_completeness_delta": 0.013311688311688316,
+        "bootstrap_95ci": [
+          -0.02418831168831168,
+          0.0630275974025974
+        ]
+      },
+      "hybrid_vs_rag": {
+        "comparisons": 32,
+        "wins": 6,
+        "ties": 22,
+        "losses": 4,
+        "win_rate_all": 0.1875,
+        "win_rate_non_tie": 0.6,
+        "mean_completeness_delta": 0.024025974025974024,
+        "bootstrap_95ci": [
+          -0.01789772727272728,
+          0.07252435064935064
+        ]
+      }
+    },
+    "single_hop_factual": {
+      "wiki_vs_rag": {
+        "comparisons": 8,
+        "wins": 0,
+        "ties": 8,
+        "losses": 0,
+        "win_rate_all": 0.0,
+        "win_rate_non_tie": null,
+        "mean_completeness_delta": 0,
+        "bootstrap_95ci": [
+          0,
+          0
+        ]
+      },
+      "hybrid_vs_rag": {
+        "comparisons": 8,
+        "wins": 0,
+        "ties": 8,
+        "losses": 0,
+        "win_rate_all": 0.0,
+        "win_rate_non_tie": null,
+        "mean_completeness_delta": 0,
+        "bootstrap_95ci": [
+          0,
+          0
+        ]
+      }
+    },
+    "local_synthesis": {
+      "wiki_vs_rag": {
+        "comparisons": 8,
+        "wins": 0,
+        "ties": 8,
+        "losses": 0,
+        "win_rate_all": 0.0,
+        "win_rate_non_tie": null,
+        "mean_completeness_delta": 0,
+        "bootstrap_95ci": [
+          0,
+          0
+        ]
+      },
+      "hybrid_vs_rag": {
+        "comparisons": 8,
+        "wins": 0,
+        "ties": 8,
+        "losses": 0,
+        "win_rate_all": 0.0,
+        "win_rate_non_tie": null,
+        "mean_completeness_delta": 0,
+        "bootstrap_95ci": [
+          0,
+          0
+        ]
+      }
+    },
+    "multi_hop": {
+      "wiki_vs_rag": {
+        "comparisons": 8,
+        "wins": 3,
+        "ties": 5,
+        "losses": 0,
+        "win_rate_all": 0.375,
+        "win_rate_non_tie": 1.0,
+        "mean_completeness_delta": 0.10340909090909091,
+        "bootstrap_95ci": [
+          0.011363636363636367,
+          0.2636363636363636
+        ]
+      },
+      "hybrid_vs_rag": {
+        "comparisons": 8,
+        "wins": 4,
+        "ties": 2,
+        "losses": 2,
+        "win_rate_all": 0.5,
+        "win_rate_non_tie": 0.6666666666666666,
+        "mean_completeness_delta": 0.09431818181818181,
+        "bootstrap_95ci": [
+          -0.021590909090909105,
+          0.2431818181818182
+        ]
+      }
+    },
+    "global_thematic": {
+      "wiki_vs_rag": {
+        "comparisons": 8,
+        "wins": 2,
+        "ties": 2,
+        "losses": 4,
+        "win_rate_all": 0.25,
+        "win_rate_non_tie": 0.3333333333333333,
+        "mean_completeness_delta": -0.050162337662337644,
+        "bootstrap_95ci": [
+          -0.12159090909090904,
+          0.021266233766233766
+        ]
+      },
+      "hybrid_vs_rag": {
+        "comparisons": 8,
+        "wins": 2,
+        "ties": 4,
+        "losses": 2,
+        "win_rate_all": 0.25,
+        "win_rate_non_tie": 0.5,
+        "mean_completeness_delta": 0.0017857142857142794,
+        "bootstrap_95ci": [
+          -0.10892857142857144,
+          0.10892857142857142
+        ]
+      }
+    }
+  }
+}

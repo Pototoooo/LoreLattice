@@ -1,0 +1,68 @@
+{
+  "rag": {
+    "runs": 3,
+    "execution_complete_rate": 1,
+    "source_coverage": 1.0,
+    "citation_source_coverage": 1.0,
+    "reference_entity_coverage": 1.0,
+    "all_five_reference_entities_rate": 1,
+    "latency_p50_ms": 19920.766,
+    "mean_total_tokens": 29908,
+    "mean_tool_calls": 6.333333333333333,
+    "rerank_path_runs": 3,
+    "ambiguous_page_events": 0,
+    "tool_error_events": 0,
+    "native_generation_metrics": {
+      "bleu1": 0.034676298589611285,
+      "bleu2": 0.019487222298518306,
+      "bleu4": 0.008850580609259674,
+      "rouge1": 0.14003825666838332,
+      "rouge2": 0.026997632943253323,
+      "rougel": 0.09276918426945974
+    }
+  },
+  "wiki": {
+    "runs": 3,
+    "execution_complete_rate": 1,
+    "source_coverage": 1.0,
+    "citation_source_coverage": 1.0,
+    "reference_entity_coverage": 1.0,
+    "all_five_reference_entities_rate": 1,
+    "latency_p50_ms": 23208.416,
+    "mean_total_tokens": 41440,
+    "mean_tool_calls": 3.3333333333333335,
+    "rerank_path_runs": 0,
+    "ambiguous_page_events": 7,
+    "tool_error_events": 0,
+    "native_generation_metrics": {
+      "bleu1": 0.03511152630095361,
+      "bleu2": 0.024187475471970192,
+      "bleu4": 0.011063420092037179,
+      "rouge1": 0.1282607896103342,
+      "rouge2": 0.03601880073748382,
+      "rougel": 0.10895671006529083
+    }
+  },
+  "hybrid": {
+    "runs": 3,
+    "execution_complete_rate": 1,
+    "source_coverage": 0.9166666666666666,
+    "citation_source_coverage": 0.5833333333333334,
+    "reference_entity_coverage": 0.9333333333333333,
+    "all_five_reference_entities_rate": 0.6666666666666666,
+    "latency_p50_ms": 24614.644,
+    "mean_total_tokens": 68573.66666666667,
+    "mean_tool_calls": 5.333333333333333,
+    "rerank_path_runs": 0,
+    "ambiguous_page_events": 5,
+    "tool_error_events": 0,
+    "native_generation_metrics": {
+      "bleu1": 0.042909732507047944,
+      "bleu2": 0.02423583451653742,
+      "bleu4": 0.012259228562216161,
+      "rouge1": 0.1415905519655152,
+      "rouge2": 0.026315128102640625,
+      "rougel": 0.11927158767471994
+    }
+  }
+}

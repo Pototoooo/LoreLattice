@@ -1,0 +1,14 @@
+{
+  "data": {
+    "id": "7fba835f-b4fd-4315-8a16-6f02be435811",
+    "title": "native-eval-wiki-1",
+    "description": "",
+    "tenant_id": 10004,
+    "user_id": "1b18c530-f65f-4d5e-bc3e-4e752531f78e",
+    "is_pinned": false,
+    "created_at": "2026-09-08T11:13:23.303087085+08:00",
+    "updated_at": "2026-09-08T11:13:23.303087169+08:00",
+    "deleted_at": null
+  },
+  "success": true
+}

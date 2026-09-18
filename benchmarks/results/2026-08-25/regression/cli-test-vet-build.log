@@ -1,0 +1,61 @@
+	github.com/Pototoooo/lorelattice/cli		coverage: 0.0% of statements
+?   	github.com/Pototoooo/lorelattice/cli/acceptance	[no test files]
+ok  	github.com/Pototoooo/lorelattice/cli/acceptance/contract	2.786s	coverage: [no statements]
+ok  	github.com/Pototoooo/lorelattice/cli/cmd	2.290s	coverage: 75.4% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/agent	2.424s	coverage: 63.9% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/api	2.961s	coverage: 87.6% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/auth	3.287s	coverage: 79.0% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/chat	3.696s	coverage: 67.0% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/chunk	3.823s	coverage: 61.2% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/config	3.962s	coverage: 57.7% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/doc	4.986s	coverage: 73.4% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/doctor	4.383s	coverage: 75.8% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/kb	3.955s	coverage: 67.4% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/link	4.029s	coverage: 63.5% of statements
+	github.com/Pototoooo/lorelattice/cli/cmd/mcp		coverage: 0.0% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/message	4.096s	coverage: 43.2% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/model	4.117s	coverage: 65.9% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/profile	4.721s	coverage: 71.0% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/search	3.997s	coverage: 84.0% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/session	3.357s	coverage: 62.8% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/cmd/skills	3.664s	coverage: 27.8% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/build	3.900s	coverage: 100.0% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/cmdutil	3.405s	coverage: 71.6% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/compat	3.749s	coverage: 77.4% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/config	3.867s	coverage: 82.4% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/format	4.484s	coverage: 76.1% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/iostreams	4.709s	coverage: 57.9% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/mcp	5.846s	coverage: 78.2% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/output	4.709s	coverage: 100.0% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/projectlink	4.756s	coverage: 76.0% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/prompt	4.858s	coverage: 15.8% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/secrets	4.833s	coverage: 85.0% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/skillparity	3.842s	coverage: [no statements]
+ok  	github.com/Pototoooo/lorelattice/cli/internal/sse	3.385s	coverage: 67.7% of statements
+	github.com/Pototoooo/lorelattice/cli/internal/testutil		coverage: 0.0% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/text	3.388s	coverage: 75.6% of statements
+ok  	github.com/Pototoooo/lorelattice/cli/internal/xdg	3.665s	coverage: 67.7% of statements
+	github.com/Pototoooo/lorelattice/cli/skills		coverage: 0.0% of statements
+real 88.83
+user 83.19
+sys 26.91
+           304644096  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             3763472  page reclaims
+               40940  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                  76  messages sent
+                  76  messages received
+               35354  signals received
+               29852  voluntary context switches
+              726184  involuntary context switches
+            37597547  instructions retired
+            22283556  cycles elapsed
+             1196344  peak memory footprint
+COMMAND=cd cli && go test -race -coverprofile=coverage.out ./... && go vet ./... && go build ./...
+EXIT_STATUS=0
+AGGREGATE_STATEMENT_COVERAGE=69.3%

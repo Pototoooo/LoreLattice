@@ -1,0 +1,444 @@
+{
+  "protocol": {
+    "dataset": "wiki_strength_v1",
+    "cases": 12,
+    "raw_runs": 36,
+    "valid_runs": 36,
+    "modes": [
+      "rag",
+      "wiki",
+      "hybrid"
+    ],
+    "categories": [
+      "concept_relation",
+      "entity_network",
+      "overview_navigation",
+      "summary_navigation"
+    ],
+    "semantic_success_definition": "complete answer + all frozen term groups + no duplicate final paragraph",
+    "navigation_success_definition": "semantic success + anchor wiki page read + no tool error",
+    "order": "Latin-square interleaved",
+    "workers": 1
+  },
+  "modes": {
+    "rag": {
+      "runs": 12,
+      "execution_complete_rate": 1,
+      "semantic_success_rate": 0.9166666666666666,
+      "mean_evidence_term_recall": 0.9861111111111112,
+      "tool_error_free_rate": 0.9166666666666666,
+      "navigation_not_found_error_rate": 0,
+      "anchor_page_hit_rate": null,
+      "mean_wiki_page_recall": null,
+      "navigation_success_rate": null,
+      "duplicate_free_rate": 1,
+      "mean_tool_calls": 3.4166666666666665,
+      "rerank_path_call_rate": 0.3333333333333333,
+      "latency_ms": {
+        "mean": 26850.383,
+        "p50": 24105.376,
+        "p95": 41552.1259,
+        "max": 42767.143
+      },
+      "tool_distribution": {
+        "grep_chunks": 13,
+        "knowledge_search": 4,
+        "list_knowledge_chunks": 24
+      },
+      "failed_cases": [
+        "WIKI-005"
+      ]
+    },
+    "wiki": {
+      "runs": 12,
+      "execution_complete_rate": 1,
+      "semantic_success_rate": 1,
+      "mean_evidence_term_recall": 1,
+      "tool_error_free_rate": 1,
+      "navigation_not_found_error_rate": 0,
+      "anchor_page_hit_rate": 1,
+      "mean_wiki_page_recall": 0.8895833333333334,
+      "navigation_success_rate": 1,
+      "duplicate_free_rate": 1,
+      "mean_tool_calls": 3.25,
+      "rerank_path_call_rate": 0,
+      "latency_ms": {
+        "mean": 33284.95808333333,
+        "p50": 34403.516,
+        "p95": 47438.07154999999,
+        "max": 49962.054
+      },
+      "tool_distribution": {
+        "wiki_read_page": 27,
+        "wiki_search": 12
+      },
+      "failed_cases": []
+    },
+    "hybrid": {
+      "runs": 12,
+      "execution_complete_rate": 1,
+      "semantic_success_rate": 1,
+      "mean_evidence_term_recall": 1,
+      "tool_error_free_rate": 1,
+      "navigation_not_found_error_rate": 0,
+      "anchor_page_hit_rate": 0.8333333333333334,
+      "mean_wiki_page_recall": 0.7583333333333333,
+      "navigation_success_rate": 0.8333333333333334,
+      "duplicate_free_rate": 1,
+      "mean_tool_calls": 4.166666666666667,
+      "rerank_path_call_rate": 0.16666666666666666,
+      "latency_ms": {
+        "mean": 31390.370583333333,
+        "p50": 30248.836499999998,
+        "p95": 44480.249749999995,
+        "max": 47768.752
+      },
+      "tool_distribution": {
+        "get_document_info": 1,
+        "grep_chunks": 2,
+        "knowledge_search": 2,
+        "list_knowledge_chunks": 8,
+        "wiki_read_page": 27,
+        "wiki_search": 10
+      },
+      "failed_cases": []
+    }
+  },
+  "category": {
+    "concept_relation": {
+      "rag": {
+        "runs": 4,
+        "execution_complete_rate": 1,
+        "semantic_success_rate": 1,
+        "mean_evidence_term_recall": 1,
+        "tool_error_free_rate": 1,
+        "navigation_not_found_error_rate": 0,
+        "anchor_page_hit_rate": null,
+        "mean_wiki_page_recall": null,
+        "navigation_success_rate": null,
+        "duplicate_free_rate": 1,
+        "mean_tool_calls": 4.5,
+        "rerank_path_call_rate": 0.75,
+        "latency_ms": {
+          "mean": 34079.568,
+          "p50": 34258.893,
+          "p95": 42014.836899999995,
+          "max": 42767.143
+        },
+        "tool_distribution": {
+          "grep_chunks": 4,
+          "knowledge_search": 3,
+          "list_knowledge_chunks": 11
+        },
+        "failed_cases": []
+      },
+      "wiki": {
+        "runs": 4,
+        "execution_complete_rate": 1,
+        "semantic_success_rate": 1,
+        "mean_evidence_term_recall": 1,
+        "tool_error_free_rate": 1,
+        "navigation_not_found_error_rate": 0,
+        "anchor_page_hit_rate": 1,
+        "mean_wiki_page_recall": 1.0,
+        "navigation_success_rate": 1,
+        "duplicate_free_rate": 1,
+        "mean_tool_calls": 3.25,
+        "rerank_path_call_rate": 0,
+        "latency_ms": {
+          "mean": 34864.91925,
+          "p50": 34565.327,
+          "p95": 44727.4463,
+          "max": 45372.995
+        },
+        "tool_distribution": {
+          "wiki_read_page": 9,
+          "wiki_search": 4
+        },
+        "failed_cases": []
+      },
+      "hybrid": {
+        "runs": 4,
+        "execution_complete_rate": 1,
+        "semantic_success_rate": 1,
+        "mean_evidence_term_recall": 1,
+        "tool_error_free_rate": 1,
+        "navigation_not_found_error_rate": 0,
+        "anchor_page_hit_rate": 0.5,
+        "mean_wiki_page_recall": 0.5,
+        "navigation_success_rate": 0.5,
+        "duplicate_free_rate": 1,
+        "mean_tool_calls": 4.5,
+        "rerank_path_call_rate": 0.5,
+        "latency_ms": {
+          "mean": 34980.144,
+          "p50": 34150.3655,
+          "p95": 46566.895599999996,
+          "max": 47768.752
+        },
+        "tool_distribution": {
+          "get_document_info": 1,
+          "grep_chunks": 2,
+          "knowledge_search": 2,
+          "list_knowledge_chunks": 5,
+          "wiki_read_page": 6,
+          "wiki_search": 2
+        },
+        "failed_cases": []
+      }
+    },
+    "entity_network": {
+      "rag": {
+        "runs": 4,
+        "execution_complete_rate": 1,
+        "semantic_success_rate": 0.75,
+        "mean_evidence_term_recall": 0.9583333333333334,
+        "tool_error_free_rate": 0.75,
+        "navigation_not_found_error_rate": 0,
+        "anchor_page_hit_rate": null,
+        "mean_wiki_page_recall": null,
+        "navigation_success_rate": null,
+        "duplicate_free_rate": 1,
+        "mean_tool_calls": 3.25,
+        "rerank_path_call_rate": 0.25,
+        "latency_ms": {
+          "mean": 24442.616,
+          "p50": 22590.8485,
+          "p95": 38021.70174999999,
+          "max": 40558.021
+        },
+        "tool_distribution": {
+          "grep_chunks": 5,
+          "knowledge_search": 1,
+          "list_knowledge_chunks": 7
+        },
+        "failed_cases": [
+          "WIKI-005"
+        ]
+      },
+      "wiki": {
+        "runs": 4,
+        "execution_complete_rate": 1,
+        "semantic_success_rate": 1,
+        "mean_evidence_term_recall": 1,
+        "tool_error_free_rate": 1,
+        "navigation_not_found_error_rate": 0,
+        "anchor_page_hit_rate": 1,
+        "mean_wiki_page_recall": 0.78125,
+        "navigation_success_rate": 1,
+        "duplicate_free_rate": 1,
+        "mean_tool_calls": 2.75,
+        "rerank_path_call_rate": 0,
+        "latency_ms": {
+          "mean": 28110.497499999998,
+          "p50": 25366.286500000002,
+          "p95": 46601.78609999999,
+          "max": 49962.054
+        },
+        "tool_distribution": {
+          "wiki_read_page": 7,
+          "wiki_search": 4
+        },
+        "failed_cases": []
+      },
+      "hybrid": {
+        "runs": 4,
+        "execution_complete_rate": 1,
+        "semantic_success_rate": 1,
+        "mean_evidence_term_recall": 1,
+        "tool_error_free_rate": 1,
+        "navigation_not_found_error_rate": 0,
+        "anchor_page_hit_rate": 1,
+        "mean_wiki_page_recall": 1.0,
+        "navigation_success_rate": 1,
+        "duplicate_free_rate": 1,
+        "mean_tool_calls": 3.75,
+        "rerank_path_call_rate": 0,
+        "latency_ms": {
+          "mean": 27085.036,
+          "p50": 26148.035499999998,
+          "p95": 39591.772699999994,
+          "max": 41789.657
+        },
+        "tool_distribution": {
+          "list_knowledge_chunks": 2,
+          "wiki_read_page": 9,
+          "wiki_search": 4
+        },
+        "failed_cases": []
+      }
+    },
+    "overview_navigation": {
+      "rag": {
+        "runs": 2,
+        "execution_complete_rate": 1,
+        "semantic_success_rate": 1,
+        "mean_evidence_term_recall": 1,
+        "tool_error_free_rate": 1,
+        "navigation_not_found_error_rate": 0,
+        "anchor_page_hit_rate": null,
+        "mean_wiki_page_recall": null,
+        "navigation_success_rate": null,
+        "duplicate_free_rate": 1,
+        "mean_tool_calls": 2.5,
+        "rerank_path_call_rate": 0,
+        "latency_ms": {
+          "mean": 24000.392,
+          "p50": 24000.392,
+          "p95": 24505.412600000003,
+          "max": 24561.526
+        },
+        "tool_distribution": {
+          "grep_chunks": 2,
+          "list_knowledge_chunks": 3
+        },
+        "failed_cases": []
+      },
+      "wiki": {
+        "runs": 2,
+        "execution_complete_rate": 1,
+        "semantic_success_rate": 1,
+        "mean_evidence_term_recall": 1,
+        "tool_error_free_rate": 1,
+        "navigation_not_found_error_rate": 0,
+        "anchor_page_hit_rate": 1,
+        "mean_wiki_page_recall": 0.875,
+        "navigation_success_rate": 1,
+        "duplicate_free_rate": 1,
+        "mean_tool_calls": 3,
+        "rerank_path_call_rate": 0,
+        "latency_ms": {
+          "mean": 37804.522,
+          "p50": 37804.522,
+          "p95": 38300.7397,
+          "max": 38355.875
+        },
+        "tool_distribution": {
+          "wiki_read_page": 4,
+          "wiki_search": 2
+        },
+        "failed_cases": []
+      },
+      "hybrid": {
+        "runs": 2,
+        "execution_complete_rate": 1,
+        "semantic_success_rate": 1,
+        "mean_evidence_term_recall": 1,
+        "tool_error_free_rate": 1,
+        "navigation_not_found_error_rate": 0,
+        "anchor_page_hit_rate": 1,
+        "mean_wiki_page_recall": 0.75,
+        "navigation_success_rate": 1,
+        "duplicate_free_rate": 1,
+        "mean_tool_calls": 3,
+        "rerank_path_call_rate": 0,
+        "latency_ms": {
+          "mean": 29754.1405,
+          "p50": 29754.1405,
+          "p95": 31733.40025,
+          "max": 31953.318
+        },
+        "tool_distribution": {
+          "wiki_read_page": 4,
+          "wiki_search": 2
+        },
+        "failed_cases": []
+      }
+    },
+    "summary_navigation": {
+      "rag": {
+        "runs": 2,
+        "execution_complete_rate": 1,
+        "semantic_success_rate": 1,
+        "mean_evidence_term_recall": 1,
+        "tool_error_free_rate": 1,
+        "navigation_not_found_error_rate": 0,
+        "anchor_page_hit_rate": null,
+        "mean_wiki_page_recall": null,
+        "navigation_success_rate": null,
+        "duplicate_free_rate": 1,
+        "mean_tool_calls": 2.5,
+        "rerank_path_call_rate": 0,
+        "latency_ms": {
+          "mean": 20057.538,
+          "p50": 20057.538,
+          "p95": 22398.0717,
+          "max": 22658.131
+        },
+        "tool_distribution": {
+          "grep_chunks": 2,
+          "list_knowledge_chunks": 3
+        },
+        "failed_cases": []
+      },
+      "wiki": {
+        "runs": 2,
+        "execution_complete_rate": 1,
+        "semantic_success_rate": 1,
+        "mean_evidence_term_recall": 1,
+        "tool_error_free_rate": 1,
+        "navigation_not_found_error_rate": 0,
+        "anchor_page_hit_rate": 1,
+        "mean_wiki_page_recall": 0.9,
+        "navigation_success_rate": 1,
+        "duplicate_free_rate": 1,
+        "mean_tool_calls": 4.5,
+        "rerank_path_call_rate": 0,
+        "latency_ms": {
+          "mean": 35954.393000000004,
+          "p50": 35954.393000000004,
+          "p95": 39914.87,
+          "max": 40354.923
+        },
+        "tool_distribution": {
+          "wiki_read_page": 7,
+          "wiki_search": 2
+        },
+        "failed_cases": []
+      },
+      "hybrid": {
+        "runs": 2,
+        "execution_complete_rate": 1,
+        "semantic_success_rate": 1,
+        "mean_evidence_term_recall": 1,
+        "tool_error_free_rate": 1,
+        "navigation_not_found_error_rate": 0,
+        "anchor_page_hit_rate": 1,
+        "mean_wiki_page_recall": 0.8,
+        "navigation_success_rate": 1,
+        "duplicate_free_rate": 1,
+        "mean_tool_calls": 5.5,
+        "rerank_path_call_rate": 0,
+        "latency_ms": {
+          "mean": 34457.723,
+          "p50": 34457.723,
+          "p95": 36707.833699999996,
+          "max": 36957.846
+        },
+        "tool_distribution": {
+          "list_knowledge_chunks": 1,
+          "wiki_read_page": 8,
+          "wiki_search": 2
+        },
+        "failed_cases": []
+      }
+    }
+  },
+  "environment_failures": [],
+  "delta_vs_rag": {
+    "wiki": {
+      "semantic_success_percentage_points": 8.333333333333337,
+      "evidence_term_recall_percentage_points": 1.388888888888884,
+      "tool_error_free_percentage_points": 8.333333333333337,
+      "p95_latency_change_percent": 14.16520941471251,
+      "mean_tool_calls_change_percent": -4.8780487804877986
+    },
+    "hybrid": {
+      "semantic_success_percentage_points": 8.333333333333337,
+      "evidence_term_recall_percentage_points": 1.388888888888884,
+      "tool_error_free_percentage_points": 8.333333333333337,
+      "p95_latency_change_percent": 7.046868930477501,
+      "mean_tool_calls_change_percent": 21.95121951219514
+    }
+  }
+}

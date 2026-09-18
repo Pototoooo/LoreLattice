@@ -1,0 +1,94 @@
+{
+  "overall": {
+    "queries": 120,
+    "successful": 118,
+    "errors": 2,
+    "strict_assertion_pass_rate": 0.16101694915254236,
+    "mean_assertion_recall": 0.25296610169491524,
+    "citation_presence_rate": 0.5508474576271186,
+    "relevant_citation_rate": 0.5508474576271186,
+    "all_sources_cited_rate": 0.5508474576271186,
+    "latency_ms": {
+      "mean": 4388.198898305085,
+      "p50": 4277.4974999999995,
+      "p95": 10543.383899999999,
+      "p99": 15800.748669999994,
+      "max": 110639.9
+    }
+  },
+  "single": {
+    "queries": 96,
+    "successful": 94,
+    "errors": 2,
+    "strict_assertion_pass_rate": 0.20212765957446807,
+    "mean_assertion_recall": 0.3175531914893617,
+    "citation_presence_rate": 0.6914893617021277,
+    "relevant_citation_rate": 0.6914893617021277,
+    "all_sources_cited_rate": 0.6914893617021277,
+    "latency_ms": {
+      "mean": 5473.265255319149,
+      "p50": 4634.6085,
+      "p95": 10775.976099999998,
+      "p99": 23116.038529999358,
+      "max": 110639.9
+    }
+  },
+  "multi": {
+    "queries": 24,
+    "successful": 24,
+    "errors": 0,
+    "strict_assertion_pass_rate": 0,
+    "mean_assertion_recall": 0.0,
+    "citation_presence_rate": 0,
+    "relevant_citation_rate": 0,
+    "all_sources_cited_rate": 0,
+    "latency_ms": {
+      "mean": 138.35566666666668,
+      "p50": 127.8105,
+      "p95": 158.75484999999998,
+      "p99": 285.2629299999999,
+      "max": 322.387
+    }
+  },
+  "canonical": {
+    "queries": 60,
+    "successful": 59,
+    "errors": 1,
+    "strict_assertion_pass_rate": 0.1864406779661017,
+    "mean_assertion_recall": 0.2662429378531073,
+    "citation_presence_rate": 0.559322033898305,
+    "relevant_citation_rate": 0.559322033898305,
+    "all_sources_cited_rate": 0.559322033898305,
+    "latency_ms": {
+      "mean": 4873.48806779661,
+      "p50": 3923.812,
+      "p95": 7375.081499999992,
+      "p99": 52120.67008000016,
+      "max": 110639.9
+    }
+  },
+  "paraphrase": {
+    "queries": 60,
+    "successful": 59,
+    "errors": 1,
+    "strict_assertion_pass_rate": 0.13559322033898305,
+    "mean_assertion_recall": 0.23968926553672315,
+    "citation_presence_rate": 0.5423728813559322,
+    "relevant_citation_rate": 0.5423728813559322,
+    "all_sources_cited_rate": 0.5423728813559322,
+    "latency_ms": {
+      "mean": 3902.9097288135595,
+      "p50": 4433.172,
+      "p95": 11072.3813,
+      "p99": 14046.256580000008,
+      "max": 16528.221
+    }
+  },
+  "run": {
+    "workers": 4,
+    "wall_seconds": 206.939337959,
+    "queries": 120,
+    "independent_facts": 60,
+    "judge": "deterministic assertions"
+  }
+}

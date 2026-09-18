@@ -1,0 +1,23 @@
+--- original/evaluation.go
++++ modified/evaluation.go
+@@ -353,7 +353,7 @@
+ 	logger.Infof(ctx, "Creating knowledge from %d passages", len(passages))
+ 
+ 	// Create knowledge base from passages
+-	knowledge, err := e.knowledgeService.CreateKnowledgeFromPassage(ctx, knowledgeBaseID, passages, "")
++	knowledge, err := e.knowledgeService.CreateKnowledgeFromPassageSync(ctx, knowledgeBaseID, passages, "")
+ 	if err != nil {
+ 		logger.Errorf(ctx, "Failed to create knowledge from passages: %v", err)
+ 		return err
+@@ -466,8 +466,9 @@
+ 			maxPID = max(maxPID, qaPair.PIDs[i])
+ 		}
+ 	}
+-	passages := make([]string, maxPID)
+-	for i := 0; i < maxPID; i++ {
++	// Preserve PID-as-ChunkIndex, including the highest PID.
++	passages := make([]string, maxPID+1)
++	for i := 0; i <= maxPID; i++ {
+ 		if _, ok := pIDMap[i]; ok {
+ 			passages[i] = pIDMap[i]
+ 		}

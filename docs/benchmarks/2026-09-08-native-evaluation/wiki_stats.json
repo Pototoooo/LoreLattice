@@ -1,0 +1,422 @@
+{
+  "total_pages": 21,
+  "pages_by_type": {
+    "concept": 6,
+    "entity": 10,
+    "index": 1,
+    "summary": 4
+  },
+  "total_links": 54,
+  "orphan_count": 0,
+  "recent_updates": [
+    {
+      "id": "14052418-3c8a-42cb-92f5-49196ee8c4fc",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/linux",
+      "title": "Linux",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# Linux\n\nLinux is a popular, free, multi-tasking [[entity/unix|UNIX]]-like operating system widely used in computing environments. It is classified as a \"UNIX type\" operating system, meaning it adheres to the standards and behaviors established by UNIX, ensuring compatibility with many UNIX tools and methodologies. Like its predecessor, it is capable of running multiple applications and services concurrently.\n\nFor users seeking to install a non-Windows operating system on their personal computer for daily use, Linux is often the recommended choice. These systems provide a robust alternative to proprietary operating systems, offering stability, security, and a wide range of software support. Among the various options available, [[entity/ubuntu|Ubuntu]] and [[entity/linux-mint|Linux Mint]] stand out as the most popular distributions. The popularity of these distributions stems from their user-friendly interfaces and extensive community support, making them ideal candidates for those transitioning away from Windows.\n\nWhile Linux dominates the open-source desktop landscape, there are other notable open-source operating systems, such as [[entity/freebsd|FreeBSD]]. Although FreeBSD utilizes a different kernel compared to Linux, the user experience on a desktop PC is remarkably similar. This similarity arises because FreeBSD shares much of the same software ecosystem found in typical Linux distributions. Users familiar with Linux will find the transition to FreeBSD relatively smooth, as the applications and tools they rely on are largely compatible or have direct equivalents. [[entity/chrome-os|Chrome OS]] is also mentioned as an alternative operating system in the broader discussion of non-Windows platforms.",
+      "summary": "Linux is a popular, free, multi-tasking Unix-like operating system recommended for PC users seeking alternatives to Windows, with Ubuntu and Linux Mint being notable distributions.",
+      "aliases": [],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/Linux",
+      "depth": 2,
+      "source_refs": [
+        "d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0",
+        "ee9f60e3-062c-49cb-bad4-d8ccd3e8083c"
+      ],
+      "chunk_refs": [
+        "de4d8f59-f1aa-4b30-b550-3af5f6b476d0",
+        "8d80d166-f494-4478-bab7-85fca180df81"
+      ],
+      "in_links": [
+        "summary/ee9f60e3-062c-49cb-bad4-d8ccd3e8083c",
+        "concept/unix-like-operating-system",
+        "concept/open-source-operating-system",
+        "entity/ubuntu",
+        "entity/linux-mint",
+        "concept/multi-tasking-operating-system",
+        "entity/freebsd",
+        "concept/command-line-interface"
+      ],
+      "out_links": [
+        "entity/unix",
+        "entity/ubuntu",
+        "entity/linux-mint",
+        "entity/freebsd",
+        "entity/chrome-os"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:21.26532+08:00",
+      "updated_at": "2026-09-08T11:09:58.751737+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e55db4a1-be32-4187-91b6-dcd04c833533",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/unix",
+      "title": "UNIX",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# UNIX\n\nUNIX is a robust operating system designed to function across a wide variety of computer hardware architectures. It is fundamentally characterized as a [[concept/multi-tasking-operating-system|Multi-tasking Operating System]], allowing it to handle multiple processes simultaneously. Its primary interface for user interaction and system management is through a [[concept/command-line-interface|Command-line Interface]] (CLI), which provides powerful control over system resources and operations.\n\nThe unique architecture of UNIX allows it to serve dual roles in computing infrastructure. It operates effectively as a standalone, independent operating system for individual machines, while also possessing the capabilities of a [[concept/network-operating-system|Network Operating System]] (NOS). This dual nature enables it to manage network resources, facilitate communication between different systems, and support distributed computing environments. Due to this flexibility, UNIX is frequently referred to as a \"multi-purpose operating system.\"",
+      "summary": "UNIX is a multi-tasking, command-line operating system that functions as both an independent and network OS across various hardware architectures.",
+      "aliases": [],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/UNIX",
+      "depth": 2,
+      "source_refs": [
+        "ee9f60e3-062c-49cb-bad4-d8ccd3e8083c"
+      ],
+      "chunk_refs": [
+        "8d80d166-f494-4478-bab7-85fca180df81"
+      ],
+      "in_links": [
+        "summary/ee9f60e3-062c-49cb-bad4-d8ccd3e8083c",
+        "concept/network-operating-system",
+        "concept/multi-tasking-operating-system",
+        "entity/linux",
+        "concept/command-line-interface"
+      ],
+      "out_links": [
+        "concept/multi-tasking-operating-system",
+        "concept/command-line-interface",
+        "concept/network-operating-system"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:11.564749+08:00",
+      "updated_at": "2026-09-08T11:09:58.751199+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "d0b271e0-d1df-404d-ab02-7e5dec14f597",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/dos",
+      "title": "DOS",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# DOS\n\nDOS (Disk Operating System, 磁盘操作系统) is one of the first major operating systems for personal computers. It served as the primary software layer that managed hardware resources and provided a platform for running applications during the initial era of personal computing.\n\nUnlike modern graphical user interfaces, DOS operated on a text-based paradigm. When a computer running DOS was powered on, the screen displayed a command prompt, typically appearing as `c:\\>`, indicating the current drive and directory. This visual cue signaled that the system was ready to accept input.\n\n## User Interaction\n\nThe system relied entirely on a [[concept/command-line-interface|命令行界面]] (Command-Line Interface, or CLI). There were no menus to click or buttons to press. To perform any action, such as launching a program, navigating directories, or managing files, the user had to manually type specific instructions.\n\nFor example, to launch a word processing application, a user had to know the exact path and filename of the executable program. A typical command might look like `c:\\>wp\\wp.exe`, where:\n*   `c:\\>` is the prompt indicating readiness.\n*   `wp\\` specifies the subdirectory named \"wp\".\n*   `wp.exe` is the executable file name.\n\nThis requirement for precise syntax meant that users needed to memorize command structures and file paths. While this presented a steeper learning curve compared to later graphical systems, it offered a direct way to control the computer's operations.",
+      "summary": "DOS is an early personal computer operating system that uses a text-based command-line interface, requiring users to type commands at a prompt like c:\\> to manage files and run applications.",
+      "aliases": [
+        "磁盘操作系统",
+        "Disk Operating System"
+      ],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/DOS",
+      "depth": 2,
+      "source_refs": [
+        "9286e345-411e-42bf-8083-02c97dac28b2"
+      ],
+      "chunk_refs": [
+        "26937b6a-2bd4-4a8c-840a-fc2edd325cbe"
+      ],
+      "in_links": [
+        "concept/command-line-interface"
+      ],
+      "out_links": [
+        "concept/command-line-interface"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:08:54.051868+08:00",
+      "updated_at": "2026-09-08T11:09:58.750733+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "96d7ea7f-7482-4b19-930d-d0f91dfa4530",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "concept/command-line-interface",
+      "title": "命令行界面",
+      "page_type": "concept",
+      "status": "published",
+      "content": "# 命令行界面\n\n**命令行界面**（Command-Line Interface，简称 CLI）是一种基于文本的用户界面方法。在此环境中，用户通过在提示符下键入命令来执行程序和管理文件，而不是使用图形元素（如图标、窗口或鼠标交互）。\n\n## 核心特征\n\n*   **文本交互**：界面完全依赖文本输出和输入，没有可点击的菜单或按钮。\n*   **命令提示符**：系统通过命令提示符（例如 `c:\\>`）指示当前驱动器、目录以及准备接收输入的状态。\n*   **手动指令**：所有操作（如启动应用程序、导航目录或管理文件）都必须通过手动输入特定的指令来完成。\n*   **精确语法**：用户需要记忆命令结构和文件路径。例如，要启动字处理程序，用户需输入类似 `wp\\wp.exe` 的命令，其中指定了子目录和可执行文件名。\n\n## 应用背景\n\n命令行界面是早期个人计算机操作系统（如 [[entity/dos|DOS]]）的主要交互模式，也是 [[entity/unix|UNIX]] 和 [[entity/linux|Linux]] 等系统进行系统管理和资源控制的核心接口。虽然现代操作系统多采用图形用户界面（GUI），但命令行界面因其直接和强大的控制能力，在计算历史和高级系统管理中仍占据重要地位。",
+      "summary": "命令行界面是一种基于文本的用户交互方式，用户通过在提示符下输入特定命令来执行程序和管理文件，区别于图形用户界面。",
+      "aliases": [
+        "CLI"
+      ],
+      "folder_id": "7b22a03e-ef48-45a3-8af8-9cc9455407a9",
+      "category_path": [
+        "计算机概念",
+        "用户界面"
+      ],
+      "wiki_path": "concept/计算机概念/用户界面/命令行界面",
+      "depth": 2,
+      "source_refs": [
+        "9286e345-411e-42bf-8083-02c97dac28b2",
+        "ee9f60e3-062c-49cb-bad4-d8ccd3e8083c"
+      ],
+      "chunk_refs": [
+        "26937b6a-2bd4-4a8c-840a-fc2edd325cbe",
+        "8d80d166-f494-4478-bab7-85fca180df81"
+      ],
+      "in_links": [
+        "entity/unix"
+      ],
+      "out_links": [
+        "entity/dos",
+        "entity/unix",
+        "entity/linux"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:32.300186+08:00",
+      "updated_at": "2026-09-08T11:09:58.749909+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "07e0a893-d2f4-483b-b3e9-2e5867df6d8f",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/freebsd",
+      "title": "FreeBSD",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# FreeBSD\n\nFreeBSD is an open-source operating system. Although it utilizes a different kernel compared to [[entity/linux|Linux]], the user experience on a desktop PC is remarkably similar. This similarity arises because FreeBSD shares much of the same software ecosystem found in typical Linux distributions. Users familiar with Linux will find the transition to FreeBSD relatively smooth, as the applications and tools they rely on are largely compatible or have direct equivalents.",
+      "summary": "FreeBSD is an open-source operating system that uses a different kernel than Linux but shares much of the same software ecosystem, offering a similar desktop experience.",
+      "aliases": [],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/FreeBSD",
+      "depth": 2,
+      "source_refs": [
+        "d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0"
+      ],
+      "chunk_refs": [
+        "de4d8f59-f1aa-4b30-b550-3af5f6b476d0"
+      ],
+      "in_links": [
+        "concept/unix-like-operating-system",
+        "concept/open-source-operating-system",
+        "entity/linux"
+      ],
+      "out_links": [
+        "entity/linux"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:23.868812+08:00",
+      "updated_at": "2026-09-08T11:09:58.747635+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e8934982-e4de-40f5-b27f-b33036c90ae0",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/chrome-os",
+      "title": "Chrome OS",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# Chrome OS\n\nChrome OS (referred to as \"铬操作系统\" in some sources) is an operating system mentioned in the context of alternative PC operating systems. It is listed alongside other major non-Windows operating systems, indicating its relevance in the broader discussion of alternative computing platforms.",
+      "summary": "Chrome OS is an operating system mentioned as an alternative to Windows for personal computers, listed alongside Linux and FreeBSD in discussions of non-Windows computing platforms.",
+      "aliases": [
+        "铬操作系统"
+      ],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/Chrome OS",
+      "depth": 2,
+      "source_refs": [
+        "d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0"
+      ],
+      "chunk_refs": [
+        "de4d8f59-f1aa-4b30-b550-3af5f6b476d0"
+      ],
+      "in_links": [
+        "concept/open-source-operating-system",
+        "entity/linux"
+      ],
+      "out_links": null,
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:26.198088+08:00",
+      "updated_at": "2026-09-08T11:09:58.74713+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e9162105-356d-48b1-aa90-dcf3ed886d08",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/linux-mint",
+      "title": "Linux Mint",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# [[entity/linux|Linux]] Mint\n\nLinux Mint is a widely used Linux distribution cited as a top choice for personal computer installations. Along with [[entity/ubuntu|Ubuntu]], it is identified as one of the most popular distributions within the Linux ecosystem.\n\nThese systems provide a robust alternative to proprietary operating systems, offering stability, security, and a wide range of software support. Their popularity stems from user-friendly interfaces and extensive community support, making them ideal candidates for those transitioning away from Windows.",
+      "summary": "Linux Mint is a popular Linux distribution recommended for personal computers as a user-friendly, stable, and secure alternative to proprietary operating systems.",
+      "aliases": [
+        "Mint"
+      ],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/Linux Mint",
+      "depth": 2,
+      "source_refs": [
+        "d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0"
+      ],
+      "chunk_refs": [
+        "de4d8f59-f1aa-4b30-b550-3af5f6b476d0"
+      ],
+      "in_links": [
+        "summary/d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0",
+        "concept/open-source-operating-system",
+        "entity/ubuntu",
+        "entity/linux"
+      ],
+      "out_links": [
+        "entity/linux",
+        "entity/ubuntu"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:08:44.311364+08:00",
+      "updated_at": "2026-09-08T11:09:58.746107+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "27fea669-9bb5-4d41-ada2-e6985abe71dd",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "entity/ubuntu",
+      "title": "Ubuntu",
+      "page_type": "entity",
+      "status": "published",
+      "content": "# Ubuntu\n\nUbuntu is a popular [[entity/linux|Linux]] distribution. It is recommended for users seeking to install a non-Windows operating system on their personal computer for daily use. Along with [[entity/linux-mint|Linux Mint]], it stands out as one of the most popular choices within the Linux ecosystem.",
+      "summary": "Ubuntu is a popular Linux distribution recommended for users seeking a non-Windows operating system for daily use on personal computers.",
+      "aliases": [],
+      "folder_id": "8f89bd6b-8ecd-4f33-98b7-558231d13b75",
+      "category_path": [
+        "操作系统",
+        "具体系统"
+      ],
+      "wiki_path": "entity/操作系统/具体系统/Ubuntu",
+      "depth": 2,
+      "source_refs": [
+        "d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0"
+      ],
+      "chunk_refs": [
+        "de4d8f59-f1aa-4b30-b550-3af5f6b476d0"
+      ],
+      "in_links": [
+        "summary/d4fdffd0-5c7d-4290-adbb-f5e1f7ae80b0",
+        "concept/open-source-operating-system",
+        "entity/linux-mint",
+        "entity/linux"
+      ],
+      "out_links": [
+        "entity/linux",
+        "entity/linux-mint"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:08:41.454444+08:00",
+      "updated_at": "2026-09-08T11:09:58.745619+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "aff59c6d-dac0-4140-8ed5-770ea622f1f2",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "concept/multi-tasking-operating-system",
+      "title": "Multi-tasking Operating System",
+      "page_type": "concept",
+      "status": "published",
+      "content": "# Multi-tasking Operating System\n\n**Multi-tasking Operating System**: An operating system capability allowing multiple tasks or processes to be executed concurrently on a computer.\n\n[[entity/unix|UNIX]] is a multi-tasking command-line operating system implemented on many different types of computers. Because it functions as both an independent operating system and a network operating system, UNIX is sometimes referred to as a multi-purpose operating system. [[entity/linux|Linux]] is a popular, free, multi-tasking UNIX-type operating system.",
+      "summary": "A multi-tasking operating system enables the concurrent execution of multiple processes or tasks, a capability found in systems like UNIX and Linux.",
+      "aliases": [],
+      "folder_id": "9cc538f4-65ef-4aca-826f-2f560d547960",
+      "category_path": [
+        "计算机概念",
+        "操作系统特性"
+      ],
+      "wiki_path": "concept/计算机概念/操作系统特性/Multi-tasking Operating System",
+      "depth": 2,
+      "source_refs": [
+        "ee9f60e3-062c-49cb-bad4-d8ccd3e8083c"
+      ],
+      "chunk_refs": [
+        "8d80d166-f494-4478-bab7-85fca180df81"
+      ],
+      "in_links": [
+        "summary/ee9f60e3-062c-49cb-bad4-d8ccd3e8083c",
+        "entity/unix"
+      ],
+      "out_links": [
+        "entity/unix",
+        "entity/linux"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:09:14.806947+08:00",
+      "updated_at": "2026-09-08T11:09:58.740632+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "67c38541-9a82-41ea-9b25-3af8391adcd9",
+      "tenant_id": 10004,
+      "knowledge_base_id": "fed4ec72-0043-49ac-b350-19a4c5a3a581",
+      "slug": "concept/network-operating-system",
+      "title": "Network Operating System",
+      "page_type": "concept",
+      "status": "published",
+      "content": "# Network Operating System\n\nA Network Operating System is an operating system designed to support workstations, personal computers, and older terminals connected on a local area network.\n\n[[entity/unix|UNIX]] is a multi-tasking command-line operating system implemented on many different types of computers. Because it functions as both an independent operating system and a network operating system, UNIX is referred to as a multi-purpose operating system.",
+      "summary": "A Network Operating System supports workstations, personal computers, and terminals on a local area network. UNIX is cited as an example that functions as both an independent and network operating system.",
+      "aliases": [
+        "NOS"
+      ],
+      "folder_id": "f3aae82c-aeba-495a-baf2-60e5436de193",
+      "category_path": [
+        "计算机概念",
+        "操作系统类型"
+      ],
+      "wiki_path": "concept/计算机概念/操作系统类型/Network Operating System",
+      "depth": 2,
+      "source_refs": [
+        "ee9f60e3-062c-49cb-bad4-d8ccd3e8083c"
+      ],
+      "chunk_refs": [
+        "8d80d166-f494-4478-bab7-85fca180df81"
+      ],
+      "in_links": [
+        "summary/ee9f60e3-062c-49cb-bad4-d8ccd3e8083c",
+        "entity/unix"
+      ],
+      "out_links": [
+        "entity/unix"
+      ],
+      "page_metadata": null,
+      "version": 1,
+      "created_at": "2026-09-08T11:08:47.153704+08:00",
+      "updated_at": "2026-09-08T11:09:58.740025+08:00",
+      "deleted_at": null
+    }
+  ],
+  "pending_tasks": 0,
+  "pending_issues": 0,
+  "is_active": false
+}

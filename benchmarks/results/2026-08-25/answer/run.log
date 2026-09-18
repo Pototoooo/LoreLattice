@@ -1,0 +1,22 @@
+ANSWER_RESULT {"canonical": {"all_sources_cited_rate": 0.559322033898305, "citation_presence_rate": 0.559322033898305, "errors": 1, "latency_ms": {"max": 110639.9, "mean": 4873.48806779661, "p50": 3923.812, "p95": 7375.081499999992, "p99": 52120.67008000016}, "mean_assertion_recall": 0.2662429378531073, "queries": 60, "relevant_citation_rate": 0.559322033898305, "strict_assertion_pass_rate": 0.1864406779661017, "successful": 59}, "multi": {"all_sources_cited_rate": 0, "citation_presence_rate": 0, "errors": 0, "latency_ms": {"max": 322.387, "mean": 138.35566666666668, "p50": 127.8105, "p95": 158.75484999999998, "p99": 285.2629299999999}, "mean_assertion_recall": 0.0, "queries": 24, "relevant_citation_rate": 0, "strict_assertion_pass_rate": 0, "successful": 24}, "overall": {"all_sources_cited_rate": 0.5508474576271186, "citation_presence_rate": 0.5508474576271186, "errors": 2, "latency_ms": {"max": 110639.9, "mean": 4388.198898305085, "p50": 4277.4974999999995, "p95": 10543.383899999999, "p99": 15800.748669999994}, "mean_assertion_recall": 0.25296610169491524, "queries": 120, "relevant_citation_rate": 0.5508474576271186, "strict_assertion_pass_rate": 0.16101694915254236, "successful": 118}, "paraphrase": {"all_sources_cited_rate": 0.5423728813559322, "citation_presence_rate": 0.5423728813559322, "errors": 1, "latency_ms": {"max": 16528.221, "mean": 3902.9097288135595, "p50": 4433.172, "p95": 11072.3813, "p99": 14046.256580000008}, "mean_assertion_recall": 0.23968926553672315, "queries": 60, "relevant_citation_rate": 0.5423728813559322, "strict_assertion_pass_rate": 0.13559322033898305, "successful": 59}, "run": {"independent_facts": 60, "judge": "deterministic assertions", "queries": 120, "wall_seconds": 206.939337959, "workers": 4}, "single": {"all_sources_cited_rate": 0.6914893617021277, "citation_presence_rate": 0.6914893617021277, "errors": 2, "latency_ms": {"max": 110639.9, "mean": 5473.265255319149, "p50": 4634.6085, "p95": 10775.976099999998, "p99": 23116.038529999358}, "mean_assertion_recall": 0.3175531914893617, "queries": 96, "relevant_citation_rate": 0.6914893617021277, "strict_assertion_pass_rate": 0.20212765957446807, "successful": 94}}
+real 207.50
+user 1.31
+sys 1.47
+            19628032  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              215786  page reclaims
+                 988  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                1320  messages sent
+                3580  messages received
+                  47  signals received
+                 722  voluntary context switches
+               45216  involuntary context switches
+          1259466318  instructions retired
+           929143964  cycles elapsed
+            12190056  peak memory footprint
+EXIT_STATUS=0

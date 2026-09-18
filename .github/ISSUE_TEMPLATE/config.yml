@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: LoreLattice Documentation
+    url: https://github.com/Pototoooo/lorelattice/blob/main/docs/QA.md
+    about: Check LoreLattice FAQ
+  - name: Discussions
+    url: https://github.com/Pototoooo/lorelattice/discussions
+    about: Ask questions or share ideas in Discussions

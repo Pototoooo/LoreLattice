@@ -1,0 +1,297 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: benchmarks/scripts/k6_read_api_rate.js
+        output: -
+
+     scenarios: (100.00%) 3 scenarios, 90 max VUs, 1m25s max duration (incl. graceful stop):
+              * api_10rps: 10.00 iterations/s for 15s (maxVUs: 2-10, gracefulStop: 30s)
+              * api_100rps: 100.00 iterations/s for 15s (maxVUs: 5-20, startTime: 20s, gracefulStop: 30s)
+              * api_300rps: 300.00 iterations/s for 15s (maxVUs: 15-60, startTime: 40s, gracefulStop: 30s)
+
+
+running (0m01.0s), 00/22 VUs, 10 complete and 0 interrupted iterations
+api_10rps    [   7% ] 00/02 VUs  01.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    19.0s     
+api_300rps • [   0% ] waiting    39.0s     
+
+running (0m02.0s), 00/22 VUs, 20 complete and 0 interrupted iterations
+api_10rps    [  13% ] 00/02 VUs  02.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    18.0s     
+api_300rps • [   0% ] waiting    38.0s     
+
+running (0m03.0s), 00/22 VUs, 30 complete and 0 interrupted iterations
+api_10rps    [  20% ] 00/02 VUs  03.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    17.0s     
+api_300rps • [   0% ] waiting    37.0s     
+
+running (0m04.0s), 00/22 VUs, 40 complete and 0 interrupted iterations
+api_10rps    [  27% ] 00/02 VUs  04.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    16.0s     
+api_300rps • [   0% ] waiting    36.0s     
+
+running (0m05.0s), 00/22 VUs, 50 complete and 0 interrupted iterations
+api_10rps    [  33% ] 00/02 VUs  05.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    15.0s     
+api_300rps • [   0% ] waiting    35.0s     
+
+running (0m06.0s), 00/22 VUs, 60 complete and 0 interrupted iterations
+api_10rps    [  40% ] 00/02 VUs  06.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    14.0s     
+api_300rps • [   0% ] waiting    34.0s     
+
+running (0m07.0s), 00/22 VUs, 70 complete and 0 interrupted iterations
+api_10rps    [  47% ] 00/02 VUs  07.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    13.0s     
+api_300rps • [   0% ] waiting    33.0s     
+
+running (0m08.0s), 00/22 VUs, 80 complete and 0 interrupted iterations
+api_10rps    [  53% ] 00/02 VUs  08.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    12.0s     
+api_300rps • [   0% ] waiting    32.0s     
+
+running (0m09.0s), 00/22 VUs, 90 complete and 0 interrupted iterations
+api_10rps    [  60% ] 00/02 VUs  09.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    11.0s     
+api_300rps • [   0% ] waiting    31.0s     
+
+running (0m10.0s), 00/22 VUs, 100 complete and 0 interrupted iterations
+api_10rps    [  67% ] 00/02 VUs  10.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    10.0s     
+api_300rps • [   0% ] waiting    30.0s     
+
+running (0m11.0s), 00/22 VUs, 110 complete and 0 interrupted iterations
+api_10rps    [  73% ] 00/02 VUs  11.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    09.0s     
+api_300rps • [   0% ] waiting    29.0s     
+
+running (0m12.0s), 00/22 VUs, 120 complete and 0 interrupted iterations
+api_10rps    [  80% ] 00/02 VUs  12.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    08.0s     
+api_300rps • [   0% ] waiting    28.0s     
+
+running (0m13.0s), 00/22 VUs, 130 complete and 0 interrupted iterations
+api_10rps    [  87% ] 00/02 VUs  13.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    07.0s     
+api_300rps • [   0% ] waiting    27.0s     
+
+running (0m14.0s), 00/22 VUs, 140 complete and 0 interrupted iterations
+api_10rps    [  93% ] 00/02 VUs  14.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    06.0s     
+api_300rps • [   0% ] waiting    26.0s     
+
+running (0m15.0s), 00/22 VUs, 150 complete and 0 interrupted iterations
+api_10rps    [ 100% ] 00/02 VUs  15.0s/15s  10.00 iters/s
+api_100rps • [   0% ] waiting    05.0s     
+api_300rps • [   0% ] waiting    25.0s     
+
+running (0m16.0s), 00/22 VUs, 150 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s  10.00 iters/s
+api_100rps • [   0% ] waiting    04.0s
+api_300rps • [   0% ] waiting    24.0s
+
+running (0m17.0s), 00/22 VUs, 150 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s  10.00 iters/s
+api_100rps • [   0% ] waiting    03.0s
+api_300rps • [   0% ] waiting    23.0s
+
+running (0m18.0s), 00/22 VUs, 150 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s  10.00 iters/s
+api_100rps • [   0% ] waiting    02.0s
+api_300rps • [   0% ] waiting    22.0s
+
+running (0m19.0s), 00/22 VUs, 150 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s  10.00 iters/s
+api_100rps • [   0% ] waiting    01.0s
+api_300rps • [   0% ] waiting    21.0s
+
+running (0m20.0s), 00/22 VUs, 150 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s  10.00 iters/s
+api_100rps • [   0% ] waiting    00.0s
+api_300rps • [   0% ] waiting    20.0s
+
+running (0m21.0s), 01/22 VUs, 249 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [   7% ] 01/05 VUs  01.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    19.0s     
+
+running (0m22.0s), 01/22 VUs, 349 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [  13% ] 01/05 VUs  02.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    18.0s     
+
+running (0m23.0s), 01/22 VUs, 449 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [  20% ] 01/05 VUs  03.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    17.0s     
+
+running (0m24.0s), 01/22 VUs, 549 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [  27% ] 01/05 VUs  04.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    16.0s     
+
+running (0m25.0s), 01/22 VUs, 649 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [  33% ] 01/05 VUs  05.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    15.0s     
+
+running (0m26.0s), 00/22 VUs, 749 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [  40% ] 01/05 VUs  06.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    14.0s     
+
+running (0m27.0s), 01/22 VUs, 849 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [  47% ] 01/05 VUs  07.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    13.0s     
+
+running (0m28.0s), 01/22 VUs, 949 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [  53% ] 01/05 VUs  08.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    12.0s     
+
+running (0m29.0s), 00/22 VUs, 1049 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [  60% ] 00/05 VUs  09.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    11.0s     
+
+running (0m30.0s), 01/22 VUs, 1149 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [  67% ] 01/05 VUs  10.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    10.0s     
+
+running (0m31.0s), 00/22 VUs, 1249 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [  73% ] 00/05 VUs  11.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    09.0s     
+
+running (0m32.0s), 01/22 VUs, 1349 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [  80% ] 01/05 VUs  12.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    08.0s     
+
+running (0m33.0s), 01/22 VUs, 1449 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [  87% ] 01/05 VUs  13.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    07.0s     
+
+running (0m34.0s), 01/22 VUs, 1549 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [  93% ] 01/05 VUs  14.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    06.0s     
+
+running (0m35.0s), 01/22 VUs, 1649 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps   [ 100% ] 01/05 VUs  15.0s/15s  100.00 iters/s
+api_300rps • [   0% ] waiting    05.0s     
+
+running (0m36.0s), 00/22 VUs, 1651 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s  10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s  100.00 iters/s
+api_300rps • [   0% ] waiting    04.0s
+
+running (0m37.0s), 00/22 VUs, 1651 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s  10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s  100.00 iters/s
+api_300rps • [   0% ] waiting    03.0s
+
+running (0m38.0s), 00/22 VUs, 1651 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s  10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s  100.00 iters/s
+api_300rps • [   0% ] waiting    02.0s
+
+running (0m39.0s), 00/22 VUs, 1651 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s  10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s  100.00 iters/s
+api_300rps • [   0% ] waiting    01.0s
+
+running (0m40.0s), 00/22 VUs, 1651 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s  10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s  100.00 iters/s
+api_300rps • [   0% ] waiting    00.0s
+
+running (0m41.0s), 00/22 VUs, 1948 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [   7% ] 00/15 VUs  01.0s/15s  300.00 iters/s
+
+running (0m42.0s), 01/22 VUs, 2247 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [  13% ] 01/15 VUs  02.0s/15s  300.00 iters/s
+
+running (0m43.0s), 01/22 VUs, 2547 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [  20% ] 01/15 VUs  03.0s/15s  300.00 iters/s
+
+running (0m44.0s), 01/22 VUs, 2847 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [  27% ] 01/15 VUs  04.0s/15s  300.00 iters/s
+
+running (0m45.0s), 01/22 VUs, 3147 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [  33% ] 01/15 VUs  05.0s/15s  300.00 iters/s
+
+running (0m46.0s), 01/22 VUs, 3447 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [  40% ] 01/15 VUs  06.0s/15s  300.00 iters/s
+
+running (0m47.0s), 01/22 VUs, 3747 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [  47% ] 01/15 VUs  07.0s/15s  300.00 iters/s
+
+running (0m48.0s), 01/22 VUs, 4047 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [  53% ] 01/15 VUs  08.0s/15s  300.00 iters/s
+
+running (0m49.0s), 00/22 VUs, 4348 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [  60% ] 00/15 VUs  09.0s/15s  300.00 iters/s
+
+running (0m50.0s), 01/22 VUs, 4647 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [  67% ] 00/15 VUs  10.0s/15s  300.00 iters/s
+
+running (0m51.0s), 01/22 VUs, 4947 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [  73% ] 01/15 VUs  11.0s/15s  300.00 iters/s
+
+running (0m52.0s), 01/32 VUs, 5229 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [  80% ] 01/25 VUs  12.0s/15s  300.00 iters/s
+
+running (0m53.0s), 01/32 VUs, 5529 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [  87% ] 01/25 VUs  13.0s/15s  300.00 iters/s
+
+running (0m54.0s), 01/32 VUs, 5829 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [  93% ] 01/25 VUs  14.0s/15s  300.00 iters/s
+
+running (0m55.0s), 01/32 VUs, 6129 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s        10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s        100.00 iters/s
+api_300rps   [ 100% ] 01/25 VUs  15.0s/15s  300.00 iters/s
+
+running (0m55.0s), 00/32 VUs, 6134 complete and 0 interrupted iterations
+api_10rps  ✓ [ 100% ] 00/02 VUs  15s  10.00 iters/s
+api_100rps ✓ [ 100% ] 00/05 VUs  15s  100.00 iters/s
+api_300rps ✓ [ 100% ] 00/25 VUs  15s  300.00 iters/s

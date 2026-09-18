@@ -1,0 +1,9 @@
+{
+  "query": "计算机的操作系统有哪些",
+  "agent_id": "9758f652-e107-48ae-bb2f-4283127a2224",
+  "agent_enabled": true,
+  "knowledge_base_ids": [
+    "fed4ec72-0043-49ac-b350-19a4c5a3a581"
+  ],
+  "disable_title": true
+}

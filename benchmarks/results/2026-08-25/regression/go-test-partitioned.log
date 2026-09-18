@@ -1,0 +1,156 @@
+COMMAND=/usr/bin/time -lp benchmarks/scripts/run_go_regression.sh
+PHASE=default packages=85
+?   	github.com/Pototoooo/lorelattice/cmd/desktop	[no test files]
+?   	github.com/Pototoooo/lorelattice/cmd/download/duckdb	[no test files]
+?   	github.com/Pototoooo/lorelattice/cmd/server	[no test files]
+2026/08/25 15:31:45.450347 client_test.go:16: INFO: Initializing DocReader client tests
+[DocReader] 2026/08/25 15:31:45.450786 INFO: Creating new DocReader client connecting to localhost:50051
+[DocReader] 2026/08/25 15:31:45.452595 INFO: Successfully connected to DocReader service in 1.80275ms
+2026/08/25 15:31:45.618402 client_test.go:35: INFO: Read(URL) completed in 165.793959ms
+[DocReader] 2026/08/25 15:31:45.618447 INFO: Closing DocReader client connection
+--- FAIL: TestReadURL (0.17s)
+    client_test.go:38: Read failed: rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp [::1]:50051: connect: connection refused"
+[DocReader] 2026/08/25 15:31:45.618855 INFO: Creating new DocReader client connecting to localhost:50051
+[DocReader] 2026/08/25 15:31:45.618987 INFO: Successfully connected to DocReader service in 96.875µs
+2026/08/25 15:31:45.764933 client_test.go:71: INFO: Read(file) completed in 145.757625ms
+[DocReader] 2026/08/25 15:31:45.765008 INFO: Closing DocReader client connection
+--- FAIL: TestReadFile (0.15s)
+    client_test.go:74: Read failed: rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp [::1]:50051: connect: connection refused"
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/docreader/client	0.800s
+?   	github.com/Pototoooo/lorelattice/docreader/proto	[no test files]
+?   	github.com/Pototoooo/lorelattice/docs	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/agent	2.029s
+# github.com/Pototoooo/lorelattice/internal/agent/tools.test
+ld: warning: ignoring duplicate libraries: '-lc++'
+ok  	github.com/Pototoooo/lorelattice/internal/agent/approval	3.288s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/memory	1.857s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/skills	1.459s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/token	2.528s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/tools	3.745s
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository	3.721s
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/doris	4.450s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch/v7	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch/v8	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/milvus	4.308s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/neo4j	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/opensearch	4.849s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/postgres	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/qdrant	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/sqlite	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/tencentvectordb	4.767s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/weaviate	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/service	6.991s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/chat_pipeline	5.756s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/file	11.428s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/metric	4.732s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/retriever	3.493s
+?   	github.com/Pototoooo/lorelattice/internal/assets	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/billing	3.784s
+ok  	github.com/Pototoooo/lorelattice/internal/common	4.019s
+ok  	github.com/Pototoooo/lorelattice/internal/config	3.746s
+# github.com/Pototoooo/lorelattice/internal/container.test
+ld: warning: ignoring duplicate libraries: '-lc++'
+ok  	github.com/Pototoooo/lorelattice/internal/container	3.548s
+?   	github.com/Pototoooo/lorelattice/internal/database	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/datasource	9.706s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/feishu	15.017s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/rss	5.609s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/yuque	12.129s
+?   	github.com/Pototoooo/lorelattice/internal/errors	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/event	4.065s
+ok  	github.com/Pototoooo/lorelattice/internal/handler	1.760s
+ok  	github.com/Pototoooo/lorelattice/internal/handler/dto	6.962s
+ok  	github.com/Pototoooo/lorelattice/internal/handler/session	6.951s
+ok  	github.com/Pototoooo/lorelattice/internal/im	6.317s
+ok  	github.com/Pototoooo/lorelattice/internal/im/dingtalk	6.640s
+ok  	github.com/Pototoooo/lorelattice/internal/im/feishu	5.938s
+ok  	github.com/Pototoooo/lorelattice/internal/im/mattermost	4.545s
+ok  	github.com/Pototoooo/lorelattice/internal/im/qqbot	4.391s
+ok  	github.com/Pototoooo/lorelattice/internal/im/slack	4.172s
+ok  	github.com/Pototoooo/lorelattice/internal/im/telegram	4.719s
+?   	github.com/Pototoooo/lorelattice/internal/im/wechat	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/im/wecom	4.647s
+ok  	github.com/Pototoooo/lorelattice/internal/im/yunzhijia	4.692s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/chunker	4.854s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/web_fetch	5.153s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/web_search	5.263s
+ok  	github.com/Pototoooo/lorelattice/internal/llmreference	5.156s
+ok  	github.com/Pototoooo/lorelattice/internal/llmresource	5.190s
+ok  	github.com/Pototoooo/lorelattice/internal/logger	5.339s
+ok  	github.com/Pototoooo/lorelattice/internal/mcp	5.932s
+ok  	github.com/Pototoooo/lorelattice/internal/middleware	6.170s
+ok  	github.com/Pototoooo/lorelattice/internal/middleware/asynqdl	6.245s
+ok  	github.com/Pototoooo/lorelattice/internal/models/asr	6.589s
+ok  	github.com/Pototoooo/lorelattice/internal/models/chat	6.791s
+ok  	github.com/Pototoooo/lorelattice/internal/models/embedding	7.231s
+ok  	github.com/Pototoooo/lorelattice/internal/models/limiter	6.925s
+ok  	github.com/Pototoooo/lorelattice/internal/models/provider	6.444s
+ok  	github.com/Pototoooo/lorelattice/internal/models/rerank	6.369s
+ok  	github.com/Pototoooo/lorelattice/internal/models/resultcache	5.294s
+?   	github.com/Pototoooo/lorelattice/internal/models/utils	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/models/utils/ollama	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/models/vlm	5.394s
+ok  	github.com/Pototoooo/lorelattice/internal/ratelimit	4.567s
+ok  	github.com/Pototoooo/lorelattice/internal/router	4.963s
+ok  	github.com/Pototoooo/lorelattice/internal/runtime	4.349s
+ok  	github.com/Pototoooo/lorelattice/internal/sandbox	14.015s
+ok  	github.com/Pototoooo/lorelattice/internal/searchutil	4.825s
+ok  	github.com/Pototoooo/lorelattice/internal/storageallowlist	4.137s
+?   	github.com/Pototoooo/lorelattice/internal/stream	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/tracing/langfuse	5.120s
+ok  	github.com/Pototoooo/lorelattice/internal/types	4.761s
+?   	github.com/Pototoooo/lorelattice/internal/types/interfaces	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/utils	4.980s
+FAIL
+PHASE=loopback-fixtures packages=2
+--- FAIL: TestDownloadFile_RejectsLoopbackURL (0.01s)
+    client_test.go:361: expected loopback attachment URL to be rejected
+WARNING[2026-08-25 15:33:00.204] [] connector.go:403[fetchPage] | [Notion] failed to get child page blk-2: resource not found in source system: /v1/pages/blk-2
+INFO [2026-08-25 15:33:00.539] [] connector.go:513[queryDatabaseRecords] | [Notion] database db-1 (Test Database): 1 records
+WARNING[2026-08-25 15:33:00.875] [] connector.go:403[fetchPage] | [Notion] failed to get child page blk-2: resource not found in source system: /v1/pages/blk-2
+INFO [2026-08-25 15:33:00.876] [] connector.go:222[FetchIncremental] | [Notion] incremental sync, discovering pages
+INFO [2026-08-25 15:33:00.876] [] connector.go:224[FetchIncremental] | [Notion] discovered 1 pages
+INFO [2026-08-25 15:33:00.876] [] connector.go:283[FetchIncremental] | [Notion] incremental: 0 changed, 0 total items
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/internal/datasource/connector/notion	1.759s
+--- FAIL: TestValidateMinerUOutboundURL_RejectsLoopback (0.00s)
+    mineru_converter_ssrf_test.go:12: 
+        	Error Trace:	/Users/macbook/Documents/Projects/LoreLattice-benchmark/internal/infrastructure/docparser/mineru_converter_ssrf_test.go:12
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestValidateMinerUOutboundURL_RejectsLoopback
+--- FAIL: TestPingMinerU_RejectsPrivateEndpoint (0.01s)
+    mineru_converter_ssrf_test.go:19: 
+        	Error Trace:	/Users/macbook/Documents/Projects/LoreLattice-benchmark/internal/infrastructure/docparser/mineru_converter_ssrf_test.go:19
+        	Error:      	"MinerU 服务返回状态 401" does not contain "SSRF"
+        	Test:       	TestPingMinerU_RejectsPrivateEndpoint
+2026/08/25 15:33:00 WARN: remote image blocked by SSRF check (SSRF validation failed: direct IP address access is not allowed, use domain name or add to SSRF_WHITELIST): http://169.254.169.254/metadata
+2026/08/25 15:33:00 WARN: failed to download remote image http://127.0.0.1:8080/secret.png: unexpected status 401
+2026/08/25 15:33:00 WARN: failed to download remote image http://127.0.0.1:62487/page.html: non-image content type: text/html
+2026/08/25 15:33:00 WARN: failed to download remote image http://127.0.0.1:62491/nope.png: unexpected status 404
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/internal/infrastructure/docparser	1.671s
+FAIL
+RESULT default_exit=1 special_exit=1
+real 81.19
+user 89.09
+sys 40.31
+          1658945536  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             4531272  page reclaims
+              554508  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                3101  messages sent
+                3470  messages received
+               12953  signals received
+               76619  voluntary context switches
+             1401258  involuntary context switches
+            36345242  instructions retired
+            21689159  cycles elapsed
+             1376568  peak memory footprint
+EXIT_STATUS=1

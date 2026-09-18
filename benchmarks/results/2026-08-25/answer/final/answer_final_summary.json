@@ -1,0 +1,33 @@
+{
+  "dataset_queries": 120,
+  "independent_facts": 60,
+  "selection": {
+    "initial_workers4": 65,
+    "controlled_retry_workers1": 54,
+    "final_single_retry": 1
+  },
+  "overall_status_counts": {
+    "pass": 118,
+    "partial": 2
+  },
+  "exact_pass_rate": 0.9833333333333333,
+  "pass_or_partial_rate": 1.0,
+  "dimension_counts": {
+    "factual_completeness": {
+      "pass": 119,
+      "partial": 1
+    },
+    "unsupported_content": {
+      "pass": 119,
+      "partial": 1
+    },
+    "citation_quality": {
+      "pass": 120
+    }
+  },
+  "citation_presence_rate": 1.0,
+  "relevant_citation_rate": 1.0,
+  "all_declared_sources_cited_rate": 0.9583333333333334,
+  "review_method": "Codex answer-by-answer qualitative adjudication against frozen expected answers and source declarations; not an independent human blind review",
+  "latency_note": "Mixed retry paths; use the individual run summaries for latency and concurrency claims."
+}

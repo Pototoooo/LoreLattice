@@ -1,0 +1,25 @@
+onnxruntime cpuid_info warning: Unknown CPU vendor. cpuinfo_vendor value: 0
+test_format_nonempty_table (docreader.tests.test_markdown_table_util.TestMarkdownTableUtil) ... ok
+test_normalize_markitdown_en_tables (docreader.tests.test_markdown_table_util.TestMarkdownTableUtil) ... ok
+test_preserves_empty_cells (docreader.tests.test_markdown_table_util.TestMarkdownTableUtil)
+Interior empty cells must not be dropped during formatting. ... ok
+test_image_heavy_legacy_ppt_extracts_images (docreader.tests.test_ppt_convert.TestPptConvert) ... skipped 'testdata missing'
+test_legacy_ppt_magic (docreader.tests.test_ppt_convert.TestPptConvert) ... ok
+test_legacy_ppt_requires_soffice (docreader.tests.test_ppt_convert.TestPptConvert) ... ok
+test_normalize_pptx_passthrough (docreader.tests.test_ppt_convert.TestPptConvert) ... ok
+test_pptx_does_not_need_conversion (docreader.tests.test_ppt_convert.TestPptConvert) ... ok
+test_wmf_legacy_ppt_extracts_rasterized_image (docreader.tests.test_ppt_convert.TestPptConvert) ... FAIL
+
+======================================================================
+FAIL: test_wmf_legacy_ppt_extracts_rasterized_image (docreader.tests.test_ppt_convert.TestPptConvert)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/docreader/tests/test_ppt_convert.py", line 64, in test_wmf_legacy_ppt_extracts_rasterized_image
+    self.assertEqual(len(doc.images), 1)
+AssertionError: 0 != 1
+
+----------------------------------------------------------------------
+Ran 9 tests in 5.870s
+
+FAILED (failures=1, skipped=1)
+EXIT_STATUS=1

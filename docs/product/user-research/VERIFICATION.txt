@@ -1,0 +1,40 @@
+LoreLattice USER RESEARCH REHEARSAL VERIFICATION
+DATE: 2026-08-26 Asia/Shanghai
+BRANCH: newBee/fix-agent-repeated-answer
+CHANGED_FIELD: research_evidence_state = baseline_stub -> pre_recruitment_rehearsal_v1
+SCOPE: documentation only; no product technology, runtime configuration, or application code changed
+ORIGINAL_SHA256: efea34bb8b7903d3626c733d5ac1725c6935049604cf596075c4ac027f309d09
+MODIFIED_SHA256: a695aa4b217b85c1a74663567a9425e4da94c74ee655da50e555815fdf5b30de
+
+ARTIFACTS
+MODIFIED_FILE: /Users/macbook/Documents/Projects/LoreLattice/docs/product/user-research/LoreLattice_USER_RESEARCH_REHEARSAL.md
+DIFF_FILE: /Users/macbook/Documents/Projects/LoreLattice/docs/product/user-research/LoreLattice_USER_RESEARCH_REHEARSAL.diff
+VERIFICATION: /Users/macbook/Documents/Projects/LoreLattice/docs/product/user-research/VERIFICATION.txt
+ROLLBACK: /Users/macbook/Documents/Projects/LoreLattice/docs/product/user-research/ROLLBACK.sh
+
+BASELINE
+COMMAND: python3 -c 'from pathlib import Path; import sys; t=Path(sys.argv[1]).read_text(); print("BASELINE result=PASS state=stub headings=%d participant_profiles=%d" % (t.count("\n## "), t.count("\n### U")))' /Users/macbook/Documents/Projects/LoreLattice/docs/product/user-research/.baseline/LoreLattice_USER_RESEARCH_REHEARSAL.md
+INPUT: /Users/macbook/Documents/Projects/LoreLattice/docs/product/user-research/.baseline/LoreLattice_USER_RESEARCH_REHEARSAL.md
+LITERAL_OUTPUT: BASELINE result=PASS state=stub headings=0 participant_profiles=0
+EXIT_STATUS: 0
+
+MODIFIED
+COMMAND: python3 -c 'from pathlib import Path; import re,sys; t=Path(sys.argv[1]).read_text(); hs=["## 2. 用户招募与筛选记录","## 3. 访谈纪要","## 4. 问题与需求聚类","## 5. 任务测试结果","## 6. 产品问题优先级","## 7. 优化前后对比","## 8. Pilot 方案与 Go/Stop 决策","## 9. 真实访谈替换清单"]; vals=(sum(x in t for x in hs),len(re.findall(r"^### U\d{2}",t,re.M)),len(re.findall(r"^\| U\d{2} \| (?:部分成功|成功|失败)",t,re.M)),len(re.findall(r"^\| P[012] \| P[012]-\d{2} \|",t,re.M))); assert vals==(8,6,6,10), vals; print(f"MODIFIED result=PASS required_sections={vals[0]} participant_profiles={vals[1]} task_result_rows={vals[2]} priority_items={vals[3]}")' /Users/macbook/Documents/Projects/LoreLattice/docs/product/user-research/LoreLattice_USER_RESEARCH_REHEARSAL.md
+INPUT: /Users/macbook/Documents/Projects/LoreLattice/docs/product/user-research/LoreLattice_USER_RESEARCH_REHEARSAL.md
+LITERAL_OUTPUT: MODIFIED result=PASS required_sections=8 participant_profiles=6 task_result_rows=6 priority_items=10
+EXIT_STATUS: 0
+
+ROLLBACK
+COMMAND: cp /Users/macbook/Documents/Projects/LoreLattice/docs/product/user-research/LoreLattice_USER_RESEARCH_REHEARSAL.md /tmp/LoreLattice_USER_RESEARCH_REHEARSAL.rollback-test.md && /Users/macbook/Documents/Projects/LoreLattice/docs/product/user-research/ROLLBACK.sh /tmp/LoreLattice_USER_RESEARCH_REHEARSAL.rollback-test.md && cmp -s /Users/macbook/Documents/Projects/LoreLattice/docs/product/user-research/.baseline/LoreLattice_USER_RESEARCH_REHEARSAL.md /tmp/LoreLattice_USER_RESEARCH_REHEARSAL.rollback-test.md && printf 'ROLLBACK_COMPARE result=PASS baseline_match=true\n'
+INPUT: /tmp/LoreLattice_USER_RESEARCH_REHEARSAL.rollback-test.md copied from MODIFIED_FILE
+LITERAL_OUTPUT: ROLLBACK result=PASS restored=/tmp/LoreLattice_USER_RESEARCH_REHEARSAL.rollback-test.md sha256=efea34bb8b7903d3626c733d5ac1725c6935049604cf596075c4ac027f309d09 state=baseline_stub
+LITERAL_OUTPUT_2: ROLLBACK_COMPARE result=PASS baseline_match=true
+EXIT_STATUS: 0
+RESTORED_BEHAVIOR_STATUS: rollback test copy exactly matches the baseline stub; MODIFIED_FILE remains the completed rehearsal report
+
+CONTENT_CHECKS
+- 6 participant profiles with three high-severity issues each
+- 6 tasks across 6 participants, 36 total task outcomes
+- 8 problem clusters and 10 prioritized product actions
+- before/after targets, three Pilot cohorts, and conditional Go/Stop gates
+- evidence boundary explicitly distinguishes rehearsal targets from completed real-user research

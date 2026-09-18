@@ -1,0 +1,1 @@
+[{"key": "identical", "answer": "计算机的操作系统有 UNIX、Linux、FreeBSD、Mac OS 和 DOS。", "reference": "计算机的操作系统有 UNIX、Linux、FreeBSD、Mac OS 和 DOS。", "retrieved": [1, 2, 3, 4], "relevant": [1, 2, 3, 4]}, {"key": "empty", "answer": "", "reference": "计算机的操作系统有 UNIX、Linux、FreeBSD、Mac OS 和 DOS。", "retrieved": [], "relevant": [1, 2, 3, 4]}]

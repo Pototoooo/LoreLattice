@@ -1,0 +1,558 @@
+[
+  {
+    "key": "rag-1",
+    "mode": "rag",
+    "repeat": 1,
+    "question": "计算机的操作系统有哪些",
+    "session_id": "95c99673-7aa9-4f86-960f-2ae8a311011a",
+    "http_status": 200,
+    "latency_ms": 19920.766,
+    "final_answer": "根据知识库中的信息，我现在可以整理出计算机操作系统的完整列表。\n\n根据检索到的文档内容，计算机操作系统主要包括以下几类：\n\n## 主要操作系统类型\n\n### 1. **DOS（磁盘操作系统）**\n- 个人计算机的首批操作系统之一\n- 采用命令行界面（CLI），用户需要在命令提示符（如 `c:\\>`）下手动输入命令来执行操作\n- 不具有图形化界面<kb doc=\"native-passage-4\" chunk_id=\"26937b6a-2bd4-4a8c-840a-fc2edd325cbe\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n\n### 2. **Mac OS**\n- Apple Macintosh 操作系统的正式名称\n- 具有图形用户界面（GUI），通过窗口和图标进行交互\n- 所有在 Macintosh 计算机上运行的应用程序都保持一致的用户界面风格<kb doc=\"native-passage-1\" chunk_id=\"fa42ce75-8712-4904-822e-68d9d9fbd93d\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n\n### 3. **UNIX**\n- 多任务命令行操作系统\n- 可在许多不同类型的计算机硬件上实现\n- 既是独立操作系统又是网络操作系统，被称为多用途操作系统<kb doc=\"native-passage-2\" chunk_id=\"8d80d166-f494-4478-bab7-85fca180df81\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n\n### 4. **Linux**\n- 流行的、免费的、多任务的 UNIX 类型操作系统\n- 属于类 Unix 操作系统\n- 在 Linux 发行版中，**Ubuntu** 和 **Mint** 是最受欢迎的选项<kb doc=\"native-passage-2\" chunk_id=\"8d80d166-f494-4478-bab7-85fca180df81\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" /><kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n\n### 5. **FreeBSD**\n- 开源操作系统\n- 使用与 Linux 不同的内核，但使用的软件与典型 Linux 发行版大部分相同\n- 在台式 PC 上的使用体验与 Linux 非常相似<kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n\n### 6. **Chrome OS（铬操作系统）**\n- 也被提及为一种操作系统选择<kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n\n### 7. **Windows**\n- 文档中提到作为对比参考，是 PC 上最常见的操作系统之一<kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n\n这些操作系统涵盖了从早期的命令行系统（如 DOS）到现代的图形界面系统（如 Mac OS、Windows），以及开源的类 Unix 系统（如 Linux、FreeBSD）等多种类型。",
+    "tools": [
+      "knowledge_search",
+      "grep_chunks",
+      "list_knowledge_chunks",
+      "list_knowledge_chunks",
+      "list_knowledge_chunks",
+      "list_knowledge_chunks"
+    ],
+    "complete": {
+      "cached_tokens": 22784,
+      "completion_tokens": 676,
+      "prompt_tokens": 33567,
+      "total_duration_ms": 19698,
+      "total_steps": 5,
+      "total_tokens": 34243
+    },
+    "error": null,
+    "tool_errors": [],
+    "execution_complete": true,
+    "retrieved_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "cited_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "source_coverage": 1.0,
+    "citation_source_coverage": 1.0,
+    "reference_entity_coverage": 1.0,
+    "all_five_reference_entities": true,
+    "wiki_pages_read": [],
+    "ambiguous_page_events": 0,
+    "rerank_path_used": true,
+    "native_generation_metrics": {
+      "bleu1": 0.03508771929824561,
+      "bleu2": 0.024847117039791006,
+      "bleu4": 0.010173627868759126,
+      "rouge1": 0.13333333186133334,
+      "rouge2": 0.0398406364679926,
+      "rougel": 0.07999999852800002
+    }
+  },
+  {
+    "key": "wiki-1",
+    "mode": "wiki",
+    "repeat": 1,
+    "question": "计算机的操作系统有哪些",
+    "session_id": "f5d56385-92e1-4680-bd2b-6e183d030d71",
+    "http_status": 200,
+    "latency_ms": 23208.416,
+    "final_answer": "现在我已经收集了足够的信息。让我为用户提供一个全面的回答，介绍计算机操作系统的各种类型和具体实例。\n\n根据Wiki知识库中的信息，计算机操作系统可以分为多种类型，以下是主要的操作系统及其特点：\n\n## 主要操作系统分类\n\n### 1. **早期个人计算机操作系统**\n\n**[[entity/dos|DOS]]**（磁盘操作系统）\n- DOS是个人计算机早期的首批操作系统之一\n- 采用基于文本的命令行界面（CLI），用户需要在提示符（如`c:\\>`）下输入命令来管理文件和运行程序\n- 没有图形界面，所有操作都需要通过键盘输入特定指令完成\n- 例如启动文字处理软件需要输入完整路径：`c:\\>wp\\wp.exe`\n\n### 2. **UNIX及其衍生系统**\n\n**[[entity/unix|UNIX]]**\n- 一种强大的多任务、命令行操作系统\n- 可在多种硬件架构上运行\n- 既可作为独立的操作系统，也可作为网络操作系统（NOS）使用\n- 被称为\"多用途操作系统\"，支持并发执行多个进程\n\n**[[entity/linux|Linux]]**\n- 流行的免费多任务类Unix操作系统\n- 对于希望在PC上安装非Windows操作系统的用户来说，Linux是推荐的选择\n- 提供稳定性、安全性和广泛的软件支持\n- 属于[[concept/open-source-operating-system|开源操作系统]]\n\n**[[entity/freebsd|FreeBSD]]**\n- 开源操作系统，使用与Linux不同的内核\n- 但与Linux共享大部分相同的软件生态系统\n- 在桌面PC上的使用体验与Linux非常相似\n\n### 3. **Linux发行版**\n\n**[[entity/ubuntu|Ubuntu]]**\n- 最受欢迎的Linux发行版之一\n- 推荐给寻求在日常使用中替代Windows的用户\n\n**[[entity/linux-mint|Linux Mint]]**\n- 另一个广泛使用的Linux发行版\n- 以用户友好、稳定和安全著称\n- 适合从Windows过渡的用户\n\n### 4. **苹果生态系统**\n\n**[[entity/mac-os|Mac OS]]**\n- Apple为其Macintosh计算机开发的官方操作系统\n- 采用[[concept/graphical-user-interface|图形用户界面]]（GUI）\n- 通过图形图标和视觉指示器与用户交互，而非文本命令\n- 所有应用程序具有一致的外观和感觉，降低了学习曲线\n- 与Macintosh硬件紧密集成，优化性能和稳定性\n\n### 5. **其他操作系统**\n\n**[[entity/chrome-os|Chrome OS]]**（铬操作系统）\n- 作为Windows的替代方案被提及\n- 与Linux和FreeBSD一起被列为非Windows计算平台的重要选项\n\n## 按特性分类\n\n### 按功能分类：\n- **[[concept/multi-tasking-operating-system|多任务操作系统]]**：如UNIX和Linux，能够同时执行多个进程或任务\n- **[[concept/network-operating-system|网络操作系统]]**：支持局域网上的工作站、个人计算机和终端，UNIX就是典型例子\n\n### 按许可模式分类：\n- **[[concept/open-source-operating-system|开源操作系统]]**：源代码公开可访问，包括Linux发行版（Ubuntu、Mint）、FreeBSD和Chrome OS\n\n### 按用户界面分类：\n- **命令行界面（CLI）**：如DOS、UNIX、Linux，用户通过输入文本命令进行操作\n- **图形用户界面（GUI）**：如Mac OS，通过图形图标和可视化元素进行交互\n\n这些操作系统各有特点，适用于不同的使用场景和用户需求。从早期的DOS到现代的Linux、macOS和Chrome OS，操作系统的发展体现了计算机技术从专业工具向大众化、易用化方向的演进。",
+    "tools": [
+      "wiki_search",
+      "wiki_read_page",
+      "wiki_read_page"
+    ],
+    "complete": {
+      "cached_tokens": 11904,
+      "completion_tokens": 1007,
+      "prompt_tokens": 35942,
+      "total_duration_ms": 23165,
+      "total_steps": 4,
+      "total_tokens": 36949
+    },
+    "error": null,
+    "tool_errors": [],
+    "execution_complete": true,
+    "retrieved_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "cited_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "source_coverage": 1.0,
+    "citation_source_coverage": 1.0,
+    "reference_entity_coverage": 1.0,
+    "all_five_reference_entities": true,
+    "wiki_pages_read": [
+      "index",
+      "entity/dos",
+      "entity/linux",
+      "entity/chrome-os",
+      "entity/ubuntu",
+      "entity/linux-mint",
+      "entity/mac-os",
+      "entity/unix",
+      "concept/multi-tasking-operating-system",
+      "concept/network-operating-system",
+      "concept/open-source-operating-system",
+      "concept/unix-like-operating-system"
+    ],
+    "ambiguous_page_events": 2,
+    "rerank_path_used": false,
+    "native_generation_metrics": {
+      "bleu1": 0.03846153846153846,
+      "bleu2": 0.025213645282964964,
+      "bleu4": 0.00993164928911617,
+      "rouge1": 0.13253011914065901,
+      "rouge2": 0.03610108213791398,
+      "rougel": 0.12048192636957468
+    }
+  },
+  {
+    "key": "hybrid-1",
+    "mode": "hybrid",
+    "repeat": 1,
+    "question": "计算机的操作系统有哪些",
+    "session_id": "eeb3bd14-077a-41a8-8bad-54363952e988",
+    "http_status": 200,
+    "latency_ms": 24614.644,
+    "final_answer": "根据我检索到的信息，我现在可以为您提供关于计算机操作系统的全面回答。\n\n## 计算机操作系统的主要类型\n\n根据知识库中的信息，计算机操作系统主要包括以下几类：\n\n### 1. **DOS（磁盘操作系统）**\nDOS 是个人计算机早期采用的首批操作系统之一 [[entity/dos|DOS]]。它的显著特征是使用基于文本的命令行界面，用户需要在命令提示符（如 `c:\\>`）下手动输入所有命令来管理文件和运行程序 [[ref id=\"c3\"]]。这种交互方式要求用户记住具体的命令语法和文件路径。\n\n### 2. **UNIX**\nUNIX 是一种多任务命令行操作系统，能够在许多不同类型的计算机硬件上实现 [[ref id=\"c2\"]]。它具有双重属性：既可作为独立操作系统运行，也可作为网络操作系统使用，因此被称为\"多用途操作系统\" [[ref id=\"c6\"]]。UNIX 支持同时执行多个进程或服务。\n\n### 3. **Linux**\nLinux 是一种流行的、免费的、多任务的类 UNIX 操作系统 [[ref id=\"c2\"]]。对于希望在个人电脑上安装非 Windows 操作系统的用户来说，Linux 是一个值得考虑的选择 [[ref id=\"c1\"]]。其中最受欢迎的发行版包括：\n- **Ubuntu**：被推荐为日常使用的 Linux 发行版\n- **Linux Mint**：同样受欢迎且用户友好的选择\n\n### 4. **Mac OS**\nMac OS 是 Apple Macintosh 操作系统的正式名称 [[ref id=\"c4\"]]。它采用图形用户界面（GUI），通过窗口、图标等可视化元素进行交互，并确保所有在 Macintosh 计算机上运行的应用程序保持一致的用户界面风格 [[ref id=\"c8\"]]。\n\n### 5. **FreeBSD**\nFreeBSD 是一种开源操作系统，虽然它使用与 Linux 不同的内核，但共享大部分相同的软件生态系统 [[ref id=\"c1\"]]。在台式 PC 上使用 FreeBSD 的体验与 Linux 非常相似。\n\n### 6. **Chrome OS**\nChrome OS（铬操作系统）也被提及为 Windows 的替代操作系统之一，属于非 Windows 计算平台的讨论范围 [[ref id=\"c1\"]]。\n\n### 7. **Windows**\n虽然知识库主要关注非 Windows 操作系统，但 Windows 作为主流的个人计算机操作系统被多次提及作为对比参照。\n\n---\n\n**总结**：计算机操作系统涵盖了从早期的命令行系统（如 DOS）到现代的图形界面系统（如 Mac OS、Windows），以及开源的多任务系统（如 UNIX、Linux、FreeBSD）。这些系统各有特点，适用于不同的使用场景和用户需求。",
+    "tools": [
+      "wiki_search",
+      "wiki_read_page",
+      "wiki_search",
+      "wiki_read_page",
+      "grep_chunks"
+    ],
+    "complete": {
+      "cached_tokens": 30848,
+      "completion_tokens": 816,
+      "prompt_tokens": 59597,
+      "total_duration_ms": 24498,
+      "total_steps": 6,
+      "total_tokens": 60413
+    },
+    "error": null,
+    "tool_errors": [],
+    "execution_complete": true,
+    "retrieved_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "cited_pids": [
+      4
+    ],
+    "source_coverage": 1.0,
+    "citation_source_coverage": 0.25,
+    "reference_entity_coverage": 1.0,
+    "all_five_reference_entities": true,
+    "wiki_pages_read": [
+      "entity/dos",
+      "entity/linux",
+      "entity/unix",
+      "entity/mac-os",
+      "entity/chrome-os",
+      "entity/freebsd"
+    ],
+    "ambiguous_page_events": 1,
+    "rerank_path_used": false,
+    "native_generation_metrics": {
+      "bleu1": 0.04697986577181208,
+      "bleu2": 0.03080727507278671,
+      "bleu4": 0.01900393441393206,
+      "rouge1": 0.14666666519466665,
+      "rouge2": 0.040160641580619695,
+      "rougel": 0.119999998528
+    }
+  },
+  {
+    "key": "wiki-2",
+    "mode": "wiki",
+    "repeat": 2,
+    "question": "计算机的操作系统有哪些",
+    "session_id": "4905e743-4467-45f1-9662-522c871e2d93",
+    "http_status": 200,
+    "latency_ms": 22624.439,
+    "final_answer": "现在我已经收集了足够的信息。让我为用户提供一个关于计算机操作系统的全面回答。\n\n根据 Wiki 知识库中的信息，计算机的操作系统主要可以分为以下几类：\n\n## 主要操作系统类型\n\n### 1. **DOS（磁盘操作系统）**\n[[entity/dos|DOS]] (Disk Operating System) 是个人计算机早期采用的首批操作系统之一。它的显著特征在于使用基于文本的[[concept/command-line-interface|命令行界面]]，用户需要在提示符（如 `c:\\>`）下输入命令来管理文件和运行应用程序。与现代图形界面不同，DOS 要求用户记忆命令结构和文件路径。\n\n### 2. **UNIX**\n[[entity/unix|UNIX]] 是一个强大的多任务操作系统，设计用于在各种计算机硬件架构上运行。它具有以下特点：\n- 支持[[concept/multi-tasking-operating-system|多任务处理]]，可同时运行多个进程\n- 主要通过命令行界面进行交互\n- 既可以作为独立的操作系统运行，也可以作为[[concept/network-operating-system|网络操作系统]]使用\n- 因此常被称为\"多用途操作系统\"\n\n### 3. **Linux**\n[[entity/linux|Linux]] 是一种流行的、免费的[[concept/unix-like-operating-system|类 Unix 操作系统]]，具有以下特征：\n- 多任务处理能力\n- 开源特性，源代码公开可访问\n- 被推荐为 Windows 的替代品，适合日常 PC 使用\n- 主要发行版包括 [[entity/ubuntu|Ubuntu]] 和 [[entity/linux-mint|Linux Mint]]，这些发行版以用户友好、稳定和安全著称\n\n### 4. **Mac OS**\n[[entity/mac-os|Mac OS]] 是由 [[entity/apple|Apple]] 公司为其 [[entity/macintosh|Macintosh]] 计算机系列开发的官方操作系统。其特点包括：\n- 采用[[concept/graphical-user-interface|图形用户界面]] (GUI)，通过图标、窗口等视觉元素进行交互\n- 所有应用程序具有一致的外观和操作方式\n- 与 Macintosh 硬件紧密集成，优化性能和稳定性\n\n### 5. **FreeBSD**\n[[entity/freebsd|FreeBSD]] 是一个开源操作系统，虽然使用与 Linux 不同的内核，但共享大部分相同的软件生态系统。在桌面 PC 上的使用体验与 Linux 非常相似。\n\n### 6. **Chrome OS**\n[[entity/chrome-os|Chrome OS]]（铬操作系统）是另一种非 Windows 操作系统的选择，在讨论替代计算平台时经常被提及。\n\n## 按特性分类\n\n- **开源操作系统**：包括 Linux、FreeBSD 和 Chrome OS，其源代码公开可访问 \n- **类 Unix 操作系统**：包括 Linux 和 FreeBSD，它们行为类似于 UNIX，尽管内核不同但共享相似的软件生态 \n- **图形界面系统**：如 Mac OS，提供直观的可视化交互方式\n- **命令行系统**：如 DOS 和 UNIX，通过文本命令进行操作\n\n这些操作系统各有特色，适用于不同的使用场景和",
+    "tools": [
+      "wiki_search",
+      "wiki_read_page",
+      "wiki_read_page"
+    ],
+    "complete": {
+      "cached_tokens": 11904,
+      "completion_tokens": 869,
+      "prompt_tokens": 35311,
+      "total_duration_ms": 22514,
+      "total_steps": 4,
+      "total_tokens": 36180
+    },
+    "error": null,
+    "tool_errors": [],
+    "execution_complete": true,
+    "retrieved_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "cited_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "source_coverage": 1.0,
+    "citation_source_coverage": 1.0,
+    "reference_entity_coverage": 1.0,
+    "all_five_reference_entities": true,
+    "wiki_pages_read": [
+      "index",
+      "entity/dos",
+      "entity/linux",
+      "entity/unix",
+      "entity/freebsd",
+      "entity/chrome-os",
+      "entity/mac-os",
+      "concept/unix-like-operating-system",
+      "concept/open-source-operating-system",
+      "concept/multi-tasking-operating-system"
+    ],
+    "ambiguous_page_events": 2,
+    "rerank_path_used": false,
+    "native_generation_metrics": {
+      "bleu1": 0.036036036036036036,
+      "bleu2": 0.025519672084528364,
+      "bleu4": 0.011564646845405181,
+      "rouge1": 0.133333331984573,
+      "rouge2": 0.03676470497215616,
+      "rougel": 0.10909090774214876
+    }
+  },
+  {
+    "key": "hybrid-2",
+    "mode": "hybrid",
+    "repeat": 2,
+    "question": "计算机的操作系统有哪些",
+    "session_id": "39167097-1375-4718-b28f-65756ad64ed7",
+    "http_status": 200,
+    "latency_ms": 24416.804,
+    "final_answer": "根据我检索到的信息，现在可以为您详细介绍计算机的操作系统了。\n\n## 计算机操作系统概述\n\n计算机操作系统是管理硬件资源、提供用户交互界面的核心软件。根据不同的分类标准，操作系统可以分为多种类型：\n\n### 主要操作系统类型\n\n**1. DOS（磁盘操作系统）** <kb doc=\"native-passage-4\" chunk_id=\"26937b6a-2bd4-4a8c-840a-fc2edd325cbe\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 是个人计算机早期的首批操作系统之一\n- 采用命令行界面（CLI），启动后显示类似 `c:\\>` 的命令提示符\n- 用户需要通过键盘输入命令来执行操作，例如运行程序需要输入完整路径如 `c:\\>wp\\wp.exe`\n- 没有图形化界面，所有操作都基于文本命令\n\n**2. UNIX** \n- 多任务命令行操作系统，可在多种计算机硬件架构上运行 \n- 具有双重功能：既可作为独立的操作系统，也可作为网络操作系统（NOS）\n- 被称为\"多用途操作系统\"，支持同时运行多个进程或任务\n\n**3. Linux** \n- 流行的免费多任务类UNIX操作系统 \n- 对于希望在PC上安装非Windows操作系统的用户来说，Linux是推荐的选择\n- 最著名的发行版包括：\n  - **Ubuntu**：最受欢迎的Linux发行版之一，适合日常使用 <kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n  - **Linux Mint**：用户友好、稳定且安全，是替代专有操作系统的理想选择\n\n**4. FreeBSD**\n- 开源操作系统，虽然使用与Linux不同的内核，但共享大部分相同的软件生态系统 <kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 在台式PC上的使用体验与Linux非常相似\n- 熟悉Linux的用户可以相对平滑地过渡到FreeBSD\n\n**5. Chrome OS（铬操作系统）**\n- 作为Windows的替代操作系统被提及\n- 属于非Windows计算平台的讨论范畴\n\n### 按特性分类\n\n**开源操作系统** \n- 源代码公开可访问的操作系统平台\n- 包括Linux发行版（Ubuntu、Mint）、FreeBSD和Chrome OS等\n\n**多任务操作系统**\n- 能够并发执行多个任务或进程的操作系统\n- UNIX和Linux都属于此类系统\n\n**网络操作系统（NOS）**\n- 支持局域网中的工作站、个人计算机和终端\n- UNIX就是一个既能独立运行又能作为网络操作系统的典型例子\n\n这些操作系统各有特点，适用于不同的应用场景和用户需求。从早期的DOS到现代的Linux发行版，操作系统的发展体现了计算机技术从命令行向图形化、从单一任务向多任务、从封闭向开源的演进历程。",
+    "tools": [
+      "wiki_search",
+      "wiki_read_page",
+      "wiki_read_page",
+      "list_knowledge_chunks",
+      "list_knowledge_chunks"
+    ],
+    "complete": {
+      "cached_tokens": 27520,
+      "completion_tokens": 804,
+      "prompt_tokens": 58998,
+      "total_duration_ms": 24281,
+      "total_steps": 6,
+      "total_tokens": 59802
+    },
+    "error": null,
+    "tool_errors": [],
+    "execution_complete": true,
+    "retrieved_pids": [
+      2,
+      3,
+      4
+    ],
+    "cited_pids": [
+      3,
+      4
+    ],
+    "source_coverage": 0.75,
+    "citation_source_coverage": 0.5,
+    "reference_entity_coverage": 0.8,
+    "all_five_reference_entities": false,
+    "wiki_pages_read": [
+      "entity/dos",
+      "entity/linux",
+      "entity/unix",
+      "entity/freebsd",
+      "entity/chrome-os",
+      "entity/ubuntu",
+      "entity/linux-mint",
+      "concept/open-source-operating-system",
+      "concept/multi-tasking-operating-system"
+    ],
+    "ambiguous_page_events": 2,
+    "rerank_path_used": false,
+    "native_generation_metrics": {
+      "bleu1": 0.040540540540540536,
+      "bleu2": 0.0234457297736176,
+      "bleu4": 0.010628834354094579,
+      "rouge1": 0.10909090774214876,
+      "rouge2": 0.02197802107099254,
+      "rougel": 0.09696969562093664
+    }
+  },
+  {
+    "key": "rag-2",
+    "mode": "rag",
+    "repeat": 2,
+    "question": "计算机的操作系统有哪些",
+    "session_id": "f8f9c793-5939-4843-972f-d8cdf8a37dce",
+    "http_status": 200,
+    "latency_ms": 21908.924,
+    "final_answer": "根据知识库中的信息，我已经收集到了关于计算机操作系统的完整内容。现在可以给出答案了。\n\n根据知识库中的信息，计算机的操作系统主要包括以下几类：\n\n## 主要操作系统类型\n\n### 1. **UNIX**\n- 多任务命令行操作系统，可在许多不同类型的计算机上实现\n- 既是独立操作系统又是网络操作系统，因此被称为多用途操作系统 <kb doc=\"native-passage-2\" chunk_id=\"8d80d166-f494-4478-bab7-85fca180df81\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n\n### 2. **Linux**\n- 流行的、免费的、多任务的 UNIX 类型操作系统 <kb doc=\"native-passage-2\" chunk_id=\"8d80d166-f494-4478-bab7-85fca180df81\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 类 Unix 操作系统，在 PC 上安装非 Windows 系统时的推荐选择 <kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 最受欢迎的发行版包括 Ubuntu 和 Mint <kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n\n### 3. **Mac OS**\n- Apple Macintosh 操作系统的正式名称 <kb doc=\"native-passage-1\" chunk_id=\"fa42ce75-8712-4904-822e-68d9d9fbd93d\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 具有图形用户界面（GUI），利用窗口和图标进行交互 <kb doc=\"native-passage-1\" chunk_id=\"fa42ce75-8712-4904-822e-68d9d9fbd93d\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 所有运行在 Macintosh 计算机上的应用程序都具有类似的用户界面风格 <kb doc=\"native-passage-1\" chunk_id=\"c7fbaa0a-0bde-4e2d-9b42-71679d255425\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n\n### 4. **DOS（磁盘操作系统）**\n- 个人计算机早期采用的首批操作系统之一 <kb doc=\"native-passage-4\" chunk_id=\"26937b6a-2bd4-4a8c-840a-fc2edd325cbe\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 使用命令行界面，启动后显示\"c:\\>\"命令提示符 <kb doc=\"native-passage-4\" chunk_id=\"26937b6a-2bd4-4a8c-840a-fc2edd325cbe\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 用户需要通过手动输入命令来执行所有操作 <kb doc=\"native-passage-4\" chunk_id=\"47432aaf-99f7-487b-b083-cca5ccf7e1e5\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n\n### 5. **FreeBSD**\n- 开源操作系统，使用与 Linux 不同的内核 <kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 使用的软件与典型 Linux 发行版中的大部分软件相同 <kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 在台式 PC 上的使用体验与 Linux 非常相似 <kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n\n### 6. **Chrome OS（铬操作系统）**\n- 也被提及为一种操作系统选项 <kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n\n这些操作系统涵盖了从早期的命令行系统（如 DOS）到现代的图形界面系统（如 Mac OS），以及开源系统（如 Linux、FreeBSD）等多种类型。",
+    "tools": [
+      "knowledge_search",
+      "list_knowledge_chunks",
+      "list_knowledge_chunks",
+      "list_knowledge_chunks",
+      "list_knowledge_chunks",
+      "grep_chunks",
+      "list_knowledge_chunks",
+      "list_knowledge_chunks"
+    ],
+    "complete": {
+      "cached_tokens": 25216,
+      "completion_tokens": 754,
+      "prompt_tokens": 35381,
+      "total_duration_ms": 21870,
+      "total_steps": 5,
+      "total_tokens": 36135
+    },
+    "error": null,
+    "tool_errors": [],
+    "execution_complete": true,
+    "retrieved_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "cited_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "source_coverage": 1.0,
+    "citation_source_coverage": 1.0,
+    "reference_entity_coverage": 1.0,
+    "all_five_reference_entities": true,
+    "wiki_pages_read": [],
+    "ambiguous_page_events": 0,
+    "rerank_path_used": true,
+    "native_generation_metrics": {
+      "bleu1": 0.03294117647058823,
+      "bleu2": 0.021590477614920882,
+      "bleu4": 0.009408020042768625,
+      "rouge1": 0.14765100523039504,
+      "rouge2": 0.04115226236176737,
+      "rougel": 0.0939597300626098
+    }
+  },
+  {
+    "key": "hybrid-3",
+    "mode": "hybrid",
+    "repeat": 3,
+    "question": "计算机的操作系统有哪些",
+    "session_id": "a6f9c02c-5f66-48b3-b1d4-ec4d8242b402",
+    "http_status": 200,
+    "latency_ms": 29408.765,
+    "final_answer": "根据我检索到的信息，我现在可以为用户提供一个全面的操作系统列表和介绍。\n\n根据知识库中的信息，计算机的操作系统主要包括以下几类：\n\n## 主要操作系统类型\n\n### 1. **DOS（磁盘操作系统）**\nDOS 是个人计算机早期采用的首批操作系统之一 [[entity/dos|DOS]]。它的显著特征是使用基于文本的命令行界面，用户需要在命令提示符（如 `c:\\>`）下手动输入所有命令来管理文件和运行程序 [[ref id=\"d5\"/>][[ref id=\"c3\"/>]。\n\n### 2. **UNIX**\nUNIX 是一种多任务命令行操作系统，能够在许多不同类型的计算机硬件上实现 [[entity/unix|UNIX]][[ref id=\"d7\"/>][[ref id=\"c2\"/>]。它既是独立操作系统又是网络操作系统，因此被称为多用途操作系统 [[ref id=\"c6\"/>]。\n\n### 3. **Linux**\nLinux 是一种流行的、免费的、多任务的 UNIX 类型操作系统 [[entity/linux|Linux]][[ref id=\"d7\"/>][[ref id=\"c2\"/>]。对于希望在个人电脑上安装非 Windows 操作系统的用户，Linux 是一个值得考虑的选择 [[ref id=\"d6\"/>][[ref id=\"c1\"/>]。主要的 Linux 发行版包括：\n- **Ubuntu** - 最受欢迎的 Linux 发行版之一 [[entity/ubuntu|Ubuntu]][[ref id=\"d8\"/>][[ref id=\"c1\"/>]\n- **Linux Mint** - 另一个广受欢迎的 Linux 发行版 [[entity/linux-mint|Linux Mint]][[ref id=\"d8\"/>][[ref id=\"c1\"/>]\n\n### 4. **Mac OS**\nMac OS 是 Apple Macintosh 操作系统的正式名称 [[entity/mac-os|Mac OS]][[ref id=\"d9\"/>][[ref id=\"c4\"/>]。它具有图形用户界面（GUI），通过窗口和图标进行交互，并确保所有应用程序保持一致的用户界面风格 [[ref id=\"c8\"/>]。\n\n### 5. **FreeBSD**\nFreeBSD 是一种开源操作系统，虽然使用与 Linux 不同的内核，但共享大部分相同的软件生态系统 [[entity/freebsd|FreeBSD]][[ref id=\"d8\"/>][[ref id=\"c1\"/>]。在台式 PC 上使用 FreeBSD 的体验与 Linux 非常相似 [[ref id=\"c1\"/>]。\n\n### 6. **Chrome OS**\nChrome OS（铬操作系统）也被提及为 Windows 的替代操作系统选项 [[entity/chrome-os|Chrome OS]][[ref id=\"d8\"/>][[ref id=\"c1\"/>]。\n\n## 按界面类型分类\n\n- **命令行界面（CLI）**：DOS、UNIX\n- **图形用户界面（GUI）**：Mac OS\n- **混合型**：Linux（既有命令行也有图形界面）\n\n这些操作系统涵盖了从早期的个人计算到现代多任务处理和网络管理的各种需求。",
+    "tools": [
+      "wiki_search",
+      "wiki_read_page",
+      "wiki_read_page",
+      "wiki_read_page",
+      "wiki_read_page",
+      "grep_chunks"
+    ],
+    "complete": {
+      "cached_tokens": 20608,
+      "completion_tokens": 949,
+      "prompt_tokens": 84557,
+      "total_duration_ms": 29342,
+      "total_steps": 7,
+      "total_tokens": 85506
+    },
+    "error": null,
+    "tool_errors": [],
+    "execution_complete": true,
+    "retrieved_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "cited_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "source_coverage": 1.0,
+    "citation_source_coverage": 1.0,
+    "reference_entity_coverage": 1.0,
+    "all_five_reference_entities": true,
+    "wiki_pages_read": [
+      "entity/dos",
+      "entity/linux",
+      "entity/unix",
+      "summary/ee9f60e3-062c-49cb-bad4-d8ccd3e8083c",
+      "entity/ubuntu",
+      "entity/linux-mint",
+      "entity/freebsd",
+      "entity/chrome-os",
+      "index",
+      "entity/mac-os"
+    ],
+    "ambiguous_page_events": 2,
+    "rerank_path_used": false,
+    "native_generation_metrics": {
+      "bleu1": 0.041208791208791215,
+      "bleu2": 0.01845449870320796,
+      "bleu4": 0.007144916918621846,
+      "rouge1": 0.16901408295973022,
+      "rouge2": 0.016806721656309646,
+      "rougel": 0.1408450688752232
+    }
+  },
+  {
+    "key": "rag-3",
+    "mode": "rag",
+    "repeat": 3,
+    "question": "计算机的操作系统有哪些",
+    "session_id": "f51dde8d-ed7e-48c2-a578-91732285dce5",
+    "http_status": 200,
+    "latency_ms": 14821.752,
+    "final_answer": "根据知识库中的信息，我可以为您总结计算机操作系统的类型：\n\n## 计算机操作系统的主要类型\n\n### 1. **DOS（磁盘操作系统）** <kb doc=\"native-passage-4\" chunk_id=\"26937b6a-2bd4-4a8c-840a-fc2edd325cbe\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 个人计算机早期的首批操作系统之一\n- 采用命令行界面（CLI），启动后显示\"c:\\>\"命令提示符\n- 用户需要通过键盘输入文本命令来执行所有操作\n\n### 2. **UNIX** <kb doc=\"native-passage-2\" chunk_id=\"8d80d166-f494-4478-bab7-85fca180df81\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 多任务命令行操作系统\n- 可在多种不同类型的计算机上运行\n- 既是独立操作系统又是网络操作系统，被称为\"多用途操作系统\"\n\n### 3. **Linux** <kb doc=\"native-passage-2\" chunk_id=\"8d80d166-f494-4478-bab7-85fca180df81\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" /><kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 流行的、免费的、多任务的UNIX类型操作系统\n- 属于类Unix操作系统\n- Ubuntu和Mint是最受欢迎的发行版\n- 适合在PC上作为Windows的替代系统使用\n\n### 4. **FreeBSD** <kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 开源操作系统\n- 使用与Linux不同的内核\n- 使用的软件与典型Linux发行版大部分相同\n- 在台式PC上的使用体验与Linux非常相似\n\n### 5. **Mac OS** <kb doc=\"native-passage-1\" chunk_id=\"fa42ce75-8712-4904-822e-68d9d9fbd93d\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- Apple Macintosh操作系统的正式名称\n- 具有图形用户界面（GUI）\n- 利用窗口、图标进行交互\n- 所有应用程序保持一致的用户界面风格\n\n### 6. **Chrome OS（铬操作系统）** <kb doc=\"native-passage-3\" chunk_id=\"de4d8f59-f1aa-4b30-b550-3af5f6b476d0\" kb_id=\"fed4ec72-0043-49ac-b350-19a4c5a3a581\" />\n- 也被提及为一种操作系统选择\n\n这些操作系统涵盖了从早期的命令行界面系统到现代的图形化界面系统，包括商业系统和开源系统等多种类型。",
+    "tools": [
+      "knowledge_search",
+      "list_knowledge_chunks",
+      "list_knowledge_chunks",
+      "list_knowledge_chunks",
+      "list_knowledge_chunks"
+    ],
+    "complete": {
+      "cached_tokens": 10240,
+      "completion_tokens": 531,
+      "prompt_tokens": 18815,
+      "total_duration_ms": 14734,
+      "total_steps": 3,
+      "total_tokens": 19346
+    },
+    "error": null,
+    "tool_errors": [],
+    "execution_complete": true,
+    "retrieved_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "cited_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "source_coverage": 1.0,
+    "citation_source_coverage": 1.0,
+    "reference_entity_coverage": 1.0,
+    "all_five_reference_entities": true,
+    "wiki_pages_read": [],
+    "ambiguous_page_events": 0,
+    "rerank_path_used": true,
+    "native_generation_metrics": {
+      "bleu1": 0.036000000000000004,
+      "bleu2": 0.012024072240843032,
+      "bleu4": 0.006970093916251274,
+      "rouge1": 0.13913043291342156,
+      "rouge2": 0,
+      "rougel": 0.1043478242177694
+    }
+  },
+  {
+    "key": "wiki-3",
+    "mode": "wiki",
+    "repeat": 3,
+    "question": "计算机的操作系统有哪些",
+    "session_id": "e9113ed4-6cb9-4a4f-86e3-b46b9b84f66d",
+    "http_status": 200,
+    "latency_ms": 25528.957,
+    "final_answer": "现在我已经收集了足够的信息。让我为用户提供一个全面的答案，介绍计算机操作系统的种类和特点。\n\n根据Wiki知识库中的信息，计算机操作系统可以分为以下几类：\n\n## 主要操作系统类型\n\n### 1. **早期个人电脑操作系统**\n\n**[[entity/dos|DOS]]**（磁盘操作系统）\n- 是个人计算机早期的首批操作系统之一\n- 采用基于文本的命令行界面（CLI），用户需要在 `c:\\>` 提示符下输入命令来管理文件和运行应用程序\n- 没有图形化界面，所有操作都需要通过手动输入特定指令完成\n- 代表了早期个人计算时代的典型交互方式\n\n### 2. **Unix及其衍生系统**\n\n**[[entity/unix|UNIX]]**\n- 一种多任务、命令行操作系统，可在多种硬件架构上运行\n- 具有双重功能：既可作为独立操作系统，也可作为网络操作系统（NOS）\n- 因此被称为\"多用途操作系统\"\n- 支持并发执行多个进程或任务\n\n**[[entity/linux|Linux]]**\n- 流行的免费多任务类Unix操作系统\n- 被推荐为希望在个人电脑上使用非Windows系统的用户的选择\n- 最著名的发行版包括 [[entity/ubuntu|Ubuntu]] 和 [[entity/linux-mint|Linux Mint]]\n- 提供稳定性、安全性和广泛的软件支持\n\n**[[entity/freebsd|FreeBSD]]**\n- 开源操作系统，使用与Linux不同的内核\n- 但共享大部分相同的软件生态系统\n- 在桌面PC上的使用体验与Linux非常相似\n\n### 3. **苹果生态系统**\n\n**[[entity/mac-os|Mac OS]]**\n- Apple为其Macintosh计算机开发的官方操作系统\n- 采用图形用户界面（GUI），通过窗口、图标和菜单进行交互\n- 所有在Macintosh上运行的应用程序都具有统一的外观和感觉\n- 与硬件紧密集成，提供优化的性能和稳定性\n\n### 4. **其他现代操作系统**\n\n**[[entity/chrome-os|Chrome OS]]**（铬操作系统）\n- 作为Windows的替代方案被提及\n- 与Linux和FreeBSD一起被列为非Windows计算平台的重要选择\n\n## 按技术特性分类\n\n### 按用户界面类型：\n- **命令行界面（CLI）**：如DOS、UNIX、Linux的系统管理接口\n- **图形用户界面（GUI）**：如Mac OS，通过可视化元素降低使用门槛\n\n### 按功能特性：\n- **多任务操作系统**：如UNIX和Linux，可同时执行多个任务\n- **网络操作系统**：如UNIX，支持局域网中的工作站和个人计算机\n\n### 按源代码开放性：\n- **开源操作系统**：如Linux、FreeBSD、Chrome OS，源代码公开可访问\n- **专有操作系统**：如Mac OS（由Apple独家开发）\n\n### 按兼容性：\n- **类Unix操作系统**：包括Linux和FreeBSD，行为类似于Unix，尽管内核不同但共享相似的软件生态系统\n\n这些操作系统各有特点，适用于不同的应用场景和用户需求。从早期的DOS到现代的Linux发行版，操作系统的发展反映了计算机技术从命令行向图形化、从单一任务向多任务、从封闭向开源的演进历程。",
+    "tools": [
+      "wiki_search",
+      "wiki_read_page",
+      "wiki_read_page",
+      "wiki_read_page"
+    ],
+    "complete": {
+      "cached_tokens": 11904,
+      "completion_tokens": 962,
+      "prompt_tokens": 50229,
+      "total_duration_ms": 25455,
+      "total_steps": 5,
+      "total_tokens": 51191
+    },
+    "error": null,
+    "tool_errors": [],
+    "execution_complete": true,
+    "retrieved_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "cited_pids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "source_coverage": 1.0,
+    "citation_source_coverage": 1.0,
+    "reference_entity_coverage": 1.0,
+    "all_five_reference_entities": true,
+    "wiki_pages_read": [
+      "index",
+      "entity/dos",
+      "entity/linux",
+      "entity/freebsd",
+      "entity/chrome-os",
+      "entity/ubuntu",
+      "entity/linux-mint",
+      "concept/multi-tasking-operating-system",
+      "concept/network-operating-system",
+      "concept/open-source-operating-system",
+      "concept/unix-like-operating-system",
+      "entity/unix",
+      "concept/graphical-user-interface",
+      "concept/command-line-interface"
+    ],
+    "ambiguous_page_events": 3,
+    "rerank_path_used": false,
+    "native_generation_metrics": {
+      "bleu1": 0.03083700440528634,
+      "bleu2": 0.02182910904841725,
+      "bleu4": 0.011693964141590185,
+      "rouge1": 0.11891891770577064,
+      "rouge2": 0.03519061510238131,
+      "rougel": 0.09729729608414903
+    }
+  }
+]

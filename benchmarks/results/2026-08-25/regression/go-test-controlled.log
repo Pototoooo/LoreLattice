@@ -1,0 +1,310 @@
+COMMAND=env -u LOG_FORMAT SSRF_WHITELIST=127.0.0.1,localhost /usr/bin/time -lp go test -count=1 ./...
+?   	github.com/Pototoooo/lorelattice/cmd/desktop	[no test files]
+?   	github.com/Pototoooo/lorelattice/cmd/download/duckdb	[no test files]
+?   	github.com/Pototoooo/lorelattice/cmd/server	[no test files]
+# github.com/Pototoooo/lorelattice/internal/agent/tools.test
+ld: warning: ignoring duplicate libraries: '-lc++'
+2026/08/25 15:29:24.314877 client_test.go:16: INFO: Initializing DocReader client tests
+[DocReader] 2026/08/25 15:29:24.327287 INFO: Creating new DocReader client connecting to localhost:50051
+[DocReader] 2026/08/25 15:29:24.327826 INFO: Successfully connected to DocReader service in 534.75µs
+2026/08/25 15:29:34.616086 client_test.go:35: INFO: Read(URL) completed in 10.288252292s
+[DocReader] 2026/08/25 15:29:34.616420 INFO: Closing DocReader client connection
+--- FAIL: TestReadURL (10.29s)
+    client_test.go:38: Read failed: rpc error: code = Unavailable desc = connection error: desc = "error reading server preface: read tcp 127.0.0.1:61202->127.0.0.1:50051: read: connection reset by peer"
+[DocReader] 2026/08/25 15:29:34.616995 INFO: Creating new DocReader client connecting to localhost:50051
+[DocReader] 2026/08/25 15:29:34.617466 INFO: Successfully connected to DocReader service in 462.791µs
+2026/08/25 15:29:34.875886 client_test.go:71: INFO: Read(file) completed in 258.121166ms
+[DocReader] 2026/08/25 15:29:34.876423 INFO: Closing DocReader client connection
+--- FAIL: TestReadFile (0.26s)
+    client_test.go:74: Read failed: rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:50051: connect: connection refused"
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/docreader/client	11.558s
+?   	github.com/Pototoooo/lorelattice/docreader/proto	[no test files]
+?   	github.com/Pototoooo/lorelattice/docs	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/agent	1.939s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/approval	3.644s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/memory	3.236s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/skills	3.182s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/token	4.492s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/tools	7.400s
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository	6.499s
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/doris	6.462s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch/v7	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch/v8	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/milvus	7.348s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/neo4j	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/opensearch	8.459s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/postgres	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/qdrant	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/sqlite	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/tencentvectordb	9.471s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/weaviate	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/service	10.907s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/chat_pipeline	8.612s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/file	12.982s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/metric	7.241s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/retriever	6.404s
+?   	github.com/Pototoooo/lorelattice/internal/assets	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/billing	6.274s
+ok  	github.com/Pototoooo/lorelattice/internal/common	6.661s
+ok  	github.com/Pototoooo/lorelattice/internal/config	5.872s
+# github.com/Pototoooo/lorelattice/internal/container.test
+ld: warning: ignoring duplicate libraries: '-lc++'
+ok  	github.com/Pototoooo/lorelattice/internal/container	9.434s
+?   	github.com/Pototoooo/lorelattice/internal/database	[no test files]
+--- FAIL: TestValidateConnectorBaseURLBlocksLoopback (0.00s)
+    httpclient_test.go:15: expected loopback base_url to be rejected
+INFO [2026-08-25 15:30:11.447] [] scheduler.go:73[Start] | [Scheduler] started with 1 cron entries
+INFO [2026-08-25 15:30:11.447] [] scheduler.go:73[Start] | [Scheduler] started with 1 cron entries
+INFO [2026-08-25 15:30:12.001] [] scheduler.go:205[triggerSync] | [Scheduler] sync task enqueued for ds=ds-fire syncLog=log-153012.000
+INFO [2026-08-25 15:30:13.001] [] scheduler.go:151[triggerSync] | [Scheduler] skipping sync for ds=ds-fire (previous sync still running)
+INFO [2026-08-25 15:30:13.948] [] scheduler.go:145[triggerSync] | [Scheduler] skipping sync for ds=ds-inactive (not active or not found)
+INFO [2026-08-25 15:30:13.948] [] scheduler.go:145[triggerSync] | [Scheduler] skipping sync for ds=nonexistent (not active or not found)
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/internal/datasource	10.036s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/feishu	15.123s
+--- FAIL: TestDownloadFile_RejectsLoopbackURL (0.08s)
+    client_test.go:361: expected loopback attachment URL to be rejected
+WARNING[2026-08-25 15:30:09.414] [] connector.go:403[fetchPage] | [Notion] failed to get child page blk-2: resource not found in source system: /v1/pages/blk-2
+INFO [2026-08-25 15:30:09.750] [] connector.go:513[queryDatabaseRecords] | [Notion] database db-1 (Test Database): 1 records
+WARNING[2026-08-25 15:30:10.085] [] connector.go:403[fetchPage] | [Notion] failed to get child page blk-2: resource not found in source system: /v1/pages/blk-2
+INFO [2026-08-25 15:30:10.085] [] connector.go:222[FetchIncremental] | [Notion] incremental sync, discovering pages
+INFO [2026-08-25 15:30:10.085] [] connector.go:224[FetchIncremental] | [Notion] discovered 1 pages
+INFO [2026-08-25 15:30:10.085] [] connector.go:283[FetchIncremental] | [Notion] incremental: 0 changed, 0 total items
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/internal/datasource/connector/notion	6.173s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/rss	4.516s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/yuque	8.819s
+?   	github.com/Pototoooo/lorelattice/internal/errors	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/event	3.712s
+ERROR[2026-08-25 15:30:06.735] [] audit_log.go:243[ListSystemAuditLog] | db: connection refused
+ERROR[2026-08-25 15:30:06.736] [] auth_register_by_invite.go:199[RegisterByInvite] | register-by-invite: accept failed for user new-user: expired
+INFO [2026-08-25 15:30:06.736] [] auth.go:143[Register] | Start user registration
+WARNING[2026-08-25 15:30:06.736] [] auth.go:152[Register] | Registration rejected: auth.registration_mode=invite_only
+INFO [2026-08-25 15:30:06.736] [] auth.go:143[Register] | Start user registration
+INFO [2026-08-25 15:30:06.736] [] auth.go:195[Register] | User registered successfully: alice@example.com
+INFO [2026-08-25 15:30:06.736] [] auth.go:143[Register] | Start user registration
+INFO [2026-08-25 15:30:06.736] [] auth.go:195[Register] | User registered successfully: alice@example.com
+ERROR[2026-08-25 15:30:06.736] [] auth.go:63[NewAuthHandler] | [auth] AuthHandler constructed with nil/incomplete config (cfg=&{<nil> <nil> <nil> <nil> <nil> <nil> <nil> [] <nil> <nil> <nil> <nil> <nil> <nil> <nil> <nil> }); registration_mode enforcement is disabled. This is almost certainly a wiring bug.
+INFO [2026-08-25 15:30:06.736] [] auth.go:143[Register] | Start user registration
+INFO [2026-08-25 15:30:06.736] [] auth.go:195[Register] | User registered successfully: alice@example.com
+DEBUG[2026-08-25 15:30:06.736] [] chunker_debug.go:190[PreviewChunking] | chunker preview: tier=heading chunks=1
+DEBUG[2026-08-25 15:30:06.737] [] chunker_debug.go:190[PreviewChunking] | chunker preview: tier=legacy chunks=1
+DEBUG[2026-08-25 15:30:06.737] [] strategy.go:111[SplitWithDiagnostics] | chunker: tier legacy rejected: too many tiny chunks
+DEBUG[2026-08-25 15:30:06.737] [] chunker_debug.go:190[PreviewChunking] | chunker preview: tier=legacy chunks=1100
+INFO [2026-08-25 15:30:06.739] [] custom_agent.go:618[GetSuggestedQuestions] | Getting suggested questions for agent agent-1, kbIDs: [kb-blocked], tagScopes: 0, limit: 6
+ERROR[2026-08-25 15:30:06.739] [agent_id=agent-1 error=error code: 1002, error message: API key scope does not allow one or more knowledge bases] custom_agent.go:623[GetSuggestedQuestions] | 发生错误
+INFO [2026-08-25 15:30:06.739] [] custom_agent.go:618[GetSuggestedQuestions] | Getting suggested questions for agent agent-1, kbIDs: [], tagScopes: 1, limit: 6
+WARNING[2026-08-25 15:30:06.740] [] embed_channel.go:430[CreateEmbedSession] | failed to assign embed session owner for 11111111-2222-3333-4444-555555555555: session not found
+ERROR[2026-08-25 15:30:06.740] [error=Key: 'StopSessionRequest.MessageID' Error:Field validation for 'MessageID' failed on the 'required' tag session_id=11111111-2222-3333-4444-555555555555] stream.go:224[StopSession] | 发生错误
+WARNING[2026-08-25 15:30:06.740] [] rbac.go:342[EvaluateOwnershipOrRole] | [rbac] ownership/role would be checked (enforcement off, lookup skipped): user= have=viewer need=admin
+WARNING[2026-08-25 15:30:06.740] [] rbac.go:342[EvaluateOwnershipOrRole] | [rbac] ownership/role would be checked (enforcement off, lookup skipped): user= have=viewer need=admin
+WARNING[2026-08-25 15:30:06.740] [] rbac.go:342[EvaluateOwnershipOrRole] | [rbac] ownership/role would be checked (enforcement off, lookup skipped): user= have=viewer need=admin
+WARNING[2026-08-25 15:30:06.740] [] rbac.go:342[EvaluateOwnershipOrRole] | [rbac] ownership/role would be checked (enforcement off, lookup skipped): user= have=viewer need=admin
+WARNING[2026-08-25 15:30:06.740] [] rbac.go:342[EvaluateOwnershipOrRole] | [rbac] ownership/role would be checked (enforcement off, lookup skipped): user= have=viewer need=admin
+WARNING[2026-08-25 15:30:06.740] [] rbac.go:342[EvaluateOwnershipOrRole] | [rbac] ownership/role would be checked (enforcement off, lookup skipped): user= have=viewer need=admin
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:1198[DuplicateKnowledgeBase] | Knowledge base duplicate created, source: src, target: copy-id
+WARNING[2026-08-25 15:30:06.741] [] knowledgebase.go:1176[DuplicateKnowledgeBase] | Knowledge base duplicate rejected: source belongs to another tenant, source_id: src, caller_tenant: 1, kb_tenant: 2
+ERROR[2026-08-25 15:30:06.741] [error=database unavailable] knowledgebase.go:1193[DuplicateKnowledgeBase] | 发生错误
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:289[HybridSearch] | Start hybrid search
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:289[HybridSearch] | Start hybrid search
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:289[HybridSearch] | Start hybrid search
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:289[HybridSearch] | Start hybrid search
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:289[HybridSearch] | Start hybrid search
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:289[HybridSearch] | Start hybrid search
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:289[HybridSearch] | Start hybrid search
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:311[HybridSearch] | Executing hybrid search, knowledge base ID: kb-1, query: MiniMax, effectiveTenantID: 1
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:332[HybridSearch] | Hybrid search completed, knowledge base ID: kb-1, result count: 0
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:289[HybridSearch] | Start hybrid search
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:311[HybridSearch] | Executing hybrid search, knowledge base ID: kb-1, query: , effectiveTenantID: 1
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:332[HybridSearch] | Hybrid search completed, knowledge base ID: kb-1, result count: 0
+ERROR[2026-08-25 15:30:06.741] [error=connection refused] knowledgebase.go:448[validateAndGetKnowledgeBase] | 发生错误
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:355[CreateKnowledgeBase] | Start creating knowledge base
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:380[CreateKnowledgeBase] | Creating knowledge base, name: kb
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:355[CreateKnowledgeBase] | Start creating knowledge base
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:380[CreateKnowledgeBase] | Creating knowledge base, name: kb
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:355[CreateKnowledgeBase] | Start creating knowledge base
+INFO [2026-08-25 15:30:06.741] [] knowledgebase.go:380[CreateKnowledgeBase] | Creating knowledge base, name: kb
+ERROR[2026-08-25 15:30:06.741] [error=connection refused] knowledgebase.go:394[CreateKnowledgeBase] | 发生错误
+WARNING[2026-08-25 15:30:06.742] [store_count=1 tenant_id=1] knowledgebase.go:229[batchResolveKBStoreViews] | [kb.list] batch store view resolve failed; rendering bound KBs as unavailable
+INFO [2026-08-25 15:30:06.742] [] message.go:54[LoadMessages] | Start loading messages
+INFO [2026-08-25 15:30:06.742] [] message.go:61[LoadMessages] | Loading messages params, session ID: sess1, limit: 20, before time: 
+INFO [2026-08-25 15:30:06.742] [] message.go:73[LoadMessages] | Getting recent messages for session, session ID: sess1, limit: 20
+WARNING[2026-08-25 15:30:06.742] [] message.go:81[LoadMessages] | Session not found, ID: sess1
+INFO [2026-08-25 15:30:06.742] [] message.go:54[LoadMessages] | Start loading messages
+INFO [2026-08-25 15:30:06.742] [] message.go:61[LoadMessages] | Loading messages params, session ID: sess1, limit: 20, before time: 2026-08-25T07:30:06.742591Z
+INFO [2026-08-25 15:30:06.742] [] message.go:115[LoadMessages] | Getting messages before specific time, session ID: sess1, before time: 2026-08-25T07:30:06.742591Z, limit: 20
+WARNING[2026-08-25 15:30:06.742] [] message.go:121[LoadMessages] | Session not found, ID: sess1
+INFO [2026-08-25 15:30:06.742] [] message.go:54[LoadMessages] | Start loading messages
+INFO [2026-08-25 15:30:06.742] [] message.go:61[LoadMessages] | Loading messages params, session ID: sess1, limit: 20, before time: 2026-05-20T09:43:37+08:00
+INFO [2026-08-25 15:30:06.742] [] message.go:115[LoadMessages] | Getting messages before specific time, session ID: sess1, before time: 2026-05-20T09:43:37+08:00, limit: 20
+INFO [2026-08-25 15:30:06.742] [] message.go:130[LoadMessages] | Successfully retrieved messages before time, session ID: sess1, message count: 0
+INFO [2026-08-25 15:30:06.742] [] message.go:157[DeleteMessage] | Start deleting message
+INFO [2026-08-25 15:30:06.742] [] message.go:163[DeleteMessage] | Deleting message, session ID: sess1, message ID: msg1
+WARNING[2026-08-25 15:30:06.742] [] message.go:171[DeleteMessage] | Session not found, ID: sess1
+INFO [2026-08-25 15:30:06.742] [] message.go:157[DeleteMessage] | Start deleting message
+INFO [2026-08-25 15:30:06.742] [] message.go:163[DeleteMessage] | Deleting message, session ID: sess1, message ID: msg1
+WARNING[2026-08-25 15:30:06.742] [] message.go:171[DeleteMessage] | Session not found, ID: sess1
+INFO [2026-08-25 15:30:06.743] [] system.go:1621[ResetUserPassword] | Password reset by system administrator for user ID: target-user
+WARNING[2026-08-25 15:30:06.743] [] system.go:1974[mutateRuntimeTask] | cancel runtime queue task queue=multimodal task=task-orphan: knowledge gone, purged queue record
+WARNING[2026-08-25 15:30:06.743] [] system.go:1974[mutateRuntimeTask] | cancel runtime queue task queue=multimodal task=task-orphan: knowledge gone, purged queue record
+WARNING[2026-08-25 15:30:06.743] [] system.go:1974[mutateRuntimeTask] | cancel runtime queue task queue=multimodal task=task-orphan: knowledge gone, purged queue record
+--- FAIL: TestIsBlockedStorageEndpoint_SchemePrefixedLoopback (0.00s)
+    --- FAIL: TestIsBlockedStorageEndpoint_SchemePrefixedLoopback/http://127.0.0.1:9000 (0.00s)
+        system_storage_ssrf_test.go:35: 
+            	Error Trace:	/Users/macbook/Documents/Projects/LoreLattice-benchmark/internal/handler/system_storage_ssrf_test.go:35
+            	Error:      	Should be true
+            	Test:       	TestIsBlockedStorageEndpoint_SchemePrefixedLoopback/http://127.0.0.1:9000
+            	Messages:   	expected loopback endpoint to be blocked
+        system_storage_ssrf_test.go:36: 
+            	Error Trace:	/Users/macbook/Documents/Projects/LoreLattice-benchmark/internal/handler/system_storage_ssrf_test.go:36
+            	Error:      	Should NOT be empty, but was 
+            	Test:       	TestIsBlockedStorageEndpoint_SchemePrefixedLoopback/http://127.0.0.1:9000
+    --- FAIL: TestIsBlockedStorageEndpoint_SchemePrefixedLoopback/https://127.0.0.1:9000 (0.00s)
+        system_storage_ssrf_test.go:35: 
+            	Error Trace:	/Users/macbook/Documents/Projects/LoreLattice-benchmark/internal/handler/system_storage_ssrf_test.go:35
+            	Error:      	Should be true
+            	Test:       	TestIsBlockedStorageEndpoint_SchemePrefixedLoopback/https://127.0.0.1:9000
+            	Messages:   	expected loopback endpoint to be blocked
+        system_storage_ssrf_test.go:36: 
+            	Error Trace:	/Users/macbook/Documents/Projects/LoreLattice-benchmark/internal/handler/system_storage_ssrf_test.go:36
+            	Error:      	Should NOT be empty, but was 
+            	Test:       	TestIsBlockedStorageEndpoint_SchemePrefixedLoopback/https://127.0.0.1:9000
+    --- FAIL: TestIsBlockedStorageEndpoint_SchemePrefixedLoopback/127.0.0.1:9000 (0.00s)
+        system_storage_ssrf_test.go:35: 
+            	Error Trace:	/Users/macbook/Documents/Projects/LoreLattice-benchmark/internal/handler/system_storage_ssrf_test.go:35
+            	Error:      	Should be true
+            	Test:       	TestIsBlockedStorageEndpoint_SchemePrefixedLoopback/127.0.0.1:9000
+            	Messages:   	expected loopback endpoint to be blocked
+        system_storage_ssrf_test.go:36: 
+            	Error Trace:	/Users/macbook/Documents/Projects/LoreLattice-benchmark/internal/handler/system_storage_ssrf_test.go:36
+            	Error:      	Should NOT be empty, but was 
+            	Test:       	TestIsBlockedStorageEndpoint_SchemePrefixedLoopback/127.0.0.1:9000
+WARNING[2026-08-25 15:30:06.744] [] access.go:192[func2] | [rbac] path-tenant-match rejected: user=u1 ctx_tenant=1 path_tenant=5 path=/tenants/5/members
+WARNING[2026-08-25 15:30:06.744] [] access.go:192[func2] | [rbac] path-tenant-match rejected: user=u1 ctx_tenant=1 path_tenant=5 path=/tenants/5/members
+WARNING[2026-08-25 15:30:06.744] [] access.go:192[func2] | [rbac] path-tenant-match rejected: user=u1 ctx_tenant=1 path_tenant=5 path=/tenants/5/members/u2
+WARNING[2026-08-25 15:30:06.744] [] access.go:192[func2] | [rbac] path-tenant-match rejected: user=u1 ctx_tenant=1 path_tenant=5 path=/tenants/5/members/u2
+WARNING[2026-08-25 15:30:06.744] [] access.go:192[func2] | [rbac] path-tenant-match rejected: user=u1 ctx_tenant=1 path_tenant=5 path=/tenants/5/leave
+WARNING[2026-08-25 15:30:06.744] [] access.go:192[func2] | [rbac] path-tenant-match rejected: user=u-superuser ctx_tenant=1 path_tenant=5 path=/tenants/5/members
+--- FAIL: TestValidateParserEngineOutboundURLs_RejectsPrivateMinerUEndpoint (0.00s)
+    tenant_parser_ssrf_test.go:15: 
+        	Error Trace:	/Users/macbook/Documents/Projects/LoreLattice-benchmark/internal/handler/tenant_parser_ssrf_test.go:15
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestValidateParserEngineOutboundURLs_RejectsPrivateMinerUEndpoint
+INFO [2026-08-25 15:30:06.748] [] tenant.go:221[CreateTenant] | Start creating tenant
+WARNING[2026-08-25 15:30:06.748] [] tenant.go:242[CreateTenant] | Self-service tenant creation denied by policy for user regular-user
+INFO [2026-08-25 15:30:06.748] [] tenant.go:221[CreateTenant] | Start creating tenant
+INFO [2026-08-25 15:30:06.748] [] tenant.go:337[CreateTenant] | Creating tenant, name: admin-created
+INFO [2026-08-25 15:30:06.748] [] tenant.go:438[CreateTenant] | Tenant created successfully, ID: 99, name: admin-created
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/internal/handler	2.834s
+ok  	github.com/Pototoooo/lorelattice/internal/handler/dto	7.246s
+ok  	github.com/Pototoooo/lorelattice/internal/handler/session	7.476s
+ok  	github.com/Pototoooo/lorelattice/internal/im	7.999s
+ok  	github.com/Pototoooo/lorelattice/internal/im/dingtalk	7.349s
+ok  	github.com/Pototoooo/lorelattice/internal/im/feishu	6.938s
+ok  	github.com/Pototoooo/lorelattice/internal/im/mattermost	6.431s
+ok  	github.com/Pototoooo/lorelattice/internal/im/qqbot	6.782s
+ok  	github.com/Pototoooo/lorelattice/internal/im/slack	7.652s
+ok  	github.com/Pototoooo/lorelattice/internal/im/telegram	7.538s
+?   	github.com/Pototoooo/lorelattice/internal/im/wechat	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/im/wecom	7.157s
+ok  	github.com/Pototoooo/lorelattice/internal/im/yunzhijia	7.336s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/chunker	6.580s
+--- FAIL: TestValidateMinerUOutboundURL_RejectsLoopback (0.00s)
+    mineru_converter_ssrf_test.go:12: 
+        	Error Trace:	/Users/macbook/Documents/Projects/LoreLattice-benchmark/internal/infrastructure/docparser/mineru_converter_ssrf_test.go:12
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestValidateMinerUOutboundURL_RejectsLoopback
+--- FAIL: TestPingMinerU_RejectsPrivateEndpoint (0.01s)
+    mineru_converter_ssrf_test.go:19: 
+        	Error Trace:	/Users/macbook/Documents/Projects/LoreLattice-benchmark/internal/infrastructure/docparser/mineru_converter_ssrf_test.go:19
+        	Error:      	"MinerU 服务返回状态 401" does not contain "SSRF"
+        	Test:       	TestPingMinerU_RejectsPrivateEndpoint
+2026/08/25 15:30:26 WARN: remote image blocked by SSRF check (SSRF validation failed: direct IP address access is not allowed, use domain name or add to SSRF_WHITELIST): http://169.254.169.254/metadata
+2026/08/25 15:30:26 WARN: failed to download remote image http://127.0.0.1:8080/secret.png: unexpected status 401
+2026/08/25 15:30:26 WARN: failed to download remote image http://127.0.0.1:61647/page.html: non-image content type: text/html
+2026/08/25 15:30:26 WARN: failed to download remote image http://127.0.0.1:61651/nope.png: unexpected status 404
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/internal/infrastructure/docparser	6.976s
+INFO [2026-08-25 15:30:27.358] [] fetcher.go:88[FetchURLContent] | [WebFetch] fetched http://127.0.0.1:61653 → 34 chars
+--- FAIL: TestFetchURLContentBlocksRedirectToLoopback (0.00s)
+    fetcher_ssrf_test.go:21: direct loopback URL was not rejected
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/internal/infrastructure/web_fetch	7.567s
+INFO [2026-08-25 15:30:28.387] [] keenable.go:80[Search] | [WebSearch][Keenable] query="hello" maxResults=2 url=http://127.0.0.1:61655/v1/search/public
+INFO [2026-08-25 15:30:28.388] [] keenable.go:147[Search] | [WebSearch][Keenable] returned 2 results
+INFO [2026-08-25 15:30:28.388] [] keenable.go:80[Search] | [WebSearch][Keenable] query="q" maxResults=5 url=http://127.0.0.1:61657/v1/search/public
+INFO [2026-08-25 15:30:28.389] [] keenable.go:147[Search] | [WebSearch][Keenable] returned 2 results
+INFO [2026-08-25 15:30:28.389] [] keenable.go:80[Search] | [WebSearch][Keenable] query="hi" maxResults=5 url=http://127.0.0.1:61659/v1/search
+INFO [2026-08-25 15:30:28.389] [] keenable.go:147[Search] | [WebSearch][Keenable] returned 0 results
+INFO [2026-08-25 15:30:28.390] [] keenable.go:80[Search] | [WebSearch][Keenable] query="x" maxResults=5 url=http://127.0.0.1:61661/v1/search/public
+WARNING[2026-08-25 15:30:28.390] [] keenable.go:106[Search] | [WebSearch][Keenable] API returned status 429: {"message":"rate limited"}
+--- FAIL: TestValidateProxyURL (0.00s)
+    --- FAIL: TestValidateProxyURL/localhost_http (0.00s)
+        proxy_test.go:29: expected error, got nil
+--- FAIL: TestNewSearchHTTPClient_RejectsUnsafeProxy (0.00s)
+    proxy_test.go:41: expected error for disallowed proxy URL (127.0.0.1)
+INFO [2026-08-25 15:30:28.390] [] searxng.go:115[Search] | [WebSearch][SearXNG] query="hello" maxResults=5 url=http://127.0.0.1:61663
+INFO [2026-08-25 15:30:28.391] [] searxng.go:168[Search] | [WebSearch][SearXNG] returned 2 results
+INFO [2026-08-25 15:30:28.391] [] searxng.go:115[Search] | [WebSearch][SearXNG] query="test" maxResults=1 url=http://127.0.0.1:61665
+WARNING[2026-08-25 15:30:28.391] [] searxng.go:166[Search] | [WebSearch][SearXNG] empty results, unresponsive_engines=[[google timeout]]
+INFO [2026-08-25 15:30:28.391] [] searxng.go:168[Search] | [WebSearch][SearXNG] returned 0 results
+INFO [2026-08-25 15:30:28.392] [] zhipu.go:114[Search] | [WebSearch][Zhipu] truncated query to 70 characters
+INFO [2026-08-25 15:30:28.392] [] zhipu.go:142[Search] | [WebSearch][Zhipu] query="智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智智" maxResults=50 engine=search_pro
+INFO [2026-08-25 15:30:28.392] [] zhipu.go:186[Search] | [WebSearch][Zhipu] returned 2 results
+INFO [2026-08-25 15:30:28.392] [] zhipu.go:142[Search] | [WebSearch][Zhipu] query="test" maxResults=10 engine=search_std
+INFO [2026-08-25 15:30:28.392] [] zhipu.go:186[Search] | [WebSearch][Zhipu] returned 0 results
+INFO [2026-08-25 15:30:28.392] [] zhipu.go:142[Search] | [WebSearch][Zhipu] query="test" maxResults=1 engine=search_std
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/internal/infrastructure/web_search	7.657s
+ok  	github.com/Pototoooo/lorelattice/internal/llmreference	7.630s
+ok  	github.com/Pototoooo/lorelattice/internal/llmresource	7.587s
+ok  	github.com/Pototoooo/lorelattice/internal/logger	7.392s
+ok  	github.com/Pototoooo/lorelattice/internal/mcp	7.426s
+ok  	github.com/Pototoooo/lorelattice/internal/middleware	7.858s
+ok  	github.com/Pototoooo/lorelattice/internal/middleware/asynqdl	7.761s
+ok  	github.com/Pototoooo/lorelattice/internal/models/asr	7.936s
+ok  	github.com/Pototoooo/lorelattice/internal/models/chat	8.369s
+ok  	github.com/Pototoooo/lorelattice/internal/models/embedding	8.607s
+ok  	github.com/Pototoooo/lorelattice/internal/models/limiter	8.475s
+ok  	github.com/Pototoooo/lorelattice/internal/models/provider	8.077s
+ok  	github.com/Pototoooo/lorelattice/internal/models/rerank	8.004s
+ok  	github.com/Pototoooo/lorelattice/internal/models/resultcache	6.860s
+?   	github.com/Pototoooo/lorelattice/internal/models/utils	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/models/utils/ollama	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/models/vlm	7.110s
+ok  	github.com/Pototoooo/lorelattice/internal/ratelimit	6.511s
+ok  	github.com/Pototoooo/lorelattice/internal/router	7.587s
+ok  	github.com/Pototoooo/lorelattice/internal/runtime	7.086s
+ok  	github.com/Pototoooo/lorelattice/internal/sandbox	16.700s
+ok  	github.com/Pototoooo/lorelattice/internal/searchutil	7.390s
+ok  	github.com/Pototoooo/lorelattice/internal/storageallowlist	6.501s
+?   	github.com/Pototoooo/lorelattice/internal/stream	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/tracing/langfuse	7.543s
+ok  	github.com/Pototoooo/lorelattice/internal/types	7.183s
+?   	github.com/Pototoooo/lorelattice/internal/types/interfaces	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/utils	7.438s
+FAIL
+real 96.72
+user 88.34
+sys 39.82
+          1790099456  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             4545694  page reclaims
+              547723  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                3130  messages sent
+                3488  messages received
+               12465  signals received
+               67267  voluntary context switches
+             1423205  involuntary context switches
+         50029276534  instructions retired
+         31406939199  cycles elapsed
+           142885584  peak memory footprint
+EXIT_STATUS=1

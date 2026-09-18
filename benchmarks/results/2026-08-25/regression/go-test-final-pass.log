@@ -1,0 +1,115 @@
+COMMAND=/usr/bin/time -lp benchmarks/scripts/run_go_regression.sh
+PHASE=isolated packages=87
+?   	github.com/Pototoooo/lorelattice/cmd/desktop	[no test files]
+?   	github.com/Pototoooo/lorelattice/cmd/download/duckdb	[no test files]
+?   	github.com/Pototoooo/lorelattice/cmd/server	[no test files]
+# github.com/Pototoooo/lorelattice/internal/agent/tools.test
+ld: warning: ignoring duplicate libraries: '-lc++'
+ok  	github.com/Pototoooo/lorelattice/docreader/client	8.676s
+?   	github.com/Pototoooo/lorelattice/docreader/proto	[no test files]
+?   	github.com/Pototoooo/lorelattice/docs	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/agent	1.761s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/approval	3.143s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/memory	1.425s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/skills	1.425s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/token	2.122s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/tools	3.347s
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository	3.188s
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/doris	3.868s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch/v7	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch/v8	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/milvus	4.314s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/neo4j	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/opensearch	3.903s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/postgres	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/qdrant	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/sqlite	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/tencentvectordb	4.252s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/weaviate	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/service	6.481s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/chat_pipeline	5.410s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/file	10.120s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/metric	4.014s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/retriever	3.664s
+?   	github.com/Pototoooo/lorelattice/internal/assets	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/billing	3.797s
+ok  	github.com/Pototoooo/lorelattice/internal/common	4.025s
+ok  	github.com/Pototoooo/lorelattice/internal/config	3.769s
+# github.com/Pototoooo/lorelattice/internal/container.test
+ld: warning: ignoring duplicate libraries: '-lc++'
+ok  	github.com/Pototoooo/lorelattice/internal/container	4.939s
+?   	github.com/Pototoooo/lorelattice/internal/database	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/datasource	4.884s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/feishu	14.433s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/notion	3.595s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/rss	1.272s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/yuque	13.895s
+?   	github.com/Pototoooo/lorelattice/internal/errors	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/event	7.096s
+ok  	github.com/Pototoooo/lorelattice/internal/handler	7.364s
+ok  	github.com/Pototoooo/lorelattice/internal/handler/dto	7.434s
+ok  	github.com/Pototoooo/lorelattice/internal/handler/session	6.132s
+ok  	github.com/Pototoooo/lorelattice/internal/im	6.232s
+ok  	github.com/Pototoooo/lorelattice/internal/im/dingtalk	7.047s
+ok  	github.com/Pototoooo/lorelattice/internal/im/feishu	5.864s
+ok  	github.com/Pototoooo/lorelattice/internal/im/mattermost	5.890s
+ok  	github.com/Pototoooo/lorelattice/internal/im/qqbot	6.191s
+ok  	github.com/Pototoooo/lorelattice/internal/im/slack	6.201s
+ok  	github.com/Pototoooo/lorelattice/internal/im/telegram	5.694s
+?   	github.com/Pototoooo/lorelattice/internal/im/wechat	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/im/wecom	5.716s
+ok  	github.com/Pototoooo/lorelattice/internal/im/yunzhijia	5.821s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/chunker	5.710s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/docparser	6.609s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/web_fetch	6.872s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/web_search	7.357s
+ok  	github.com/Pototoooo/lorelattice/internal/llmreference	7.163s
+ok  	github.com/Pototoooo/lorelattice/internal/llmresource	7.147s
+ok  	github.com/Pototoooo/lorelattice/internal/logger	7.078s
+ok  	github.com/Pototoooo/lorelattice/internal/mcp	7.087s
+ok  	github.com/Pototoooo/lorelattice/internal/middleware	7.437s
+ok  	github.com/Pototoooo/lorelattice/internal/middleware/asynqdl	7.363s
+ok  	github.com/Pototoooo/lorelattice/internal/models/asr	7.587s
+ok  	github.com/Pototoooo/lorelattice/internal/models/chat	8.007s
+ok  	github.com/Pototoooo/lorelattice/internal/models/embedding	8.370s
+ok  	github.com/Pototoooo/lorelattice/internal/models/limiter	8.173s
+ok  	github.com/Pototoooo/lorelattice/internal/models/provider	7.637s
+ok  	github.com/Pototoooo/lorelattice/internal/models/rerank	7.559s
+ok  	github.com/Pototoooo/lorelattice/internal/models/resultcache	6.385s
+?   	github.com/Pototoooo/lorelattice/internal/models/utils	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/models/utils/ollama	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/models/vlm	6.487s
+ok  	github.com/Pototoooo/lorelattice/internal/ratelimit	5.821s
+ok  	github.com/Pototoooo/lorelattice/internal/router	6.045s
+ok  	github.com/Pototoooo/lorelattice/internal/runtime	5.456s
+ok  	github.com/Pototoooo/lorelattice/internal/sandbox	15.124s
+ok  	github.com/Pototoooo/lorelattice/internal/searchutil	5.827s
+ok  	github.com/Pototoooo/lorelattice/internal/storageallowlist	5.124s
+?   	github.com/Pototoooo/lorelattice/internal/stream	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/tracing/langfuse	6.152s
+ok  	github.com/Pototoooo/lorelattice/internal/types	5.877s
+?   	github.com/Pototoooo/lorelattice/internal/types/interfaces	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/utils	6.138s
+RESULT suite_exit=0
+real 82.67
+user 91.20
+sys 40.80
+          1806712832  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             4546217  page reclaims
+              534715  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                3118  messages sent
+                3485  messages received
+               13390  signals received
+               55476  voluntary context switches
+             1410501  involuntary context switches
+            33030406  instructions retired
+            20064190  cycles elapsed
+             1360184  peak memory footprint
+EXIT_STATUS=0

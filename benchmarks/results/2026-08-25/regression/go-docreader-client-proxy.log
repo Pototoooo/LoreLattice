@@ -1,0 +1,18 @@
+2026/08/25 15:37:11.465986 client_test.go:16: INFO: Initializing DocReader client tests
+=== RUN   TestReadURL
+[DocReader] 2026/08/25 15:37:11.466858 INFO: Creating new DocReader client connecting to localhost:50051
+[DocReader] 2026/08/25 15:37:11.467477 INFO: Successfully connected to DocReader service in 611µs
+2026/08/25 15:37:31.464246 client_test.go:35: INFO: Read(URL) completed in 19.9967595s
+2026/08/25 15:37:31.464300 client_test.go:46: INFO: content_len=143, images=0
+[DocReader] 2026/08/25 15:37:31.464304 INFO: Closing DocReader client connection
+--- PASS: TestReadURL (20.00s)
+=== RUN   TestReadFile
+[DocReader] 2026/08/25 15:37:31.464962 INFO: Creating new DocReader client connecting to localhost:50051
+[DocReader] 2026/08/25 15:37:31.465156 INFO: Successfully connected to DocReader service in 186.333µs
+2026/08/25 15:37:31.730140 client_test.go:71: INFO: Read(file) completed in 264.67525ms
+2026/08/25 15:37:31.730159 client_test.go:84: INFO: content_len=730, images=0
+[DocReader] 2026/08/25 15:37:31.730163 INFO: Closing DocReader client connection
+--- PASS: TestReadFile (0.27s)
+PASS
+ok  	github.com/Pototoooo/lorelattice/docreader/client	20.825s
+EXIT_STATUS=0

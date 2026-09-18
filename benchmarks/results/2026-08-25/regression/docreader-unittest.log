@@ -1,0 +1,249 @@
+onnxruntime cpuid_info warning: Unknown CPU vendor. cpuinfo_vendor value: 0
+test_dump_config_includes_parser_limits (test_config.DocReaderConfigTest) ... ok
+test_loads_parser_concurrency_env (test_config.DocReaderConfigTest) ... ok
+test_parser_concurrency_defaults_are_conservative (test_config.DocReaderConfigTest) ... ok
+test_internal_links_are_unwrapped_but_external_links_remain (test_epub_parser.EPUBParserTest) ... ok
+test_parse_minimal_epub (test_epub_parser.EPUBParserTest) ... ok
+test_parse_without_images (test_epub_parser.EPUBParserTest) ... ok
+test_registry_resolves_epub (test_epub_parser.EPUBParserTest) ... ok
+test_detect_xls_magic (test_excel_parser.ExcelFormatDetectionTest) ... ok
+test_detect_xlsx_and_engine (test_excel_parser.ExcelFormatDetectionTest) ... ok
+test_open_legacy_xls_bytes_with_xlsx_extension (test_excel_parser.ExcelFormatDetectionTest) ... ok
+test_dispimg_text_values_are_excluded (test_excel_parser.ExcelImageFilterTest)
+Image function strings stored as text must not appear in output. ... ok
+test_dispimg_with_equals_prefix (test_excel_parser.ExcelImageFilterTest)
+=_xlfn.DISPIMG(...) as text (not formula) should also be filtered. ... ok
+test_image_function_variations (test_excel_parser.ExcelImageFilterTest)
+Various image function patterns should all be filtered. ... ok
+test_real_world_wps_dispimg (test_excel_parser.ExcelImageFilterTest)
+Exact pattern from issue #1779 screenshot: =DISPIMG("ID_...",1). ... ok
+test_parse_en_calcchain_shared_strings_case (test_excel_parser.ExcelParserTest) ... skipped 'en_calcchain.xlsx fixture not available'
+test_parse_phantom_shared_strings_workbook (test_excel_parser.ExcelParserTest) ... ok
+test_fill_merged_cells_propagates_master_value (test_excel_parser.XlsxMergeFillTest) ... ok
+test_parse_en_mergecell_workbook (test_excel_parser.XlsxMergeFillTest) ... skipped 'en_mergecell.xlsx fixture not available'
+test_repair_removes_phantom_shared_strings_reference (test_excel_parser.XlsxRepairTest) ... ok
+test_repair_skips_when_shared_string_cells_need_table (test_excel_parser.XlsxRepairTest) ... ok
+test_format_nonempty_table (test_markdown_table_util.TestMarkdownTableUtil) ... ok
+test_normalize_markitdown_en_tables (test_markdown_table_util.TestMarkdownTableUtil) ... ERROR
+test_preserves_empty_cells (test_markdown_table_util.TestMarkdownTableUtil)
+Interior empty cells must not be dropped during formatting. ... ok
+test_html_to_markdown_collapses_excess_blank_lines_outside_code (test_mhtml_parser.MHTMLParserTest) ... ok
+test_html_to_markdown_does_not_strip_leading_indentation_at_document_start (test_mhtml_parser.MHTMLParserTest) ... ok
+test_html_to_markdown_normalizes_crlf (test_mhtml_parser.MHTMLParserTest) ... ok
+test_html_to_markdown_preserves_blockquote_boundaries (test_mhtml_parser.MHTMLParserTest) ... ok
+test_html_to_markdown_preserves_fenced_code_blank_lines (test_mhtml_parser.MHTMLParserTest) ... ok
+test_html_to_markdown_preserves_hard_break_spaces (test_mhtml_parser.MHTMLParserTest) ... ok
+test_html_to_markdown_preserves_indentation_and_code_block_blanks (test_mhtml_parser.MHTMLParserTest) ... ok
+test_html_to_markdown_preserves_nested_list_indentation (test_mhtml_parser.MHTMLParserTest) ... ok
+test_image_extraction_toggle (test_mhtml_parser.MHTMLParserTest) ... ok
+test_internal_links_are_unwrapped_but_external_links_remain (test_mhtml_parser.MHTMLParserTest) ... ok
+test_mhtml_shared_contract_fixture (test_mhtml_parser.MHTMLParserTest) ... ok
+test_normalize_markdown_preserves_two_space_hard_break (test_mhtml_parser.MHTMLParserTest) ... ok
+test_parse_selects_main_html_and_filters_noise (test_mhtml_parser.MHTMLParserTest) ... ok
+test_registry_resolves_mhtml (test_mhtml_parser.MHTMLParserTest) ... ok
+test_table_image_and_caption_keep_markdown_block_boundaries (test_mhtml_parser.MHTMLParserTest) ... ok
+test_collect_and_rewrite_images (test_opendataloader_parser.OpenDataLoaderHelpersTest) ... ok
+test_find_markdown_prefers_stem_match (test_opendataloader_parser.OpenDataLoaderHelpersTest) ... ok
+test_normalize_odl_image_url (test_opendataloader_parser.OpenDataLoaderHelpersTest) ... ok
+test_rewrite_odl_angle_bracket_and_entity_urls (test_opendataloader_parser.OpenDataLoaderHelpersTest) ... ok
+test_rewrite_skips_data_uris (test_opendataloader_parser.OpenDataLoaderHelpersTest) ... ok
+test_availability_requires_java (test_opendataloader_parser.OpenDataLoaderParserTest) ... ok
+test_parse_reads_markdown_and_images (test_opendataloader_parser.OpenDataLoaderParserTest) ... ok
+test_normalize_image_quality_bounds_jpeg_quality (test_parser_concurrency.ParserConcurrencyTest) ... ok
+test_parser_worker_limit_serializes_work (test_parser_concurrency.ParserConcurrencyTest) ... ok
+test_scanned_pdf_parser_logs_malformed_pdf_without_format_error (test_parser_concurrency.ParserConcurrencyTest) ... ok
+test_scanned_pdf_parser_outputs_jpeg_images (test_parser_concurrency.ParserConcurrencyTest) ... onnxruntime cpuid_info warning: Unknown CPU vendor. cpuinfo_vendor value: 0
+ok
+test_legacy_doc_payload_renamed_to_docx_uses_doc_parser (test_parser_routing.ParserRoutingTest) ... Detected legacy DOC content with a DOCX extension; using DOC parser
+ok
+test_real_docx_payload_keeps_docx_parser_route (test_parser_routing.ParserRoutingTest) ... ok
+test_unrelated_ole_type_is_not_reclassified (test_parser_routing.ParserRoutingTest) ... ok
+test_blank_page_is_text (test_pdf_router.ClassifyPageTest) ... ok
+test_full_page_image_is_scanned_even_with_text (test_pdf_router.ClassifyPageTest) ... ok
+test_native_text_page_is_text (test_pdf_router.ClassifyPageTest) ... ok
+test_sparse_text_with_image_is_scanned (test_pdf_router.ClassifyPageTest) ... ok
+test_default_text_pdf_is_not_force_scanned (test_pdf_router.ForceScannedTest)
+Without any override, a text PDF should NOT use scanned mode. ... ok
+test_force_scanned_output_is_scanned_pdf (test_pdf_router.ForceScannedTest)
+Force-scanned mode produces scanned_pdf metadata and image refs. ... onnxruntime cpuid_info warning: Unknown CPU vendor. cpuinfo_vendor value: 0
+ok
+test_force_scanned_via_env (test_pdf_router.ForceScannedTest)
+Global env variable enables force scanned when no override. ... ok
+test_force_scanned_via_kwarg_false (test_pdf_router.ForceScannedTest)
+Per-upload override pdf_force_scanned=false disables scanned mode. ... ok
+test_force_scanned_via_kwarg_overrides_env (test_pdf_router.ForceScannedTest)
+Per-upload override takes priority over global env var. ... ok
+test_force_scanned_via_kwarg_true (test_pdf_router.ForceScannedTest)
+Per-upload override pdf_force_scanned=true enables scanned mode. ... ok
+test_gpt3_page0_title_and_authors (test_pdf_router.Gpt3PaperLayoutTest) ... skipped 'gpt3.pdf not in testdata'
+test_does_not_promote_when_sizes_uniform (test_pdf_router.HeadingDetectionTest) ... ok
+test_promotes_large_line_to_heading (test_pdf_router.HeadingDetectionTest) ... ok
+test_skips_sentence_like_long_lines (test_pdf_router.HeadingDetectionTest) ... ok
+test_point_in_boxes (test_pdf_router.HiddenTextFilterTest) ... ok
+test_keeps_good_layout (test_pdf_router.LayoutQualityFallbackTest) ... ok
+test_prefers_plain_when_many_single_char_lines (test_pdf_router.LayoutQualityFallbackTest) ... ok
+test_drops_narrow_vertical_margin_column (test_pdf_router.MarginColumnFilterTest) ... ok
+test_keeps_real_two_column_layout (test_pdf_router.MarginColumnFilterTest) ... ok
+test_image_only_pdf_routes_to_scanned (test_pdf_router.PDFRouterIntegrationTest) ... onnxruntime cpuid_info warning: Unknown CPU vendor. cpuinfo_vendor value: 0
+ok
+test_malformed_pdf_raises_after_fallback (test_pdf_router.PDFRouterIntegrationTest) ... PDFParser: per-page routing failed for broken.pdf; falling back to full image rendering
+Traceback (most recent call last):
+  File "/workspace/docreader/parser/pdf_parser.py", line 1420, in parse_into_text
+    return self._route(content)
+  File "/workspace/docreader/parser/pdf_parser.py", line 1437, in _route
+    return self._route_locked(content)
+  File "/workspace/docreader/parser/pdf_parser.py", line 1447, in _route_locked
+    pdf = pdfium.PdfDocument(content)
+  File "/app/.venv/lib/python3.10/site-packages/pypdfium2/_helpers/document.py", line 76, in __init__
+    self.raw, to_hold, to_close = _open_pdf(self._input, self._password, self._autoclose)
+  File "/app/.venv/lib/python3.10/site-packages/pypdfium2/_helpers/document.py", line 557, in _open_pdf
+    raise PdfiumError(f"Failed to load document (PDFium: {pdfium_i.ErrorToStr.get(err_code)}).", err_code=err_code)
+pypdfium2._helpers.misc.PdfiumError: Failed to load document (PDFium: Data format error).
+PDFScannedParser failed to parse PDF: Failed to load document (PDFium: Data format error).
+Traceback (most recent call last):
+  File "/workspace/docreader/parser/pdf_parser.py", line 1420, in parse_into_text
+    return self._route(content)
+  File "/workspace/docreader/parser/pdf_parser.py", line 1437, in _route
+    return self._route_locked(content)
+  File "/workspace/docreader/parser/pdf_parser.py", line 1447, in _route_locked
+    pdf = pdfium.PdfDocument(content)
+  File "/app/.venv/lib/python3.10/site-packages/pypdfium2/_helpers/document.py", line 76, in __init__
+    self.raw, to_hold, to_close = _open_pdf(self._input, self._password, self._autoclose)
+  File "/app/.venv/lib/python3.10/site-packages/pypdfium2/_helpers/document.py", line 557, in _open_pdf
+    raise PdfiumError(f"Failed to load document (PDFium: {pdfium_i.ErrorToStr.get(err_code)}).", err_code=err_code)
+pypdfium2._helpers.misc.PdfiumError: Failed to load document (PDFium: Data format error).
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/docreader/parser/pdf_parser.py", line 1333, in parse_into_text
+    pdf = pdfium.PdfDocument(content)
+  File "/app/.venv/lib/python3.10/site-packages/pypdfium2/_helpers/document.py", line 76, in __init__
+    self.raw, to_hold, to_close = _open_pdf(self._input, self._password, self._autoclose)
+  File "/app/.venv/lib/python3.10/site-packages/pypdfium2/_helpers/document.py", line 557, in _open_pdf
+    raise PdfiumError(f"Failed to load document (PDFium: {pdfium_i.ErrorToStr.get(err_code)}).", err_code=err_code)
+pypdfium2._helpers.misc.PdfiumError: Failed to load document (PDFium: Data format error).
+ok
+test_removes_fffe_placeholder (test_pdf_router.PdfTextSanitizeTest) ... ok
+test_strips_arxiv_header_line (test_pdf_router.PdfTextSanitizeTest) ... ok
+test_strips_chart_axis_run (test_pdf_router.PdfTextSanitizeTest) ... ok
+test_strips_diagram_labels_above_caption (test_pdf_router.PdfTextSanitizeTest) ... ok
+test_academic_plain_skips_layout (test_pdf_router.PlainWellFormedTest) ... ok
+test_glued_scan_plain_needs_layout (test_pdf_router.PlainWellFormedTest) ... ok
+test_merges_orphan_periods (test_pdf_router.PunctuationMergeTest) ... ok
+test_group_lines_orders_by_y_then_x (test_pdf_router.ReadingOrderTest) ... ok
+test_join_line_glyphs_inserts_word_spaces (test_pdf_router.ReadingOrderTest) ... ok
+test_join_line_glyphs_keeps_adjacent_letters (test_pdf_router.ReadingOrderTest) ... ok
+test_single_column_stays_single (test_pdf_router.ReadingOrderTest) ... ok
+test_two_columns_split_left_to_right (test_pdf_router.ReadingOrderTest) ... ok
+test_resnet_figures_and_captions (test_pdf_router.ResNetPaperFigureTest) ... skipped 'resnet.pdf not available'
+test_scan_en_dict_page0_has_word_spaces (test_pdf_router.ScanEnglishDictLayoutTest) ... skipped 'scan_en_dict.pdf not in testdata'
+test_dedups_identical_image_on_same_page (test_pdf_router.SelectEmbeddedImagesTest) ... ok
+test_drops_repeated_logo_watermark (test_pdf_router.SelectEmbeddedImagesTest) ... ok
+test_drops_tiny_and_small_images (test_pdf_router.SelectEmbeddedImagesTest) ... ok
+test_keeps_real_figure (test_pdf_router.SelectEmbeddedImagesTest) ... ok
+test_respects_max_images_cap (test_pdf_router.SelectEmbeddedImagesTest) ... ok
+test_keeps_lines_when_too_few_pages (test_pdf_router.StripRepeatingLinesTest) ... ok
+test_removes_repeated_header_footer (test_pdf_router.StripRepeatingLinesTest) ... ok
+test_image_heavy_legacy_ppt_extracts_images (test_ppt_convert.TestPptConvert) ... skipped 'testdata missing'
+test_legacy_ppt_magic (test_ppt_convert.TestPptConvert) ... ERROR
+test_legacy_ppt_requires_soffice (test_ppt_convert.TestPptConvert) ... ERROR
+test_normalize_pptx_passthrough (test_ppt_convert.TestPptConvert) ... ERROR
+test_pptx_does_not_need_conversion (test_ppt_convert.TestPptConvert) ... ERROR
+test_wmf_legacy_ppt_extracts_rasterized_image (test_ppt_convert.TestPptConvert) ... skipped 'testdata missing'
+test_allows_public_https (test_ssrf.TestSSRFValidation) ... ok
+test_blocks_loopback_ip (test_ssrf.TestSSRFValidation) ... ok
+test_blocks_metadata_host (test_ssrf.TestSSRFValidation) ... ok
+test_blocks_restricted_hostname (test_ssrf.TestSSRFValidation) ... ok
+test_build_fallback_too_short (test_web_parser.TestWebParserHelpers) ... ok
+test_build_fallback_with_title (test_web_parser.TestWebParserHelpers) ... ok
+test_build_fallback_without_title (test_web_parser.TestWebParserHelpers) ... ok
+test_extract_markdown_article_html (test_web_parser.TestWebParserHelpers) ... ok
+test_extract_markdown_empty_html (test_web_parser.TestWebParserHelpers) ... ok
+test_install_ssrf_route_guard_is_importable (test_web_parser.TestWebParserHelpers) ... ok
+test_redirect_target_blocked_before_navigation (test_web_parser.TestWebParserHelpers) ... ok
+
+======================================================================
+ERROR: test_normalize_markitdown_en_tables (test_markdown_table_util.TestMarkdownTableUtil)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/docreader/tests/test_markdown_table_util.py", line 35, in test_normalize_markitdown_en_tables
+    raw = MarkItDown().convert(io.BytesIO(docx.read_bytes()), file_extension=".docx").text_content
+  File "/usr/local/lib/python3.10/pathlib.py", line 1126, in read_bytes
+    with self.open(mode='rb') as f:
+  File "/usr/local/lib/python3.10/pathlib.py", line 1119, in open
+    return self._accessor.open(self, mode, buffering, encoding, errors,
+FileNotFoundError: [Errno 2] No such file or directory: '/testdata/rag_test/docx/en_tables.docx'
+
+======================================================================
+ERROR: test_legacy_ppt_magic (test_ppt_convert.TestPptConvert)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/docreader/tests/test_ppt_convert.py", line 22, in test_legacy_ppt_magic
+    content = LEGACY_PPT.read_bytes()
+  File "/usr/local/lib/python3.10/pathlib.py", line 1126, in read_bytes
+    with self.open(mode='rb') as f:
+  File "/usr/local/lib/python3.10/pathlib.py", line 1119, in open
+    return self._accessor.open(self, mode, buffering, encoding, errors,
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/testdata/rag_test/ppt_old/en_38256.ppt'
+
+======================================================================
+ERROR: test_legacy_ppt_requires_soffice (test_ppt_convert.TestPptConvert)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/docreader/tests/test_ppt_convert.py", line 44, in test_legacy_ppt_requires_soffice
+    converted = convert_ppt_to_pptx_bytes(LEGACY_PPT.read_bytes(), suffix=".ppt")
+  File "/usr/local/lib/python3.10/pathlib.py", line 1126, in read_bytes
+    with self.open(mode='rb') as f:
+  File "/usr/local/lib/python3.10/pathlib.py", line 1119, in open
+    return self._accessor.open(self, mode, buffering, encoding, errors,
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/testdata/rag_test/ppt_old/en_38256.ppt'
+
+======================================================================
+ERROR: test_normalize_pptx_passthrough (test_ppt_convert.TestPptConvert)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/docreader/tests/test_ppt_convert.py", line 33, in test_normalize_pptx_passthrough
+    content = PPTX_SAMPLE.read_bytes()
+  File "/usr/local/lib/python3.10/pathlib.py", line 1126, in read_bytes
+    with self.open(mode='rb') as f:
+  File "/usr/local/lib/python3.10/pathlib.py", line 1119, in open
+    return self._accessor.open(self, mode, buffering, encoding, errors,
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/testdata/rag_test/pptx/en_marker.pptx'
+
+======================================================================
+ERROR: test_pptx_does_not_need_conversion (test_ppt_convert.TestPptConvert)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/docreader/tests/test_ppt_convert.py", line 28, in test_pptx_does_not_need_conversion
+    content = PPTX_SAMPLE.read_bytes()
+  File "/usr/local/lib/python3.10/pathlib.py", line 1126, in read_bytes
+    with self.open(mode='rb') as f:
+  File "/usr/local/lib/python3.10/pathlib.py", line 1119, in open
+    return self._accessor.open(self, mode, buffering, encoding, errors,
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/testdata/rag_test/pptx/en_marker.pptx'
+
+----------------------------------------------------------------------
+Ran 111 tests in 51.764s
+
+FAILED (errors=5, skipped=7)
+real 68.98
+user 0.01
+sys 0.02
+            28311552  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                4683  page reclaims
+                  13  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                  21  messages sent
+                  62  messages received
+                  13  signals received
+                  35  voluntary context switches
+                1576  involuntary context switches
+           166199524  instructions retired
+           130208119  cycles elapsed
+            13517376  peak memory footprint

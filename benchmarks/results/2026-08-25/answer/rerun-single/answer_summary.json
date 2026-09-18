@@ -1,0 +1,94 @@
+{
+  "overall": {
+    "queries": 55,
+    "successful": 54,
+    "errors": 1,
+    "strict_assertion_pass_rate": 0.2777777777777778,
+    "mean_assertion_recall": 0.4089506172839506,
+    "citation_presence_rate": 1,
+    "relevant_citation_rate": 1,
+    "all_sources_cited_rate": 0.9074074074074074,
+    "latency_ms": {
+      "mean": 6815.2891851851855,
+      "p50": 6238.437,
+      "p95": 9610.850849999999,
+      "p99": 12589.673289999999,
+      "max": 13443.083
+    }
+  },
+  "single": {
+    "queries": 31,
+    "successful": 30,
+    "errors": 1,
+    "strict_assertion_pass_rate": 0.3333333333333333,
+    "mean_assertion_recall": 0.4388888888888889,
+    "citation_presence_rate": 1,
+    "relevant_citation_rate": 1,
+    "all_sources_cited_rate": 1,
+    "latency_ms": {
+      "mean": 6163.2576,
+      "p50": 5929.4169999999995,
+      "p95": 8519.518599999998,
+      "p99": 9256.43006,
+      "max": 9428.28
+    }
+  },
+  "multi": {
+    "queries": 24,
+    "successful": 24,
+    "errors": 0,
+    "strict_assertion_pass_rate": 0.20833333333333334,
+    "mean_assertion_recall": 0.3715277777777778,
+    "citation_presence_rate": 1,
+    "relevant_citation_rate": 1,
+    "all_sources_cited_rate": 0.7916666666666666,
+    "latency_ms": {
+      "mean": 7630.328666666666,
+      "p50": 7032.9385,
+      "p95": 11517.228599999995,
+      "p99": 13072.73539,
+      "max": 13443.083
+    }
+  },
+  "canonical": {
+    "queries": 27,
+    "successful": 26,
+    "errors": 1,
+    "strict_assertion_pass_rate": 0.34615384615384615,
+    "mean_assertion_recall": 0.4391025641025641,
+    "citation_presence_rate": 1,
+    "relevant_citation_rate": 1,
+    "all_sources_cited_rate": 0.9230769230769231,
+    "latency_ms": {
+      "mean": 6705.29,
+      "p50": 6404.665,
+      "p95": 9407.88375,
+      "p99": 9509.4585,
+      "max": 9536.518
+    }
+  },
+  "paraphrase": {
+    "queries": 28,
+    "successful": 28,
+    "errors": 0,
+    "strict_assertion_pass_rate": 0.21428571428571427,
+    "mean_assertion_recall": 0.38095238095238093,
+    "citation_presence_rate": 1,
+    "relevant_citation_rate": 1,
+    "all_sources_cited_rate": 0.8928571428571429,
+    "latency_ms": {
+      "mean": 6917.431285714286,
+      "p50": 6134.217500000001,
+      "p95": 11096.365399999997,
+      "p99": 13008.32711,
+      "max": 13443.083
+    }
+  },
+  "run": {
+    "workers": 1,
+    "wall_seconds": 371.607995,
+    "queries": 55,
+    "independent_facts": 28,
+    "judge": "deterministic assertions"
+  }
+}

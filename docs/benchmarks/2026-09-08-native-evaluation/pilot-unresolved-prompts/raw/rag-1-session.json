@@ -1,0 +1,14 @@
+{
+  "data": {
+    "id": "5e7bb23a-9654-4842-a9f0-7c950e514c56",
+    "title": "native-eval-rag-1",
+    "description": "",
+    "tenant_id": 10004,
+    "user_id": "1b18c530-f65f-4d5e-bc3e-4e752531f78e",
+    "is_pinned": false,
+    "created_at": "2026-09-08T11:13:05.061108299+08:00",
+    "updated_at": "2026-09-08T11:13:05.061108382+08:00",
+    "deleted_at": null
+  },
+  "success": true
+}

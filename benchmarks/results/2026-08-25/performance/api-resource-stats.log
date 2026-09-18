@@ -1,0 +1,91 @@
+timestamp=2026-08-26T02:51:57Z
+LoreLattice-app	51.21%	231MiB / 7.75GiB	244MB / 394MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	6.28%	8.422MiB / 7.75GiB	8.97MB / 9.86MB	0B / 16.4kB	9
+LoreLattice-postgres	17.03%	289.9MiB / 7.75GiB	57.5MB / 183MB	77.5MB / 194MB	13
+LoreLattice-redis	0.59%	20.89MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:00Z
+LoreLattice-app	44.18%	231.7MiB / 7.75GiB	249MB / 400MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	5.79%	8.984MiB / 7.75GiB	12.4MB / 13.7MB	0B / 16.4kB	9
+LoreLattice-postgres	17.30%	289.9MiB / 7.75GiB	60.5MB / 187MB	77.5MB / 194MB	13
+LoreLattice-redis	0.28%	20.88MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:03Z
+LoreLattice-app	44.84%	232.2MiB / 7.75GiB	254MB / 406MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	5.97%	8.789MiB / 7.75GiB	14.7MB / 16.3MB	0B / 16.4kB	9
+LoreLattice-postgres	20.11%	289.9MiB / 7.75GiB	63.7MB / 192MB	77.5MB / 194MB	13
+LoreLattice-redis	0.15%	20.9MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:06Z
+LoreLattice-app	45.79%	232MiB / 7.75GiB	258MB / 410MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	6.18%	9.098MiB / 7.75GiB	19.3MB / 21.5MB	0B / 16.4kB	9
+LoreLattice-postgres	17.58%	289.9MiB / 7.75GiB	65.8MB / 195MB	77.5MB / 194MB	13
+LoreLattice-redis	0.20%	20.88MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:10Z
+LoreLattice-app	43.06%	232.5MiB / 7.75GiB	265MB / 418MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	5.74%	9.465MiB / 7.75GiB	22.8MB / 25.4MB	0B / 16.4kB	9
+LoreLattice-postgres	16.56%	289.9MiB / 7.75GiB	69.7MB / 200MB	77.5MB / 194MB	13
+LoreLattice-redis	0.22%	20.88MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:13Z
+LoreLattice-app	0.84%	232MiB / 7.75GiB	267MB / 421MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	0.00%	9.617MiB / 7.75GiB	24.2MB / 27.1MB	0B / 16.4kB	9
+LoreLattice-postgres	0.02%	289.9MiB / 7.75GiB	71.1MB / 202MB	77.5MB / 194MB	13
+LoreLattice-redis	0.22%	21.14MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:16Z
+LoreLattice-app	1.17%	231.9MiB / 7.75GiB	267MB / 421MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	0.00%	9.535MiB / 7.75GiB	24.2MB / 27.1MB	0B / 16.4kB	9
+LoreLattice-postgres	0.01%	67.36MiB / 7.75GiB	71.1MB / 202MB	77.5MB / 194MB	7
+LoreLattice-redis	0.92%	21.14MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:19Z
+LoreLattice-app	242.43%	240.8MiB / 7.75GiB	285MB / 441MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	29.94%	12.16MiB / 7.75GiB	43.1MB / 48.4MB	0B / 16.4kB	9
+LoreLattice-postgres	132.82%	91.64MiB / 7.75GiB	87.9MB / 224MB	77.5MB / 194MB	17
+LoreLattice-redis	0.18%	20.89MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:22Z
+LoreLattice-app	162.78%	238.8MiB / 7.75GiB	315MB / 474MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	194.00%	12.87MiB / 7.75GiB	55.7MB / 62.6MB	0B / 16.4kB	9
+LoreLattice-postgres	76.70%	91.64MiB / 7.75GiB	99MB / 240MB	77.5MB / 194MB	17
+LoreLattice-redis	0.28%	20.89MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:25Z
+LoreLattice-app	169.97%	238MiB / 7.75GiB	334MB / 496MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	208.69%	14.29MiB / 7.75GiB	68.3MB / 76.9MB	0B / 16.4kB	9
+LoreLattice-postgres	81.45%	91.64MiB / 7.75GiB	110MB / 255MB	77.5MB / 194MB	17
+LoreLattice-redis	0.23%	21.14MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:28Z
+LoreLattice-app	159.16%	237.3MiB / 7.75GiB	351MB / 515MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	190.23%	15.28MiB / 7.75GiB	75.7MB / 85.2MB	0B / 16.4kB	9
+LoreLattice-postgres	74.11%	91.64MiB / 7.75GiB	120MB / 268MB	77.5MB / 194MB	17
+LoreLattice-redis	0.19%	20.88MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:31Z
+LoreLattice-app	0.63%	238.6MiB / 7.75GiB	360MB / 525MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	217.66%	15.55MiB / 7.75GiB	86.4MB / 97.8MB	4.1kB / 16.4kB	9
+LoreLattice-postgres	0.00%	91.61MiB / 7.75GiB	126MB / 276MB	77.5MB / 194MB	17
+LoreLattice-redis	0.34%	20.88MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:34Z
+LoreLattice-app	1.56%	238.6MiB / 7.75GiB	360MB / 525MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	0.00%	15.42MiB / 7.75GiB	86.4MB / 97.8MB	4.1kB / 16.4kB	9
+LoreLattice-postgres	0.04%	91.62MiB / 7.75GiB	126MB / 276MB	77.5MB / 194MB	17
+LoreLattice-redis	0.84%	20.89MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:38Z
+LoreLattice-app	4.07%	238.5MiB / 7.75GiB	360MB / 525MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	420.51%	16.64MiB / 7.75GiB	87MB / 98.8MB	4.1kB / 16.4kB	9
+LoreLattice-postgres	0.13%	91.61MiB / 7.75GiB	126MB / 276MB	77.5MB / 194MB	17
+LoreLattice-redis	0.42%	21.14MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:40Z
+LoreLattice-app	0.50%	238.5MiB / 7.75GiB	360MB / 525MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	596.27%	17.31MiB / 7.75GiB	89.5MB / 103MB	4.1kB / 16.4kB	9
+LoreLattice-postgres	0.12%	91.61MiB / 7.75GiB	126MB / 276MB	77.5MB / 194MB	17
+LoreLattice-redis	0.32%	20.88MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:43Z
+LoreLattice-app	0.39%	238.5MiB / 7.75GiB	360MB / 525MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	621.75%	16.93MiB / 7.75GiB	91MB / 106MB	4.1kB / 16.4kB	9
+LoreLattice-postgres	4.32%	91.87MiB / 7.75GiB	126MB / 276MB	77.5MB / 194MB	17
+LoreLattice-redis	0.33%	21.13MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:46Z
+LoreLattice-app	0.77%	238.5MiB / 7.75GiB	360MB / 525MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	599.15%	16.72MiB / 7.75GiB	93.6MB / 111MB	4.1kB / 16.4kB	9
+LoreLattice-postgres	0.02%	91.61MiB / 7.75GiB	126MB / 276MB	77.5MB / 194MB	17
+LoreLattice-redis	0.38%	20.89MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:49Z
+LoreLattice-app	0.94%	238.5MiB / 7.75GiB	360MB / 525MB	11.1MB / 69.6kB	22
+LoreLattice-frontend	636.82%	16.92MiB / 7.75GiB	96.9MB / 117MB	4.1kB / 16.4kB	9
+LoreLattice-postgres	0.01%	91.61MiB / 7.75GiB	126MB / 276MB	77.5MB / 194MB	17
+LoreLattice-redis	0.40%	20.89MiB / 7.75GiB	1.44GB / 353MB	22.6MB / 429MB	7
+timestamp=2026-08-26T02:52:52Z

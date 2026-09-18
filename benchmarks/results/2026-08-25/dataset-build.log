@@ -1,0 +1,1 @@
+DATASET facts=60 queries=120 path=benchmarks/datasets/enterprise_knowledge_v1/queries.jsonl

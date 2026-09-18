@@ -1,0 +1,516 @@
+{
+  "concept/acceptance-testing-criteria": [
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "concept/agent-answer-reliability": [
+    "deebd8ee-b757-468a-8649-8edde1fb728d"
+  ],
+  "concept/agent-behavior-guidelines": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "concept/agent-duplicate-response-block": [
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "concept/ai-model-usage-policy": [
+    "fb2bb21e-1769-4de1-9e41-e4eb9217ceb9"
+  ],
+  "concept/annual-budget-and-quarterly-rolling-forecast": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "concept/annual-recurring-revenue": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "concept/anomaly-monitoring-and-takedown-process": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "concept/arr": [
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "concept/bian-geng-guan-li": [
+    "3b99bbfe-72a0-496f-9a4e-53b599695170"
+  ],
+  "concept/biao-zhun-jiao-fu-mo-xing": [
+    "3b99bbfe-72a0-496f-9a4e-53b599695170"
+  ],
+  "concept/biao-zhun-yan-shou-wen-ti-ji": [
+    "3b99bbfe-72a0-496f-9a4e-53b599695170"
+  ],
+  "concept/cloud-resource-cost-warning-mechanism": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "concept/compensation-and-incentives": [
+    "59808dd7-f818-4bc8-9bcc-223df7a6e19e"
+  ],
+  "concept/connector-health-center": [
+    "deebd8ee-b757-468a-8649-8edde1fb728d"
+  ],
+  "concept/contract-acceptance-and-payment-compliance": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "concept/cost-center": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "concept/cursor-premature-commit": [
+    "0173c370-1a56-421e-be61-71df39284cd5"
+  ],
+  "concept/custom-requirement-review-criteria": [
+    "deebd8ee-b757-468a-8649-8edde1fb728d"
+  ],
+  "concept/data-classification": [
+    "fb2bb21e-1769-4de1-9e41-e4eb9217ceb9"
+  ],
+  "concept/data-compliance-and-privacy-protection": [
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "concept/data-confidentiality-and-security": [
+    "59808dd7-f818-4bc8-9bcc-223df7a6e19e"
+  ],
+  "concept/data-freshness": [
+    "0173c370-1a56-421e-be61-71df39284cd5"
+  ],
+  "concept/data-masking": [
+    "fb2bb21e-1769-4de1-9e41-e4eb9217ceb9"
+  ],
+  "concept/data-retention-policy": [
+    "fb2bb21e-1769-4de1-9e41-e4eb9217ceb9"
+  ],
+  "concept/data-synchronization-strategy": [
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "concept/deal-desk-ping-shen-chu-fa-tiao-jian": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "concept/decision-authority-matrix": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "concept/document-priority-hierarchy": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "concept/dual-control": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "concept/executive-committee": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "concept/external-sharing-control": [
+    "fb2bb21e-1769-4de1-9e41-e4eb9217ceb9"
+  ],
+  "concept/feature-flag-management": [
+    "deebd8ee-b757-468a-8649-8edde1fb728d"
+  ],
+  "concept/go-live-evaluation-thresholds": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "concept/hu-hang-yu-yi-jiao": [
+    "3b99bbfe-72a0-496f-9a4e-53b599695170"
+  ],
+  "concept/human-review-mechanism": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "concept/hybrid-work-policy": [
+    "59808dd7-f818-4bc8-9bcc-223df7a6e19e"
+  ],
+  "concept/incident-response-process": [
+    "40cb6e26-0345-44b8-a021-d819d232f619"
+  ],
+  "concept/incident-severity-levels": [
+    "40cb6e26-0345-44b8-a021-d819d232f619"
+  ],
+  "concept/initial-response-time": [
+    "40cb6e26-0345-44b8-a021-d819d232f619"
+  ],
+  "concept/jie-duan-zhun-chu-tiao-jian": [
+    "3b99bbfe-72a0-496f-9a4e-53b599695170"
+  ],
+  "concept/knowledge-block-billing": [
+    "deebd8ee-b757-468a-8649-8edde1fb728d"
+  ],
+  "concept/least-privilege-principle": [
+    "fb2bb21e-1769-4de1-9e41-e4eb9217ceb9"
+  ],
+  "concept/lighthouse-customer": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "concept/log-and-training-data-management": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "concept/mian-fei-shi-yong-guan-li": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "concept/model-tiering-and-whitelist": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "concept/multi-hop-qa": [
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "concept/net-revenue-retention": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "concept/notification-rules": [
+    "40cb6e26-0345-44b8-a021-d819d232f619"
+  ],
+  "concept/nrr": [
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "concept/okr": [
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "concept/on-premise-deployment": [
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "concept/out-of-order-message-processing": [
+    "0173c370-1a56-421e-be61-71df39284cd5"
+  ],
+  "concept/performance-evaluation": [
+    "59808dd7-f818-4bc8-9bcc-223df7a6e19e"
+  ],
+  "concept/performance-improvement-plan": [
+    "59808dd7-f818-4bc8-9bcc-223df7a6e19e"
+  ],
+  "concept/permission-inheritance-mechanism": [
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "concept/post-incident-review": [
+    "40cb6e26-0345-44b8-a021-d819d232f619"
+  ],
+  "concept/procurement-approval-threshold": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "concept/quantity-conservation-check": [
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "concept/quan-xian-qian-yi-ce-lve": [
+    "3b99bbfe-72a0-496f-9a4e-53b599695170"
+  ],
+  "concept/rank-system": [
+    "59808dd7-f818-4bc8-9bcc-223df7a6e19e"
+  ],
+  "concept/recovery-point-objective": [
+    "40cb6e26-0345-44b8-a021-d819d232f619"
+  ],
+  "concept/recovery-time-objective": [
+    "40cb6e26-0345-44b8-a021-d819d232f619"
+  ],
+  "concept/red-line-customer": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "concept/regulated-customers": [
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "concept/release-channel-strategy": [
+    "deebd8ee-b757-468a-8649-8edde1fb728d"
+  ],
+  "concept/result-count-conservation": [
+    "0173c370-1a56-421e-be61-71df39284cd5"
+  ],
+  "concept/sales-exception-approval": [
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "concept/security-incident-response": [
+    "fb2bb21e-1769-4de1-9e41-e4eb9217ceb9"
+  ],
+  "concept/service-level-agreement": [
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "concept/shang-ye-bao-jia-gou-cheng": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "concept/single-source-procurement": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "concept/source-and-conflict-resolution": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "concept/special-purpose-budget-management": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "concept/standard-go-live": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "concept/travel-and-expense-reimbursement-standard": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "concept/wiki-doc-mode-2": [
+    "deebd8ee-b757-468a-8649-8edde1fb728d"
+  ],
+  "concept/xiang-mu-zhuang-tai-yan-se": [
+    "3b99bbfe-72a0-496f-9a4e-53b599695170"
+  ],
+  "concept/xiao-shou-jin-zhi-xing-wei": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "concept/xu-yue-yu-kuo-rong-gui-ze": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "concept/zhe-kou-shen-pi-ju-zhen": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "entity/2026-07-17-beichen-sync-delay-incident": [
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "entity/ai-governance-committee": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "entity/amazon-s3": [
+    "deebd8ee-b757-468a-8649-8edde1fb728d"
+  ],
+  "entity/atlasdesk": [
+    "fb2bb21e-1769-4de1-9e41-e4eb9217ceb9",
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf",
+    "deebd8ee-b757-468a-8649-8edde1fb728d",
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "entity/atlasdesk-regulated": [
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "entity/bei-chen-ling-shou": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2",
+    "3b99bbfe-72a0-496f-9a4e-53b599695170"
+  ],
+  "entity/beichen-retail": [
+    "fb2bb21e-1769-4de1-9e41-e4eb9217ceb9",
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf",
+    "40cb6e26-0345-44b8-a021-d819d232f619",
+    "0173c370-1a56-421e-be61-71df39284cd5",
+    "deebd8ee-b757-468a-8649-8edde1fb728d",
+    "2b6265dd-c6c2-48c6-a047-f7088c178978",
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "entity/beichen-retail-group": [
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "entity/beichen-sync-delay-incident": [
+    "0173c370-1a56-421e-be61-71df39284cd5"
+  ],
+  "entity/board-of-directors": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "entity/canghai-heavy-industry": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "entity/cang-hai-zhong-gong": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "entity/chengdu": [
+    "59808dd7-f818-4bc8-9bcc-223df7a6e19e"
+  ],
+  "entity/chief-executive-officer": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "entity/chief-financial-officer": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "entity/chief-operating-officer": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "entity/communications-lead": [
+    "40cb6e26-0345-44b8-a021-d819d232f619"
+  ],
+  "entity/confluence": [
+    "deebd8ee-b757-468a-8649-8edde1fb728d"
+  ],
+  "entity/connector-sap": [
+    "0173c370-1a56-421e-be61-71df39284cd5"
+  ],
+  "entity/core-ding-yue-tao-can": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "entity/deal-desk": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "entity/executive-committee": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "entity/feishu": [
+    "deebd8ee-b757-468a-8649-8edde1fb728d"
+  ],
+  "entity/finance-department": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "entity/gu-linchuan": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf",
+    "2b6265dd-c6c2-48c6-a047-f7088c178978",
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "entity/han-chuan": [
+    "0173c370-1a56-421e-be61-71df39284cd5",
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "entity/hangzhou": [
+    "59808dd7-f818-4bc8-9bcc-223df7a6e19e"
+  ],
+  "entity/hangzhou-data-center": [
+    "fb2bb21e-1769-4de1-9e41-e4eb9217ceb9",
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "entity/he-jian": [
+    "40cb6e26-0345-44b8-a021-d819d232f619",
+    "0173c370-1a56-421e-be61-71df39284cd5"
+  ],
+  "entity/human-resources-department": [
+    "59808dd7-f818-4bc8-9bcc-223df7a6e19e"
+  ],
+  "entity/incident-commander": [
+    "40cb6e26-0345-44b8-a021-d819d232f619"
+  ],
+  "entity/jade-embed-v4": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "entity/jiang-yu": [
+    "0173c370-1a56-421e-be61-71df39284cd5"
+  ],
+  "entity/jiang-yuan": [
+    "fb2bb21e-1769-4de1-9e41-e4eb9217ceb9"
+  ],
+  "entity/ke-hu-shi-shi-jiao-fu-shou-ce": [
+    "3b99bbfe-72a0-496f-9a4e-53b599695170"
+  ],
+  "entity/lin-che": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf",
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "entity/ling-jing-yun-tu": [
+    "3b99bbfe-72a0-496f-9a4e-53b599695170"
+  ],
+  "entity/local-rerank-3b": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "entity/luo-qing": [
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "entity/operations-lead": [
+    "40cb6e26-0345-44b8-a021-d819d232f619"
+  ],
+  "entity/orion-large-cn-2026-06": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "entity/orion-mini-2026-07": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "entity/platform-reliability-group": [
+    "40cb6e26-0345-44b8-a021-d819d232f619"
+  ],
+  "entity/president-office": [
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "entity/prism-atlas-tech": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "entity/prism-cloud-map": [
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "entity/pro-ding-yue-tao-can": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "entity/regulated-ding-yue-tao-can": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "entity/sap": [
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "entity/security-and-compliance-department": [
+    "fb2bb21e-1769-4de1-9e41-e4eb9217ceb9"
+  ],
+  "entity/shang-ye-yun-ying-bu": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "entity/sharepoint": [
+    "deebd8ee-b757-468a-8649-8edde1fb728d",
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "entity/shen-ning": [
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8",
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf",
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "entity/shenzhen-customer-success-center": [
+    "59808dd7-f818-4bc8-9bcc-223df7a6e19e"
+  ],
+  "entity/shi-shi-jiao-fu-bu": [
+    "3b99bbfe-72a0-496f-9a4e-53b599695170"
+  ],
+  "entity/song-lan": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf",
+    "deebd8ee-b757-468a-8649-8edde1fb728d",
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "entity/tang-xiao": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf",
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "entity/viewer-xi-wei-bao": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "entity/vision-parse-2": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "entity/wechat-work": [
+    "deebd8ee-b757-468a-8649-8edde1fb728d"
+  ],
+  "entity/wei-ran": [
+    "3b99bbfe-72a0-496f-9a4e-53b599695170"
+  ],
+  "entity/wiki-2-0": [
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "entity/wiki-2-0-project": [
+    "59808dd7-f818-4bc8-9bcc-223df7a6e19e"
+  ],
+  "entity/wiki-doc-mode-2.0": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "entity/xu-tang": [
+    "59808dd7-f818-4bc8-9bcc-223df7a6e19e",
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "entity/yaoshi-consulting": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "entity/ye-ning": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "entity/zheng-he": [
+    "0173c370-1a56-421e-be61-71df39284cd5",
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "entity/zhou-mu": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "index": [],
+  "summary/0173c370-1a56-421e-be61-71df39284cd5": [
+    "0173c370-1a56-421e-be61-71df39284cd5"
+  ],
+  "summary/01e15f76-5984-4dba-8c6a-34e5c950ed09": [
+    "01e15f76-5984-4dba-8c6a-34e5c950ed09"
+  ],
+  "summary/2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2": [
+    "2b4c4809-3fc8-4ea2-8f8e-f91e5a28b9b2"
+  ],
+  "summary/2b6265dd-c6c2-48c6-a047-f7088c178978": [
+    "2b6265dd-c6c2-48c6-a047-f7088c178978"
+  ],
+  "summary/3b99bbfe-72a0-496f-9a4e-53b599695170": [
+    "3b99bbfe-72a0-496f-9a4e-53b599695170"
+  ],
+  "summary/40cb6e26-0345-44b8-a021-d819d232f619": [
+    "40cb6e26-0345-44b8-a021-d819d232f619"
+  ],
+  "summary/59808dd7-f818-4bc8-9bcc-223df7a6e19e": [
+    "59808dd7-f818-4bc8-9bcc-223df7a6e19e"
+  ],
+  "summary/63cd98a5-7250-476c-9a42-06bdda60dea0": [
+    "63cd98a5-7250-476c-9a42-06bdda60dea0"
+  ],
+  "summary/686f8b78-34c0-4aea-bf22-18a6276c23d8": [
+    "686f8b78-34c0-4aea-bf22-18a6276c23d8"
+  ],
+  "summary/93639dd6-f7d6-4d29-bc4f-013c7d5726bf": [
+    "93639dd6-f7d6-4d29-bc4f-013c7d5726bf"
+  ],
+  "summary/deebd8ee-b757-468a-8649-8edde1fb728d": [
+    "deebd8ee-b757-468a-8649-8edde1fb728d"
+  ],
+  "summary/fb2bb21e-1769-4de1-9e41-e4eb9217ceb9": [
+    "fb2bb21e-1769-4de1-9e41-e4eb9217ceb9"
+  ]
+}

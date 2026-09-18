@@ -1,0 +1,45 @@
+1/25 kind=repeat exit=0 tools=2 expected=True latency_ms=8484.6
+2/25 kind=repeat exit=0 tools=2 expected=True latency_ms=10638.0
+3/25 kind=repeat exit=0 tools=2 expected=True latency_ms=8338.1
+4/25 kind=repeat exit=0 tools=2 expected=True latency_ms=8137.8
+5/25 kind=repeat exit=0 tools=2 expected=True latency_ms=7451.8
+6/25 kind=repeat exit=0 tools=2 expected=True latency_ms=7253.3
+7/25 kind=repeat exit=0 tools=2 expected=True latency_ms=7654.2
+8/25 kind=repeat exit=0 tools=2 expected=True latency_ms=7339.6
+9/25 kind=repeat exit=0 tools=2 expected=True latency_ms=8351.1
+10/25 kind=repeat exit=0 tools=2 expected=True latency_ms=7246.4
+11/25 kind=repeat exit=0 tools=2 expected=True latency_ms=8334.9
+12/25 kind=repeat exit=0 tools=2 expected=True latency_ms=7744.8
+13/25 kind=repeat exit=0 tools=2 expected=True latency_ms=9739.5
+14/25 kind=repeat exit=0 tools=1 expected=True latency_ms=128643.0
+15/25 kind=repeat exit=0 tools=2 expected=True latency_ms=8948.2
+16/25 kind=repeat exit=0 tools=2 expected=True latency_ms=8037.1
+17/25 kind=repeat exit=0 tools=2 expected=True latency_ms=8644.5
+18/25 kind=repeat exit=0 tools=2 expected=True latency_ms=8355.7
+19/25 kind=repeat exit=0 tools=2 expected=True latency_ms=9547.7
+20/25 kind=repeat exit=0 tools=2 expected=True latency_ms=8442.2
+21/25 kind=unknown exit=0 tools=6 expected=True latency_ms=23649.8
+22/25 kind=unknown exit=0 tools=9 expected=True latency_ms=36347.8
+23/25 kind=unknown exit=0 tools=6 expected=True latency_ms=27452.3
+24/25 kind=unknown exit=0 tools=11 expected=True latency_ms=42756.0
+25/25 kind=unknown exit=0 tools=8 expected=True latency_ms=32855.2
+{
+  "agent_id": "builtin-smart-reasoning",
+  "runs": 25,
+  "repeat_runs": 20,
+  "unknown_runs": 5,
+  "process_success_rate": 1.0,
+  "repeat_answer_accuracy": 1.0,
+  "repeat_duplicate_free_rate": 1.0,
+  "unknown_grounded_refusal_rate": 0.8,
+  "tool_result_success_rate": 1.0,
+  "tool_calls_total": 79,
+  "tool_calls_max_per_run": 11,
+  "latency_ms": {
+    "mean": 18015.7474,
+    "p50": 8442.202,
+    "p95": 41474.38699999998,
+    "max": 128642.989
+  },
+  "wall_seconds": 450.450196458
+}

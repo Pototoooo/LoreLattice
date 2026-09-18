@@ -1,0 +1,599 @@
+# github.com/shoenig/go-m1cpu
+../../../go/pkg/mod/github.com/shoenig/go-m1cpu@v0.1.6/cpu.go:75:17: warning: variable length array folded to constant array as an extension [-Wgnu-folding-constant]
+../../../go/pkg/mod/github.com/shoenig/go-m1cpu@v0.1.6/cpu.go:77:16: warning: variable length array folded to constant array as an extension [-Wgnu-folding-constant]
+# github.com/asg017/sqlite-vec-go-bindings/cgo
+cgo-gcc-prolog:55:11: warning: 'sqlite3_auto_extension' is deprecated: first deprecated in macOS 10.10 - Process-global auto extensions are not supported on Apple platforms [-Wdeprecated-declarations]
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sqlite3.h:7436:16: note: 'sqlite3_auto_extension' has been explicitly marked deprecated here
+cgo-gcc-prolog:74:11: warning: 'sqlite3_cancel_auto_extension' is deprecated: first deprecated in macOS 10.14 - Process-global auto extensions are not supported on Apple platforms [-Wdeprecated-declarations]
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sqlite3.h:7449:16: note: 'sqlite3_cancel_auto_extension' has been explicitly marked deprecated here
+?   	github.com/Pototoooo/lorelattice/cmd/desktop	[no test files]
+?   	github.com/Pototoooo/lorelattice/cmd/download/duckdb	[no test files]
+?   	github.com/Pototoooo/lorelattice/cmd/server	[no test files]
+2026/08/25 15:20:32.006953 client_test.go:16: INFO: Initializing DocReader client tests
+[DocReader] 2026/08/25 15:20:32.007448 INFO: Creating new DocReader client connecting to localhost:50051
+[DocReader] 2026/08/25 15:20:32.007806 INFO: Successfully connected to DocReader service in 351.334µs
+2026/08/25 15:20:32.165588 client_test.go:35: INFO: Read(URL) completed in 157.77575ms
+[DocReader] 2026/08/25 15:20:32.165680 INFO: Closing DocReader client connection
+--- FAIL: TestReadURL (0.16s)
+    client_test.go:38: Read failed: rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:50051: connect: connection refused"
+[DocReader] 2026/08/25 15:20:32.165860 INFO: Creating new DocReader client connecting to localhost:50051
+[DocReader] 2026/08/25 15:20:32.165976 INFO: Successfully connected to DocReader service in 109.333µs
+2026/08/25 15:20:32.329528 client_test.go:71: INFO: Read(file) completed in 153.781917ms
+[DocReader] 2026/08/25 15:20:32.329590 INFO: Closing DocReader client connection
+--- FAIL: TestReadFile (0.16s)
+    client_test.go:74: Read failed: rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:50051: connect: connection refused"
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/docreader/client	0.970s
+?   	github.com/Pototoooo/lorelattice/docreader/proto	[no test files]
+?   	github.com/Pototoooo/lorelattice/docs	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/agent	1.207s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/approval	3.200s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/memory	2.159s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/skills	1.789s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/token	3.157s
+# github.com/Pototoooo/lorelattice/internal/agent/tools.test
+ld: warning: ignoring duplicate libraries: '-lc++'
+ok  	github.com/Pototoooo/lorelattice/internal/agent/tools	2.531s
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository	2.882s
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/doris	3.919s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch/v7	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch/v8	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/milvus	5.169s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/neo4j	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/opensearch	6.097s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/postgres	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/qdrant	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/sqlite	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/tencentvectordb	7.840s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/weaviate	[no test files]
+# github.com/Pototoooo/lorelattice/internal/container.test
+ld: warning: ignoring duplicate libraries: '-lc++'
+ok  	github.com/Pototoooo/lorelattice/internal/application/service	7.794s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/chat_pipeline	7.188s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/file	14.141s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/metric	8.200s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/retriever	7.689s
+?   	github.com/Pototoooo/lorelattice/internal/assets	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/billing	7.598s
+ok  	github.com/Pototoooo/lorelattice/internal/common	6.203s
+ok  	github.com/Pototoooo/lorelattice/internal/config	6.391s
+ok  	github.com/Pototoooo/lorelattice/internal/container	7.233s
+?   	github.com/Pototoooo/lorelattice/internal/database	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/datasource	10.471s
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+--- FAIL: TestFetchAll_LogsSummaryWithSkipBreakdown (0.00s)
+    connector_test.go:808: summary log missing "sync summary"; got:
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+    connector_test.go:808: summary log missing "discovered=3"; got:
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+    connector_test.go:808: summary log missing "fetched=1"; got:
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+    connector_test.go:808: summary log missing "skipped_unsupported=2"; got:
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+    connector_test.go:808: summary log missing "mindnote:1"; got:
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+    connector_test.go:808: summary log missing "slides:1"; got:
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+        json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+json
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/internal/datasource/connector/feishu	16.649s
+--- FAIL: TestConnectorValidate (0.00s)
+    connector_test.go:38: Validate() error: base_url SSRF validation failed: SSRF validation failed: hostname 127.0.0.1 is restricted
+--- FAIL: TestConnectorListResources (0.00s)
+    connector_test.go:62: ListResources() error: base_url SSRF validation failed: SSRF validation failed: hostname 127.0.0.1 is restricted
+--- FAIL: TestConnectorFetchAll (0.00s)
+    connector_test.go:83: FetchAll() error: base_url SSRF validation failed: SSRF validation failed: hostname 127.0.0.1 is restricted
+--- FAIL: TestConnectorFetchAll_Database (0.00s)
+    connector_test.go:118: FetchAll() error: base_url SSRF validation failed: SSRF validation failed: hostname 127.0.0.1 is restricted
+--- FAIL: TestConnectorFetchAll_SingleRecord (0.00s)
+    connector_test.go:161: FetchAll() error: base_url SSRF validation failed: SSRF validation failed: hostname 127.0.0.1 is restricted
+--- FAIL: TestConnectorFetchIncremental_NoChanges (0.00s)
+    connector_test.go:187: FetchAll() error: base_url SSRF validation failed: SSRF validation failed: hostname 127.0.0.1 is restricted
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/internal/datasource/connector/notion	7.728s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/rss	7.786s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/yuque	15.246s
+?   	github.com/Pototoooo/lorelattice/internal/errors	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/event	7.593s
+ok  	github.com/Pototoooo/lorelattice/internal/handler	2.810s
+ok  	github.com/Pototoooo/lorelattice/internal/handler/dto	3.244s
+ok  	github.com/Pototoooo/lorelattice/internal/handler/session	3.503s
+ok  	github.com/Pototoooo/lorelattice/internal/im	3.421s
+ok  	github.com/Pototoooo/lorelattice/internal/im/dingtalk	3.829s
+ok  	github.com/Pototoooo/lorelattice/internal/im/feishu	3.325s
+ok  	github.com/Pototoooo/lorelattice/internal/im/mattermost	2.593s
+ok  	github.com/Pototoooo/lorelattice/internal/im/qqbot	2.905s
+ok  	github.com/Pototoooo/lorelattice/internal/im/slack	2.768s
+ok  	github.com/Pototoooo/lorelattice/internal/im/telegram	2.618s
+?   	github.com/Pototoooo/lorelattice/internal/im/wechat	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/im/wecom	2.779s
+ok  	github.com/Pototoooo/lorelattice/internal/im/yunzhijia	2.662s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/chunker	2.561s
+2026/08/25 15:21:15 WARN: remote image blocked by SSRF check (SSRF validation failed: hostname 127.0.0.1 is restricted): http://127.0.0.1:60081/image.png
+--- FAIL: TestResolveRemoteImages_NormalDownload (0.00s)
+    resolve_remote_images_test.go:68: expected 1 stored image, got 0
+2026/08/25 15:21:15 WARN: remote image blocked by SSRF check (SSRF validation failed: direct IP address access is not allowed, use domain name or add to SSRF_WHITELIST): http://169.254.169.254/metadata
+2026/08/25 15:21:15 WARN: remote image blocked by SSRF check (SSRF validation failed: hostname 127.0.0.1 is restricted): http://127.0.0.1:8080/secret.png
+2026/08/25 15:21:15 WARN: remote image blocked by SSRF check (SSRF validation failed: hostname 127.0.0.1 is restricted): http://127.0.0.1:60082/page.html
+2026/08/25 15:21:15 WARN: remote image blocked by SSRF check (SSRF validation failed: hostname 127.0.0.1 is restricted): http://127.0.0.1:60083/c.png
+2026/08/25 15:21:15 WARN: remote image blocked by SSRF check (SSRF validation failed: hostname 127.0.0.1 is restricted): http://127.0.0.1:60083/b.png
+2026/08/25 15:21:15 WARN: remote image blocked by SSRF check (SSRF validation failed: hostname 127.0.0.1 is restricted): http://127.0.0.1:60083/a.png
+--- FAIL: TestResolveRemoteImages_MultipleImages (0.00s)
+    resolve_remote_images_test.go:184: expected 3 stored images, got 0
+2026/08/25 15:21:15 WARN: remote image blocked by SSRF check (SSRF validation failed: hostname 127.0.0.1 is restricted): http://127.0.0.1:60084/nope.png
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/internal/infrastructure/docparser	2.448s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/web_fetch	2.453s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/web_search	2.748s
+ok  	github.com/Pototoooo/lorelattice/internal/llmreference	3.466s
+ok  	github.com/Pototoooo/lorelattice/internal/llmresource	3.910s
+ok  	github.com/Pototoooo/lorelattice/internal/logger	4.321s
+ok  	github.com/Pototoooo/lorelattice/internal/mcp	4.158s
+ok  	github.com/Pototoooo/lorelattice/internal/middleware	2.704s
+ok  	github.com/Pototoooo/lorelattice/internal/middleware/asynqdl	3.270s
+ok  	github.com/Pototoooo/lorelattice/internal/models/asr	3.886s
+ok  	github.com/Pototoooo/lorelattice/internal/models/chat	4.782s
+ok  	github.com/Pototoooo/lorelattice/internal/models/embedding	4.727s
+ok  	github.com/Pototoooo/lorelattice/internal/models/limiter	4.703s
+ok  	github.com/Pototoooo/lorelattice/internal/models/provider	4.794s
+ok  	github.com/Pototoooo/lorelattice/internal/models/rerank	4.725s
+ok  	github.com/Pototoooo/lorelattice/internal/models/resultcache	4.509s
+?   	github.com/Pototoooo/lorelattice/internal/models/utils	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/models/utils/ollama	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/models/vlm	4.356s
+ok  	github.com/Pototoooo/lorelattice/internal/ratelimit	4.352s
+ok  	github.com/Pototoooo/lorelattice/internal/router	1.591s
+ok  	github.com/Pototoooo/lorelattice/internal/runtime	2.429s
+ok  	github.com/Pototoooo/lorelattice/internal/sandbox	14.989s
+ok  	github.com/Pototoooo/lorelattice/internal/searchutil	3.744s
+ok  	github.com/Pototoooo/lorelattice/internal/storageallowlist	1.605s
+?   	github.com/Pototoooo/lorelattice/internal/stream	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/tracing/langfuse	5.579s
+ok  	github.com/Pototoooo/lorelattice/internal/types	3.216s
+?   	github.com/Pototoooo/lorelattice/internal/types/interfaces	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/utils	4.133s
+FAIL
+real 157.13
+user 372.65
+sys 107.73
+          2217754624  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+            17174870  page reclaims
+              537488  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                3038  messages sent
+                3405  messages received
+               91006  signals received
+              100795  voluntary context switches
+             2495213  involuntary context switches
+        118018858025  instructions retired
+         88638976240  cycles elapsed
+           152535808  peak memory footprint

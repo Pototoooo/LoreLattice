@@ -1,0 +1,9 @@
+{
+  "collected_benchmark_session_ids": 202,
+  "matched_live_before_cleanup": 202,
+  "delete_successes": 202,
+  "delete_failures": 0,
+  "live_sessions_after_cleanup": 5,
+  "benchmark_sessions_remaining": 0,
+  "selection": "recursive JSON/JSONL key=session_id intersected with session list --since 2d"
+}

@@ -1,0 +1,67 @@
+原生评测验收记录 — 2026-09-08
+BRANCH=newBee/native-evaluation-20260908
+CHANGED=getPassageList: maxPID -> maxPID+1; <maxPID -> <=maxPID
+CHANGED=CreateKnowledgeFromPassage -> CreateKnowledgeFromPassageSync
+MAIN_SOURCE=UNCHANGED
+MODIFIED_FILE=/Users/macbook/Documents/Projects/LoreLattice/docs/benchmarks/2026-09-08-native-evaluation/artifacts/MODIFIED_FILE.go
+DIFF_FILE=/Users/macbook/Documents/Projects/LoreLattice/docs/benchmarks/2026-09-08-native-evaluation/DIFF_FILE.patch
+VERIFICATION=/Users/macbook/Documents/Projects/LoreLattice/docs/benchmarks/2026-09-08-native-evaluation/VERIFICATION.txt
+ROLLBACK=/Users/macbook/Documents/Projects/LoreLattice/docs/benchmarks/2026-09-08-native-evaluation/ROLLBACK.sh
+ORIGINAL_SHA256=41e62cfe459cca864f2938a98caa5a092242b1a5283176019de15ac4d0d83720
+
+BASELINE
+CWD=/Users/macbook/Documents/Projects/LoreLattice/.work/native-eval-20260908/repo
+COMMAND=go test ./internal/application/service -run '^TestNativeEvaluationPassageConservation$' -count=1
+INPUT=PIDs [2,3,1,4], passages [UNIX,FreeBSD,Mac,DOS]; assert PID4=DOS
+LITERAL_OUTPUT:
+--- FAIL: TestNativeEvaluationPassageConservation (0.00s)
+    native_evaluation_audit_test.go:9: highest PID 4 lost: len=4 passages=["" "Mac" "UNIX" "FreeBSD"]
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/internal/application/service	1.652s
+FAIL
+BASELINE_EXIT_STATUS=1
+
+MODIFIED
+CWD=/Users/macbook/Documents/Projects/LoreLattice/.work/native-eval-20260908/repo
+COMMAND=go test ./internal/application/service -run '^TestNativeEvaluationPassageConservation$' -count=1
+INPUT=PIDs [2,3,1,4], passages [UNIX,FreeBSD,Mac,DOS]; assert PID4=DOS
+LITERAL_OUTPUT:
+ok  	github.com/Pototoooo/lorelattice/internal/application/service	1.438s
+MODIFIED_EXIT_STATUS=0
+
+ROLLBACK
+CWD=/Users/macbook/Documents/Projects/LoreLattice/.work/native-eval-20260908/repo
+COMMAND=go test -overlay ../rollback-overlay.json ./internal/application/service -run '^TestNativeEvaluationPassageConservation$' -count=1
+INPUT=PIDs [2,3,1,4], passages [UNIX,FreeBSD,Mac,DOS]; assert PID4=DOS
+LITERAL_OUTPUT:
+--- FAIL: TestNativeEvaluationPassageConservation (0.00s)
+    native_evaluation_audit_test.go:12: highest PID 4 lost: len=4 passages=["" "Mac" "UNIX" "FreeBSD"]
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/internal/application/service	1.329s
+FAIL
+ROLLBACK_TEST_EXIT_STATUS=1
+
+ROLLBACK_RESTORE_COMMAND=/Users/macbook/Documents/Projects/LoreLattice/docs/benchmarks/2026-09-08-native-evaluation/ROLLBACK.sh /Users/macbook/Documents/Projects/LoreLattice/.work/native-eval-20260908/rollback-copy/evaluation.go
+OUTPUT=ROLLBACK_HASH_MATCH=YES
+EXIT_STATUS=0
+RESTORED_BEHAVIOR=highest PID4 omitted again; expected regression failure exit1 proves original behavior restored on another copy, not on the retained modified file.
+
+FINAL_COMMAND=python3 /Users/macbook/Documents/Projects/LoreLattice/.work/native-eval-20260908/final_verify.py
+INPUT=9 SSE runs, three saved configs, original hashes, rollback copy
+LITERAL_OUTPUT:
+FORMAL_RUNS=9/9 COMPLETE; UNIQUE_QUESTIONS=1; MODES=3; REPEATS=3
+CONFIG_DIFF=agent_type,allowed_tools,system_prompt,system_prompt_id
+ORIGINAL_HASHES=UNCHANGED; ROLLBACK_HASH_MATCH=YES; MODIFIED_COPY=RETAINED
+REOPENED=/Users/macbook/Documents/Projects/LoreLattice/docs/benchmarks/2026-09-08-native-evaluation/REPORT.md
+REOPENED=/Users/macbook/Documents/Projects/LoreLattice/docs/benchmarks/2026-09-08-native-evaluation/COMPARISON.md
+REOPENED=/Users/macbook/Documents/Projects/LoreLattice/docs/benchmarks/2026-09-08-native-evaluation/DIFF_FILE.patch
+REOPENED=/Users/macbook/Documents/Projects/LoreLattice/docs/benchmarks/2026-09-08-native-evaluation/ROLLBACK.sh
+EXIT_STATUS=0
+
+RUNTIME_COMMAND=docker stop LoreLattice-native-eval-20260908
+OUTPUT=LoreLattice-native-eval-20260908
+EXIT_STATUS=0
+HEALTH_COMMAND=curl -fsS http://127.0.0.1:8080/health
+OUTPUT={"status":"ok"}
+EXIT_STATUS=0
+STATUS=Original service healthy. Temporary evaluation container stopped. Generated test KB, agents and sessions retained for inspection; model usage stops. Original unrelated deletion misc/dex-config.yaml preserved.

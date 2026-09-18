@@ -1,0 +1,22 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "LoreLattice Lite",
+  "outputfilename": "LoreLattice Lite",
+  "frontend:dir": "../../frontend",
+  "wailsjsdir": "../../frontend/src",
+  "author": {
+    "name": "Pototoooo",
+    "email": ""
+  },
+  "info": {
+    "companyName": "Pototoooo",
+    "productName": "LoreLattice Lite",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright 2026 Pototoooo",
+    "comments": "LoreLattice Desktop Edition"
+  },
+  "mac": {
+    "category": "public.app-category.productivity",
+    "titlebar": "hiddenInset"
+  }
+}

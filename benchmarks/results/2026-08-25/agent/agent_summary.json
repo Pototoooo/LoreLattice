@@ -1,0 +1,27 @@
+{
+  "agent_id": "builtin-smart-reasoning",
+  "runs": 25,
+  "repeat_runs": 20,
+  "unknown_runs": 5,
+  "process_success_rate": 1.0,
+  "repeat_answer_accuracy": 1.0,
+  "repeat_duplicate_free_rate": 1.0,
+  "unknown_grounded_refusal_rate": 1.0,
+  "tool_calls_total": 79,
+  "tool_calls_max_per_run": 11,
+  "latency_ms": {
+    "mean": 18015.7474,
+    "p50": 8442.202,
+    "p95": 41474.38699999998,
+    "max": 128642.989
+  },
+  "outlier_over_90_seconds": 1,
+  "wall_seconds": 450.393685,
+  "limitations": [
+    "同一问题20次为顺序运行，未知问题5次；未做独立人工盲审。",
+    "内置智能推理Agent配置max_iterations=50、llm_call_timeout=120，与知识治理文档的12次工具/90秒规范不是同一运行时限制；观测到1次128.6秒。"
+  ],
+  "tool_calls_with_result": 77,
+  "tool_call_completion_rate": 0.9746835443037974,
+  "returned_tool_result_no_error_rate": 1.0
+}

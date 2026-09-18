@@ -1,0 +1,11 @@
+COMMAND=docker inspect health + authenticated KB list + frontend shell
+/LoreLattice-app health=healthy status=running
+/LoreLattice-docreader health=healthy status=running
+/LoreLattice-postgres health=healthy status=running
+/LoreLattice-redis health=n/a status=running
+/LoreLattice-frontend health=n/a status=running
+api_http=200 api_time=0.017486 api_bytes=1794
+api_success=true kb_count=1
+frontend_http=200 frontend_time=0.003007 frontend_bytes=4684
+frontend_app_shell=true
+EXIT_STATUS=0

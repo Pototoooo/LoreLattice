@@ -1,0 +1,130 @@
+COMMAND=/usr/bin/time -lp benchmarks/scripts/run_go_regression.sh
+PHASE=isolated packages=87
+?   	github.com/Pototoooo/lorelattice/cmd/desktop	[no test files]
+?   	github.com/Pototoooo/lorelattice/cmd/download/duckdb	[no test files]
+?   	github.com/Pototoooo/lorelattice/cmd/server	[no test files]
+# github.com/Pototoooo/lorelattice/internal/agent/tools.test
+ld: warning: ignoring duplicate libraries: '-lc++'
+2026/08/25 15:34:36.311957 client_test.go:16: INFO: Initializing DocReader client tests
+[DocReader] 2026/08/25 15:34:36.312491 INFO: Creating new DocReader client connecting to localhost:50051
+[DocReader] 2026/08/25 15:34:36.312831 INFO: Successfully connected to DocReader service in 334.25µs
+2026/08/25 15:34:46.585885 client_test.go:35: INFO: Read(URL) completed in 10.273047959s
+[DocReader] 2026/08/25 15:34:46.585942 INFO: Closing DocReader client connection
+--- FAIL: TestReadURL (10.27s)
+    client_test.go:38: Read failed: rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:50051: connect: connection refused"
+[DocReader] 2026/08/25 15:34:46.586125 INFO: Creating new DocReader client connecting to localhost:50051
+[DocReader] 2026/08/25 15:34:46.586217 INFO: Successfully connected to DocReader service in 84.041µs
+2026/08/25 15:34:46.752455 client_test.go:71: INFO: Read(file) completed in 165.955833ms
+[DocReader] 2026/08/25 15:34:46.752482 INFO: Closing DocReader client connection
+--- FAIL: TestReadFile (0.17s)
+    client_test.go:74: Read failed: rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp [::1]:50051: connect: connection refused"
+FAIL
+FAIL	github.com/Pototoooo/lorelattice/docreader/client	11.025s
+?   	github.com/Pototoooo/lorelattice/docreader/proto	[no test files]
+?   	github.com/Pototoooo/lorelattice/docs	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/agent	1.385s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/approval	2.983s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/memory	1.166s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/skills	1.301s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/token	2.346s
+ok  	github.com/Pototoooo/lorelattice/internal/agent/tools	3.510s
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository	3.334s
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/doris	3.976s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch/v7	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/elasticsearch/v8	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/milvus	4.552s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/neo4j	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/opensearch	4.467s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/postgres	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/qdrant	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/sqlite	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/tencentvectordb	5.144s
+?   	github.com/Pototoooo/lorelattice/internal/application/repository/retriever/weaviate	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/application/service	7.584s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/chat_pipeline	5.375s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/file	10.942s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/metric	4.985s
+ok  	github.com/Pototoooo/lorelattice/internal/application/service/retriever	4.426s
+?   	github.com/Pototoooo/lorelattice/internal/assets	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/billing	4.680s
+ok  	github.com/Pototoooo/lorelattice/internal/common	5.198s
+ok  	github.com/Pototoooo/lorelattice/internal/config	5.917s
+# github.com/Pototoooo/lorelattice/internal/container.test
+ld: warning: ignoring duplicate libraries: '-lc++'
+ok  	github.com/Pototoooo/lorelattice/internal/container	2.232s
+?   	github.com/Pototoooo/lorelattice/internal/database	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/datasource	5.328s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/feishu	11.982s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/notion	4.716s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/rss	4.490s
+ok  	github.com/Pototoooo/lorelattice/internal/datasource/connector/yuque	12.412s
+?   	github.com/Pototoooo/lorelattice/internal/errors	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/event	5.975s
+ok  	github.com/Pototoooo/lorelattice/internal/handler	7.097s
+ok  	github.com/Pototoooo/lorelattice/internal/handler/dto	6.167s
+ok  	github.com/Pototoooo/lorelattice/internal/handler/session	4.274s
+ok  	github.com/Pototoooo/lorelattice/internal/im	5.200s
+ok  	github.com/Pototoooo/lorelattice/internal/im/dingtalk	5.487s
+ok  	github.com/Pototoooo/lorelattice/internal/im/feishu	4.843s
+ok  	github.com/Pototoooo/lorelattice/internal/im/mattermost	4.362s
+ok  	github.com/Pototoooo/lorelattice/internal/im/qqbot	4.599s
+ok  	github.com/Pototoooo/lorelattice/internal/im/slack	4.560s
+ok  	github.com/Pototoooo/lorelattice/internal/im/telegram	4.275s
+?   	github.com/Pototoooo/lorelattice/internal/im/wechat	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/im/wecom	4.290s
+ok  	github.com/Pototoooo/lorelattice/internal/im/yunzhijia	4.426s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/chunker	4.570s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/docparser	5.318s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/web_fetch	5.054s
+ok  	github.com/Pototoooo/lorelattice/internal/infrastructure/web_search	5.653s
+ok  	github.com/Pototoooo/lorelattice/internal/llmreference	5.699s
+ok  	github.com/Pototoooo/lorelattice/internal/llmresource	5.983s
+ok  	github.com/Pototoooo/lorelattice/internal/logger	5.694s
+ok  	github.com/Pototoooo/lorelattice/internal/mcp	5.612s
+ok  	github.com/Pototoooo/lorelattice/internal/middleware	5.481s
+ok  	github.com/Pototoooo/lorelattice/internal/middleware/asynqdl	4.928s
+ok  	github.com/Pototoooo/lorelattice/internal/models/asr	4.991s
+ok  	github.com/Pototoooo/lorelattice/internal/models/chat	4.966s
+ok  	github.com/Pototoooo/lorelattice/internal/models/embedding	5.079s
+ok  	github.com/Pototoooo/lorelattice/internal/models/limiter	4.360s
+ok  	github.com/Pototoooo/lorelattice/internal/models/provider	3.991s
+ok  	github.com/Pototoooo/lorelattice/internal/models/rerank	3.828s
+ok  	github.com/Pototoooo/lorelattice/internal/models/resultcache	3.197s
+?   	github.com/Pototoooo/lorelattice/internal/models/utils	[no test files]
+?   	github.com/Pototoooo/lorelattice/internal/models/utils/ollama	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/models/vlm	3.740s
+ok  	github.com/Pototoooo/lorelattice/internal/ratelimit	3.074s
+ok  	github.com/Pototoooo/lorelattice/internal/router	2.064s
+ok  	github.com/Pototoooo/lorelattice/internal/runtime	2.264s
+ok  	github.com/Pototoooo/lorelattice/internal/sandbox	12.856s
+ok  	github.com/Pototoooo/lorelattice/internal/searchutil	0.686s
+ok  	github.com/Pototoooo/lorelattice/internal/storageallowlist	0.667s
+?   	github.com/Pototoooo/lorelattice/internal/stream	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/tracing/langfuse	2.801s
+ok  	github.com/Pototoooo/lorelattice/internal/types	3.387s
+?   	github.com/Pototoooo/lorelattice/internal/types/interfaces	[no test files]
+ok  	github.com/Pototoooo/lorelattice/internal/utils	3.443s
+FAIL
+RESULT suite_exit=1
+real 71.08
+user 88.94
+sys 37.27
+          1873412096  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             4556448  page reclaims
+              490799  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                3097  messages sent
+                3465  messages received
+               11602  signals received
+               59748  voluntary context switches
+             1181969  involuntary context switches
+            33662177  instructions retired
+            20215585  cycles elapsed
+             1376568  peak memory footprint
+EXIT_STATUS=1

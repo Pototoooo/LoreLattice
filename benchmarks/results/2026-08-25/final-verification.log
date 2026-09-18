@@ -1,0 +1,8 @@
+VERIFY_INPUT root=/Users/macbook/Documents/Projects/LoreLattice-benchmark dataset=/Users/macbook/Documents/Projects/LoreLattice-benchmark/benchmarks/datasets/enterprise_knowledge_v1/queries.jsonl
+VERIFY_BRANCH branch=newBee/benchmark-evidence head=f0eca422ed78f396d3f9a8c5dd26d0bf100028a7
+METRICS retrieval_queries=120 hybrid_hit_at_8=0.9916666666666667 answer_pass=118 answer_partial=2 relevant_citation=1.0
+AGENT repeat=20 accurate=20 duplicate_free=20 unknown=5 grounded_refusal=5 max_latency_ms=128642.989
+PERFORMANCE api_http_200=6134 api_http_failure_rate=0 api_p95_ms=6.418149999999993
+REGRESSION frontend=225/225 go_packages=87 docreader=111_skipped_6 cli_statement_coverage=69.3%
+ARTIFACTS report=/Users/macbook/Documents/Projects/LoreLattice-benchmark/benchmarks/reports/2026-08-25/BENCHMARK_REPORT.md decision_log=/Users/macbook/Documents/Projects/LoreLattice-benchmark/benchmarks/reports/2026-08-25/DECISION_LOG.md resume=/Users/macbook/Documents/Projects/LoreLattice-benchmark/benchmarks/reports/2026-08-25/RESUME_BULLETS.md metrics=/Users/macbook/Documents/Projects/LoreLattice-benchmark/benchmarks/reports/2026-08-25/METRICS.csv scorecard=/Users/macbook/Documents/Projects/LoreLattice-benchmark/benchmarks/reports/2026-08-25/benchmark-scorecard.svg
+VERIFY_RESULT=PASS EXIT_STATUS=0

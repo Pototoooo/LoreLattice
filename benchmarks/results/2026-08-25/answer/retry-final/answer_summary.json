@@ -1,0 +1,94 @@
+{
+  "overall": {
+    "queries": 1,
+    "successful": 1,
+    "errors": 0,
+    "strict_assertion_pass_rate": 0,
+    "mean_assertion_recall": 0.5,
+    "citation_presence_rate": 1,
+    "relevant_citation_rate": 1,
+    "all_sources_cited_rate": 1,
+    "latency_ms": {
+      "mean": 5074.923,
+      "p50": 5074.923,
+      "p95": 5074.923,
+      "p99": 5074.923,
+      "max": 5074.923
+    }
+  },
+  "single": {
+    "queries": 1,
+    "successful": 1,
+    "errors": 0,
+    "strict_assertion_pass_rate": 0,
+    "mean_assertion_recall": 0.5,
+    "citation_presence_rate": 1,
+    "relevant_citation_rate": 1,
+    "all_sources_cited_rate": 1,
+    "latency_ms": {
+      "mean": 5074.923,
+      "p50": 5074.923,
+      "p95": 5074.923,
+      "p99": 5074.923,
+      "max": 5074.923
+    }
+  },
+  "multi": {
+    "queries": 0,
+    "successful": 0,
+    "errors": 0,
+    "strict_assertion_pass_rate": null,
+    "mean_assertion_recall": null,
+    "citation_presence_rate": null,
+    "relevant_citation_rate": null,
+    "all_sources_cited_rate": null,
+    "latency_ms": {
+      "mean": null,
+      "p50": null,
+      "p95": null,
+      "p99": null,
+      "max": null
+    }
+  },
+  "canonical": {
+    "queries": 1,
+    "successful": 1,
+    "errors": 0,
+    "strict_assertion_pass_rate": 0,
+    "mean_assertion_recall": 0.5,
+    "citation_presence_rate": 1,
+    "relevant_citation_rate": 1,
+    "all_sources_cited_rate": 1,
+    "latency_ms": {
+      "mean": 5074.923,
+      "p50": 5074.923,
+      "p95": 5074.923,
+      "p99": 5074.923,
+      "max": 5074.923
+    }
+  },
+  "paraphrase": {
+    "queries": 0,
+    "successful": 0,
+    "errors": 0,
+    "strict_assertion_pass_rate": null,
+    "mean_assertion_recall": null,
+    "citation_presence_rate": null,
+    "relevant_citation_rate": null,
+    "all_sources_cited_rate": null,
+    "latency_ms": {
+      "mean": null,
+      "p50": null,
+      "p95": null,
+      "p99": null,
+      "max": null
+    }
+  },
+  "run": {
+    "workers": 1,
+    "wall_seconds": 5.078786375,
+    "queries": 1,
+    "independent_facts": 1,
+    "judge": "deterministic assertions"
+  }
+}

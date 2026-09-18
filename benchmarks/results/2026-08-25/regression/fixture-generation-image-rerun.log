@@ -1,0 +1,4 @@
+FIXTURE testdata/rag_test/docx/en_tables.docx bytes=36915
+FIXTURE testdata/rag_test/pptx/en_marker.pptx bytes=29431
+FIXTURE testdata/rag_test/ppt_old/en_38256.ppt bytes=608768
+EXIT_STATUS=0
