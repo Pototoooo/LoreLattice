@@ -18,9 +18,9 @@ var webSearchTool = BaseTool{
 	description: `Search the web for current information and news. This tool searches the internet to find up-to-date information that may not be in the knowledge base.
 
 ## CRITICAL - KB First Rule
-**ABSOLUTE RULE**: You MUST complete KB retrieval (grep_chunks AND knowledge_search) FIRST before using this tool.
-- NEVER use web_search without first trying grep_chunks and knowledge_search
-- ONLY use web_search if BOTH grep_chunks AND knowledge_search return insufficient/no results
+**ABSOLUTE RULE**: You MUST complete KB retrieval (search_knowledge) FIRST before using this tool.
+- NEVER use web_search without first trying search_knowledge and search_knowledge
+- ONLY use web_search if BOTH search_knowledge return insufficient/no results
 - KB retrieval is MANDATORY - you CANNOT skip it
 
 ## Features
@@ -31,7 +31,7 @@ var webSearchTool = BaseTool{
 ## Usage
 
 **Use when**:
-- **ONLY after** completing grep_chunks AND knowledge_search
+- **ONLY after** completing search_knowledge
 - KB retrieval returned insufficient or no results
 - Need current or real-time information (news, events, recent updates)
 - Information is not available in knowledge bases

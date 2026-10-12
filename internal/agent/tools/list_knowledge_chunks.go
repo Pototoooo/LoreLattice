@@ -152,7 +152,7 @@ func (t *ListKnowledgeChunksTool) Execute(ctx context.Context, args json.RawMess
 
 	chunkLimit := 20
 	if input.Limit > 0 {
-		chunkLimit = input.Limit
+		chunkLimit = min(input.Limit, 100)
 	}
 	offset := 0
 	if input.Offset > 0 {
@@ -182,6 +182,25 @@ func (t *ListKnowledgeChunksTool) Execute(ctx context.Context, args json.RawMess
 		}, fmt.Errorf("chunk query returned no data")
 	}
 
+	remainder := offset % chunkLimit
+	if remainder > 0 && len(chunks) > 0 {
+		if remainder >= len(chunks) {
+			chunks = nil
+		} else {
+			chunks = chunks[remainder:]
+		}
+		if int64(offset+len(chunks)) < total && len(chunks) < chunkLimit {
+			next := &types.Pagination{Page: pagination.Page + 1, PageSize: chunkLimit}
+			extra, _, e := t.chunkService.GetRepository().ListPagedChunksByKnowledgeID(ctx, effectiveTenantID, knowledgeID, next, []types.ChunkType{types.ChunkTypeText, types.ChunkTypeFAQ}, nil, "", "", "", "")
+			if e != nil {
+				return retrievalError(e)
+			}
+			chunks = append(chunks, extra...)
+			if len(chunks) > chunkLimit {
+				chunks = chunks[:chunkLimit]
+			}
+		}
+	}
 	totalChunks := total
 	fetched := len(chunks)
 
@@ -287,6 +306,8 @@ func (t *ListKnowledgeChunksTool) Execute(ctx context.Context, args json.RawMess
 			"knowledge_title": knowledgeTitle,
 			"total_chunks":    totalChunks,
 			"fetched_chunks":  fetched,
+			"offset":          offset,
+			"limit":           chunkLimit,
 			"page":            pagination.Page,
 			"page_size":       pagination.PageSize,
 			"chunks":          formattedChunks,

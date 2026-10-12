@@ -353,7 +353,7 @@ func (e *EvaluationService) EvalDataset(ctx context.Context, detail *types.Evalu
 	logger.Infof(ctx, "Creating knowledge from %d passages", len(passages))
 
 	// Create knowledge base from passages
-	knowledge, err := e.knowledgeService.CreateKnowledgeFromPassage(ctx, knowledgeBaseID, passages, "")
+	knowledge, err := e.knowledgeService.CreateKnowledgeFromPassageSync(ctx, knowledgeBaseID, passages, "")
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create knowledge from passages: %v", err)
 		return err
@@ -409,7 +409,7 @@ func (e *EvaluationService) EvalDataset(ctx context.Context, detail *types.Evalu
 
 			// Execute knowledge QA pipeline
 			logger.Infof(ctx, "Running knowledge QA for question: %s", qaPair.Question)
-			err = e.sessionService.KnowledgeQAByEvent(ctx, chatManage, types.Pipline["rag"])
+			err := e.sessionService.KnowledgeQAByEvent(ctx, chatManage, types.Pipline["rag"])
 			if err != nil {
 				logger.Errorf(ctx, "Failed to process question %d: %v", i, err)
 				return err
@@ -466,8 +466,11 @@ func getPassageList(dataset []*types.QAPair) []string {
 			maxPID = max(maxPID, qaPair.PIDs[i])
 		}
 	}
-	passages := make([]string, maxPID)
-	for i := 0; i < maxPID; i++ {
+	if len(pIDMap) == 0 {
+		return nil
+	}
+	passages := make([]string, maxPID+1)
+	for i := 0; i <= maxPID; i++ {
 		if _, ok := pIDMap[i]; ok {
 			passages[i] = pIDMap[i]
 		}

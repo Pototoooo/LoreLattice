@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "test": "tsx --test"
+    "test": "tsx --test",
+    "check": "npm run test && npm run type-check && npm run build"
   },
   "dependencies": {
     "@microsoft/fetch-event-source": "^2.0.1",
@@ -64,5 +65,8 @@
     "esbuild": "^0.25.0",
     "serialize-javascript": "^7.0.3",
     "tdesign-icons-vue-next": "0.4.4"
+  },
+  "engines": {
+    "node": ">=22.19.0"
   }
 }

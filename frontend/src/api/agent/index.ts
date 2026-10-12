@@ -1,3 +1,5 @@
+import { BUILTIN_QUICK_ANSWER_ID, BUILTIN_SMART_REASONING_ID } from '../../config/agentConstants'
+export { BUILTIN_QUICK_ANSWER_ID, BUILTIN_SMART_REASONING_ID } from '../../config/agentConstants'
 import { get, post, put, del } from "../../utils/request";
 
 // 智能体配置
@@ -161,8 +163,8 @@ export interface UpdateAgentRequest {
 }
 
 // 内置智能体 ID（常用的保留常量，便于代码引用）
-export const BUILTIN_QUICK_ANSWER_ID = 'builtin-quick-answer';
-export const BUILTIN_SMART_REASONING_ID = 'builtin-smart-reasoning';
+
+
 
 // AgentMode 常量
 export const AGENT_MODE_QUICK_ANSWER = 'quick-answer';

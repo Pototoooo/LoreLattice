@@ -56,6 +56,9 @@ var ToolCapabilityRequirements = map[string]ToolRequirement{
 	"todo_write": {},
 
 	// ---- RAG / chunk retrieval (need at least one chunk-indexed KB) ----
+	"search_knowledge":      {AnyOf: []KBCapability{CapVector, CapKeyword}, ConsumesFiles: true},
+	"read_document":         {AnyOf: []KBCapability{CapVector, CapKeyword, CapWiki}, ConsumesFiles: true},
+	"list_documents":        {AnyOf: []KBCapability{CapVector, CapKeyword, CapWiki}, ConsumesFiles: true},
 	"knowledge_search":      {AnyOf: []KBCapability{CapVector, CapKeyword}, ConsumesFiles: true},
 	"grep_chunks":           {AnyOf: []KBCapability{CapVector, CapKeyword}, ConsumesFiles: true},
 	"list_knowledge_chunks": {AnyOf: []KBCapability{CapVector, CapKeyword}, ConsumesFiles: true},

@@ -58,6 +58,14 @@ func (r *ToolRegistry) RegisterTool(tool types.Tool) {
 func (r *ToolRegistry) GetTool(name string) (types.Tool, error) {
 	tool, exists := r.tools[name]
 	if !exists {
+		tool, exists = r.tools[CanonicalRetrievalTool(name)]
+		if name == ToolGetDocumentInfo {
+			if list, ok := tool.(*ListDocumentsTool); ok && list.legacyInfo != nil {
+				tool = list.legacyInfo
+			}
+		}
+	}
+	if !exists {
 		return nil, fmt.Errorf("tool not found: %s", name)
 	}
 	return tool, nil
@@ -124,6 +132,9 @@ func (r *ToolRegistry) ExecuteTool(
 
 	// Cast parameters to match expected schema types before execution.
 	// This handles common LLM quirks like returning "true" instead of true.
+	if tool.Name() != name {
+		args = legacyRetrievalArgs(name, args)
+	}
 	args = CastParams(args, tool.Parameters())
 
 	// Validate parameters against the tool's JSON Schema before execution.

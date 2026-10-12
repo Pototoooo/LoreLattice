@@ -250,7 +250,7 @@ func (r *chunkRepository) ListPagedChunksByKnowledgeID(
 	}
 
 	if err := dataQuery.
-		Order(orderClause).
+		Order(orderClause).Order("id ASC").
 		Offset(page.Offset()).
 		Limit(page.Limit()).
 		Find(&chunks).Error; err != nil {

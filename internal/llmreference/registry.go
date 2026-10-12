@@ -280,6 +280,21 @@ func (r *Registry) KnowledgeBaseAlias(id string) string {
 func (r *Registry) DecodeToolCalls(toolCalls []types.LLMToolCall) {
 	for i := range toolCalls {
 		toolCalls[i].Function.Arguments = r.decodeJSON(toolCalls[i].Function.Arguments, false)
+		if toolCalls[i].Function.Name == "read_document" {
+			var args map[string]interface{}
+			if json.Unmarshal([]byte(toolCalls[i].Function.Arguments), &args) == nil {
+				if id, ok := args["id"].(string); ok {
+					if strings.HasPrefix(id, "c") || strings.HasPrefix(id, "d") {
+						if real := r.realForAlias(id); real != "" {
+							args["id"] = real
+						}
+					}
+				}
+				if b, err := json.Marshal(args); err == nil {
+					toolCalls[i].Function.Arguments = string(b)
+				}
+			}
+		}
 	}
 }
 

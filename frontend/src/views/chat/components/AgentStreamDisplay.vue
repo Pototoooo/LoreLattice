@@ -160,7 +160,7 @@
                     <div class="results-summary-text" v-html="getGrepResultsSummary(event.tool_data)"></div>
                   </div>
 
-                  <div v-if="!event.pending && event.tool_name === 'list_knowledge_chunks' && event.tool_data"
+                  <div v-if="!event.pending && (event.tool_name === 'list_knowledge_chunks' || event.tool_name === 'read_document') && event.tool_data"
                     class="search-results-summary-fixed knowledge-chunks-summary">
                     <div class="results-summary-text" v-html="getKnowledgeChunksSummary(event.tool_data)"></div>
                   </div>
@@ -390,7 +390,7 @@
                   <div class="results-summary-text" v-html="getGrepResultsSummary(event.tool_data)"></div>
                 </div>
 
-                <div v-if="!event.pending && event.tool_name === 'list_knowledge_chunks' && event.tool_data"
+                <div v-if="!event.pending && (event.tool_name === 'list_knowledge_chunks' || event.tool_name === 'read_document') && event.tool_data"
                   class="search-results-summary-fixed knowledge-chunks-summary">
                   <div class="results-summary-text" v-html="getKnowledgeChunksSummary(event.tool_data)"></div>
                 </div>
@@ -551,7 +551,9 @@ const TOOL_NAME_KEYS: Record<string, string> = {
   grep_chunks: 'agentStream.tools.grepChunks',
   web_search: 'agentStream.tools.webSearch',
   web_fetch: 'agentStream.tools.webFetch',
-  get_document_info: 'agentStream.tools.getDocumentInfo',
+  list_documents: 'agentStream.tools.getDocumentInfo',
+ read_document: 'agentStream.tools.listKnowledgeChunks',
+ get_document_info: 'agentStream.tools.getDocumentInfo',
   list_knowledge_chunks: 'agentStream.tools.listKnowledgeChunks',
   get_related_documents: 'agentStream.tools.getRelatedDocuments',
   get_document_content: 'agentStream.tools.getDocumentContent',
@@ -1021,7 +1023,7 @@ function getToolReferenceItems(event: any): KnowledgeReferenceLike[] {
       })));
   }
 
-  if (toolName === 'list_knowledge_chunks') {
+  if ((toolName === 'list_knowledge_chunks' || toolName === 'read_document')) {
     const chunks = Array.isArray(toolData.chunks) ? toolData.chunks : [];
     if (chunks.length) {
       return mergeDocumentReferences(chunks
@@ -1808,7 +1810,7 @@ const isReferenceDrawerTool = (toolName?: string | null): boolean =>
   toolName === 'web_search' ||
   toolName === 'web_fetch' ||
   toolName === 'grep_chunks' ||
-  toolName === 'list_knowledge_chunks';
+  (toolName === 'list_knowledge_chunks' || toolName === 'read_document');
 
 const hasExpandableResults = (event: any): boolean => {
   if (isReferenceDrawerTool(event?.tool_name)) return false;
@@ -1843,7 +1845,7 @@ const hasResults = (event: any): boolean => {
   }
 
   // list_knowledge_chunks: summary is inline below the header (no expandable body)
-  if (toolName === 'list_knowledge_chunks') {
+  if ((toolName === 'list_knowledge_chunks' || toolName === 'read_document')) {
     return false;
   }
 
@@ -2183,11 +2185,11 @@ const getToolSummary = (event: any): string => {
   // For search tools, don't return summary here - it will be displayed in SearchResults component
   if (toolName === 'search_knowledge' || toolName === 'knowledge_search') {
     return '';
-  } else if (toolName === 'get_document_info') {
+  } else if ((toolName === 'get_document_info' || toolName === 'list_documents')) {
     if (toolData?.title) {
       return t('agentStream.toolSummary.getDocument', { title: toolData.title });
     }
-  } else if (toolName === 'list_knowledge_chunks') {
+  } else if ((toolName === 'list_knowledge_chunks' || toolName === 'read_document')) {
     if (toolData?.faq_question) {
       return t('agentStream.toolSummary.listFaqEntry', { question: toolData.faq_question });
     }
@@ -2493,7 +2495,7 @@ const getToolDescription = (event: any): string => {
     return success ? t('agentStream.toolStatus.webSearch') : t('agentStream.toolStatus.webSearchFailed');
   } else if (toolName === 'grep_chunks') {
     return success ? t('agentStream.toolStatus.grepSearch') : t('agentStream.toolStatus.grepSearchFailed');
-  } else if (toolName === 'get_document_info') {
+  } else if ((toolName === 'get_document_info' || toolName === 'list_documents')) {
     return success ? t('agentStream.toolStatus.getDocInfo') : t('agentStream.toolStatus.getDocInfoFailed');
   } else if (toolName === 'get_document_content' || toolName === 'wiki_read_source_doc') {
     return success ? t('agentStream.toolStatus.viewDocument') : t('agentStream.toolStatus.calledFailed', { name: t('agentStream.toolStatus.viewDocument') });

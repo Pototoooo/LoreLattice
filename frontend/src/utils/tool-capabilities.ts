@@ -49,7 +49,10 @@ export const TOOL_CAPABILITY_REQUIREMENTS: Record<string, ToolRequirement> = {
   // We use vector|keyword as the canonical "has RAG chunks" signal. FAQ KBs
   // also expose chunks, but the current UX message bucket is "RAG KB"; once
   // we add a dedicated `requiresFaqKb` i18n key we can include `faq` here.
-  knowledge_search:      { anyOf: ['vector', 'keyword'], consumesFiles: true },
+  search_knowledge: { anyOf: ['vector', 'keyword'], consumesFiles: true },
+ read_document: { anyOf: ['vector', 'keyword', 'wiki'], consumesFiles: true },
+ list_documents: { anyOf: ['vector', 'keyword', 'wiki'], consumesFiles: true },
+ knowledge_search:      { anyOf: ['vector', 'keyword'], consumesFiles: true },
   grep_chunks:           { anyOf: ['vector', 'keyword'], consumesFiles: true },
   list_knowledge_chunks: { anyOf: ['vector', 'keyword'], consumesFiles: true },
   query_knowledge_graph: { anyOf: ['vector', 'keyword'], consumesFiles: true },

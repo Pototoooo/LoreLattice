@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/Pototoooo/LoreLattice/actions"><img alt="GitHub Actions" src="https://img.shields.io/github/actions/workflow/status/Pototoooo/LoreLattice/cli.yml?branch=main&label=CLI"></a>
-  <img alt="Go" src="https://img.shields.io/badge/Go-1.24+-00ADD8?logo=go&logoColor=white">
+  <img alt="Go" src="https://img.shields.io/badge/Go-1.26+-00ADD8?logo=go&logoColor=white">
   <img alt="Vue" src="https://img.shields.io/badge/Vue-3-42b883?logo=vuedotjs&logoColor=white">
   <img alt="Docker" src="https://img.shields.io/badge/Docker_Compose-ready-2496ED?logo=docker&logoColor=white">
 </p>
@@ -175,7 +175,7 @@ npm run type-check
 npm run build
 ```
 
-前端构建要求 Node.js 20.19+，项目验证环境使用 Node.js 24。
+前端构建要求 Node.js 22.19+，项目验证环境使用 Node.js 24。
 
 ## 文档入口
 

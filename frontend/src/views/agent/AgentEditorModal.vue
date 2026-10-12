@@ -1631,6 +1631,7 @@
 </template>
 
 <script setup lang="ts">
+import { normalizeRetrievalTools } from "@/utils/retrieval-tools";
 import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import AgentCreateContextualGuide from '@/components/AgentCreateContextualGuide.vue';
@@ -1911,10 +1912,10 @@ const defaultMaxCompletionTokens = ref(2048);
 const defaultTemperature = ref(0.7);
 
 // 知识库相关工具列表（用于 watch(hasKnowledgeBase) 从"无"变"有"时 seed 默认工具）
-const knowledgeBaseTools = ['grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'query_knowledge_graph', 'get_document_info', 'database_query'];
+const knowledgeBaseTools = ['search_knowledge', 'read_document', 'query_knowledge_graph', 'list_documents', 'database_query'];
 
 // Wiki 读取类工具（用于 watch(agentMode) 切到 smart-reasoning 时 seed 默认工具）
-const wikiReadTools = ['wiki_search', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_flag_issue'];
+const wikiReadTools = ['wiki_search', 'wiki_read_page', 'read_document', 'wiki_flag_issue'];
 
 // 初始化标志，防止初始化时触发 watch 自动添加工具
 const isInitializing = ref(false);
@@ -1938,16 +1939,14 @@ const allTools = computed(() => [
   { value: 'thinking', label: t('agentEditor.tools.thinking'), description: t('agentEditor.tools.thinkingDesc'), group: 'base' },
   { value: 'todo_write', label: t('agentEditor.tools.todoWrite'), description: t('agentEditor.tools.todoWriteDesc'), group: 'base' },
   // 知识库语义/关键词检索
-  { value: 'grep_chunks', label: t('agentEditor.tools.grepChunks'), description: t('agentEditor.tools.grepChunksDesc'), group: 'rag' },
-  { value: 'knowledge_search', label: t('agentEditor.tools.knowledgeSearch'), description: t('agentEditor.tools.knowledgeSearchDesc'), group: 'rag' },
-  { value: 'list_knowledge_chunks', label: t('agentEditor.tools.listChunks'), description: t('agentEditor.tools.listChunksDesc'), group: 'rag' },
+  { value: 'search_knowledge', label: t('agentEditor.tools.searchKnowledge'), description: t('agentEditor.tools.searchKnowledgeDesc'), group: 'rag' },
+  { value: 'read_document', label: t('agentEditor.tools.readDocument'), description: t('agentEditor.tools.readDocumentDesc'), group: 'rag' },
   { value: 'query_knowledge_graph', label: t('agentEditor.tools.queryGraph'), description: t('agentEditor.tools.queryGraphDesc'), group: 'rag' },
-  { value: 'get_document_info', label: t('agentEditor.tools.getDocInfo'), description: t('agentEditor.tools.getDocInfoDesc'), group: 'rag' },
+  { value: 'list_documents', label: t('agentEditor.tools.listDocuments'), description: t('agentEditor.tools.listDocumentsDesc'), group: 'rag' },
   { value: 'database_query', label: t('agentEditor.tools.dbQuery'), description: t('agentEditor.tools.dbQueryDesc'), group: 'rag' },
   // Wiki 读取类（阅读、搜索、标记问题）
   { value: 'wiki_search', label: t('agentEditor.tools.wikiSearch'), description: t('agentEditor.tools.wikiSearchDesc'), group: 'wiki_read' },
   { value: 'wiki_read_page', label: t('agentEditor.tools.wikiReadPage'), description: t('agentEditor.tools.wikiReadPageDesc'), group: 'wiki_read' },
-  { value: 'wiki_read_source_doc', label: t('agentEditor.tools.wikiReadSourceDoc'), description: t('agentEditor.tools.wikiReadSourceDocDesc'), group: 'wiki_read' },
   { value: 'wiki_flag_issue', label: t('agentEditor.tools.wikiFlagIssue'), description: t('agentEditor.tools.wikiFlagIssueDesc'), group: 'wiki_read' },
   // Wiki 编辑类（会直接修改 Wiki 内容）
   { value: 'wiki_write_page', label: t('agentEditor.tools.wikiWritePage'), description: t('agentEditor.tools.wikiWritePageDesc'), group: 'wiki_edit', danger: true },
@@ -2812,7 +2811,7 @@ const applyAgentTypePreset = (preset: AgentTypePreset | null) => {
   }
   if (typeof c.temperature === 'number') target.temperature = c.temperature;
   if (typeof c.max_iterations === 'number') target.max_iterations = c.max_iterations;
-  if (Array.isArray(c.allowed_tools)) target.allowed_tools = [...c.allowed_tools];
+  if (Array.isArray(c.allowed_tools)) target.allowed_tools = normalizeRetrievalTools(c.allowed_tools);
   if (typeof c.retain_retrieval_history === 'boolean') target.retain_retrieval_history = c.retain_retrieval_history;
   if (typeof c.faq_priority_enabled === 'boolean') target.faq_priority_enabled = c.faq_priority_enabled;
   if (typeof c.web_search_enabled === 'boolean') target.web_search_enabled = c.web_search_enabled;
@@ -2934,7 +2933,7 @@ watch(() => props.visible, async (val) => {
       };
       // 确保数组字段存在
       if (!agentData.config.knowledge_bases) agentData.config.knowledge_bases = [];
-      if (!agentData.config.allowed_tools) agentData.config.allowed_tools = [];
+      agentData.config.allowed_tools = normalizeRetrievalTools(agentData.config.allowed_tools || []);
       if (!agentData.config.mcp_services) agentData.config.mcp_services = [];
       // 授权等待超时：旧数据缺省时用默认 600 秒
       if (agentData.config.mcp_auth_wait_timeout == null || agentData.config.mcp_auth_wait_timeout <= 0) {
@@ -3168,18 +3167,18 @@ watch(agentMode, (val, _oldVal) => {
       const tools: string[] = [];
       if (hasRagKnowledgeBase.value) {
         tools.push(
-          'knowledge_search',
-          'grep_chunks',
-          'list_knowledge_chunks',
+          'search_knowledge',
+          'search_knowledge',
+          'read_document',
           'query_knowledge_graph',
-          'get_document_info',
+          'list_documents',
           'database_query',
         );
       }
       if (hasWikiKnowledgeBase.value) {
         tools.push(...wikiReadTools);
       }
-      formData.value.config.allowed_tools = tools;
+      formData.value.config.allowed_tools = normalizeRetrievalTools(tools);
     }
     if (formData.value.config.max_iterations <= 1) {
       formData.value.config.max_iterations = 10;
@@ -3242,7 +3241,7 @@ watch(hasKnowledgeBase, (hasKB, oldHasKB) => {
     // 从无知识库变为有知识库，seed 默认的 RAG 工具（仅补齐未勾的）
     const currentTools = formData.value.config.allowed_tools || [];
     const toolsToAdd = knowledgeBaseTools.filter((tool: string) => !currentTools.includes(tool));
-    formData.value.config.allowed_tools = [...currentTools, ...toolsToAdd];
+    formData.value.config.allowed_tools = normalizeRetrievalTools([...currentTools, ...toolsToAdd]);
   }
 });
 

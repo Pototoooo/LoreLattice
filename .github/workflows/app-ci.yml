@@ -1,0 +1,86 @@
+name: Main Application
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: app-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: lorelattice_test
+          POSTGRES_PASSWORD: disposable_ci_password
+          POSTGRES_DB: lorelattice_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U lorelattice_test -d lorelattice_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      BILLING_TEST_POSTGRES_DSN: 'host=127.0.0.1 port=5432 user=lorelattice_test password=disposable_ci_password dbname=lorelattice_test sslmode=disable'
+      GOLANG_PROTOBUF_REGISTRATION_CONFLICT: warn
+      CGO_ENABLED: '1'
+      CGO_CFLAGS: '-Wno-deprecated-declarations'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Backend regression tests
+        run: env -u LOG_FORMAT -u SSRF_WHITELIST -u SSRF_WHITELIST_EXTRA go test -count=1 -timeout=15m ./internal/... ./docreader/client/...
+      - name: SDK regression tests
+        working-directory: client
+        run: go test -race -count=1 -timeout=5m ./...
+      - name: Critical concurrency and evaluation checks
+        run: |
+          env -u LOG_FORMAT -u SSRF_WHITELIST -u SSRF_WHITELIST_EXTRA go test -race -count=1 -timeout=5m ./internal/billing ./internal/agent/approval ./internal/ratelimit ./internal/models/resultcache
+          env -u LOG_FORMAT -u SSRF_WHITELIST -u SSRF_WHITELIST_EXTRA go test -race -count=1 -timeout=5m ./internal/application/service -run '^TestEvaluationReliability'
+      - name: Build API server
+        run: go build -o "$RUNNER_TEMP/lorelattice-server" ./cmd/server
+
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Tests, types and production build
+        run: npm run check
+
+  docreader:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install locked parser dependencies
+        run: |
+          python -m pip install uv
+          uv sync --frozen --project docreader
+      - name: Parser and SSRF regression tests
+        run: uv run --frozen --project docreader python -m unittest discover -s docreader/tests -p 'test_*.py' -v

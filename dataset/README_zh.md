@@ -282,3 +282,14 @@ python dataset/qa_dataset.py show \
 ## 许可证
 
 MIT许可证 - 可自由用于研究和项目。
+## 服务端评测数据集选择
+
+`/api/v1/evaluation` 的 `dataset_id` 为空或为 `default` 时读取 `dataset/samples`；
+其他 ID（例如 `custom_v1`）读取 `dataset/custom_v1`。ID 仅允许字母、数字、
+下划线和连字符，且必须以字母或数字开头，不能传绝对路径或 `../`。
+读取被限制在 `dataset` 根目录内，指向根目录外的符号链接也会被拒绝。
+
+每套数据集需要完整的五个 Parquet 文件：`queries`、`corpus`、`answers`、
+`qrels`、`qas`（均带 `.parquet` 后缀）。缺文件或损坏文件返回错误，不再在
+API 加载路径中 panic。评测等待文档索引完成后才提问；问题按 QID 排序，
+便于复现。新增数据集不代表新增了经人工核验的独立评测题。

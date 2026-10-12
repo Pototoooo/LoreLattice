@@ -1,32 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-const BUILTIN_QUICK_ANSWER_ID = 'builtin-quick-answer'
-const BUILTIN_SMART_REASONING_ID = 'builtin-smart-reasoning'
-
-function isQuickAnswerAgentId(agentId) {
-  return (agentId || BUILTIN_QUICK_ANSWER_ID) === BUILTIN_QUICK_ANSWER_ID
-}
-
-function isAgentStreamAgentId(agentId, isAgentEnabled) {
-  const id = agentId || BUILTIN_QUICK_ANSWER_ID
-  if (id === BUILTIN_QUICK_ANSWER_ID) return false
-  if (id === BUILTIN_SMART_REASONING_ID) return true
-  return isAgentEnabled
-}
-
-function reconcileBuiltinAgentMode(settings) {
-  const agentId = settings.selectedAgentId || BUILTIN_QUICK_ANSWER_ID
-  if (agentId === BUILTIN_QUICK_ANSWER_ID && settings.isAgentEnabled) {
-    settings.isAgentEnabled = false
-    return true
-  }
-  if (agentId === BUILTIN_SMART_REASONING_ID && !settings.isAgentEnabled) {
-    settings.isAgentEnabled = true
-    return true
-  }
-  return false
-}
+import { isQuickAnswerAgentId, isAgentStreamAgentId, reconcileBuiltinAgentMode } from './agent-mode.ts'
 
 test('isQuickAnswerAgentId treats builtin quick-answer as RAG mode', () => {
   assert.equal(isQuickAnswerAgentId('builtin-quick-answer'), true)

@@ -349,6 +349,15 @@ func (s *knowledgeBaseService) buildRetrievalParams(
 		}
 	}
 
+	if params.RequiredMode == "keyword" && !retrieveEngine.SupportRetriever(types.KeywordsRetrieverType) {
+		return nil, apperrors.NewBadRequestError("keyword retrieval is unsupported by the bound index engine")
+	}
+	if params.RequiredMode == "semantic" && !retrieveEngine.SupportRetriever(types.VectorRetrieverType) {
+		return nil, apperrors.NewBadRequestError("semantic retrieval is unsupported by the bound index engine")
+	}
+	if params.RequiredMode == "hybrid" && !retrieveEngine.SupportRetriever(types.VectorRetrieverType) && !retrieveEngine.SupportRetriever(types.KeywordsRetrieverType) {
+		return nil, apperrors.NewBadRequestError("hybrid retrieval is unsupported by the bound index engine")
+	}
 	// Add vector retrieval params if supported
 	if retrieveEngine.SupportRetriever(types.VectorRetrieverType) && !params.DisableVectorMatch &&
 		(len(faqVectorKBIDs) > 0 || len(docVectorKBIDs) > 0) {

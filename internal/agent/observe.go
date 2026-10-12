@@ -559,6 +559,9 @@ func countTotalToolCalls(steps []types.AgentStep) int {
 // may become stale across turns (KB can be switched, updated, or deleted).
 // Historical results from these tools are redacted to force fresh retrieval.
 var kbToolNames = map[string]bool{
+	agenttools.ToolSearchKnowledge:     true,
+	agenttools.ToolReadDocument:        true,
+	agenttools.ToolListDocuments:       true,
 	agenttools.ToolKnowledgeSearch:     true,
 	agenttools.ToolGrepChunks:          true,
 	agenttools.ToolListKnowledgeChunks: true,

@@ -49,7 +49,7 @@ func agentRequiresRerankModel(agent *types.CustomAgent) bool {
 		allowed = tools.DefaultAllowedTools()
 	}
 	for _, t := range allowed {
-		if t == tools.ToolKnowledgeSearch {
+		if t == tools.ToolKnowledgeSearch || t == tools.ToolSearchKnowledge {
 			return true
 		}
 	}

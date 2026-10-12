@@ -788,7 +788,7 @@ func (r *knowledgeRepository) SearchKnowledgeInScopes(
 	}
 
 	var results []KnowledgeWithKBName
-	err := query.Order("knowledges.created_at DESC").
+	err := query.Order("knowledges.created_at DESC, knowledges.id ASC").
 		Offset(offset).
 		Limit(limit + 1).
 		Scan(&results).Error

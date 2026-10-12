@@ -186,6 +186,8 @@ type SearchResult struct {
 
 // SearchParams represents the search parameters
 type SearchParams struct {
+	// RequiredMode requests explicit engine capability validation for canonical agent retrieval.
+	RequiredMode string `json:"-"`
 	// QueryText is required unless query_embedding is provided, keyword matching is disabled,
 	// and vector matching remains enabled.
 	QueryText            string    `json:"query_text"`

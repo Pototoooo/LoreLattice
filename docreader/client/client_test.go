@@ -2,7 +2,9 @@ package client
 
 import (
 	"context"
+	"google.golang.org/grpc"
 	"log"
+	"net"
 	"os"
 	"testing"
 	"time"
@@ -17,7 +19,11 @@ func init() {
 }
 
 func TestReadURL(t *testing.T) {
-	client, err := NewClient("localhost:50051")
+	addr := os.Getenv("DOCREADER_TEST_ADDR")
+	if addr == "" {
+		t.Skip("set DOCREADER_TEST_ADDR for live parser integration tests")
+	}
+	client, err := NewClient(addr)
 	if err != nil {
 		t.Fatalf("Failed to create client: %v", err)
 	}
@@ -47,7 +53,11 @@ func TestReadURL(t *testing.T) {
 }
 
 func TestReadFile(t *testing.T) {
-	client, err := NewClient("localhost:50051")
+	addr := os.Getenv("DOCREADER_TEST_ADDR")
+	if addr == "" {
+		t.Skip("set DOCREADER_TEST_ADDR for live parser integration tests")
+	}
+	client, err := NewClient(addr)
 	if err != nil {
 		t.Fatalf("Failed to create client: %v", err)
 	}
@@ -82,4 +92,47 @@ func TestReadFile(t *testing.T) {
 
 	imageRefs := GetImageRefsFromResponse(resp)
 	log.Printf("INFO: content_len=%d, images=%d", len(resp.MarkdownContent), len(imageRefs))
+}
+
+// Unit coverage of the real gRPC client without an external parser or website.
+// Live parser coverage remains in the opt-in tests above and Python parser suite.
+type fixtureDocReader struct {
+	proto.UnimplementedDocReaderServer
+}
+
+func (fixtureDocReader) Read(_ context.Context, req *proto.ReadRequest) (*proto.ReadResponse, error) {
+	if req.Url != "" {
+		return &proto.ReadResponse{MarkdownContent: "# fixture URL"}, nil
+	}
+	return &proto.ReadResponse{MarkdownContent: string(req.FileContent)}, nil
+}
+func TestReadRPCFixture(t *testing.T) {
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	server := grpc.NewServer()
+	proto.RegisterDocReaderServer(server, fixtureDocReader{})
+	go func() { _ = server.Serve(listener) }()
+	t.Cleanup(server.Stop)
+	client, err := NewClientWithAuth(listener.Addr().String(), &AuthConfig{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = client.Close() })
+	for _, req := range []*proto.ReadRequest{{Url: "https://fixture.invalid"}, {FileContent: []byte("# local fixture"), FileName: "fixture.md", FileType: "md"}} {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		resp, err := client.Read(ctx, req)
+		cancel()
+		if err != nil {
+			t.Fatal(err)
+		}
+		want := "# fixture URL"
+		if req.Url == "" {
+			want = string(req.FileContent)
+		}
+		if resp.MarkdownContent != want {
+			t.Fatalf("content=%q want=%q", resp.MarkdownContent, want)
+		}
+	}
 }

@@ -1,7 +1,7 @@
 import {
   BUILTIN_QUICK_ANSWER_ID,
   BUILTIN_SMART_REASONING_ID,
-} from '@/api/agent'
+} from '../config/agentConstants.ts'
 
 /** Whether the selected agent id is the builtin quick-answer (RAG) mode. */
 export function isQuickAnswerAgentId(agentId: string | null | undefined): boolean {

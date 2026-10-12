@@ -474,6 +474,9 @@ func (s *agentService) registerTools(
 		filteredTools := make([]string, 0)
 		kbTools := map[string]bool{
 			tools.ToolKnowledgeSearch:     true,
+			tools.ToolSearchKnowledge:     true,
+			tools.ToolReadDocument:        true,
+			tools.ToolListDocuments:       true,
 			tools.ToolGrepChunks:          true,
 			tools.ToolListKnowledgeChunks: true,
 			tools.ToolQueryKnowledgeGraph: true,
@@ -522,6 +525,7 @@ func (s *agentService) registerTools(
 	// content from RAG-style knowledge bases.
 	ragToolSet := map[string]bool{
 		tools.ToolKnowledgeSearch:     true,
+		tools.ToolSearchKnowledge:     true,
 		tools.ToolGrepChunks:          true,
 		tools.ToolListKnowledgeChunks: true,
 		tools.ToolQueryKnowledgeGraph: true,
@@ -576,7 +580,7 @@ func (s *agentService) registerTools(
 	}
 
 	// Deduplicate while preserving original order.
-	allowedTools = dedupStrings(allowedTools)
+	allowedTools = tools.NormalizeRetrievalTools(allowedTools)
 
 	// logger.Infof(ctx, "Registering tools: %v, webSearchEnabled: %v", allowedTools, config.WebSearchEnabled)
 	// Register each allowed tool
@@ -588,8 +592,8 @@ func (s *agentService) registerTools(
 			toolToRegister = tools.NewSequentialThinkingTool()
 		case tools.ToolTodoWrite:
 			toolToRegister = tools.NewTodoWriteTool()
-		case tools.ToolKnowledgeSearch:
-			toolToRegister = tools.NewKnowledgeSearchTool(
+		case tools.ToolSearchKnowledge:
+			toolToRegister = tools.NewSearchKnowledgeTool(tools.NewKnowledgeSearchTool(
 				s.knowledgeBaseService,
 				s.knowledgeService,
 				s.chunkService,
@@ -597,7 +601,11 @@ func (s *agentService) registerTools(
 				rerankModel,
 				chatModel,
 				s.cfg,
-			)
+			))
+		case tools.ToolReadDocument:
+			toolToRegister = tools.NewReadDocumentTool(s.knowledgeService, s.chunkService, config.SearchTargets)
+		case tools.ToolListDocuments:
+			toolToRegister = tools.NewListDocumentsTool(s.knowledgeService, s.chunkService, config.SearchTargets)
 		case tools.ToolGrepChunks:
 			toolToRegister = tools.NewGrepChunksTool(s.db, config.SearchTargets)
 			logger.Infof(ctx, "Registered grep_chunks tool with searchTargets: %d targets", len(config.SearchTargets))

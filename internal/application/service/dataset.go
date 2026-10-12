@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"regexp"
+	"sort"
 
 	"github.com/Pototoooo/lorelattice/internal/logger"
 	"github.com/Pototoooo/lorelattice/internal/types"
@@ -42,7 +45,10 @@ func (d *DatasetService) GetDatasetByID(ctx context.Context, datasetID string) (
 	logger.Info(ctx, "Start getting dataset by ID")
 	logger.Infof(ctx, "Getting dataset with ID: %s", datasetID)
 
-	dataset := DefaultDataset()
+	dataset, err := loadDatasetByID(datasetID)
+	if err != nil {
+		return nil, err
+	}
 	dataset.PrintStats(ctx)
 	qaPairs := dataset.Iterate()
 
@@ -50,28 +56,50 @@ func (d *DatasetService) GetDatasetByID(ctx context.Context, datasetID string) (
 	return qaPairs, nil
 }
 
-// DefaultDataset loads and initializes the default dataset from parquet files
+// DefaultDataset preserves the legacy helper; API callers use the error-returning loader.
 func DefaultDataset() dataset {
-	datasetDir := "./dataset/samples"
-	queries, err := loadParquet[TextInfo](fmt.Sprintf("%s/queries.parquet", datasetDir))
+	result, err := loadDatasetByID("default")
 	if err != nil {
 		panic(err)
 	}
-	corpus, err := loadParquet[TextInfo](fmt.Sprintf("%s/corpus.parquet", datasetDir))
-	if err != nil {
-		panic(err)
+	return result
+}
+
+var datasetNamePattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9_-]*$`)
+
+// loadDatasetByID selects only named datasets inside the dataset root.
+// os.Root also prevents symlink traversal outside that root.
+func loadDatasetByID(datasetID string) (dataset, error) {
+	if datasetID == "" || datasetID == "default" {
+		datasetID = "samples"
 	}
-	answers, err := loadParquet[TextInfo](fmt.Sprintf("%s/answers.parquet", datasetDir))
-	if err != nil {
-		panic(err)
+	if !datasetNamePattern.MatchString(datasetID) {
+		return dataset{}, fmt.Errorf("invalid dataset ID %q", datasetID)
 	}
-	qrels, err := loadParquet[RelsInfo](fmt.Sprintf("%s/qrels.parquet", datasetDir))
+	root, err := os.OpenRoot("./dataset")
 	if err != nil {
-		panic(err)
+		return dataset{}, fmt.Errorf("open dataset root: %w", err)
 	}
-	qas, err := loadParquet[QaInfo](fmt.Sprintf("%s/qas.parquet", datasetDir))
+	defer root.Close()
+	queries, err := loadDatasetParquet[TextInfo](root, datasetID+"/queries.parquet")
 	if err != nil {
-		panic(err)
+		return dataset{}, err
+	}
+	corpus, err := loadDatasetParquet[TextInfo](root, datasetID+"/corpus.parquet")
+	if err != nil {
+		return dataset{}, err
+	}
+	answers, err := loadDatasetParquet[TextInfo](root, datasetID+"/answers.parquet")
+	if err != nil {
+		return dataset{}, err
+	}
+	qrels, err := loadDatasetParquet[RelsInfo](root, datasetID+"/qrels.parquet")
+	if err != nil {
+		return dataset{}, err
+	}
+	qas, err := loadDatasetParquet[QaInfo](root, datasetID+"/qas.parquet")
+	if err != nil {
+		return dataset{}, err
 	}
 
 	res := dataset{
@@ -96,7 +124,7 @@ func DefaultDataset() dataset {
 	for _, qi := range qas {
 		res.qas[qi.QID] = qi.AID
 	}
-	return res
+	return res, nil
 }
 
 // dataset represents the in-memory dataset structure
@@ -112,7 +140,13 @@ type dataset struct {
 func (d *dataset) Iterate() []*types.QAPair {
 	var pairs []*types.QAPair
 
-	for qid, question := range d.queries {
+	qids := make([]int64, 0, len(d.queries))
+	for qid := range d.queries {
+		qids = append(qids, qid)
+	}
+	sort.Slice(qids, func(i, j int) bool { return qids[i] < qids[j] })
+	for _, qid := range qids {
+		question := d.queries[qid]
 		// Get answer info
 		aid, hasAnswer := d.qas[qid]
 		answer := ""
@@ -238,6 +272,24 @@ func loadParquet[T any](filePath string) ([]T, error) {
 	rows, err := parquet.ReadFile[T](filePath)
 	if err != nil {
 		return nil, err
+	}
+	return rows, nil
+}
+
+// loadDatasetParquet reads through a confined root and returns file errors instead of panicking.
+func loadDatasetParquet[T any](root *os.Root, name string) ([]T, error) {
+	file, err := root.Open(name)
+	if err != nil {
+		return nil, fmt.Errorf("open dataset file %s: %w", name, err)
+	}
+	defer file.Close()
+	info, err := file.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("stat dataset file %s: %w", name, err)
+	}
+	rows, err := parquet.Read[T](file, info.Size())
+	if err != nil {
+		return nil, fmt.Errorf("read dataset file %s: %w", name, err)
 	}
 	return rows, nil
 }
